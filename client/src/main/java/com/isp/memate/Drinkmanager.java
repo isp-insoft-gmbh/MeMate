@@ -17,6 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * Im Getränkemanager kann man einstellen, welche Getränke derzeit verfügbar sind und somit im
@@ -28,9 +30,12 @@ import javax.swing.border.EmptyBorder;
  */
 public class Drinkmanager extends JPanel
 {
-  private final String[]      data       = { "MioMio Mate", "MioMio Cola", "Coca Cola", "MioMio Pomegranate" };
-  private final JList<String> drinkList  = new JList<>( data );
-  private final JScrollPane   scrollpane = new JScrollPane();
+  private final String[]      data         = { "MioMio Mate", "MioMio Cola", "Coca Cola", "MioMio Pomegranate" };
+  private final JList<String> drinkList    = new JList<>( data );
+  private final JScrollPane   scrollpane   = new JScrollPane();
+  final JButton               addButton    = new JButton( "Hinzufügen" );
+  final JButton               editButton   = new JButton( "Bearbeiten" );
+  final JButton               removeButton = new JButton( "Entfernen" );
 
   /**
    * Passt das Layout an und legt den CellRenderer fest. Dadurch werden
@@ -39,14 +44,16 @@ public class Drinkmanager extends JPanel
   public Drinkmanager()
   {
     setLayout( new BorderLayout() );
+    add( scrollpane, BorderLayout.CENTER );
+    add( createButtonPanel(), BorderLayout.SOUTH );
+
     drinkList.setCellRenderer( new DrinkCellRenderer() );
-    drinkList.setSelectedIndex( 0 );
     drinkList.setFixedCellHeight( 150 );
     drinkList.setFont( drinkList.getFont().deriveFont( 20f ) );
     scrollpane.setViewportView( drinkList );
 
-    add( scrollpane, BorderLayout.CENTER );
-    add( createButtonPanel(), BorderLayout.SOUTH );
+    //TODO Make sure we only select data if data is present. In the future, this might fail.
+    drinkList.setSelectedIndex( 0 );
   }
 
   /**
@@ -54,11 +61,11 @@ public class Drinkmanager extends JPanel
    */
   private JPanel createButtonPanel()
   {
+    editButton.setEnabled( false );
+    removeButton.setEnabled( false );
+
     final JPanel panel = new JPanel();
     final GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    final JButton addButton = new JButton( "Hinzufügen" );
-    final JButton editButton = new JButton( "Bearbeiten" );
-    final JButton removeButton = new JButton( "Entfernen" );
 
     panel.setBorder( new EmptyBorder( 5, 5, 5, 5 ) );
     panel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
@@ -73,6 +80,24 @@ public class Drinkmanager extends JPanel
     gridBagConstraints.gridx = 2;
     gridBagConstraints.anchor = GridBagConstraints.LINE_END;
     panel.add( removeButton, gridBagConstraints );
+
+    drinkList.addListSelectionListener( new ListSelectionListener()
+    {
+      @Override
+      public void valueChanged( ListSelectionEvent e )
+      {
+        if ( e.getLastIndex() == -1 )
+        {
+          editButton.setEnabled( false );
+          removeButton.setEnabled( false );
+        }
+        else
+        {
+          editButton.setEnabled( true );
+          removeButton.setEnabled( true );
+        }
+      }
+    } );
 
     removeButton.addActionListener( new ActionListener()
     {
