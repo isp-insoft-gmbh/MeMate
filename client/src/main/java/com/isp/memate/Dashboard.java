@@ -76,14 +76,19 @@ public class Dashboard extends JPanel
     final JButton aufladenButton = new JButton( "Einzahlen" );
     final JSeparator seperator = new JSeparator( JSeparator.VERTICAL );
     final JLabel aufladenlabel = new JLabel( "Kontostand aufladen" );
-    final JLabel infoTextLabel1 = new JLabel(
-        "Einzahlung sind nur in Höhe von gültigen Kombination von 1€ und 2€ Münzen, 5€ Scheinen, 10€ Scheinen und 20€ Scheinen möglich. " );
-    final JLabel infoTextLabel2 = new JLabel(
-        "Einmal eingezahltes Guthaben kann nicht wieder ausgezahlt werden und muss durch den Konsum von Getränken aufgebraucht werden." );
+    final String infoText1 =
+        "Einzahlung sind nur in Höhe von gültigen Kombination von 1€ und 2€ Münzen, 5€ Scheinen, 10€ Scheinen und 20€ Scheinen möglich.";
+    final String infoText2 =
+        "Einmal eingezahltes Guthaben kann nicht wieder ausgezahlt werden und muss durch den Konsum von Getränken aufgebraucht werden.";
+    final JLabel infoTextLabel1 = new JLabel( infoText1 );
+    final JLabel infoTextLabel2 = new JLabel( infoText2 );
 
     final ImageIcon infoIcon = new ImageIcon( getClass().getClassLoader().getResource( "infoicon.png" ) );
     final JLabel infoIconLabel = new JLabel( infoIcon );
     infoIconLabel.setBorder( new MatteBorder( 0, 1, 0, 0, UIManager.getColor( "separator.background" ) ) );
+
+    infoTextLabel1.setToolTipText( "<html>" + infoText1 + "<br>" + infoText2 + "</html>" );
+    infoTextLabel2.setToolTipText( "<html>" + infoText1 + "<br>" + infoText2 + "</html>" );
 
     infoTextLabel1.setFont( infoTextLabel1.getFont().deriveFont( 13f ) );
     infoTextLabel2.setFont( infoTextLabel2.getFont().deriveFont( 13f ) );
