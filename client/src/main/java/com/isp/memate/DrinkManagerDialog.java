@@ -10,16 +10,25 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Der {@link DrinkManagerDialog} erzeugt einen neuen Frame, wenn im {@link Drinkmanager} ein Getränk
@@ -32,12 +41,14 @@ import javax.swing.border.EmptyBorder;
 public class DrinkManagerDialog
 {
   private JDialog                  dialog;
-  private final JPanel             addDrinkPanel     = new JPanel( new GridBagLayout() );
+  private final JPanel             layout            = new JPanel( new GridBagLayout() );
   private final JTextField         drinkNameField    = new JTextField();
   private final JTextField         drinkPictureField = new JTextField();
   private final SpinnerNumberModel spinnerModel      = new SpinnerNumberModel( 0, 0, 2, 0.10 );
   private final JSpinner           drinkPriceSpinner = new JSpinner( spinnerModel );
   private final JButton            confirmButton     = new JButton();
+  private final JButton            fileChooserButton = new JButton( "Auswählen..." );
+  private final JFileChooser       fileChooser       = new JFileChooser();
 
   /**
    * Erzeugt den Frame und setzt das Layout der vorhandenen Kompnenten.
@@ -46,66 +57,103 @@ public class DrinkManagerDialog
    */
   public DrinkManagerDialog( Window owner )
   {
-    dialog = new JDialog( owner );
     final JLabel drinkName = new JLabel( "Name" );
     final JLabel drinkPicture = new JLabel( "Bild" );
     final JLabel drinkPrice = new JLabel( "Preis" );
     final JButton cancelButton = new JButton( "Abbrechen" );
-    addDrinkPanel.setBorder( new EmptyBorder( 5, 5, 5, 5 ) );
+    layout.setBorder( new EmptyBorder( 5, 10, 5, 10 ) );
+
+    fileChooser.setFileFilter( new FileNameExtensionFilter( "Bilder", "jpg", "png", "gif" ) );
 
     GridBagConstraints drinkNameConstraints = new GridBagConstraints();
     drinkNameConstraints.gridx = 0;
     drinkNameConstraints.gridy = 0;
     drinkNameConstraints.anchor = GridBagConstraints.LINE_START;
-    addDrinkPanel.add( drinkName, drinkNameConstraints );
+    layout.add( drinkName, drinkNameConstraints );
     GridBagConstraints drinkNameFieldConstraints = new GridBagConstraints();
     drinkNameFieldConstraints.gridx = 1;
     drinkNameFieldConstraints.gridy = 0;
-    drinkNameFieldConstraints.gridwidth = 3;
-    drinkNameField.setPreferredSize( new Dimension( 200, 20 ) );
+    drinkNameFieldConstraints.gridwidth = 2;
+    drinkNameFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
     drinkNameFieldConstraints.insets = new Insets( 5, 10, 0, 0 );
-    addDrinkPanel.add( drinkNameField, drinkNameFieldConstraints );
+    layout.add( drinkNameField, drinkNameFieldConstraints );
 
     GridBagConstraints drinkPictureConstraints = new GridBagConstraints();
     drinkPictureConstraints.gridx = 0;
     drinkPictureConstraints.gridy = 1;
     drinkPictureConstraints.anchor = GridBagConstraints.LINE_START;
     drinkPictureConstraints.insets = new Insets( 5, 0, 0, 0 );
-    addDrinkPanel.add( drinkPicture, drinkPictureConstraints );
+    layout.add( drinkPicture, drinkPictureConstraints );
     GridBagConstraints drinkPictureFieldConstraints = new GridBagConstraints();
     drinkPictureFieldConstraints.gridx = 1;
     drinkPictureFieldConstraints.gridy = 1;
-    drinkPictureFieldConstraints.gridwidth = 3;
-    drinkPictureField.setPreferredSize( new Dimension( 200, 20 ) );
+    drinkPictureFieldConstraints.weightx = 1.0;
+    drinkPictureFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
     drinkPictureFieldConstraints.insets = new Insets( 5, 10, 0, 0 );
-    addDrinkPanel.add( drinkPictureField, drinkPictureFieldConstraints );
+    layout.add( drinkPictureField, drinkPictureFieldConstraints );
+    GridBagConstraints drinkPictureFileChooserConstraints = new GridBagConstraints();
+    drinkPictureFileChooserConstraints.gridx = 2;
+    drinkPictureFileChooserConstraints.gridy = 1;
+    drinkPictureFileChooserConstraints.anchor = GridBagConstraints.LINE_START;
+    drinkPictureFileChooserConstraints.insets = new Insets( 5, 5, 0, 0 );
+    layout.add( fileChooserButton, drinkPictureFileChooserConstraints );
 
     GridBagConstraints drinkPriceConstraints = new GridBagConstraints();
     drinkPriceConstraints.gridx = 0;
     drinkPriceConstraints.gridy = 2;
     drinkPriceConstraints.anchor = GridBagConstraints.LINE_START;
     drinkPriceConstraints.insets = new Insets( 5, 0, 0, 0 );
-    addDrinkPanel.add( drinkPrice, drinkPriceConstraints );
+    layout.add( drinkPrice, drinkPriceConstraints );
     GridBagConstraints drinkPriceSpinnerConstraints = new GridBagConstraints();
     drinkPriceSpinnerConstraints.gridx = 1;
     drinkPriceSpinnerConstraints.gridy = 2;
-    drinkPriceSpinnerConstraints.gridwidth = 3;
+    drinkPriceSpinnerConstraints.gridwidth = 2;
     drinkPriceSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
-    drinkPriceSpinner.setPreferredSize( new Dimension( 50, 20 ) );
+    drinkPriceSpinnerConstraints.fill = GridBagConstraints.HORIZONTAL;
     drinkPriceSpinnerConstraints.insets = new Insets( 5, 10, 0, 0 );
-    addDrinkPanel.add( drinkPriceSpinner, drinkPriceSpinnerConstraints );
+    layout.add( drinkPriceSpinner, drinkPriceSpinnerConstraints );
 
-    GridBagConstraints confirmButtonConstraints = new GridBagConstraints();
-    confirmButtonConstraints.gridx = 1;
-    confirmButtonConstraints.gridy = 3;
-    confirmButtonConstraints.insets = new Insets( 5, 10, 0, 0 );
-    addDrinkPanel.add( confirmButton, confirmButtonConstraints );
+    JPanel buttonBar = new JPanel();
+    buttonBar.setLayout( new BoxLayout( buttonBar, BoxLayout.X_AXIS ) );
+    buttonBar.add( confirmButton );
+    buttonBar.add( Box.createHorizontalStrut( 5 ) );
+    buttonBar.add( cancelButton );
 
-    GridBagConstraints cancelButtonBagConstraints = new GridBagConstraints();
-    cancelButtonBagConstraints.gridx = 2;
-    cancelButtonBagConstraints.gridy = 3;
-    cancelButtonBagConstraints.insets = new Insets( 5, 5, 0, 0 );
-    addDrinkPanel.add( cancelButton, cancelButtonBagConstraints );
+
+    GridBagConstraints buttonBarConstraints = new GridBagConstraints();
+    buttonBarConstraints.gridx = 0;
+    buttonBarConstraints.gridy = 3;
+    buttonBarConstraints.gridwidth = 3;
+    buttonBarConstraints.anchor = GridBagConstraints.LINE_END;
+    buttonBarConstraints.insets = new Insets( 10, 0, 0, 0 );
+    layout.add( buttonBar, buttonBarConstraints );
+
+    dialog = new JDialog( owner );
+    JRootPane rootPane = dialog.getRootPane();
+    final String quitDialogActionName = "QUIT_DIALOG";
+    rootPane
+        .getActionMap()
+        .put( quitDialogActionName, new AbstractAction()
+        {
+          @Override
+          public void actionPerformed( ActionEvent __ )
+          {
+            dialog.dispose();
+          }
+        } );
+    rootPane
+        .getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW )
+        .put( KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0, false ), quitDialogActionName );
+
+    fileChooserButton.addActionListener( new ActionListener()
+    {
+      @Override
+      public void actionPerformed( ActionEvent __ )
+      {
+        fileChooser.showOpenDialog( owner );
+
+      }
+    } );
 
     cancelButton.addActionListener( new ActionListener()
     {
@@ -117,8 +165,11 @@ public class DrinkManagerDialog
     } );
 
     SwingUtilities.getRootPane( dialog ).setDefaultButton( confirmButton );
-    dialog.add( addDrinkPanel );
+    dialog.add( layout );
     dialog.pack();
+    Dimension oldPreferredSize = dialog.getPreferredSize();
+    dialog.setSize( new Dimension( oldPreferredSize.width + 300, oldPreferredSize.height ) );
+    dialog.setModal( true );
     dialog.setResizable( false );
     dialog.setLocationRelativeTo( dialog.getOwner() );
   }
