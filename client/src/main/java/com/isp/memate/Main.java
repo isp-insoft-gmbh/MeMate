@@ -9,23 +9,21 @@ import javax.swing.UnsupportedLookAndFeelException;
  * @author nwe
  * @since 15.10.2019
  */
-public class Main
+public class Main 
 {
-  /**
-   * @param args unused
-   */
-  public static void main( String[] args )
-  {
-    try
+    /**
+     * @param args unused
+     */
+    public static void main(String[] args)
     {
-      UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-    }
-    catch ( ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException exception )
-    {
-      //We don't mind if we aren't able to set a Look and Feel, therefore we just ignore the exceptions.
-    }
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+            | UnsupportedLookAndFeelException exception) {
+            // We don't mind if we aren't able to set a Look and Feel, therefore we just ignore the exceptions.
+        }
 
-    Login login = new Login();
-    login.setVisible( true );
-  }
+        Login login = new Login();
+        login.setVisible(true);
+    }
 }

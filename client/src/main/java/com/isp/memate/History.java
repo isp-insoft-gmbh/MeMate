@@ -29,8 +29,8 @@ public class History extends JPanel
   {
     super( new BorderLayout() );
     final String[] columnNames = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
-    final JTable historyTable = new JTable( DrinkInfos.getInstance().getHistoryData(), columnNames );
-    final DefaultTableModel tableModel = new DefaultTableModel( DrinkInfos.getInstance().getHistoryData(), columnNames )
+    final JTable historyTable = new JTable( ServerCommunication.getInstance().getHistoryData(), columnNames );
+    final DefaultTableModel tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData(), columnNames )
     {
       @Override
       public boolean isCellEditable( int row, int column )

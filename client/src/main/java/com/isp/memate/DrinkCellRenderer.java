@@ -7,8 +7,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Image;
+import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -60,8 +63,13 @@ public class DrinkCellRenderer implements ListCellRenderer<Object>
   public Component getListCellRendererComponent( JList<?> list, Object value, int index,
                                                  boolean isSelected, boolean cellHasFocus )
   {
-    priceLabel.setText( String.format( "%.2f €", DrinkInfos.getInstance().getPrice( value ) ) );
-    pictureLabel.setIcon( DrinkInfos.getInstance().getIcon( value ) );
+    Float price = ServerCommunication.getInstance().getPrice( value );
+    NumberFormat formatter = NumberFormat.getCurrencyInstance();
+    String format = formatter.format( price.doubleValue() );
+    priceLabel.setText( format );
+
+    pictureLabel.setIcon(
+        new ImageIcon( ServerCommunication.getInstance().getIcon( value ).getImage().getScaledInstance( 45, 140, Image.SCALE_SMOOTH ) ) );
     drinkNameLabel.setText( value.toString() );
     if ( cellHasFocus )
     {

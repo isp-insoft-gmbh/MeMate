@@ -45,8 +45,7 @@ public class Login extends JFrame
   private final JButton        loginButton          = new JButton( "Anmelden" );
   private final JButton        registerButton       = new JButton( "Registrieren" );
   private final JCheckBox      stayLoggedInCheckBox = new JCheckBox();
-
-  private final Font LABEL_FONT = UIManager.getFont( "Label.font" ).deriveFont( 15f );
+  private final Font           LABEL_FONT           = UIManager.getFont( "Label.font" ).deriveFont( 15f );
 
   /**
    * Passt Schriftgrößen, Borders und Größen an. Außerdem werden die
@@ -54,12 +53,13 @@ public class Login extends JFrame
    */
   public Login()
   {
-    setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "memateicon.png" ) ) );
+    setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
     deriveFonts();
     setBordersAndPreferredSize();
     layoutComponents();
     addActionListener();
+
 
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     pack();
@@ -73,10 +73,36 @@ public class Login extends JFrame
     {
       public void actionPerformed( ActionEvent e )
       {
-        dispose();
-        Mainframe mainframe = new Mainframe();
-        mainframe.setVisible( true );
-        // TODO implement Login
+        String loginResult;
+
+        if ( usernameTextField.getText().isEmpty() )
+        {
+          JOptionPane.showMessageDialog( loginPanel, "Benutzername darf nicht leer sein" );
+          return;
+        }
+        else if ( passwordField.getPassword().length == 0 )
+        {
+          JOptionPane.showMessageDialog( loginPanel, "Passwort darf nicht leer sein" );
+          return;
+        }
+        else
+        {
+          loginResult = ServerCommunication.getInstance()
+              .checkLogin( usernameTextField.getText() + System.lineSeparator() + String.valueOf( passwordField.getPassword() ) );
+        }
+        if ( loginResult.equals( "Login erfolgreich" ) )
+        {
+          dispose();
+          ServerCommunication.getInstance().balance = ServerCommunication.getInstance().getBalance( usernameTextField.getText() );
+          ServerCommunication.getInstance().updateCurrentUser( usernameTextField.getText() );
+          Mainframe mainframe = Mainframe.getInstance();
+          mainframe.setHelloLabel( usernameTextField.getText() );
+          mainframe.setVisible( true );
+        }
+        else
+        {
+          JOptionPane.showMessageDialog( loginButton, loginResult );
+        }
       }
     } );
     registerButton.addActionListener( new ActionListener()
@@ -90,14 +116,14 @@ public class Login extends JFrame
         }
         else
         {
-          //String username = usernameTextField.getText();
-          //char[] password = passwordField.getPassword();
+          String username = usernameTextField.getText();
+          char[] password = passwordField.getPassword();
           int reply =
               JOptionPane.showConfirmDialog( Login.this, "Wollen Sie wirklich einen neuen Benutzer anlegen?", "Registrieren",
                   JOptionPane.INFORMATION_MESSAGE );
           if ( reply == JOptionPane.YES_OPTION )
           {
-            //TODO implement new User 
+            ServerCommunication.getInstance().registerNewUser( username + System.lineSeparator() + String.valueOf( password ) );
           }
         }
       }
@@ -196,4 +222,6 @@ public class Login extends JFrame
     passwordLabel.setFont( LABEL_FONT );
     stayLoggedInLabel.setFont( LABEL_FONT );
   }
+
+
 }

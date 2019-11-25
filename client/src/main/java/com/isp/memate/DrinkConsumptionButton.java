@@ -13,6 +13,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -42,7 +43,7 @@ public class DrinkConsumptionButton extends JPanel
       BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createCompoundBorder(
           BorderFactory.createEmptyBorder( 1, 1, 1, 1 ), BorderFactory.createDashedBorder( Color.BLACK, 1f, 1f ) ) );
 
-  private final Mainframe mainFrame;
+  private Mainframe mainFrame;
 
   /**
    * @param mainFrame Parent-Mainframe für Zugriff auf state
@@ -59,7 +60,13 @@ public class DrinkConsumptionButton extends JPanel
     nameLabel.setFont( nameLabel.getFont().deriveFont( 14f ) );
     nameLabel.setHorizontalAlignment( JLabel.CENTER );
 
-    JLabel priceLabel = new JLabel( price );
+
+    price = price.replace( "€", "" );
+    Float priceAsFloat = Float.valueOf( price );
+    NumberFormat formatter = NumberFormat.getCurrencyInstance();
+    String format = formatter.format( priceAsFloat.doubleValue() );
+
+    JLabel priceLabel = new JLabel( format );
     priceLabel.setFont( priceLabel.getFont().deriveFont( 14f ) );
     priceLabel.setHorizontalAlignment( JLabel.CENTER );
 
@@ -143,7 +150,11 @@ public class DrinkConsumptionButton extends JPanel
         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE );
     if ( result == JOptionPane.YES_OPTION )
     {
-      mainFrame.setBalance( DrinkInfos.balance - DrinkInfos.getInstance().getPrice( drinkName ) );
+      ServerCommunication servercommunication = ServerCommunication.getInstance();
+      Float newBalance = servercommunication.balance - servercommunication.getPrice( drinkName );
+      ServerCommunication.getInstance()
+          .updateBalance( newBalance );
+      Mainframe.getInstance().setBalance( newBalance );
     }
   }
 }

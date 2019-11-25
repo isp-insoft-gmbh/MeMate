@@ -48,4 +48,4 @@ of server and client. Those include the newly created jar files called
 
 ## Credits
 
-Application icon by [Icojam](https://http://www.icojam.com/). //BombIcon
+Application icon by [Stefania Servidio](https://www.graficheria.it/), with some modifications
