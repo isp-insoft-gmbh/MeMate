@@ -1,4 +1,4 @@
-# MeMate
+﻿# MeMate
 
 ## Description
 
@@ -49,3 +49,5 @@ of server and client. Those include the newly created jar files called
 ## Credits
 
 Application icon by [Stefania Servidio](https://www.graficheria.it/), with some modifications
+Charts in the Stats-Pane are created with JFreeChart (http://www.jfree.org/jfreechart/)
+

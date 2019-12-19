@@ -38,6 +38,49 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<version>1.7.25</version>
+				<executions>
+					<execution>
+						<id>l4j-clui</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<headerType>gui</headerType>
+							<jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
+							<outfile>${project.build.directory}/MeMateClient${project.version}.exe</outfile>
+							<classPath>
+								<mainClass>com.isp.memate.Main</mainClass>
+								<preCp>anything</preCp>
+							</classPath>
+							<icon>MeMate.ico</icon>
+							<jre>
+								<minVersion>1.8.0_0</minVersion>
+								<maxVersion>1.8.0_999</maxVersion>
+								<jdkPreference>preferJre</jdkPreference>
+							</jre>
+							<versionInfo>
+								<fileVersion>${project.version}.0.0</fileVersion>
+								<txtFileVersion>${project.version}</txtFileVersion>
+								<fileDescription>MeMate Client</fileDescription>
+								<copyright>ISP Insoft 2019</copyright>
+								<productVersion>${project.version}.0.0</productVersion>
+								<txtProductVersion>${project.version}</txtProductVersion>
+								<productName>MeMate</productName>
+								<companyName>Isp Insoft GmbH</companyName>
+								<internalName>LicenseGenerator</internalName>
+								<originalFilename>MeMateClient${project.version}.exe</originalFilename>
+								<language>GERMAN</language>
+							</versionInfo>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -52,6 +95,11 @@
 			<groupId>com.miglayout</groupId>
 			<artifactId>miglayout-swing</artifactId>
 			<version>5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.5.0</version>
 		</dependency>
 	</dependencies>
 </project>

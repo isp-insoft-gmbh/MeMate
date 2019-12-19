@@ -4,16 +4,20 @@
 package com.isp.memate;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.Map;
 
+import com.isp.memate.Shared.LoginResult;
+import com.isp.memate.Shared.Operation;
+
 /**
- * Damit mehrere Clients sich zum Server verbinden können und der Server nicht abstürzt, wenn ein Client sich
- * beendet, wird Jeder clientSocket einen anderen Thread zugewiesen.
+ * Damit mehrere Clients sich zum Server verbinden können und
+ * der Server nicht abstürzt, wenn ein Client sich
+ * beendet, wird jeder clientSocket einen anderen Thread zugewiesen.
  * 
  * @author nwe
  * @since 24.10.2019
@@ -21,183 +25,420 @@ import java.util.Map;
  */
 public class SocketThread extends Thread
 {
-  ConnectDatabase     connectDB = new ConnectDatabase();
-  protected Socket    socket;
-  Map<String, String> userMap   = connectDB.getUserMap();
+  String               dataBasePath;
+  Database             database;
+  protected Socket     socket;
+  Map<String, Integer> userIDMap;
+  ObjectInputStream    objectInputStream;
+  ObjectOutputStream   objectOutputStream;
+  String               currentUser;
+  String               currentSessionID;
 
   /**
    * @param clientSocket userSocket
+   * @param dataBasePath Pfad der Datenbank
    */
-  public SocketThread( Socket clientSocket )
+  public SocketThread( Socket clientSocket, String dataBasePath )
   {
     this.socket = clientSocket;
+    this.dataBasePath = dataBasePath;
+    database = new Database( dataBasePath );
+    userIDMap = database.getUserIDMap();
   }
 
-
+  /**
+   * Überprüft ständig, ob es einen neuen Befehl gibt,
+   * trifft dies zu, dann wird dieser zugeordnet und
+   * die zutreffenden Aktionen ausgeführt.
+   */
   public void run()
   {
     try
     {
-      InputStreamReader inputStreamReader = new InputStreamReader( socket.getInputStream() );
-      BufferedReader inputPassword = new BufferedReader( inputStreamReader );
-      PrintStream output = new PrintStream( socket.getOutputStream() );
+      objectInputStream = new ObjectInputStream( socket.getInputStream() );
+      objectOutputStream = new ObjectOutputStream( socket.getOutputStream() );
 
-      char[] buffer = new char[1024];
-      int lastRead = -1;
-      while ( (lastRead = inputPassword.read( buffer )) != -1 )
+      while ( true )
       {
-        String inputString = new String( buffer, 0, lastRead );
-        if ( inputString.equals( "GET_DRINK_INFORMATIONS" ) )
+        try
         {
-          sendDrinkInformations( output );
-        }
-        else if(inputString.contains("REMOVE_DRINK:"))
-        {
-            String drinkname = inputString.replace("REMOVE_DRINK:", "")
-                .replace("GET_DRINK_INFORMATIONS", ""); //TODO FIXME this should not even appear here
-            connectDB.removeDrink(drinkname);
-        }
-        else if ( inputString.equals( "GET_HISTORY_DATA" ) )
-        {
-          sendHistoryInformations( output );
-        }
-        else if ( inputString.contains( "GET_BALANCE_FOR:" ) )
-        {
-          String username = inputString.replace( "GET_BALANCE_FOR:", "" );
-          sendBalance( username, output );
-        }
-        else if ( inputString.contains( "REGISTER_NEW_USER:" ) )
-        {
-          String userData = inputString.replace( "REGISTER_NEW_USER:", "" );
-          registerNewUser( userData );
-        }
-        else if ( inputString.contains( "UPDATE_BALANCE_FOR:" ) )
-        {
-          String input = inputString.replace( "UPDATE_BALANCE_FOR:", "" );
-          String[] splitUserAndBalance = input.split( "NEW_BALANCE:" );
-          updateBalance( splitUserAndBalance[ 0 ], splitUserAndBalance[ 1 ] );
-        }
-        else if ( inputString.contains( "REGISTER_NEW_DRINK:" ) )
-        {
-          String newDrinkData = inputString.replace( "REGISTER_NEW_DRINK:", "" );
-          String[] splitedNewDrinkData = newDrinkData.split( "," );
-          String name = splitedNewDrinkData[ 0 ];
-          Float price = Float.valueOf( splitedNewDrinkData[ 1 ] );
-          String picture = splitedNewDrinkData[ 2 ];
-          registerNewDrink( name, price, picture );
-        }
-        else
-        {
-
-
-          String[] usernameAndPasswordSplitted = inputString.split( System.lineSeparator() );
-
-          String username = usernameAndPasswordSplitted[ 0 ];
-          String password = usernameAndPasswordSplitted[ 1 ];
-
-          System.out.println( "Benutzername: " + username );
-          System.out.println( "Passwort: " + password );
-
-          if ( userMap.containsKey( username ) )
+          Shared shared = (Shared) objectInputStream.readObject();
+          Operation operation = shared.operation;
+          if ( operation != Operation.GET_DRINKINFO )
           {
-            if ( password.equals( userMap.get( username ) ) )
-            {
-              output.println( "Login erfolgreich" );
-              //            inputStreamReader.close();
-              //            inputPassword.close();
-              //            output.close();
-              //            this.interrupt();
-              //            this.socket.close();
-            }
-            else
-            {
-              output.println( "falsches Passwort" );
-            }
+            System.out.println( operation );
           }
-          else
+
+          switch ( operation )
           {
-            output.println( "Benutzer konnte nicht gefunden werden" );
+            case REGISTER_USER:
+              registerUser( shared.user );
+              break;
+
+            case CHECK_LOGIN:
+              checkLogin( shared.loginInformation );
+              break;
+
+            case GET_BALANCE:
+              getBalance( shared.username );
+              break;
+
+            case GET_DRINKINFO:
+              getDrinkInfo();
+              break;
+
+            case GET_HISTORY:
+              sendHistoryData();
+              break;
+
+            case REGISTER_DRINK:
+              registerDrink( shared.drink );
+              break;
+
+            case REMOVE_DRINK:
+              removeDrink( shared.drink );
+              break;
+
+            case UPDATE_DRINKNAME:
+              updateDrinkName( shared.drinkName );
+              break;
+
+            case UPDATE_DRINKPRICE:
+              updateDrinkPrice( shared.drinkPrice );
+              break;
+
+            case UPDATE_DRINKPICTURE:
+              updateDrinkPicture( shared.drinkPicture );
+              break;
+
+            case CONNECT_SESSION_ID:
+              connectSessionID( shared.sessionID );
+              break;
+
+            case GET_USERNAME_FOR_SESSION_ID:
+              sendUsernameForSessionID( shared.userSessionID );
+              break;
+
+            case ADD_BALANCE:
+              addBalance( shared.balanceToAdd );
+              sendPiggybankBalance();
+              break;
+
+            case CONSUM_DRINK:
+              removeBalance( shared.drinkPrice );
+              break;
+
+            case SET_PIGGYBANK_BALANCE:
+              database.setPiggyBankBalance( shared.userBalance );
+              sendPiggybankBalance();
+              break;
+
+            case PIGGYBANK_BALANCE:
+              sendPiggybankBalance();
+              break;
+
+            case SET_DRINK_AMOUNT:
+              database.setAmountOfDrinks( shared.drinkAmount.name, shared.drinkAmount.amount );
+              break;
+
+            default :
+              break;
           }
+        }
+        catch ( ClassNotFoundException exception )
+        {
+          exception.printStackTrace();
         }
       }
     }
-
-
-    catch ( IOException __ )
+    catch ( IOException exception )
     {
-      System.out.println( "Verbindung getrennt" );
+      System.out.println( "Die Verbindung zu " + currentUser + " wurde getrennt." );
     }
-
   }
 
   /**
-   * @param name
-   * @param price
-   * @param picture
+   * Sendet das Guthaben des Spaarschweins
    */
-  private void registerNewDrink( String name, Float price, String picture )
+  private void sendPiggybankBalance()
   {
-    connectDB.registerNewDrink( name, price, picture );
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.PIGGYBANK_BALANCE, database.getPiggyBankBalance() ) );
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Das Guthaben des Spaarschweins konnte nicht geladen werden. " + exception );
+    }
   }
 
-
   /**
+   * Sendet die History Daten an den Client.
    */
-  private void updateBalance( String username, String newBalance )
+  private void sendHistoryData()
   {
-    Float updatedBalance = Float.valueOf( newBalance );
-    connectDB.updateBalance( username, updatedBalance );
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_HISTORY, database.getHistory( currentUser ) ) );
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Die Historie konnte nicht geladen werden. " + exception );
+    }
+  }
+
+  /**
+   * @param consumedDrink
+   */
+  private void removeBalance( DrinkPrice consumedDrink )
+  {
+    Float drinkPrice = database.getDrinkPrice( consumedDrink.name );
+    Float expectedPrice = consumedDrink.price;
+    if ( drinkPrice == null )
+    {
+      return;
+    }
+    if ( database.getDrinkAmount( consumedDrink.name ) < 1 )
+    {
+      getDrinkInfo();
+      try
+      {
+        objectOutputStream.writeObject( new Shared( Operation.NO_MORE_DRINKS_AVAIBLE, consumedDrink.name ) );
+      }
+      catch ( IOException exception )
+      {
+        // TODO(nwe|17.12.2019): Fehlerbehandlung muss noch implementiert werden!
+      }
+      return;
+    }
+    System.out.println( "EXPECTED: " + expectedPrice );
+    System.out.println( "REAL: " + drinkPrice );
+    if ( !expectedPrice.equals( drinkPrice ) )
+    {
+      getDrinkInfo();
+      try
+      {
+        objectOutputStream.writeObject( new Shared( Operation.PRICE_CHANGED, new DrinkPrice( drinkPrice, -1, consumedDrink.name ) ) );
+      }
+      catch ( IOException exception )
+      {
+        exception.printStackTrace();
+      }
+      return;
+    }
+    Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - drinkPrice;
+    database.updateBalance( currentSessionID, newBalance );
+    database.addLog( consumedDrink.name + " getrunken", currentUser, drinkPrice * -1, newBalance,
+        LocalDateTime.now().toString().substring( 0, 10 ) );
+    database.decreaseAmountOfDrinks( consumedDrink.name );
+    sendHistoryData();
+  }
+
+  /**
+   * @param balanceToAdd
+   */
+  private void addBalance( int balanceToAdd )
+  {
+    Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + balanceToAdd;
+    database.updateBalance( currentSessionID, newBalance );
+    database.addLog( "Guthaben aufgeladen", currentUser, Float.valueOf( balanceToAdd ), newBalance,
+        LocalDateTime.now().toString().substring( 0, 10 ) );
+    System.out.println( "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
+    sendHistoryData();
+
+    //For Admin-Balance
+    Float adminBalance = database.getPiggyBankBalance() + balanceToAdd;
+    database.setPiggyBankBalance( adminBalance );
+  }
+
+  /**
+   * @param sessionID
+   */
+  private void sendUsernameForSessionID( String sessionID )
+  {
+    String username = database.getUsernameForSessionID( sessionID );
+    currentSessionID = sessionID;
+    currentUser = username;
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_USERNAME_FOR_SESSION_ID_RESULT, username ) );
+      System.out.println( "Der Nutzer " + username + " gehört zu der SessionID " + sessionID );
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Es konnte kein Nutzer für die gegebene Session gefunden werden\n" + exception );
+    }
+  }
+
+  /**
+   * @param sessionID
+   */
+  private void connectSessionID( SessionID sessionID )
+  {
+    database.addSessionIDToUser( sessionID.sessionID, userIDMap.get( sessionID.username ) );
+    currentSessionID = sessionID.sessionID;
+    System.out.println( "Die SessionID " + sessionID.sessionID + " wurde mit " + sessionID.username + " verbunden." );
+  }
+
+  /**
+   * Updated das Bild des Getränks.
+   * 
+   * @param drinkPicture DrinkPicture-Objekt, welches die ID und das Bild in Bytes beinhaltet.
+   */
+  private void updateDrinkPicture( DrinkPicture drinkPicture )
+  {
+    database.updateDrinkInformation( drinkPicture.id, Operation.UPDATE_DRINKPICTURE, drinkPicture.pictureAsBytes );
+    System.out.println( "Das Bild des Getränk mit der ID " + drinkPicture.id + " wurde geändert." );
+  }
+
+  /**
+   * Updated den Preis des Getränks.
+   * 
+   * @param drinkPrice DrinkPrice-Objekt, welches die ID und den neuen Preis enthält.
+   */
+  private void updateDrinkPrice( DrinkPrice drinkPrice )
+  {
+    database.updateDrinkInformation( drinkPrice.id, Operation.UPDATE_DRINKPRICE, drinkPrice.price );
+    System.out.println( "Der Preis des Getränk mit der ID " + drinkPrice.id + " wurde auf " + drinkPrice.price + "€ geändert." );
   }
 
 
   /**
-   * @param userData contains new Username and Password
+   * Updated den Namen des Getränks.
+   * 
+   * @param drinkName DrinkName-Objekt, welches die ID und den neuen Namen enthält.
+   */
+  private void updateDrinkName( DrinkName drinkName )
+  {
+    database.updateDrinkInformation( drinkName.id, Operation.UPDATE_DRINKNAME, drinkName.name );
+    System.out.println( "Das Getränk mit der ID " + drinkName.id + " wurde zu " + drinkName.name + " umbenannt." );
+  }
+
+
+  /**
+   * Zuerst wird die zugehörige ID für das Getränk
+   * geholt und anschließend der Datensatz für
+   * die ID gelöscht.
+   * 
+   * @param drink Drink-Objekt, welches den Namen des Getränks enthält.
+   */
+  private void removeDrink( Drink drink )
+  {
+    database.removeDrink( drink.id );
+    System.out.println( drink.name + " wurde entfernt." );
+  }
+
+  /**
+   * Sendet ein Objekt, welches ein Array aus {@linkplain Drink}-Objekten enthält.
+   */
+  private void getDrinkInfo()
+  {
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_DRINKINFO, database.getDrinkInformations() ) );
+      objectOutputStream.reset();
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Die Getränkeinformationen konnten nicht geladen werden." + exception );
+    }
+  }
+
+  /**
+   * Schickt an die Datenbankverbindung die Informationen
+   * (Name, Preis, Bildpfad) für ein neues Getränk.
+   * 
+   * @param drink ein Drink-Objekt, welches Name, Preis und Bildpfad enthält.
+   */
+  private void registerDrink( Drink drink )
+  {
+    String name = drink.name;
+    Float price = drink.price;
+    String picture = drink.pictureInBytes;
+    database.registerNewDrink( name, price, picture );
+    System.out.println( "Ein neues Getränk wurde registriert." );
+    System.out.println( "Name: " + name );
+    System.out.println( "Preis: " + price + "€" );
+  }
+
+  /**
+   * Die UserID wird anhand des Namens beschafft und
+   * mit dieser ID wird der Kontostand von der Datenbank
+   * erfragt und zurück gegben.
+   * 
+   * @param username Benutzername
    * 
    */
-  private void registerNewUser( String userData )
+  private void getBalance( String username )
   {
-    String[] splitUsernameAndPassword = userData.split( System.lineSeparator() );
-    String username = splitUsernameAndPassword[ 0 ];
-    String password = splitUsernameAndPassword[ 1 ];
-    connectDB.registerNewUser( username, password );
-    userMap = connectDB.getUserMap();
-  }
-
-
-  /**
-   * Sends the Data for creating the Dashboardbuttons
-   * 
-   * @param output Printstream to user
-   */
-  private void sendHistoryInformations( PrintStream output )
-  {
-    StringBuilder historyBuilder = new StringBuilder();
-    historyBuilder
-        .append( "{" )
-        .append( "{Guthaben aufgeladen,Niklas,+1.00€,0.00€,18.10.2019}," )
-        .append( "{MioMio Ginger konsumiert,Niklas,-0.60€,-1.00€,18.10.2019}," )
-        .append( "{MioMio Pomegranate konsumiert,Niklas,-0.60€,-0.40€,17.10.2019}," )
-        .append( "{MioMio Cola konsumiert,Niklas,-0.60€,0.20€,16.10.2019}," )
-        .append( "{MioMio Mate konsumiert,Niklas,-0.60€,0.80€,15.10.2019}," )
-        .append( "{MioMio Cola konsumiert,Marcel,-0.60€,1.40€,15.10.2019}," )
-        .append( "{MioMio Cola konsumiert,Niklas,-0.60€,1.40€,15.10.2019}," )
-        .append( "{Guthaben aufgeladen,Niklas,+2.00€,2.00€,15.10.2019}" )
-        .append( "}" );
-    output.println( historyBuilder.toString() );
-  }
-
-  private void sendBalance( String username, PrintStream output )
-  {
-    output.println( connectDB.getBalance( username ) );
+    Integer userID = userIDMap.get( username );
+    Float balance = database.getBalance( userID );
+    System.out.println( "Der Kontostand von " + username + " beträgt " + balance + "€" );
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_BALANCE_RESULT, balance ) );
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Der Kontostand konnte nicht geladen werden." + exception );
+    }
   }
 
   /**
-   * Sendet die Daten der Getränke, wird z.B. verwendet um die Buttons zu erzeugen
+   * Die gegebenen Informationen werden mit den Daten in der Datenbank verglichen
+   * und das Ergebnis wird an den Client zurück gesendet.
    * 
-   * @param output Printstream to user
+   * @param login ein Login-Objekt mit Benutzername und Passwort.
    */
-  private void sendDrinkInformations( PrintStream output )
+  private void checkLogin( LoginInformation login ) throws IOException
   {
-    output.println( connectDB.getDrinkInformations() );
+    String username = login.username;
+    String password = login.password;
+
+    System.out.println( "Loginversuch für " + username );
+
+    LoginResult result = database.checkLogin( username, password );
+
+    switch ( result )
+    {
+      case LOGIN_SUCCESSFULL:
+        currentUser = username;
+        System.out.println( username + " hat sich erfolgreich eingeloggt." );
+        objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
+        break;
+
+      case USER_NOT_FOUND:
+        System.out.println( "Benutzer " + username + " konnte nicht gefunden werden." );
+        objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
+        break;
+
+      case WRONG_PASSWORD:
+        System.out.println( "Falsches Passwort" );
+        objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
+        break;
+    }
+  }
+
+  /**
+   * Es wird ein neuer Datenbankeintrag für den Nutzer angelegt.
+   * 
+   * @param user enthät alle Nutzerinformationen.
+   */
+  private void registerUser( User user )
+  {
+    String username = user.name;
+    String password = user.password;
+    String result = database.registerNewUser( username, password );
+    System.out.println( "Ein neuer Benutzer mit dem Namen " + username + " wurde registriert." );
+    userIDMap.clear();
+    userIDMap = database.getUserIDMap();
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.REGISTRATION_RESULT, result ) );
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Der Benutzer konnte nicht angelegt werden." + exception );
+    }
   }
 }

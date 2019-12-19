@@ -22,15 +22,29 @@ import javax.swing.table.DefaultTableModel;
  */
 public class History extends JPanel
 {
+  private final String[]       columnNames = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
+  private static final History instance    = new History();
+  private JTable               historyTable;
+  private DefaultTableModel    tableModel;
+  private final JScrollPane    scrollPane  = new JScrollPane();
+
   /**
-   * Erzeugt einen Table mit Beispieldaten und fügt diesen dem HistoryPanel hinzu.
+   * @return static instance of {@linkplain History}
+   */
+  public static History getInstance()
+  {
+    return instance;
+  }
+
+  /**
+   * Erzeugt einen Table mit Daten von dem Server
+   * und fügt diesen dem HistoryPanel hinzu.
    */
   public History()
   {
     super( new BorderLayout() );
-    final String[] columnNames = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
-    final JTable historyTable = new JTable( ServerCommunication.getInstance().getHistoryData(), columnNames );
-    final DefaultTableModel tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData(), columnNames )
+    historyTable = new JTable( ServerCommunication.getInstance().getHistoryData(), columnNames );
+    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData(), columnNames )
     {
       @Override
       public boolean isCellEditable( int row, int column )
@@ -40,11 +54,24 @@ public class History extends JPanel
     };
     historyTable.setModel( tableModel );
     setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
-
-    final JScrollPane scrollPane = new JScrollPane();
     scrollPane.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
     scrollPane.setBorder( BorderFactory.createEmptyBorder() );
     scrollPane.setViewportView( historyTable );
     add( scrollPane );
+  }
+
+
+  @SuppressWarnings( "javadoc" )
+  public void updateHistory()
+  {
+    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData(), columnNames )
+    {
+      @Override
+      public boolean isCellEditable( int row, int column )
+      {
+        return false;
+      }
+    };
+    historyTable.setModel( tableModel );
   }
 }

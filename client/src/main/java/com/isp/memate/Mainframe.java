@@ -8,7 +8,16 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Properties;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,11 +26,10 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Der Mainframe bildet das Gerüst für Dashboard, Historie und den Getränkemanager. Des weitern zeigt der
- * Mainframe eine
- * kleine Begrüßung des Users und den Kontostand des Benutzers an (sollte dieser negativ sein, so soll der
- * Kontostand in
- * rot dargestellt werden).
+ * Der Mainframe bildet das Gerüst für Dashboard, Historie und den Getränkemanager.
+ * Des weitern zeigt der Mainframe eine kleine Begrüßung des Users und den
+ * Kontostand des Benutzers an (sollte dieser negativ sein, so wird der
+ * Kontostand in rot dargestellt ).
  *
  * @author nwe
  * @since 15.10.2019
@@ -33,9 +41,9 @@ public class Mainframe extends JFrame
   private final JPanel           headerPanel     = new JPanel( new GridBagLayout() );
   private final JLabel           kontostandLabel = new JLabel();
   private final JLabel           helloUserLabel  = new JLabel( "Hallo User" );
+  private final JButton          logOutButton    =
+      new JButton( new ImageIcon( getClass().getClassLoader().getResource( "logout.png" ) ) );
   private final JTabbedPane      tabbedPane      = new JTabbedPane();
-  public Dashboard               dashboard       = Dashboard.getInstance();
-  public Drinkmanager            drinkmanager    = new Drinkmanager();
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -47,49 +55,60 @@ public class Mainframe extends JFrame
 
   /**
    * Setzt das Layout und nimmt einige Änderungen an den Komponenten vor.
+   * Außerdem wird die Logik für den Logout-Button definiert.
    */
   public Mainframe()
   {
-    setBalance( ServerCommunication.getInstance().balance );
     setBorderAndDeriveFonts();
-    tabbedPane.addTab( "Dashboard", dashboard );
-    tabbedPane.addTab( "Historie", new History() );
-    tabbedPane.addTab( "Getränkemanager", drinkmanager );
+    tabbedPane.addTab( "Dashboard", Dashboard.getInstance() );
+    tabbedPane.addTab( "Historie", History.getInstance() );
+    tabbedPane.addTab( "Stats", Stats.getInstance() );
+    // tabbedPane.addTab( "Präferenzen", PreferencesTab.getInstance() );
+
     layoutComponents();
     add( mainPanel );
     setIconImage(
         Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-    setSize( 1180, 740 );
+    setSize( 1180, 795 );
     setLocationRelativeTo( null );
+
+    logOutButton.addActionListener( new ActionListener()
+    {
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        ServerCommunication.getInstance().sessionID = null;
+        ServerCommunication.getInstance().currentUser = null;
+        try ( OutputStream output = new FileOutputStream(
+            new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ), false ); )
+        {
+          Properties userProperties = new Properties();
+          userProperties.setProperty( "SessionID", "null" );
+          userProperties.store( output, "SessionID" );
+        }
+        catch ( IOException exception )
+        {
+          System.out.println( "Die SessionID konnte nicht resetet werden." );
+          exception.printStackTrace();
+        }
+        dispose();
+        Login login = Login.getInstance();
+        login.setVisible( true );
+      }
+    } );
   }
 
+
   /**
-   * @param username
+   * Setzt den Text Im Begrüßungslabel.
+   * 
+   * @param username Benutzername
    */
   public void setHelloLabel( String username )
   {
     helloUserLabel.setText( "Hallo " + username );
-  }
-
-  /**
-   * Updates the the balance internally and updates the UI component.
-   * 
-   * @param newBalance new balance to set and display
-   */
-  public void setBalance( Float newBalance )
-  {
-    ServerCommunication.getInstance().balance = newBalance;
-    kontostandLabel.setText( String.format( "Kontostand: %.2f €", ServerCommunication.getInstance().balance ) );
-    if ( newBalance.floatValue() >= 0 )
-    {
-      kontostandLabel.setForeground( UIManager.getColor( "Label.foreground" ) );
-    }
-    else
-    {
-      kontostandLabel.setForeground( Color.RED );
-    }
   }
 
   /**
@@ -106,8 +125,14 @@ public class Mainframe extends JFrame
     final GridBagConstraints halloLabelConstraints = new GridBagConstraints();
     halloLabelConstraints.anchor = GridBagConstraints.LINE_END;
     halloLabelConstraints.gridx = 1;
-    halloLabelConstraints.weightx = 0.5;
+    halloLabelConstraints.weightx = 1;
     headerPanel.add( helloUserLabel, halloLabelConstraints );
+
+    final GridBagConstraints logOutButtonConstraints = new GridBagConstraints();
+    logOutButtonConstraints.anchor = GridBagConstraints.LINE_END;
+    logOutButtonConstraints.gridx = 2;
+    logOutButtonConstraints.weightx = 0.01;
+    headerPanel.add( logOutButton, logOutButtonConstraints );
 
     mainPanel.add( headerPanel, BorderLayout.NORTH );
     mainPanel.add( tabbedPane, BorderLayout.CENTER );
@@ -123,13 +148,52 @@ public class Mainframe extends JFrame
     helloUserLabel.setFont( helloUserLabel.getFont().deriveFont( 20f ) );
   }
 
+  /**
+   * Wenn Getränke hinzugefügt, bearbeitet oder entfernt werden,
+   * dann werden Dashboard und Drinkmanager aktualisiert.
+   */
   public void updateDashboardAndDrinkmanager()
   {
-    tabbedPane.removeTabAt( 2 );
-    tabbedPane.insertTab( "Getränkemanager", null, new Drinkmanager(), null, 2 );
-    tabbedPane.setSelectedIndex( 2 );
-    tabbedPane.removeTabAt( 0 );
-    tabbedPane.insertTab( "Dashboard", null, new Dashboard( this ), null, 0 );
+    Drinkmanager.getInstance().updateList();
+    Dashboard.getInstance().updateButtonpanel();
+    Adminview.getInstance().updateDrinkAmounts();
+  }
 
+  /**
+   * Aktualisiert die UI-Komponente für den Kontostand.
+   * 
+   * @param newBalance der Kontostand
+   */
+  public void updateBalanceLabel( Float newBalance )
+  {
+    kontostandLabel.setText( String.format( "Kontostand: %.2f €", newBalance ) );
+    if ( newBalance.floatValue() >= 0 )
+    {
+      kontostandLabel.setForeground( UIManager.getColor( "Label.foreground" ) );
+    }
+    else
+    {
+      kontostandLabel.setForeground( Color.RED );
+    }
+  }
+
+  /**
+   * Toggles the Adminview
+   */
+  public void toggleAdminView()
+  {
+    if ( ServerCommunication.getInstance().currentUser.equals( "admin" ) )
+    {
+      tabbedPane.addTab( "Getränkemanager", Drinkmanager.getInstance() );
+      tabbedPane.addTab( "Adminview", Adminview.getInstance() );
+    }
+    else
+    {
+      if ( tabbedPane.getTabCount() > 3 )
+      {
+        tabbedPane.removeTabAt( 4 );
+        tabbedPane.removeTabAt( 3 );
+      }
+    }
   }
 }
