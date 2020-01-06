@@ -14,7 +14,6 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -27,12 +26,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.FocusManager;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -41,7 +37,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
@@ -108,36 +103,29 @@ public class Login extends JFrame
    */
   private void addActionListener()
   {
-    Action loginAction = new AbstractAction( "Login" )
+    loginButton.addActionListener( __ ->
     {
-      public void actionPerformed( ActionEvent e )
+      if ( usernameTextField.getText().isEmpty() )
       {
-        if ( usernameTextField.getText().isEmpty() )
-        {
-          JOptionPane.showMessageDialog( loginPanel, "Benutzername darf nicht leer sein.", "Login fehlgeschlagen",
-              JOptionPane.WARNING_MESSAGE, null );
-          return;
-        }
-        else if ( passwordField.getPassword().length == 0 )
-        {
-          JOptionPane.showMessageDialog( loginPanel, "Passwort darf nicht leer sein.", "Login fehlgeschlagen",
-              JOptionPane.WARNING_MESSAGE, null );
-          return;
-        }
-        else
-        {
-          currentUsername = usernameTextField.getText();
-          LoginInformation login =
-              new LoginInformation( usernameTextField.getText(), getHash( String.valueOf( passwordField.getPassword() ) ) );
-          ServerCommunication.getInstance().checkLogin( login );
-        }
+        JOptionPane.showMessageDialog( loginPanel, "Benutzername darf nicht leer sein.", "Login fehlgeschlagen",
+            JOptionPane.WARNING_MESSAGE, null );
+        return;
       }
-    };
-    String key = "Login";
-    loginButton.setAction( loginAction );
-    loginAction.putValue( Action.MNEMONIC_KEY, KeyEvent.VK_ENTER );
-    loginButton.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ).put( KeyStroke.getKeyStroke( KeyEvent.VK_ENTER, 0 ), key );
-    loginButton.getActionMap().put( key, loginAction );
+      else if ( passwordField.getPassword().length == 0 )
+      {
+        JOptionPane.showMessageDialog( loginPanel, "Passwort darf nicht leer sein.", "Login fehlgeschlagen",
+            JOptionPane.WARNING_MESSAGE, null );
+        return;
+      }
+      else
+      {
+        currentUsername = usernameTextField.getText();
+        LoginInformation login =
+            new LoginInformation( usernameTextField.getText(), getHash( String.valueOf( passwordField.getPassword() ) ) );
+        ServerCommunication.getInstance().checkLogin( login );
+      }
+    } );
+    getRootPane().setDefaultButton( loginButton );
 
     forgotPasswordHyperLink.addMouseListener( new MouseAdapter()
     {
@@ -153,7 +141,7 @@ public class Login extends JFrame
       @Override
       public void mouseClicked( MouseEvent e )
       {
-        JFrame registrationFrame = new JFrame( "neuen Benutzer anlegen" );
+        JFrame registrationFrame = new JFrame( "Konto erstellen" );
         JPanel registrationPanel = new JPanel( new GridBagLayout() );
         JLabel reg_usernamelabel = new JLabel( "Benutzername:" );
         JLabel reg_passwordlabel = new JLabel( "Passwort:" );
@@ -165,10 +153,13 @@ public class Login extends JFrame
         JButton reg_registrationButton = new JButton( "Registrieren" );
         JButton reg_abortButton = new JButton( "Abbrechen" );
 
-        reg_usernameTextField.setPreferredSize( new Dimension( 200, 20 ) );
-        reg_passwordField.setPreferredSize( new Dimension( 200, 20 ) );
-        reg_password2Field.setPreferredSize( new Dimension( 200, 20 ) );
-        passwordCompareLabel.setPreferredSize( new Dimension( 200, 20 ) );
+        registrationFrame.getRootPane().setDefaultButton( reg_registrationButton );
+
+        int prefHeight = reg_usernameTextField.getPreferredSize().height;
+        reg_usernameTextField.setPreferredSize( new Dimension( 200, prefHeight ) );
+        reg_passwordField.setPreferredSize( new Dimension( 200, prefHeight ) );
+        reg_password2Field.setPreferredSize( new Dimension( 200, prefHeight ) );
+        passwordCompareLabel.setPreferredSize( new Dimension( 200, prefHeight ) );
 
         GridBagConstraints reg_usernameLabelConstraints = new GridBagConstraints();
         reg_usernameLabelConstraints.gridx = 0;
@@ -217,6 +208,7 @@ public class Login extends JFrame
         reg_buttonpanelConstraints.gridwidth = 2;
         registrationPanel.add( buttonPanel, reg_buttonpanelConstraints );
 
+        Color green = new Color( 33, 122, 34 );
         DocumentListener documentListener = new DocumentListener()
         {
 
@@ -239,10 +231,10 @@ public class Login extends JFrame
 
           private void compare()
           {
-            if ( String.valueOf( reg_passwordField.getPassword() ) == null
-                || String.valueOf( reg_passwordField.getPassword() ).length() == 0
-                || String.valueOf( reg_password2Field.getPassword() ) == null
-                || String.valueOf( reg_password2Field.getPassword() ).length() == 0 )
+            if ( reg_passwordField.getPassword() == null
+                || reg_passwordField.getPassword().length == 0
+                || reg_password2Field.getPassword() == null
+                || reg_password2Field.getPassword().length == 0 )
             {
               passwordCompareLabel.setText( "" );
               passwordCompareLabel.setForeground( Color.black );
@@ -252,7 +244,7 @@ public class Login extends JFrame
               if ( String.valueOf( reg_passwordField.getPassword() ).equals( String.valueOf( reg_password2Field.getPassword() ) ) )
               {
                 passwordCompareLabel.setText( "Die Passwörter stimmen überein." );
-                passwordCompareLabel.setForeground( Color.green );
+                passwordCompareLabel.setForeground( green );
               }
               else
               {
@@ -265,7 +257,7 @@ public class Login extends JFrame
         reg_password2Field.getDocument().addDocumentListener( documentListener );
         reg_passwordField.getDocument().addDocumentListener( documentListener );
 
-
+        getRootPane().setDefaultButton( reg_registrationButton );
         registrationFrame.add( registrationPanel );
         registrationFrame.pack();
         registrationFrame.setResizable( false );
@@ -281,6 +273,7 @@ public class Login extends JFrame
           public void actionPerformed( ActionEvent e )
           {
             registrationFrame.dispose();
+            getRootPane().setDefaultButton( loginButton );
           }
         } );
 
@@ -315,6 +308,7 @@ public class Login extends JFrame
               {
                 ServerCommunication.getInstance().registerNewUser( username, getHash( String.valueOf( password ) ) );
                 registrationFrame.dispose();
+                getRootPane().setDefaultButton( loginButton );
                 currentUsername = username;
                 LoginInformation login =
                     new LoginInformation( reg_usernameTextField.getText(), getHash( String.valueOf( reg_passwordField.getPassword() ) ) );

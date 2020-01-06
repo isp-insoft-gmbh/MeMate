@@ -71,8 +71,9 @@ public class Mainframe extends JFrame
         Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-    setSize( 1180, 795 );
+    setSize( 1170, 790 );
     setLocationRelativeTo( null );
+    logOutButton.setToolTipText( "Ausloggen" );
 
     logOutButton.addActionListener( new ActionListener()
     {
@@ -81,6 +82,8 @@ public class Mainframe extends JFrame
       {
         ServerCommunication.getInstance().sessionID = null;
         ServerCommunication.getInstance().currentUser = null;
+        ServerCommunication.getInstance().logout();
+        Dashboard.getInstance().undoButton.setEnabled( false );
         try ( OutputStream output = new FileOutputStream(
             new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ), false ); )
         {

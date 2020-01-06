@@ -12,16 +12,19 @@ import java.io.Serializable;
  */
 public class Drink implements Serializable
 {
-  String name;
-  Float  price;
-  String picturePath;
-  String pictureInBytes;
-  int    id;
-  int    amount;
+  String           name;
+  Float            price;
+  String           picturePath;
+  String           pictureInBytes;
+  int              id;
+  int              amount;
+  boolean          ingredients;
+  DrinkIngredients drinkIngredients;
 
 
   @SuppressWarnings( "javadoc" )
-  public Drink( String name, Float price, String picturePath, int id, String pictureInBytes, int amount )
+  public Drink( String name, Float price, String picturePath, int id, String pictureInBytes, int amount, boolean ingredients,
+                DrinkIngredients drinkIngredients )
   {
     this.name = name;
     this.price = price;
@@ -29,6 +32,8 @@ public class Drink implements Serializable
     this.pictureInBytes = pictureInBytes;
     this.id = id;
     this.amount = amount;
+    this.ingredients = ingredients;
+    this.drinkIngredients = drinkIngredients;
   }
 
 }

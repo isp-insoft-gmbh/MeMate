@@ -20,6 +20,7 @@ public class Shared implements Serializable
   DrinkPicture     drinkPicture     = null;
   DrinkAmount      drinkAmount      = null;
   SessionID        sessionID        = null;
+  DrinkIngredients drinkIngredients = null;
   Drink[]          drinkInfos       = null;
   String[][]       history;
   Float            userBalance;
@@ -60,6 +61,9 @@ public class Shared implements Serializable
         break;
       case REGISTER_DRINK:
         drink = (Drink) object;
+        break;
+      case REGISTER_INGREDIENTS:
+        drinkIngredients = (DrinkIngredients) object;
         break;
       case REMOVE_DRINK:
         drink = (Drink) object;
@@ -109,6 +113,10 @@ public class Shared implements Serializable
       case SET_DRINK_AMOUNT:
         drinkAmount = (DrinkAmount) object;
         break;
+      case UNDO:
+        break;
+      case LOGOUT:
+        break;
       default :
         break;
     }
@@ -123,6 +131,7 @@ public class Shared implements Serializable
     GET_HISTORY,
     GET_DRINKINFO,
     REGISTER_DRINK,
+    REGISTER_INGREDIENTS,
     REMOVE_DRINK,
     UPDATE_DRINKNAME,
     UPDATE_DRINKPRICE,
@@ -138,7 +147,9 @@ public class Shared implements Serializable
     PIGGYBANK_BALANCE,
     PRICE_CHANGED,
     NO_MORE_DRINKS_AVAIBLE,
-    SET_DRINK_AMOUNT;
+    SET_DRINK_AMOUNT,
+    UNDO,
+    LOGOUT;
   }
 
   enum LoginResult

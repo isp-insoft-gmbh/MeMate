@@ -39,6 +39,7 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
@@ -62,6 +63,7 @@ public class DrinkManagerDialog
   private final SpinnerNumberModel spinnerModel      = new SpinnerNumberModel( 0, 0, 1000, 0.10 );
   private final JSpinner           drinkPriceSpinner = new JSpinner( spinnerModel );
   private final JButton            confirmButton     = new JButton();
+  private final JButton            cancelButton      = new JButton( "Abbrechen" );
   private final JFileChooser       fileChooser       = new JFileChooser();
   private final JLabel             pictureLabel      = new JLabel();
   private ImageIcon                currentImage;
@@ -77,7 +79,6 @@ public class DrinkManagerDialog
   {
     final JLabel drinkName = new JLabel( "Name" );
     final JLabel drinkPrice = new JLabel( "Preis" );
-    final JButton cancelButton = new JButton( "Abbrechen" );
     layout.setBorder( new EmptyBorder( 5, 10, 5, 10 ) );
 
     fileChooser.setFileFilter( new FileNameExtensionFilter( "Bilder", "jpg", "png", "gif" ) );
@@ -375,13 +376,171 @@ public class DrinkManagerDialog
             exception.printStackTrace();
           }
           byte[] bytes = bos.toByteArray();
-          ServerCommunication.getInstance().registerNewDrink( new Drink( name, price, drinkPicturePath, -1, Arrays.toString( bytes ), 0 ) );
+          ServerCommunication.getInstance()
+              .registerNewDrink( new Drink( name, price, drinkPicturePath, -1, Arrays.toString( bytes ), 0, false, null ) );
           dialog.dispose();
         }
       }
     } );
     Dimension oldPreferredSize = dialog.getPreferredSize();
     dialog.setSize( new Dimension( oldPreferredSize.width + 150, oldPreferredSize.height ) );
+    dialog.setLocationRelativeTo( dialog.getOwner() );
+    dialog.setVisible( true );
+  }
+
+  /**
+   * @param DrinkID
+   * 
+   */
+  public void showIngredientsDialog( int DrinkID )
+  {
+    layout.removeAll();
+    dialog.setTitle( "Inhaltsstoffe hinzufügen" );
+    confirmButton.setText( "Hinzufügen" );
+
+    GridBagConstraints ingredientsLabelConstraints = new GridBagConstraints();
+    ingredientsLabelConstraints.gridx = 0;
+    ingredientsLabelConstraints.gridy = 0;
+    layout.add( new JLabel( "Zutaten" ), ingredientsLabelConstraints );
+    JTextField ingredientsField = new JTextField();
+    ingredientsField.setPreferredSize( new Dimension( 200, 20 ) );
+    GridBagConstraints ingredientsFieldConstraints = new GridBagConstraints();
+    ingredientsFieldConstraints.gridx = 1;
+    ingredientsFieldConstraints.gridy = 0;
+    layout.add( ingredientsField, ingredientsFieldConstraints );
+
+    GridBagConstraints energyKJLabelConstraints = new GridBagConstraints();
+    energyKJLabelConstraints.gridx = 0;
+    energyKJLabelConstraints.gridy = 1;
+    layout.add( new JLabel( "Energie kJ" ), energyKJLabelConstraints );
+    SpinnerModel energykJModel = new SpinnerNumberModel( 0, 0, 500, 1 );
+    JSpinner energykJSpinner = new JSpinner( energykJModel );
+    GridBagConstraints energykJSpinnerConstraints = new GridBagConstraints();
+    energykJSpinnerConstraints.gridx = 1;
+    energykJSpinnerConstraints.gridy = 1;
+    energykJSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( energykJSpinner, energykJSpinnerConstraints );
+
+    GridBagConstraints energyKCALLabelConstraints = new GridBagConstraints();
+    energyKCALLabelConstraints.gridx = 0;
+    energyKCALLabelConstraints.gridy = 2;
+    layout.add( new JLabel( "Energie kcal" ), energyKCALLabelConstraints );
+    SpinnerModel energykCALModel = new SpinnerNumberModel( 0, 0, 500, 1 );
+    JSpinner energykCALSpinner = new JSpinner( energykCALModel );
+    GridBagConstraints energykCALSpinnerConstraints = new GridBagConstraints();
+    energykCALSpinnerConstraints.gridx = 1;
+    energykCALSpinnerConstraints.gridy = 2;
+    energykCALSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( energykCALSpinner, energykCALSpinnerConstraints );
+
+    GridBagConstraints fatLabelConstraints = new GridBagConstraints();
+    fatLabelConstraints.gridx = 0;
+    fatLabelConstraints.gridy = 3;
+    layout.add( new JLabel( "Fett" ), fatLabelConstraints );
+    SpinnerModel fatModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
+    JSpinner fatSpinner = new JSpinner( fatModel );
+    GridBagConstraints fatSpinnerConstraints = new GridBagConstraints();
+    fatSpinnerConstraints.gridx = 1;
+    fatSpinnerConstraints.gridy = 3;
+    fatSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( fatSpinner, fatSpinnerConstraints );
+
+    GridBagConstraints fattyAcidsLabelConstraints = new GridBagConstraints();
+    fattyAcidsLabelConstraints.gridx = 0;
+    fattyAcidsLabelConstraints.gridy = 4;
+    layout.add( new JLabel( "gesättigte Fettsäuren" ), fattyAcidsLabelConstraints );
+    SpinnerModel fattyAcidsModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
+    JSpinner fattyAcidsSpinner = new JSpinner( fattyAcidsModel );
+    GridBagConstraints fattyAcidsSpinnerConstraints = new GridBagConstraints();
+    fattyAcidsSpinnerConstraints.gridx = 1;
+    fattyAcidsSpinnerConstraints.gridy = 4;
+    fattyAcidsSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( fattyAcidsSpinner, fattyAcidsSpinnerConstraints );
+
+    GridBagConstraints carbsLabelConstraints = new GridBagConstraints();
+    carbsLabelConstraints.gridx = 0;
+    carbsLabelConstraints.gridy = 5;
+    layout.add( new JLabel( "Kohlenhydrate" ), carbsLabelConstraints );
+    SpinnerModel carbsModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
+    JSpinner carbsSpinner = new JSpinner( carbsModel );
+    GridBagConstraints carbsSpinnerConstraints = new GridBagConstraints();
+    carbsSpinnerConstraints.gridx = 1;
+    carbsSpinnerConstraints.gridy = 5;
+    carbsSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( carbsSpinner, carbsSpinnerConstraints );
+
+    GridBagConstraints sugarLabelConstraints = new GridBagConstraints();
+    sugarLabelConstraints.gridx = 0;
+    sugarLabelConstraints.gridy = 6;
+    layout.add( new JLabel( "davon Zucker" ), sugarLabelConstraints );
+    SpinnerModel sugarModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
+    JSpinner sugarSpinner = new JSpinner( sugarModel );
+    GridBagConstraints sugarSpinnerConstraints = new GridBagConstraints();
+    sugarSpinnerConstraints.gridx = 1;
+    sugarSpinnerConstraints.gridy = 6;
+    sugarSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( sugarSpinner, sugarSpinnerConstraints );
+
+    GridBagConstraints proteinLabelConstraints = new GridBagConstraints();
+    proteinLabelConstraints.gridx = 0;
+    proteinLabelConstraints.gridy = 7;
+    layout.add( new JLabel( "Eiweiß" ), proteinLabelConstraints );
+    SpinnerModel proteinModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
+    JSpinner proteinSpinner = new JSpinner( proteinModel );
+    GridBagConstraints proteinSpinnerConstraints = new GridBagConstraints();
+    proteinSpinnerConstraints.gridx = 1;
+    proteinSpinnerConstraints.gridy = 7;
+    proteinSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( proteinSpinner, proteinSpinnerConstraints );
+
+    GridBagConstraints saltLabelConstraints = new GridBagConstraints();
+    saltLabelConstraints.gridx = 0;
+    saltLabelConstraints.gridy = 8;
+    layout.add( new JLabel( "Salz" ), saltLabelConstraints );
+    SpinnerModel saltModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
+    JSpinner saltSpinner = new JSpinner( saltModel );
+    GridBagConstraints saltSpinnerConstraints = new GridBagConstraints();
+    saltSpinnerConstraints.gridx = 1;
+    saltSpinnerConstraints.gridy = 8;
+    saltSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( saltSpinner, saltSpinnerConstraints );
+
+    JPanel buttonBar = new JPanel();
+    buttonBar.setLayout( new BoxLayout( buttonBar, BoxLayout.X_AXIS ) );
+    buttonBar.add( confirmButton );
+    buttonBar.add( Box.createHorizontalStrut( 5 ) );
+    buttonBar.add( cancelButton );
+    GridBagConstraints buttonBarConstraints = new GridBagConstraints();
+    buttonBarConstraints.gridx = 1;
+    buttonBarConstraints.gridy = 9;
+    buttonBarConstraints.gridwidth = 2;
+    buttonBarConstraints.anchor = GridBagConstraints.LINE_END;
+    layout.add( buttonBar, buttonBarConstraints );
+
+    ActionListener[] listeners = confirmButton.getActionListeners();
+    for ( ActionListener actionListener : listeners )
+    {
+      confirmButton.removeActionListener( actionListener );
+    }
+
+    confirmButton.addActionListener( new ActionListener()
+    {
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        ServerCommunication.getInstance().registerIngredients( new DrinkIngredients( DrinkID,
+            ingredientsField.getText(), (int) energykJSpinner.getValue(), (int) energykCALSpinner.getValue(),
+            (Double) fatSpinner.getValue(),
+            (Double) fattyAcidsSpinner.getValue(),
+            (Double) carbsSpinner.getValue(), (Double) sugarSpinner.getValue(),
+            (Double) proteinSpinner.getValue(), (Double) saltSpinner.getValue() ) );
+        dialog.dispose();
+      }
+    } );
+
+
+    Dimension oldPreferredSize = dialog.getPreferredSize();
+    dialog.setSize( new Dimension( oldPreferredSize.width, oldPreferredSize.height ) );
     dialog.setLocationRelativeTo( dialog.getOwner() );
     dialog.setVisible( true );
   }

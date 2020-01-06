@@ -34,12 +34,14 @@ import com.isp.memate.Shared.Operation;
  */
 public class ServerCommunication
 {
-  private static final ServerCommunication instance      = new ServerCommunication();
-  private final Map<String, Float>         priceMap      = new HashMap<>();
-  private final Map<String, ImageIcon>     imageMap      = new HashMap<>();
-  private final Map<String, Integer>       amountMap     = new HashMap<>();
-  private final Map<String, Integer>       drinkIDMap    = new HashMap<>();
-  private final ArrayList<Byte>            byteImageList = new ArrayList<>();
+  private static final ServerCommunication    instance            = new ServerCommunication();
+  private final Map<String, Float>            priceMap            = new HashMap<>();
+  private final Map<String, ImageIcon>        imageMap            = new HashMap<>();
+  private final Map<String, Integer>          amountMap           = new HashMap<>();
+  private final Map<String, Integer>          drinkIDMap          = new HashMap<>();
+  private final Map<String, Boolean>          drinkIngredientsMap = new HashMap<>();
+  private final Map<String, DrinkIngredients> IngredientsMap      = new HashMap<>();
+  private final ArrayList<Byte>               byteImageList       = new ArrayList<>();
 
   final List<String> drinkNames  = new ArrayList<>();
   String[][]         history;
@@ -206,6 +208,24 @@ public class ServerCommunication
     return amountMap.get( name );
   }
 
+  /**
+   * @param name Name des Getränks
+   * @return Inhaltsstoffe des Getränks
+   */
+  public DrinkIngredients getIngredients( String name )
+  {
+    return IngredientsMap.get( name );
+  }
+
+  /**
+   * @param name Name des Getränks
+   * @return Ob es Inhaltsangaben über das Getränk gibt oder nicht.
+   */
+  public Boolean hasIngredients( String name )
+  {
+    return drinkIngredientsMap.get( name );
+  }
+
 
   /**
    * Die Preismap, Bildermap und eine Liste von allen Namen
@@ -228,6 +248,8 @@ public class ServerCommunication
     imageMap.clear();
     drinkIDMap.clear();
     drinkNames.clear();
+    drinkIngredientsMap.clear();
+    IngredientsMap.clear();
     byteImageList.clear();
     for ( Drink drink : drinkInfos )
     {
@@ -249,6 +271,8 @@ public class ServerCommunication
       byteImageList.add( bytes[ 355 ] );
       drinkIDMap.put( name, id );
       drinkNames.add( name );
+      drinkIngredientsMap.put( name, drink.ingredients );
+      IngredientsMap.put( name, drink.drinkIngredients );
     }
     if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap ) || !byteImageList.equals( oldByteImageList )
         || !amountMap.equals( oldAmountMap ) )
@@ -271,6 +295,19 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       System.out.println( "Die Historie konnte nicht geladen werden. " + exception );
+    }
+  }
+
+  public void undoLastAction()
+  {
+    try
+    {
+      outStream.writeObject( new Shared( Operation.UNDO, null ) );
+      Dashboard.getInstance().undoButton.setEnabled( false );
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Die letzte Aktion konnte nicht rückgängig gemacht werden. " + exception );
     }
   }
 
@@ -304,6 +341,25 @@ public class ServerCommunication
     try
     {
       outStream.writeObject( new Shared( Operation.GET_DRINKINFO, new Drink[0] ) );
+    }
+    catch ( IOException exception )
+    {
+      showErrorDialog(
+          "Die Getränke konnten nicht geladen werden.\nBitte stellen Sie sicher, dass der Server an ist\nund Sie mit dem Internet verbunden sind",
+          "Getränke laden fehlgeschlagen" );
+    }
+  }
+
+  /**
+   * Fügt einem Getränk optional die Inhaltsstoffe hinzu
+   * 
+   * @param drinkIngredients Inhaltsstoffe
+   */
+  public void registerIngredients( DrinkIngredients drinkIngredients )
+  {
+    try
+    {
+      outStream.writeObject( new Shared( Operation.REGISTER_INGREDIENTS, drinkIngredients ) );
     }
     catch ( IOException exception )
     {
@@ -363,7 +419,17 @@ public class ServerCommunication
    */
   public String[][] getHistoryData()
   {
-    return history;
+    String[][] historyArray = history;
+    if ( history == null )
+    {
+      return history;
+    }
+    for ( int i = 0; i < historyArray.length; i++ )
+    {
+      historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 10 );
+    }
+
+    return historyArray;
   }
 
 
@@ -459,7 +525,7 @@ public class ServerCommunication
   {
     try
     {
-      outStream.writeObject( new Shared( Operation.REMOVE_DRINK, new Drink( name, null, null, id, null, -1 ) ) );
+      outStream.writeObject( new Shared( Operation.REMOVE_DRINK, new Drink( name, null, null, id, null, -1, false, null ) ) );
     }
     catch ( IOException exception )
     {
@@ -592,6 +658,21 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       // TODO(nwe|17.12.2019): Fehlerbehandlung muss noch implementiert werden!
+    }
+  }
+
+  /**
+   * 
+   */
+  public void logout()
+  {
+    try
+    {
+      outStream.writeObject( new Shared( Operation.LOGOUT, null ) );
+    }
+    catch ( IOException exception )
+    {
+      showErrorDialog( "Ausloggen fehlgeschlagen", "Ausloggen" );
     }
   }
 }

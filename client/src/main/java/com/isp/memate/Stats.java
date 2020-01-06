@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -36,10 +37,11 @@ import org.jfree.data.xy.XYDataset;
  */
 public class Stats extends JPanel
 {
-  private static final Stats instance = new Stats();
+  private static final Stats instance  = new Stats();
   XYDataset                  dataset;
   JFreeChart                 chart;
   ChartPanel                 chartPanel;
+  final Map<String, Integer> amountMap = new HashMap<>();
 
   /**
    * 
@@ -52,9 +54,9 @@ public class Stats extends JPanel
 
   private XYDataset createDataset( String drink )
   {
+    amountMap.clear();
     LocalDateTime now = LocalDateTime.now();
     DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
-    final Map<String, Integer> amountMap = new HashMap<>();
     for ( int i = 0; i < 31; i++ )
     {
       amountMap.put( formatter.format( now.minusDays( i ) ).toString(), 0 );
@@ -125,7 +127,7 @@ public class Stats extends JPanel
     GridBagConstraints chartPanelConstraits = new GridBagConstraints();
     chartPanelConstraits.gridx = 0;
     chartPanelConstraits.gridy = 0;
-    chartPanelConstraits.gridheight = 2;
+    chartPanelConstraits.gridheight = 3;
     chartPanelConstraits.fill = GridBagConstraints.BOTH;
     chartPanelConstraits.weightx = 1;
     chartPanelConstraits.weighty = 1;
@@ -150,6 +152,16 @@ public class Stats extends JPanel
     selectedDrinkComboboxConstraints.insets = new Insets( 35, 0, 0, 10 );
     selectedDrinkComboboxConstraints.anchor = GridBagConstraints.NORTH;
     add( selectDrinkComboBox, selectedDrinkComboboxConstraints );
+    JLabel averageConsumption =
+        new JLabel(
+            String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
+    GridBagConstraints averageConsumptionConstraints = new GridBagConstraints();
+    averageConsumptionConstraints.gridx = 1;
+    averageConsumptionConstraints.gridy = 2;
+    averageConsumptionConstraints.insets = new Insets( 10, 0, 0, 10 );
+    averageConsumptionConstraints.anchor = GridBagConstraints.NORTH;
+    add( averageConsumption, averageConsumptionConstraints );
+
 
     selectDrinkComboBox.addItemListener( new ItemListener()
     {
@@ -162,11 +174,31 @@ public class Stats extends JPanel
         chartPanel = new ChartPanel( chart );
         chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
         chartPanel.setMouseZoomable( true, false );
+        averageConsumption
+            .setText(
+                String.format( "Ø %.2f Flaschen/Tag", getAverage(),
+                    String.valueOf( e.getItem() ) ) );
         add( chartPanel, chartPanelConstraits );
         repaint();
         revalidate();
       }
+
     } );
 
+  }
+
+  /**
+   * @return
+   */
+  private Float getAverage()
+  {
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+    LocalDateTime now = LocalDateTime.now();
+    float counter = 0f;
+    for ( int i = 0; i < 31; i++ )
+    {
+      counter = counter + amountMap.get( formatter.format( now.minusDays( i ) ).toString() );
+    }
+    return counter / 31f;
   }
 }

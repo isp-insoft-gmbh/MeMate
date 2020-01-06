@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import com.isp.memate.ServerLog.logType;
 import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.Shared.Operation;
 
@@ -33,6 +34,11 @@ public class SocketThread extends Thread
   ObjectOutputStream   objectOutputStream;
   String               currentUser;
   String               currentSessionID;
+  //REDO
+  boolean lastActionDrink   = false;
+  boolean lastActionDeposit = false;
+  String  lastDrinkName;
+  float   lastTransaction;
 
   /**
    * @param clientSocket userSocket
@@ -66,7 +72,7 @@ public class SocketThread extends Thread
           Operation operation = shared.operation;
           if ( operation != Operation.GET_DRINKINFO )
           {
-            System.out.println( operation );
+            ServerLog.newLog( logType.COMMAND, operation.toString() );
           }
 
           switch ( operation )
@@ -93,6 +99,10 @@ public class SocketThread extends Thread
 
             case REGISTER_DRINK:
               registerDrink( shared.drink );
+              break;
+
+            case REGISTER_INGREDIENTS:
+              registerIngredients( shared.drinkIngredients );
               break;
 
             case REMOVE_DRINK:
@@ -141,6 +151,14 @@ public class SocketThread extends Thread
               database.setAmountOfDrinks( shared.drinkAmount.name, shared.drinkAmount.amount );
               break;
 
+            case UNDO:
+              undoLastAction();
+              break;
+
+            case LOGOUT:
+              resetUser();
+              break;
+
             default :
               break;
           }
@@ -153,7 +171,70 @@ public class SocketThread extends Thread
     }
     catch ( IOException exception )
     {
-      System.out.println( "Die Verbindung zu " + currentUser + " wurde getrennt." );
+      ServerLog.newLog( logType.INFO, "Die Verbindung zu " + currentUser + " wurde getrennt." );
+    }
+  }
+
+  /**
+   * @param drinkIngredients
+   */
+  private void registerIngredients( DrinkIngredients drinkIngredients )
+  {
+    database.addIngredients( drinkIngredients.drinkID, drinkIngredients.ingredients, drinkIngredients.energy_kJ,
+        drinkIngredients.energy_kcal, drinkIngredients.fat, drinkIngredients.fatty_acids, drinkIngredients.carbs, drinkIngredients.sugar,
+        drinkIngredients.protein, drinkIngredients.salt );
+  }
+
+  /**
+   * 
+   */
+  private void resetUser()
+  {
+    ServerLog.newLog( logType.INFO, currentUser + " hat sich ausgeloggt." );
+    lastActionDeposit = false;
+    lastActionDrink = false;
+    currentUser = null;
+    currentSessionID = null;
+  }
+
+  /**
+   * 
+   */
+  private void undoLastAction()
+  {
+    if ( lastActionDeposit )
+    {
+      Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - lastTransaction;
+      database.updateBalance( currentSessionID, newBalance );
+      database.addLog( "Letzte Aktion rückgängig", currentUser, Float.valueOf( lastTransaction ) * -1f, newBalance,
+          LocalDateTime.now().toString() );
+      ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
+      sendHistoryData();
+      getBalance( currentUser );
+
+      //For Admin-Balance
+      Float adminBalance = database.getPiggyBankBalance() - lastTransaction;
+      database.setPiggyBankBalance( adminBalance );
+
+      //For Undo
+      lastActionDeposit = false;
+      lastActionDrink = false;
+      lastTransaction = 0;
+    }
+    else
+    {
+      Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + lastTransaction;
+      database.updateBalance( currentSessionID, newBalance );
+      database.addLog( "Letzte Aktion rückgängig", currentUser, lastTransaction, newBalance,
+          LocalDateTime.now().toString() );
+      database.increaseAmountOfDrinks( lastDrinkName );
+      sendHistoryData();
+      getBalance( currentUser );
+
+      //For Undo
+      lastActionDrink = false;
+      lastActionDeposit = false;
+      lastTransaction = 0;
     }
   }
 
@@ -168,7 +249,7 @@ public class SocketThread extends Thread
     }
     catch ( IOException exception )
     {
-      System.out.println( "Das Guthaben des Spaarschweins konnte nicht geladen werden. " + exception );
+      ServerLog.newLog( logType.ERROR, "Das Guthaben des Spaarschweins konnte nicht geladen werden. " + exception );
     }
   }
 
@@ -183,7 +264,7 @@ public class SocketThread extends Thread
     }
     catch ( IOException exception )
     {
-      System.out.println( "Die Historie konnte nicht geladen werden. " + exception );
+      ServerLog.newLog( logType.ERROR, "Die Historie konnte nicht geladen werden. " + exception );
     }
   }
 
@@ -211,8 +292,8 @@ public class SocketThread extends Thread
       }
       return;
     }
-    System.out.println( "EXPECTED: " + expectedPrice );
-    System.out.println( "REAL: " + drinkPrice );
+    ServerLog.newLog( logType.INFO, "EXPECTED: " + expectedPrice );
+    ServerLog.newLog( logType.INFO, "REAL: " + drinkPrice );
     if ( !expectedPrice.equals( drinkPrice ) )
     {
       getDrinkInfo();
@@ -222,16 +303,22 @@ public class SocketThread extends Thread
       }
       catch ( IOException exception )
       {
-        exception.printStackTrace();
+        ServerLog.newLog( logType.ERROR, exception.getMessage() );
       }
       return;
     }
     Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - drinkPrice;
     database.updateBalance( currentSessionID, newBalance );
     database.addLog( consumedDrink.name + " getrunken", currentUser, drinkPrice * -1, newBalance,
-        LocalDateTime.now().toString().substring( 0, 10 ) );
+        LocalDateTime.now().toString() );
     database.decreaseAmountOfDrinks( consumedDrink.name );
     sendHistoryData();
+
+    //For Undo
+    lastActionDrink = true;
+    lastActionDeposit = false;
+    lastTransaction = drinkPrice;
+    lastDrinkName = consumedDrink.name;
   }
 
   /**
@@ -242,13 +329,18 @@ public class SocketThread extends Thread
     Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + balanceToAdd;
     database.updateBalance( currentSessionID, newBalance );
     database.addLog( "Guthaben aufgeladen", currentUser, Float.valueOf( balanceToAdd ), newBalance,
-        LocalDateTime.now().toString().substring( 0, 10 ) );
-    System.out.println( "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
+        LocalDateTime.now().toString() );
+    ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
     sendHistoryData();
 
     //For Admin-Balance
     Float adminBalance = database.getPiggyBankBalance() + balanceToAdd;
     database.setPiggyBankBalance( adminBalance );
+
+    //For Undo
+    lastActionDeposit = true;
+    lastActionDrink = false;
+    lastTransaction = balanceToAdd;
   }
 
   /**
@@ -262,11 +354,11 @@ public class SocketThread extends Thread
     try
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_USERNAME_FOR_SESSION_ID_RESULT, username ) );
-      System.out.println( "Der Nutzer " + username + " gehört zu der SessionID " + sessionID );
+      ServerLog.newLog( logType.INFO, "Der Nutzer " + username + " gehört zu der SessionID " + sessionID );
     }
     catch ( IOException exception )
     {
-      System.out.println( "Es konnte kein Nutzer für die gegebene Session gefunden werden\n" + exception );
+      ServerLog.newLog( logType.ERROR, "Es konnte kein Nutzer für die gegebene Session gefunden werden\n" + exception );
     }
   }
 
@@ -277,7 +369,7 @@ public class SocketThread extends Thread
   {
     database.addSessionIDToUser( sessionID.sessionID, userIDMap.get( sessionID.username ) );
     currentSessionID = sessionID.sessionID;
-    System.out.println( "Die SessionID " + sessionID.sessionID + " wurde mit " + sessionID.username + " verbunden." );
+    ServerLog.newLog( logType.INFO, "Die SessionID " + sessionID.sessionID + " wurde mit " + sessionID.username + " verbunden." );
   }
 
   /**
@@ -288,7 +380,7 @@ public class SocketThread extends Thread
   private void updateDrinkPicture( DrinkPicture drinkPicture )
   {
     database.updateDrinkInformation( drinkPicture.id, Operation.UPDATE_DRINKPICTURE, drinkPicture.pictureAsBytes );
-    System.out.println( "Das Bild des Getränk mit der ID " + drinkPicture.id + " wurde geändert." );
+    ServerLog.newLog( logType.INFO, "Das Bild des Getränk mit der ID " + drinkPicture.id + " wurde geändert." );
   }
 
   /**
@@ -299,7 +391,8 @@ public class SocketThread extends Thread
   private void updateDrinkPrice( DrinkPrice drinkPrice )
   {
     database.updateDrinkInformation( drinkPrice.id, Operation.UPDATE_DRINKPRICE, drinkPrice.price );
-    System.out.println( "Der Preis des Getränk mit der ID " + drinkPrice.id + " wurde auf " + drinkPrice.price + "€ geändert." );
+    ServerLog.newLog( logType.INFO,
+        "Der Preis des Getränk mit der ID " + drinkPrice.id + " wurde auf " + drinkPrice.price + "€ geändert." );
   }
 
 
@@ -311,7 +404,7 @@ public class SocketThread extends Thread
   private void updateDrinkName( DrinkName drinkName )
   {
     database.updateDrinkInformation( drinkName.id, Operation.UPDATE_DRINKNAME, drinkName.name );
-    System.out.println( "Das Getränk mit der ID " + drinkName.id + " wurde zu " + drinkName.name + " umbenannt." );
+    ServerLog.newLog( logType.INFO, "Das Getränk mit der ID " + drinkName.id + " wurde zu " + drinkName.name + " umbenannt." );
   }
 
 
@@ -325,7 +418,7 @@ public class SocketThread extends Thread
   private void removeDrink( Drink drink )
   {
     database.removeDrink( drink.id );
-    System.out.println( drink.name + " wurde entfernt." );
+    ServerLog.newLog( logType.INFO, drink.name + " wurde entfernt." );
   }
 
   /**
@@ -340,7 +433,7 @@ public class SocketThread extends Thread
     }
     catch ( IOException exception )
     {
-      System.out.println( "Die Getränkeinformationen konnten nicht geladen werden." + exception );
+      ServerLog.newLog( logType.ERROR, "Die Getränkeinformationen konnten nicht geladen werden." + exception );
     }
   }
 
@@ -356,9 +449,9 @@ public class SocketThread extends Thread
     Float price = drink.price;
     String picture = drink.pictureInBytes;
     database.registerNewDrink( name, price, picture );
-    System.out.println( "Ein neues Getränk wurde registriert." );
-    System.out.println( "Name: " + name );
-    System.out.println( "Preis: " + price + "€" );
+    ServerLog.newLog( logType.INFO, "Ein neues Getränk wurde registriert." );
+    ServerLog.newLog( logType.INFO, "Name: " + name );
+    ServerLog.newLog( logType.INFO, "Preis: " + price + "€" );
   }
 
   /**
@@ -373,14 +466,14 @@ public class SocketThread extends Thread
   {
     Integer userID = userIDMap.get( username );
     Float balance = database.getBalance( userID );
-    System.out.println( "Der Kontostand von " + username + " beträgt " + balance + "€" );
+    ServerLog.newLog( logType.INFO, "Der Kontostand von " + username + " beträgt " + balance + "€" );
     try
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_BALANCE_RESULT, balance ) );
     }
     catch ( IOException exception )
     {
-      System.out.println( "Der Kontostand konnte nicht geladen werden." + exception );
+      ServerLog.newLog( logType.ERROR, "Der Kontostand konnte nicht geladen werden." + exception );
     }
   }
 
@@ -395,7 +488,7 @@ public class SocketThread extends Thread
     String username = login.username;
     String password = login.password;
 
-    System.out.println( "Loginversuch für " + username );
+    ServerLog.newLog( logType.INFO, "Loginversuch für " + username );
 
     LoginResult result = database.checkLogin( username, password );
 
@@ -403,17 +496,17 @@ public class SocketThread extends Thread
     {
       case LOGIN_SUCCESSFULL:
         currentUser = username;
-        System.out.println( username + " hat sich erfolgreich eingeloggt." );
+        ServerLog.newLog( logType.INFO, username + " hat sich erfolgreich eingeloggt." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
         break;
 
       case USER_NOT_FOUND:
-        System.out.println( "Benutzer " + username + " konnte nicht gefunden werden." );
+        ServerLog.newLog( logType.ERROR, "Benutzer " + username + " konnte nicht gefunden werden." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
         break;
 
       case WRONG_PASSWORD:
-        System.out.println( "Falsches Passwort" );
+        ServerLog.newLog( logType.ERROR, "Falsches Passwort" );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
         break;
     }
@@ -429,7 +522,7 @@ public class SocketThread extends Thread
     String username = user.name;
     String password = user.password;
     String result = database.registerNewUser( username, password );
-    System.out.println( "Ein neuer Benutzer mit dem Namen " + username + " wurde registriert." );
+    ServerLog.newLog( logType.INFO, "Ein neuer Benutzer mit dem Namen " + username + " wurde registriert." );
     userIDMap.clear();
     userIDMap = database.getUserIDMap();
     try
@@ -438,7 +531,7 @@ public class SocketThread extends Thread
     }
     catch ( IOException exception )
     {
-      System.out.println( "Der Benutzer konnte nicht angelegt werden." + exception );
+      ServerLog.newLog( logType.ERROR, "Der Benutzer konnte nicht angelegt werden." + exception );
     }
   }
 }

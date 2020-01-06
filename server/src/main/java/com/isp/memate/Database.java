@@ -3,6 +3,7 @@
  */
 package com.isp.memate;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,11 +14,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.isp.memate.ServerLog.logType;
 import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.Shared.Operation;
 
@@ -54,10 +60,12 @@ public class Database
     try
     {
       Files.createDirectories( getTargetFolder() );
+      File logFile = new File( getTargetFolder().toString() + File.separator + "ServerLog.log" );
+      logFile.createNewFile();
     }
     catch ( IOException exception )
     {
-      System.out.println( "Der Ordern für die Datenbank konnte nicht erstellt werden." + exception.getMessage() );
+      ServerLog.newLog( logType.ERROR, "Der Ordner für die Datenbank konnte nicht erstellt werden." + exception.getMessage() );
     }
     try
     {
@@ -65,12 +73,15 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     addUserTable();
+    addSessionIDTable();
     addDrinkTable();
     addHistoryTable();
     addPiggyBankTable();
+    addIngredientsTable();
+    cleanSessionIDTable();
   }
 
 
@@ -84,7 +95,8 @@ public class Database
         + "name string NOT NULL UNIQUE,"
         + "preis double NOT NULL CHECK (Preis != 0),"
         + "picture blob NOT NULL,"
-        + "amount integer NOT NULL DEFAULT 0"
+        + "amount integer NOT NULL DEFAULT 0,"
+        + "ingredients BOOLEAN DEFAULT (false)"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -92,7 +104,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -115,7 +127,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -129,8 +141,7 @@ public class Database
         + "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
         + "guthaben double NOT NULL,"
         + "username string UNIQUE NOT NULL,"
-        + "password string NOT NULL,"
-        + "sessionID string"
+        + "password string NOT NULL"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -138,9 +149,67 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
-    registerNewUser( "admin", "8C6976E5B541415BDE98BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918" );
+    String sql2 = "SELECT username FROM user WHERE username = ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql2 ); )
+    {
+      pstmt.setString( 1, "admin" );
+      ResultSet rs = pstmt.executeQuery();
+      rs.getString( "username" );
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+      registerNewUser( "admin", "8C6976E5B541415BDE98BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918" );
+    }
+  }
+
+  /**
+   * 
+   */
+  private void addSessionIDTable()
+  {
+    String sql = "CREATE TABLE IF NOT EXISTS session_id ("
+        + "user REFERENCES user(ID),"
+        + "sessionID string NOT NULL UNIQUE,"
+        + "last_login string NOT NULL"
+        + ");";
+    try ( Statement stmt = conn.createStatement() )
+    {
+      stmt.execute( sql );
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+  }
+
+  /**
+   * Erstellt den Inhaltsstoffe-Table in der Datenbank, falls dieser noch nicht existiert.
+   */
+  private void addIngredientsTable()
+  {
+    String sql = "CREATE TABLE IF NOT EXISTS ingredients ("
+        + "drink REFERENCES drink(ID),"
+        + "ingredients string NOT NULL,"
+        + "energy_kJ integer NOT NULL,"
+        + "energy_kcal integer NOT NULL,"
+        + "fat double NOT NULL,"
+        + "fatty_acids double NOT NULL,"
+        + "carbs double NOT NULL,"
+        + "sugar double NOT NULL,"
+        + "protein double NOT NULL,"
+        + "salt double NOT NULL"
+        + ");";
+    try ( Statement stmt = conn.createStatement() )
+    {
+      stmt.execute( sql );
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
   }
 
   /**
@@ -157,7 +226,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.ERROR, e.getMessage() );
     }
     if ( getPiggyBankBalance() == null )
     {
@@ -169,7 +238,7 @@ public class Database
       }
       catch ( SQLException e )
       {
-        System.out.println( e.getMessage() );
+        ServerLog.newLog( logType.SQL, e.getMessage() );
       }
     }
   }
@@ -192,7 +261,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return balance;
   }
@@ -217,7 +286,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return userMap;
   }
@@ -242,8 +311,10 @@ public class Database
     }
     catch ( SQLException e )
     {
+      ServerLog.newLog( logType.SQL, "Benutzername bereits vergeben." );
       return "Benutzername bereits vergeben.";
     }
+    ServerLog.newLog( logType.INFO, "Registrierung erfolgreich." );
     return "Registrierung erfolgreich.";
   }
 
@@ -255,16 +326,17 @@ public class Database
    */
   public void updateBalance( String sessionID, Float updatedBalance )
   {
-    String sql = "UPDATE user SET guthaben=? WHERE sessionID=?";
+    String username = getUsernameForSessionID( sessionID );
+    String sql = "UPDATE user SET guthaben=? WHERE username=?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setFloat( 1, updatedBalance );
-      pstmt.setString( 2, sessionID );
+      pstmt.setString( 2, username );
       pstmt.executeUpdate();
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -315,7 +387,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -330,20 +402,30 @@ public class Database
   {
     ArrayList<Drink> drinkInfos = new ArrayList<>();
 
-    String sql = "SELECT ID,name,preis,picture,amount FROM drink";
+    String sql = "SELECT ID,name,preis,picture,amount,ingredients FROM drink";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
       while ( rs.next() )
       {
-        drinkInfos
-            .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
-                Arrays.toString( rs.getBytes( "picture" ) ), rs.getInt( "amount" ) ) );
+        if ( rs.getBoolean( "ingredients" ) )
+        {
+          drinkInfos
+              .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
+                  Arrays.toString( rs.getBytes( "picture" ) ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ),
+                  getIngredients( rs.getInt( "ID" ) ) ) );
+        }
+        else
+        {
+          drinkInfos
+              .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
+                  Arrays.toString( rs.getBytes( "picture" ) ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ), null ) );
+        }
       }
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return drinkInfos.toArray( new Drink[drinkInfos.size()] );
   }
@@ -373,7 +455,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -394,7 +476,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -425,7 +507,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return LoginResult.USER_NOT_FOUND;
   }
@@ -438,16 +520,17 @@ public class Database
    */
   public void addSessionIDToUser( String sessionID, Integer userID )
   {
-    String sql = "UPDATE user SET sessionid=? WHERE ID=?";
-    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
+    String sql2 = "INSERT INTO session_ID(user,sessionID,last_login) VALUES (?,?,?)";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql2 ) )
     {
-      pstmt.setString( 1, sessionID );
-      pstmt.setInt( 2, userID );
+      pstmt.setInt( 1, userID );
+      pstmt.setString( 2, sessionID );
+      pstmt.setString( 3, LocalDateTime.now().toString() );
       pstmt.executeUpdate();
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -459,18 +542,97 @@ public class Database
    */
   public String getUsernameForSessionID( String sessionID )
   {
-    String sql = "SELECT username FROM user WHERE sessionID = ?";
+    int userID = -1;
+    String sql = "SELECT user FROM session_id WHERE sessionID = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setString( 1, sessionID );
+      ResultSet rs = pstmt.executeQuery();
+      userID = rs.getInt( "user" );
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    updateLastLogin( sessionID );
+    String sql2 = "SELECT username FROM user WHERE ID = ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql2 ) )
+    {
+      pstmt.setInt( 1, userID );
       ResultSet rs = pstmt.executeQuery();
       return rs.getString( "username" );
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return null;
+  }
+
+  /**
+   * @param sessionID
+   */
+  private void updateLastLogin( String sessionID )
+  {
+    String sql = "UPDATE session_id SET last_login=? WHERE sessionID=?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
+    {
+      pstmt.setString( 1, LocalDateTime.now().toString() );
+      pstmt.setString( 2, sessionID );
+      pstmt.executeUpdate();
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+  }
+
+  /**
+   * Alle SessionIDs, die älter als 30 Tage sind werden gelöscht.
+   */
+  private void cleanSessionIDTable()
+  {
+    ArrayList<String> delList = new ArrayList<>();
+    Date thirtyDaysAgo = null;
+    try
+    {
+      thirtyDaysAgo = new SimpleDateFormat( "yyyy-MM-dd" ).parse( LocalDateTime.now().minusDays( 30 ).toString() );
+    }
+    catch ( ParseException exception1 )
+    {
+      // TODO(nwe|02.01.2020): Fehlerbehandlung muss noch implementiert werden!
+    }
+    String sql = "SELECT last_login FROM session_id";
+    try ( Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery( sql ) )
+    {
+      while ( rs.next() )
+      {
+        String dateString = rs.getString( "last_login" );
+        Date date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateString );
+        if ( thirtyDaysAgo.toInstant().isAfter( date.toInstant() ) )
+        {
+          delList.add( dateString );
+        }
+      }
+    }
+    catch ( Exception exception )
+    {
+      // TODO: handle exception
+    }
+    for ( String date : delList )
+    {
+      String delStatement = "DELETE FROM session_id WHERE last_login=?";
+      try ( PreparedStatement pstmt = conn.prepareStatement( delStatement ) )
+      {
+        pstmt.setString( 1, date );
+        pstmt.executeUpdate();
+      }
+      catch ( SQLException e )
+      {
+        ServerLog.newLog( logType.SQL, e.getMessage() );
+      }
+    }
   }
 
   /**
@@ -490,7 +652,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return null;
   }
@@ -521,7 +683,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     String[][] historyAsArray = history.toArray( new String[history.size()][] );
     return historyAsArray;
@@ -552,8 +714,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      e.printStackTrace();
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -572,7 +733,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -589,7 +750,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return null;
   }
@@ -609,7 +770,7 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return -1;
   }
@@ -629,7 +790,26 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+  }
+
+  /**
+   * Wenn ein Getränkekauf rückgängig gmeacht wird, wird hier die Anzahl um 1 erhöht.
+   * 
+   * @param name Name des Getränks
+   */
+  public void increaseAmountOfDrinks( String name )
+  {
+    String sql = "UPDATE drink SET amount = amount +1 WHERE name = ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
+    {
+      pstmt.setString( 1, name );
+      pstmt.executeUpdate();
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
   }
 
@@ -650,7 +830,83 @@ public class Database
     }
     catch ( SQLException e )
     {
-      System.out.println( e.getMessage() );
+      ServerLog.newLog( logType.SQL, e.getMessage() );
     }
+  }
+
+
+  /**
+   * Die Methode legt einen neuen Eintrag im IngredientsTable an.
+   * 
+   * @param DrinkID ID des Getränks
+   * @param ingredients Inhaltsstoffe
+   * @param energy_kJ kJ
+   * @param energy_kcal kcal
+   * @param fat Fett
+   * @param fattyAcids gesätigte Fettsäuren
+   * @param carbs Kohlenhydrate
+   * @param sugar Zucker
+   * @param protein Eiweiß
+   * @param salt Salz
+   */
+  public void addIngredients( int DrinkID, String ingredients, int energy_kJ, int energy_kcal, double fat, double fattyAcids,
+                              double carbs, double sugar, double protein, double salt )
+  {
+    String sql =
+        "INSERT INTO ingredients(drink,ingredients,energy_kJ,energy_kcal,fat,fatty_acids,carbs,sugar,protein,salt) VALUES(?,?,?,?,?,?,?,?,?,?)";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
+    {
+      pstmt.setInt( 1, DrinkID );
+      pstmt.setString( 2, ingredients );
+      pstmt.setInt( 3, energy_kJ );
+      pstmt.setInt( 4, energy_kcal );
+      pstmt.setDouble( 5, fat );
+      pstmt.setDouble( 6, fattyAcids );
+      pstmt.setDouble( 7, carbs );
+      pstmt.setDouble( 8, sugar );
+      pstmt.setDouble( 9, protein );
+      pstmt.setDouble( 10, salt );
+      pstmt.executeUpdate();
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+
+    String enableIngredients = "UPDATE drink SET ingredients = ? WHERE ID = ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( enableIngredients ) )
+    {
+      pstmt.setBoolean( 1, true );
+      pstmt.setInt( 2, DrinkID );
+      pstmt.executeUpdate();
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+
+  }
+
+  /**
+   * @param drinkID ID des Getränks
+   * @return Inhaltsstoffe etc. des Getränks
+   */
+  public DrinkIngredients getIngredients( int drinkID )
+  {
+    String sql = "SELECT * FROM ingredients WHERE drink = ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
+    {
+      pstmt.setInt( 1, drinkID );
+      ResultSet rs = pstmt.executeQuery();
+      return new DrinkIngredients( rs.getInt( "drink" ), rs.getString( "ingredients" ), rs.getInt( "energy_kJ" ),
+          rs.getInt( "energy_kcal" ),
+          rs.getDouble( "fat" ), rs.getDouble( "fatty_acids" ), rs.getDouble( "carbs" ), rs.getDouble( "sugar" ), rs.getDouble( "protein" ),
+          rs.getDouble( "salt" ) );
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    return null;
   }
 }

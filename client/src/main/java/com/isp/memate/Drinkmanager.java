@@ -30,14 +30,15 @@ import javax.swing.event.ListSelectionListener;
  */
 public class Drinkmanager extends JPanel
 {
-  private String[]                  data         = new String[ServerCommunication.getInstance().getDrinkNames().size()];
-  private JList<String>             drinkList    = new JList<>( data );
-  private final JScrollPane         scrollpane   = new JScrollPane();
+  private String[]                  data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
+  private JList<String>             drinkList         = new JList<>( data );
+  private final JScrollPane         scrollpane        = new JScrollPane();
   private int                       currentSelection;
-  final JButton                     addButton    = new JButton( "Hinzufügen" );
-  final JButton                     editButton   = new JButton( "Bearbeiten" );
-  final JButton                     removeButton = new JButton( "Entfernen" );
-  private static final Drinkmanager instance     = new Drinkmanager();
+  final JButton                     addButton         = new JButton( "Hinzufügen" );
+  final JButton                     editButton        = new JButton( "Bearbeiten" );
+  final JButton                     removeButton      = new JButton( "Entfernen" );
+  final JButton                     ingredientsButton = new JButton( "Inhaltsstoffe" );
+  private static final Drinkmanager instance          = new Drinkmanager();
 
   /**
    * @return static instance of {@link Drinkmanager}
@@ -105,8 +106,11 @@ public class Drinkmanager extends JPanel
     panel.add( addButton, gridBagConstraints );
     gridBagConstraints.gridx = 1;
     gridBagConstraints.weightx = 0;
-    panel.add( editButton, gridBagConstraints );
+    panel.add( ingredientsButton, gridBagConstraints );
     gridBagConstraints.gridx = 2;
+    gridBagConstraints.weightx = 0;
+    panel.add( editButton, gridBagConstraints );
+    gridBagConstraints.gridx = 3;
     gridBagConstraints.anchor = GridBagConstraints.LINE_END;
     panel.add( removeButton, gridBagConstraints );
 
@@ -123,6 +127,15 @@ public class Drinkmanager extends JPanel
           ServerCommunication.getInstance().removeDrink( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ),
               drinkList.getSelectedValue() );
         }
+      }
+    } );
+    ingredientsButton.addActionListener( new ActionListener()
+    {
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        DrinkManagerDialog ingredientsDialog = new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
+        ingredientsDialog.showIngredientsDialog( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ) );
       }
     } );
     addButton.addActionListener( new ActionListener()

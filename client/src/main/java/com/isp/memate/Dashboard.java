@@ -5,6 +5,8 @@ package com.isp.memate;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +42,9 @@ import net.miginfocom.swing.MigLayout;
 public class Dashboard extends JPanel
 {
   private final Mainframe        mainFrame;
-  private static final Dashboard instance = new Dashboard( Mainframe.getInstance() );
+  private static final Dashboard instance   = new Dashboard( Mainframe.getInstance() );
+  final ImageIcon                undoIcon   = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
+  final JButton                  undoButton = new JButton( undoIcon );
   JScrollPane                    scrollpane;
 
   /**
@@ -62,14 +66,36 @@ public class Dashboard extends JPanel
     scrollpane = new JScrollPane( createDrinkButtonPanel() );
     scrollpane.getVerticalScrollBar().setUnitIncrement( 16 );
 
+    final JPanel upperPanel = new JPanel( new GridBagLayout() );
     final JLabel consumeLabel = new JLabel( "Getränk konsumieren" );
     consumeLabel.setHorizontalAlignment( JLabel.CENTER );
     consumeLabel.setFont( consumeLabel.getFont().deriveFont( 20f ) );
-    consumeLabel.setBorder( new EmptyBorder( 5, 5, 5, 5 ) );
+    upperPanel.setBorder( new EmptyBorder( 0, 0, 5, 0 ) );
+    GridBagConstraints consumeLabelConstraints = new GridBagConstraints();
+    consumeLabelConstraints.gridx = 1;
+    consumeLabelConstraints.gridy = 0;
+    consumeLabelConstraints.weightx = 1;
+    upperPanel.add( consumeLabel, consumeLabelConstraints );
+    GridBagConstraints undoButtonConstraints = new GridBagConstraints();
+    undoButtonConstraints.gridx = 2;
+    undoButtonConstraints.gridy = 0;
+    upperPanel.add( undoButton, undoButtonConstraints );
+    upperPanel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    undoButton.setEnabled( false );
+    undoButton.setToolTipText( "Letzte Aktion rückgängig machen" );
+    undoButton.addActionListener( new ActionListener()
+    {
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        ServerCommunication.getInstance().undoLastAction();
+      }
+    } );
+
 
     setLayout( new BorderLayout() );
-    setBorder( new EmptyBorder( 10, 10, 10, 10 ) );
-    add( consumeLabel, BorderLayout.NORTH );
+    setBorder( new EmptyBorder( 5, 10, 10, 10 ) );
+    add( upperPanel, BorderLayout.NORTH );
     add( scrollpane, BorderLayout.CENTER );
     add( createLowerPanel(), BorderLayout.SOUTH );
     setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
@@ -85,9 +111,6 @@ public class Dashboard extends JPanel
     final JPanel panel = new JPanel();
     final SpinnerNumberModel spinnerModel = new SpinnerNumberModel( 1, 1, 1000, 1 );
     final JSpinner valueSpinner = new JSpinner( spinnerModel );
-    String pattern = "0€";
-    JSpinner.NumberEditor editor = new JSpinner.NumberEditor( valueSpinner, pattern );
-    valueSpinner.setEditor( editor );
 
     final JButton aufladenButton = new JButton( "Einzahlen" );
     final JSeparator seperator = new JSeparator( JSeparator.VERTICAL );
@@ -139,11 +162,13 @@ public class Dashboard extends JPanel
           ServerCommunication sc = ServerCommunication.getInstance();
           sc.addBalance( (int) value );
           ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
+          undoButton.setEnabled( true );
         }
       }
     } );
     return panel;
   }
+
 
   /**
    * Es wird eine Liste von der Klasse {@link ServerCommunication}

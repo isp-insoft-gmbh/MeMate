@@ -7,6 +7,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -52,8 +54,10 @@ public class DrinkConsumptionButton extends JPanel
   private JLabel             nameLabel;
   private final JLabel       priceLabel;
   private final JLabel       iconLabel;
+  private JLabel             ingredientsLabel;
   private final JButton      acceptButton                   = new JButton( "Ja" );
   private final JButton      abortButton                    = new JButton( "Nein" );
+  private final JButton      infoButton                     = new JButton( "Info" );
   private final JLayeredPane overlay                        = new JLayeredPane();
   private final JLabel       askWhetherToReallyConsumeLabel = new JLabel( "Wirklich konsumieren?" );
   private MouseListener      mouseListener;
@@ -72,12 +76,100 @@ public class DrinkConsumptionButton extends JPanel
   {
     setLayout( new BorderLayout() );
 
-    JPanel nameLabelAndDrinkInfoButtonPanel = new JPanel( new BorderLayout() );
+    JPanel nameLabelAndDrinkInfoButtonPanel = new JPanel( new GridBagLayout() );
     nameLabel = new JLabel( name );
     nameLabel.setFont( nameLabel.getFont().deriveFont( 14f ) );
     nameLabel.setHorizontalAlignment( JLabel.CENTER );
-    nameLabelAndDrinkInfoButtonPanel.add( nameLabel, BorderLayout.CENTER );
-    // nameLabelAndDrinkInfoButtonPanel.add( new JButton( "Info" ), BorderLayout.EAST );
+    GridBagConstraints nameLabelConstraints = new GridBagConstraints();
+    nameLabelConstraints.gridx = 1;
+    nameLabelConstraints.gridy = 0;
+    nameLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
+    nameLabelConstraints.weightx = 1;
+    nameLabelAndDrinkInfoButtonPanel.add( nameLabel, nameLabelConstraints );
+    if ( ServerCommunication.getInstance().hasIngredients( name ) )
+    {
+
+      GridBagConstraints infoButtonConstraints = new GridBagConstraints();
+      infoButtonConstraints.gridx = 2;
+      infoButtonConstraints.gridy = 0;
+      infoButtonConstraints.weightx = 0.1;
+      infoButtonConstraints.anchor = GridBagConstraints.LINE_END;
+      nameLabelAndDrinkInfoButtonPanel.add( infoButton, infoButtonConstraints );
+
+      JLabel fillLable = new JLabel();
+      fillLable.setPreferredSize( new Dimension( 51, 1 ) );
+      GridBagConstraints fillLablenConstraints = new GridBagConstraints();
+      fillLablenConstraints.gridx = 0;
+      fillLablenConstraints.gridy = 0;
+      fillLablenConstraints.weightx = 0.1;
+      fillLablenConstraints.anchor = GridBagConstraints.LINE_START;
+      nameLabelAndDrinkInfoButtonPanel.add( fillLable, fillLablenConstraints );
+
+      infoButton.addActionListener( new ActionListener()
+      {
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          if ( iconLabel.isVisible() )
+          {
+            iconLabel.setVisible( false );
+            DrinkIngredients ingredients = ServerCommunication.getInstance().getIngredients( name );
+            String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
+            int maxLength = 50;
+            int currentLength = 0;
+            StringBuilder listBuilder = new StringBuilder();
+            for ( int i = 0; i < ingredientsArray.length; i++ )
+            {
+              currentLength += ingredientsArray[ i ].length() + 2;
+              if ( currentLength > maxLength )
+              {
+                listBuilder.append( "<br>" );
+                currentLength = ingredientsArray[ i ].length() + 2;
+              }
+              listBuilder.append( ingredientsArray[ i ] )
+                  .append( ", " );
+            }
+
+            StringBuilder ingredientsBuilder = new StringBuilder();
+            ingredientsBuilder.append( "<html>Zutaten:<br>" )
+                .append( listBuilder.toString().substring( 0, listBuilder.length() - 2 ) )
+                .append( "<br><br>Durchschnittlicher Gehalt je 100ml<br>" )
+                .append( "Energie .............................................. " )
+                .append( ingredients.energy_kJ )
+                .append( "kJ(" )
+                .append( ingredients.energy_kcal )
+                .append( " kcal)<br>" )
+                .append( "Fett .................................................................... " )
+                .append( ingredients.fat )
+                .append( "g<br>davon gesättigte Fettsäuren ............................. " )
+                .append( ingredients.fatty_acids )
+                .append( "g<br>Kohlenhydrate .................................................. " )
+                .append( ingredients.carbs )
+                .append( "g<br>davon Zucker .................................................... " )
+                .append( ingredients.sugar )
+                .append( "g<br>Eiweiß ................................................................ " )
+                .append( ingredients.protein )
+                .append( "g<br>Salz .................................................................. " )
+                .append( ingredients.salt )
+                .append( "g" );
+
+            ingredientsLabel = new JLabel( ingredientsBuilder.toString() );
+            ingredientsLabel.setHorizontalAlignment( JLabel.LEFT );
+            ingredientsLabel.setBorder( new EmptyBorder( 0, 5, 0, 5 ) );
+            add( ingredientsLabel, BorderLayout.CENTER );
+          }
+          else
+          {
+            remove( ingredientsLabel );
+            iconLabel.setVisible( true );
+          }
+          repaint();
+          revalidate();
+          requestFocus();
+        }
+      } );
+
+    }
 
     price = price.replace( "€", "" );
     Float priceAsFloat = Float.valueOf( price );
@@ -109,6 +201,7 @@ public class DrinkConsumptionButton extends JPanel
 
     acceptButton.addActionListener( new ActionListener()
     {
+
       @Override
       public void actionPerformed( ActionEvent e )
       {
@@ -120,6 +213,7 @@ public class DrinkConsumptionButton extends JPanel
         requestFocus();
       }
     } );
+
     ActionListener abortButtonListener = new ActionListener()
     {
       @Override
@@ -219,9 +313,17 @@ public class DrinkConsumptionButton extends JPanel
    */
   private void askWhetherToReallyConsume( String drinkName, ActionListener abortButtonListener )
   {
+    infoButton.setEnabled( false );
     DrinkConsumptionButton.this.removeMouseListener( mouseListener );
     DrinkConsumptionButton.this.removeKeyListener( keyListener );
     iconLabel.setVisible( false );
+    try
+    {
+      remove( ingredientsLabel );
+    }
+    catch ( Exception exception )
+    {
+    }
     add( askWhetherToReallyConsumeLabel, BorderLayout.NORTH );
     add( overlay, BorderLayout.CENTER );
     repaint();
@@ -243,6 +345,8 @@ public class DrinkConsumptionButton extends JPanel
         abortButton.addActionListener( abortButtonListener );
         DrinkConsumptionButton.this.addMouseListener( mouseListener );
         DrinkConsumptionButton.this.addKeyListener( keyListener );
+        Dashboard.getInstance().undoButton.setEnabled( true );
+        infoButton.setEnabled( true );
       }
     };
     acceptButton.addActionListener( actionListener );
@@ -255,6 +359,7 @@ public class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addMouseListener( mouseListener );
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         abortButton.removeActionListener( this );
+        infoButton.setEnabled( true );
       }
     };
     abortButton.addActionListener( actionListener2 );
