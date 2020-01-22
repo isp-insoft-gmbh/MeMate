@@ -10,6 +10,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -49,6 +53,14 @@ public class Adminview extends JPanel
    * 
    */
   public Adminview()
+  {
+    loadDefaultSettings();
+  }
+
+  /**
+   * 
+   */
+  private void loadDefaultSettings()
   {
     setLayout( new GridBagLayout() );
     balanceField.setPreferredSize( new Dimension( 100, 20 ) );
@@ -111,7 +123,6 @@ public class Adminview extends JPanel
     ServerCommunication.getInstance().tellServerToSendPiggybankBalance();
   }
 
-
   /**
    * Fügt für jedes Getränk einen Spinner und ein Speicher-Button an
    */
@@ -122,11 +133,10 @@ public class Adminview extends JPanel
     {
       drinkAmountPanel = new JPanel( new GridBagLayout() );
       JLabel drinkNameLabel = new JLabel( drink );
+      drinkNameLabel.setPreferredSize( new Dimension( 150, 30 ) );
       GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
       drinkNameLabelConstraints.gridy = 0;
       drinkNameLabelConstraints.gridx = 0;
-      drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_END;
-      drinkNameLabelConstraints.weightx = 1;
       drinkAmountPanel.add( drinkNameLabel, drinkNameLabelConstraints );
       SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 50, 1 );
       JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
@@ -134,18 +144,20 @@ public class Adminview extends JPanel
       GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
       amountSpinnerConstraints.gridx = 1;
       amountSpinnerConstraints.gridy = 0;
-      amountSpinnerConstraints.weightx = 0;
-      amountSpinnerConstraints.anchor = GridBagConstraints.LINE_END;
-      amountSpinnerConstraints.insets = new Insets( 0, 5, 0, 0 );
+      amountSpinnerConstraints.insets = new Insets( 0, 0, 0, 5 );
       drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
       JButton setAmountButton = new JButton( "Anzahl setzen" );
       GridBagConstraints setAmountButtonConstraints = new GridBagConstraints();
       setAmountButtonConstraints.gridx = 2;
       setAmountButtonConstraints.gridy = 0;
-      setAmountButtonConstraints.weightx = 0;
-      setAmountButtonConstraints.anchor = GridBagConstraints.LINE_END;
-      setAmountButtonConstraints.insets = new Insets( 0, 5, 0, 462 );
+      setAmountButtonConstraints.insets = new Insets( 0, 0, 0, 5 );
       drinkAmountPanel.add( setAmountButton, setAmountButtonConstraints );
+      JLabel daysLeftLabel = new JLabel( String.format( "in etwa %.2f Tagen leer.", getDaysLeft( drink ) ) );
+      GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
+      daysLeftLabelConstraints.gridx = 3;
+      daysLeftLabelConstraints.gridy = 0;
+      drinkAmountPanel.add( daysLeftLabel, daysLeftLabelConstraints );
+
       setAmountButton.addActionListener( new ActionListener()
       {
         @Override
@@ -182,12 +194,51 @@ public class Adminview extends JPanel
     }
   }
 
+  /**
+   * @return
+   */
+  private Float getDaysLeft( String drink )
+  {
+    Float amount = 0f;
+    String[][] historyData = ServerCommunication.getInstance().getHistoryData();
+    if ( historyData != null )
+    {
+      for ( String[] data : historyData )
+      {
+        String action = data[ 0 ];
+        if ( action.contains( "getrunken" ) )
+        {
+          if ( action.contains( drink ) )
+          {
+            String dateAsString = data[ 4 ];
+            Date date;
+            try
+            {
+              date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
+              ZonedDateTime now = ZonedDateTime.now();
+              ZonedDateTime thirtyDaysAgo = now.minusDays( 30 );
+              if ( !date.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+              {
+                amount++;
+              }
+            }
+            catch ( ParseException exception )
+            {
+              // TODO(nwe|20.01.2020): Fehlerbehandlung muss noch implementiert werden!
+            }
+          }
+        }
+      }
+    }
+    Float averageConsumption = amount / 30f;
+    return ServerCommunication.getInstance().getAmount( drink ) / averageConsumption;
+  }
+
   @SuppressWarnings( "javadoc" )
   public void updateDrinkAmounts()
   {
-    remove( drinkAmountPanel );
-    repaint();
-    revalidate();
+    removeAll();
+    loadDefaultSettings();
     addAllDrinks();
     repaint();
     revalidate();

@@ -182,9 +182,7 @@ public class Stats extends JPanel
         repaint();
         revalidate();
       }
-
     } );
-
   }
 
   /**

@@ -169,6 +169,7 @@ public class ServerCommunication
     this.history = list.toArray( history );
     History.getInstance().updateHistory();
     Stats.getInstance().addGraph();
+    Adminview.getInstance().updateDrinkAmounts();
   }
 
 

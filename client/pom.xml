@@ -61,18 +61,19 @@
 							<jre>
 								<minVersion>1.8.0_0</minVersion>
 								<maxVersion>1.8.0_999</maxVersion>
+								<path>jre</path>
 								<jdkPreference>preferJre</jdkPreference>
 							</jre>
 							<versionInfo>
 								<fileVersion>${project.version}.0.0</fileVersion>
 								<txtFileVersion>${project.version}</txtFileVersion>
 								<fileDescription>MeMate Client</fileDescription>
-								<copyright>ISP Insoft 2019</copyright>
+								<copyright>ISP Insoft 2020</copyright>
 								<productVersion>${project.version}.0.0</productVersion>
 								<txtProductVersion>${project.version}</txtProductVersion>
 								<productName>MeMate</productName>
 								<companyName>Isp Insoft GmbH</companyName>
-								<internalName>LicenseGenerator</internalName>
+								<internalName>MeMate</internalName>
 								<originalFilename>MeMateClient${project.version}.exe</originalFilename>
 								<language>GERMAN</language>
 							</versionInfo>
@@ -80,7 +81,28 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <!-- here the phase you need -->
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/jre</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>jre</directory>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
 		</plugins>
 	</build>
 
@@ -102,4 +124,5 @@
 			<version>1.5.0</version>
 		</dependency>
 	</dependencies>
+
 </project>

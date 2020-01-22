@@ -30,7 +30,7 @@ public class Main
     Socket socket = null;
     try
     {
-      serverSocket = new ServerSocket( 3141 ); //Default is 3141 
+      serverSocket = new ServerSocket( 3142 ); //Default is 3141 
     }
     catch ( IOException e )
     {

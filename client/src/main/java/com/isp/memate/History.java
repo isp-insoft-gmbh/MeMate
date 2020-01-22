@@ -53,6 +53,7 @@ public class History extends JPanel
       }
     };
     historyTable.setModel( tableModel );
+    historyTable.setAutoCreateRowSorter( true );
     setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
     scrollPane.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
     scrollPane.setBorder( BorderFactory.createEmptyBorder() );

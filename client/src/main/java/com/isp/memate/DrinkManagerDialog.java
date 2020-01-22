@@ -528,13 +528,26 @@ public class DrinkManagerDialog
       @Override
       public void actionPerformed( ActionEvent e )
       {
-        ServerCommunication.getInstance().registerIngredients( new DrinkIngredients( DrinkID,
-            ingredientsField.getText(), (int) energykJSpinner.getValue(), (int) energykCALSpinner.getValue(),
-            (Double) fatSpinner.getValue(),
-            (Double) fattyAcidsSpinner.getValue(),
-            (Double) carbsSpinner.getValue(), (Double) sugarSpinner.getValue(),
-            (Double) proteinSpinner.getValue(), (Double) saltSpinner.getValue() ) );
-        dialog.dispose();
+
+        //TODO implement Illegal Argument Check
+
+        if ( energykJSpinner.getValue() instanceof Number || energykCALSpinner.getValue() instanceof Number
+            || fatSpinner.getValue() instanceof Number || fattyAcidsSpinner.getValue() instanceof Number
+            || carbsSpinner.getValue() instanceof Number || sugarSpinner.getValue() instanceof Number
+            || proteinSpinner.getValue() instanceof Number || saltSpinner.getValue() instanceof Number )
+        {
+          ServerCommunication.getInstance().registerIngredients( new DrinkIngredients( DrinkID,
+              ingredientsField.getText(), (int) energykJSpinner.getValue(), (int) energykCALSpinner.getValue(),
+              (Double) fatSpinner.getValue(),
+              (Double) fattyAcidsSpinner.getValue(),
+              (Double) carbsSpinner.getValue(), (Double) sugarSpinner.getValue(),
+              (Double) proteinSpinner.getValue(), (Double) saltSpinner.getValue() ) );
+          dialog.dispose();
+        }
+        else
+        {
+          JOptionPane.showConfirmDialog( dialog, "Ungültige Eingabe" );
+        }
       }
     } );
 

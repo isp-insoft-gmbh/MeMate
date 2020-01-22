@@ -5,10 +5,13 @@ package com.isp.memate;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -27,6 +30,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -54,7 +58,7 @@ public class DrinkConsumptionButton extends JPanel
   private JLabel             nameLabel;
   private final JLabel       priceLabel;
   private final JLabel       iconLabel;
-  private JLabel             ingredientsLabel;
+  JPanel                     infoPanel                      = new JPanel( new GridBagLayout() );
   private final JButton      acceptButton                   = new JButton( "Ja" );
   private final JButton      abortButton                    = new JButton( "Nein" );
   private final JButton      infoButton                     = new JButton( "Info" );
@@ -88,7 +92,6 @@ public class DrinkConsumptionButton extends JPanel
     nameLabelAndDrinkInfoButtonPanel.add( nameLabel, nameLabelConstraints );
     if ( ServerCommunication.getInstance().hasIngredients( name ) )
     {
-
       GridBagConstraints infoButtonConstraints = new GridBagConstraints();
       infoButtonConstraints.gridx = 2;
       infoButtonConstraints.gridy = 0;
@@ -118,6 +121,7 @@ public class DrinkConsumptionButton extends JPanel
             int maxLength = 50;
             int currentLength = 0;
             StringBuilder listBuilder = new StringBuilder();
+            listBuilder.append( "<html>Zutaten:<br>" );
             for ( int i = 0; i < ingredientsArray.length; i++ )
             {
               currentLength += ingredientsArray[ i ].length() + 2;
@@ -129,43 +133,120 @@ public class DrinkConsumptionButton extends JPanel
               listBuilder.append( ingredientsArray[ i ] )
                   .append( ", " );
             }
-
-            StringBuilder ingredientsBuilder = new StringBuilder();
-            ingredientsBuilder.append( "<html>Zutaten:<br>" )
-                .append( listBuilder.toString().substring( 0, listBuilder.length() - 2 ) )
-                .append( "<br><br>Durchschnittlicher Gehalt je 100ml<br>" )
-                .append( "Energie .............................................. " )
-                .append( ingredients.energy_kJ )
-                .append( "kJ(" )
-                .append( ingredients.energy_kcal )
-                .append( " kcal)<br>" )
-                .append( "Fett .................................................................... " )
-                .append( ingredients.fat )
-                .append( "g<br>davon gesättigte Fettsäuren ............................. " )
-                .append( ingredients.fatty_acids )
-                .append( "g<br>Kohlenhydrate .................................................. " )
-                .append( ingredients.carbs )
-                .append( "g<br>davon Zucker .................................................... " )
-                .append( ingredients.sugar )
-                .append( "g<br>Eiweiß ................................................................ " )
-                .append( ingredients.protein )
-                .append( "g<br>Salz .................................................................. " )
-                .append( ingredients.salt )
-                .append( "g" );
-
-            ingredientsLabel = new JLabel( ingredientsBuilder.toString() );
-            ingredientsLabel.setHorizontalAlignment( JLabel.LEFT );
-            ingredientsLabel.setBorder( new EmptyBorder( 0, 5, 0, 5 ) );
-            add( ingredientsLabel, BorderLayout.CENTER );
+            JLabel textLabel = new JLabel();
+            if ( listBuilder.toString().length() >= 190 )
+            {
+              textLabel = new JLabel(
+                  listBuilder.toString().substring( 0, 190 ) + "...<br><br>Durchschnittlicher Gehalt je 100ml<br>" );
+            }
+            else
+            {
+              textLabel = new JLabel(
+                  listBuilder.toString().substring( 0, listBuilder.length() - 2 ) + "<br><br>Durchschnittlicher Gehalt je 100ml<br>" );
+            }
+            textLabel.setHorizontalAlignment( JLabel.LEFT );
+            GridBagConstraints textLabelConstraints = new GridBagConstraints();
+            textLabelConstraints.gridx = 0;
+            textLabelConstraints.gridy = 0;
+            textLabelConstraints.gridwidth = 3;
+            textLabelConstraints.gridheight = 2;
+            textLabelConstraints.anchor = GridBagConstraints.LINE_START;
+            textLabelConstraints.insets = new Insets( 0, 2, 0, 2 );
+            infoPanel.add( textLabel, textLabelConstraints );
+            addPanel( "Energie", 3, infoPanel, ingredients );
+            addPanel( "Fett", 4, infoPanel, ingredients );
+            addPanel( "davon gesättigte Fettsäuren", 5, infoPanel, ingredients );
+            addPanel( "Kohlenhydrate", 6, infoPanel, ingredients );
+            addPanel( "Zucker", 7, infoPanel, ingredients );
+            addPanel( "Eiweiß", 8, infoPanel, ingredients );
+            addPanel( "Salz", 9, infoPanel, ingredients );
+            add( infoPanel, BorderLayout.CENTER );
           }
           else
           {
-            remove( ingredientsLabel );
+            remove( infoPanel );
+            infoPanel.removeAll();
             iconLabel.setVisible( true );
           }
           repaint();
           revalidate();
           requestFocus();
+        }
+
+        private JPanel addPanel( String ingredient, int y, JPanel mainPanel, DrinkIngredients ingredients )
+        {
+          JPanel panel = new JPanel( new GridBagLayout() );
+
+          JLabel label = new JLabel( ingredient + " " );
+          GridBagConstraints labelConstraints = new GridBagConstraints();
+          labelConstraints.gridx = 0;
+          labelConstraints.gridy = 0;
+          labelConstraints.weightx = 0;
+          labelConstraints.anchor = GridBagConstraints.LAST_LINE_START;
+          panel.add( label, labelConstraints );
+
+          JSeparator separator = new JSeparator()
+          {
+            @Override
+            public void paintComponent( final Graphics g )
+            {
+              for ( int x = 0; x < getWidth(); x += 4 )
+              {
+                g.drawLine( x, 0, x + 1, 0 );
+              }
+            }
+          };
+
+          separator.setForeground( Color.black );
+          GridBagConstraints seperatorConstraints = new GridBagConstraints();
+          seperatorConstraints.gridx = 1;
+          seperatorConstraints.gridy = 0;
+          seperatorConstraints.weightx = 1;
+          seperatorConstraints.anchor = GridBagConstraints.SOUTH;
+          seperatorConstraints.fill = GridBagConstraints.HORIZONTAL;
+          panel.add( separator, seperatorConstraints );
+
+          JLabel amountLabel = new JLabel();
+          switch ( ingredient )
+          {
+            case "Salz":
+              amountLabel.setText( " " + ingredients.salt + "g" );
+              break;
+            case "Eiweiß":
+              amountLabel.setText( " " + ingredients.protein + "g" );
+              break;
+            case "Energie":
+              amountLabel.setText( " " + ingredients.energy_kJ + " kJ (" + ingredients.energy_kcal + " kcal)" );
+              break;
+            case "Fett":
+              amountLabel.setText( " " + ingredients.fat + "g" );
+              break;
+            case "davon gesättigte Fettsäuren":
+              amountLabel.setText( " " + ingredients.fatty_acids + "g" );
+              break;
+            case "Kohlenhydrate":
+              amountLabel.setText( String.format( " %.2fg", ingredients.carbs ) );
+              break;
+            case "Zucker":
+              amountLabel.setText( String.format( " %.2fg", ingredients.sugar ) );
+            default :
+              break;
+          }
+          GridBagConstraints amountLabelConstraints = new GridBagConstraints();
+          amountLabelConstraints.gridx = 2;
+          amountLabelConstraints.gridy = 0;
+          amountLabelConstraints.weightx = 0;
+          amountLabelConstraints.anchor = GridBagConstraints.LAST_LINE_END;
+          panel.add( amountLabel, amountLabelConstraints );
+
+          panel.setPreferredSize( new Dimension( getWidth() - 10, 15 ) );
+          GridBagConstraints panelConstraints = new GridBagConstraints();
+          panelConstraints.gridx = 0;
+          panelConstraints.gridy = y;
+          panelConstraints.gridwidth = 3;
+          panelConstraints.insets = new Insets( 0, 2, 0, 2 );
+          mainPanel.add( panel, panelConstraints );
+          return panel;
         }
       } );
 
@@ -201,7 +282,6 @@ public class DrinkConsumptionButton extends JPanel
 
     acceptButton.addActionListener( new ActionListener()
     {
-
       @Override
       public void actionPerformed( ActionEvent e )
       {
@@ -244,12 +324,24 @@ public class DrinkConsumptionButton extends JPanel
       {
         setBackground( HOVER_BACKGROUND_COLOR );
         nameLabelAndDrinkInfoButtonPanel.setBackground( HOVER_BACKGROUND_COLOR );
+        infoPanel.setBackground( HOVER_BACKGROUND_COLOR );
+        Component[] components = infoPanel.getComponents();
+        for ( Component component : components )
+        {
+          component.setBackground( HOVER_BACKGROUND_COLOR );
+        }
       }
 
       public void mouseExited( MouseEvent __ )
       {
         setBackground( UIManager.getColor( "Panel.background" ) );
         nameLabelAndDrinkInfoButtonPanel.setBackground( UIManager.getColor( "Panel.background" ) );
+        infoPanel.setBackground( UIManager.getColor( "Panel.background" ) );
+        Component[] components = infoPanel.getComponents();
+        for ( Component component : components )
+        {
+          component.setBackground( UIManager.getColor( "Panel.background" ) );
+        }
       }
 
       public void mousePressed( MouseEvent __ )
@@ -257,6 +349,12 @@ public class DrinkConsumptionButton extends JPanel
         requestFocus();
         setBackground( UIManager.getColor( "Table.selectionBackground" ) );
         nameLabelAndDrinkInfoButtonPanel.setBackground( UIManager.getColor( "Table.selectionBackground" ) );
+        infoPanel.setBackground( UIManager.getColor( "Table.selectionBackground" ) );
+        Component[] components = infoPanel.getComponents();
+        for ( Component component : components )
+        {
+          component.setBackground( UIManager.getColor( "Table.selectionBackground" ) );
+        }
       }
 
       public void mouseReleased( MouseEvent event )
@@ -265,11 +363,24 @@ public class DrinkConsumptionButton extends JPanel
         {
           setBackground( HOVER_BACKGROUND_COLOR );
           nameLabelAndDrinkInfoButtonPanel.setBackground( HOVER_BACKGROUND_COLOR );
+          infoPanel.setBackground( HOVER_BACKGROUND_COLOR );
+          Component[] components = infoPanel.getComponents();
+          for ( Component component : components )
+          {
+            component.setBackground( HOVER_BACKGROUND_COLOR );
+          }
+          askWhetherToReallyConsume( name, abortButtonListener );
         }
         else
         {
           setBackground( UIManager.getColor( "Panel.background" ) );
           nameLabelAndDrinkInfoButtonPanel.setBackground( UIManager.getColor( "Panel.background" ) );
+          infoPanel.setBackground( UIManager.getColor( "Panel.background" ) );
+          Component[] components = infoPanel.getComponents();
+          for ( Component component : components )
+          {
+            component.setBackground( UIManager.getColor( "Panel.background" ) );
+          }
         }
       }
     };
@@ -319,7 +430,7 @@ public class DrinkConsumptionButton extends JPanel
     iconLabel.setVisible( false );
     try
     {
-      remove( ingredientsLabel );
+      remove( infoPanel );
     }
     catch ( Exception exception )
     {

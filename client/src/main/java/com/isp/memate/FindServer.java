@@ -94,6 +94,7 @@ public class FindServer
     byte[] buffer = broadcastMessage.getBytes();
     DatagramPacket clientPacket = new DatagramPacket( buffer, buffer.length, address, 3141 );
     socket.send( clientPacket );
+    socket.setSoTimeout( 1500 );
 
 
     //Empfangen des Serverpackets
