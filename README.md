@@ -50,7 +50,7 @@ of server and client. Those include the newly created jar files called
 
 If you encounter any Problem while starting the `.exe` its likely because it couldn't find an installed JRE.
 To avoid this problem simply create a folder named `./jre` next to the `.exe`.
-You can download a JRE [here](https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.242-1.b08/java-1.8.0-openjdk-jre-1.8.0.242-1.b08.ojdkbuild.windows.x86_64.zip). Unzip the File inside the `./jre` Folder and you done. 
+You can download a JRE [here](https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.242-1.b08/java-1.8.0-openjdk-jre-1.8.0.242-1.b08.ojdkbuild.windows.x86_64.zip). Unzip the File inside the `./jre` Folder and you're done. 
 
 ## Credits
 

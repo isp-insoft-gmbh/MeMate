@@ -27,10 +27,10 @@ import java.text.NumberFormat;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -185,7 +185,7 @@ public class DrinkConsumptionButton extends JPanel
           labelConstraints.anchor = GridBagConstraints.LAST_LINE_START;
           panel.add( label, labelConstraints );
 
-          JSeparator separator = new JSeparator()
+          JComponent separator = new JComponent()
           {
             @Override
             public void paintComponent( final Graphics g )
@@ -202,6 +202,7 @@ public class DrinkConsumptionButton extends JPanel
           seperatorConstraints.gridx = 1;
           seperatorConstraints.gridy = 0;
           seperatorConstraints.weightx = 1;
+          seperatorConstraints.insets = new Insets( 0, 0, 3, 0 );
           seperatorConstraints.anchor = GridBagConstraints.SOUTH;
           seperatorConstraints.fill = GridBagConstraints.HORIZONTAL;
           panel.add( separator, seperatorConstraints );

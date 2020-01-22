@@ -132,7 +132,8 @@ public class Login extends JFrame
       @Override
       public void mouseClicked( MouseEvent e )
       {
-        JOptionPane.showMessageDialog( Login.this, "Pech gehabt ¯\\_(ツ)_/¯" );
+        JOptionPane.showMessageDialog( Login.this, "Bitte kontaktieren Sie ihren Admin.", "Passwort vergessen", JOptionPane.WARNING_MESSAGE,
+            null );
       }
     } );
 
