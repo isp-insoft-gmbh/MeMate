@@ -26,7 +26,6 @@ import com.isp.memate.Shared.Operation;
  */
 public class SocketThread extends Thread
 {
-  String               dataBasePath;
   Database             database;
   protected Socket     socket;
   Map<String, Integer> userIDMap;
@@ -42,13 +41,12 @@ public class SocketThread extends Thread
 
   /**
    * @param clientSocket userSocket
-   * @param dataBasePath Pfad der Datenbank
+   * @param dataBase Database
    */
-  public SocketThread( Socket clientSocket, String dataBasePath )
+  public SocketThread( Socket clientSocket, Database dataBase )
   {
     this.socket = clientSocket;
-    this.dataBasePath = dataBasePath;
-    database = new Database( dataBasePath );
+    this.database = dataBase;
     userIDMap = database.getUserIDMap();
   }
 

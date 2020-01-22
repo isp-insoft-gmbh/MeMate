@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.isp.memate.ServerLog.logType;
 import com.isp.memate.Shared.LoginResult;
@@ -36,6 +37,7 @@ import com.isp.memate.Shared.Operation;
 public class Database
 {
   private Connection conn = null;
+  ReentrantLock      lock = new ReentrantLock( true );
 
   /**
    * @return path for all configuration / data; changes depending on OS
@@ -301,6 +303,7 @@ public class Database
    */
   public String registerNewUser( String username, String password )
   {
+    lock.lock();
     String sql = "INSERT INTO user(guthaben,username,password) VALUES(?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
@@ -314,6 +317,10 @@ public class Database
       ServerLog.newLog( logType.SQL, "Benutzername bereits vergeben." );
       return "Benutzername bereits vergeben.";
     }
+    finally
+    {
+      lock.unlock();
+    }
     ServerLog.newLog( logType.INFO, "Registrierung erfolgreich." );
     return "Registrierung erfolgreich.";
   }
@@ -326,6 +333,7 @@ public class Database
    */
   public void updateBalance( String sessionID, Float updatedBalance )
   {
+    lock.lock();
     String username = getUsernameForSessionID( sessionID );
     String sql = "UPDATE user SET guthaben=? WHERE username=?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
@@ -337,6 +345,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -351,6 +363,7 @@ public class Database
    */
   public void updateDrinkInformation( Integer id, Operation operation, Object updatedInformation )
   {
+    lock.lock();
     String sql = null;
     switch ( operation )
     {
@@ -388,6 +401,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -439,6 +456,7 @@ public class Database
    */
   public void registerNewDrink( String name, Float price, String picture )
   {
+    lock.lock();
     String sql = "INSERT INTO drink(name,preis,picture) VALUES(?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
@@ -457,6 +475,10 @@ public class Database
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
+    finally
+    {
+      lock.unlock();
+    }
   }
 
   /**
@@ -466,6 +488,7 @@ public class Database
    */
   public void removeDrink( Integer id )
   {
+    lock.lock();
     String sql = "DELETE FROM drink WHERE ID= ?";
 
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
@@ -477,6 +500,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -520,6 +547,7 @@ public class Database
    */
   public void addSessionIDToUser( String sessionID, Integer userID )
   {
+    lock.lock();
     String sql2 = "INSERT INTO session_ID(user,sessionID,last_login) VALUES (?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql2 ) )
     {
@@ -531,6 +559,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -574,6 +606,7 @@ public class Database
    */
   private void updateLastLogin( String sessionID )
   {
+    lock.lock();
     String sql = "UPDATE session_id SET last_login=? WHERE sessionID=?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
@@ -584,6 +617,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -702,6 +739,7 @@ public class Database
    */
   public void addLog( String action, String username, Float transaction, Float newBalance, String date )
   {
+    lock.lock();
     String sql = "INSERT INTO historie_log(action,consumer,transaction_price,balance,date) VALUES(?,?,?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
@@ -716,6 +754,10 @@ public class Database
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
+    finally
+    {
+      lock.unlock();
+    }
   }
 
   /**
@@ -725,6 +767,7 @@ public class Database
    */
   public void setPiggyBankBalance( Float userBalance )
   {
+    lock.lock();
     String sql = "UPDATE piggy_bank SET guthaben=?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
@@ -734,6 +777,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -782,6 +829,7 @@ public class Database
    */
   public void decreaseAmountOfDrinks( String name )
   {
+    lock.lock();
     String sql = "UPDATE drink SET amount = amount -1 WHERE name = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
@@ -792,6 +840,10 @@ public class Database
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
+    finally
+    {
+      lock.unlock();
+    }
   }
 
   /**
@@ -801,6 +853,7 @@ public class Database
    */
   public void increaseAmountOfDrinks( String name )
   {
+    lock.lock();
     String sql = "UPDATE drink SET amount = amount +1 WHERE name = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
@@ -810,6 +863,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -821,6 +878,7 @@ public class Database
    */
   public void setAmountOfDrinks( String name, int amount )
   {
+    lock.lock();
     String sql = "UPDATE drink SET amount = ? WHERE name = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
@@ -831,6 +889,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -852,6 +914,7 @@ public class Database
   public void addIngredients( int DrinkID, String ingredients, int energy_kJ, int energy_kcal, double fat, double fattyAcids,
                               double carbs, double sugar, double protein, double salt )
   {
+    lock.lock();
     String sql =
         "INSERT INTO ingredients(drink,ingredients,energy_kJ,energy_kcal,fat,fatty_acids,carbs,sugar,protein,salt) VALUES(?,?,?,?,?,?,?,?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
@@ -883,6 +946,10 @@ public class Database
     catch ( SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
     }
 
   }

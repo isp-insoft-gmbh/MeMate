@@ -30,13 +30,23 @@ public class Main
     Socket socket = null;
     try
     {
-      serverSocket = new ServerSocket( 3142 ); //Default is 3141 
+      serverSocket = new ServerSocket( 3141 ); //Default is 3141 
     }
     catch ( IOException e )
     {
       System.out.println( "Der Server konnte nicht gestartet werden" );
       e.printStackTrace();
     }
+    final String dataBasePath;
+    if ( args.length > 0 )
+    {
+      dataBasePath = args[ 0 ];
+    }
+    else
+    {
+      dataBasePath = Database.getTargetFolder().toFile().toString() + File.separator + "MeMate.db";
+    }
+    Database database = new Database( dataBasePath );
     while ( true )
     {
       try
@@ -48,16 +58,7 @@ public class Main
         System.out.println( "Es konnte keine Verbindung zwischen Client und Server aufgebaut werden\n" + "I/O error: " + e );
       }
 
-      final String dataBasePath;
-      if ( args.length > 0 )
-      {
-        dataBasePath = args[ 0 ];
-      }
-      else
-      {
-        dataBasePath = Database.getTargetFolder().toFile().toString() + File.separator + "MeMate.db";
-      }
-      new SocketThread( socket, dataBasePath ).start();
+      new SocketThread( socket, database ).start();
     }
   }
 }
