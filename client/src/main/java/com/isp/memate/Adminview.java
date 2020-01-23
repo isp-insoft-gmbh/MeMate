@@ -16,6 +16,9 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -24,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 /**
  * In der Adminview kann man das Guthaben des Spaarschweins setzen/sehen.
@@ -37,9 +41,11 @@ public class Adminview extends JPanel
 {
   private static final Adminview instance              = new Adminview();
   private final JButton          setAdminBalanceButton = new JButton( "Guthaben setzen" );
+  private final JButton          resetPasswordButton   = new JButton( "Passwort ändern" );
   private final JTextField       balanceField          = new JTextField();
   private final JLabel           piggyBankLabel        = new JLabel();
   private JPanel                 drinkAmountPanel      = new JPanel( new FlowLayout() );
+  private JDialog                passwordFrame         = new JDialog( Mainframe.getInstance() );
 
   /**
    * @return static instance of Adminview
@@ -86,7 +92,89 @@ public class Adminview extends JPanel
     setAdminBalanceButtonConstraints.anchor = GridBagConstraints.LINE_START;
     add( setAdminBalanceButton, setAdminBalanceButtonConstraints );
     setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    GridBagConstraints resetPasswordButtonConstraints = new GridBagConstraints();
+    resetPasswordButtonConstraints.gridx = 0;
+    resetPasswordButtonConstraints.gridy = 2;
+    resetPasswordButtonConstraints.gridwidth = 2;
+    resetPasswordButtonConstraints.insets = new Insets( 5, 0, 5, 0 );
+    add( resetPasswordButton, resetPasswordButtonConstraints );
     addAllDrinks();
+
+    resetPasswordButton.addActionListener( new ActionListener()
+    {
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        //FIXME Die Methode und die piggybank balance werden 3x aufgerufen wenn man den Button drückt.
+        passwordFrame.setTitle( "Passwort zurücksetzen" );
+        String[] user = ServerCommunication.getInstance().getAllUsers();
+        JPanel passwordPanel = new JPanel( new GridBagLayout() );
+        JButton saveButton = new JButton( "Speichern" );
+        JButton abortButton = new JButton( "Abbrechen" );
+        JLabel userLabel = new JLabel( "Nutzer auswählen" );
+        JLabel newPassword = new JLabel( "Neues Passwort:  " );
+        JTextField passwordField = new JTextField();
+        JComboBox<String> userComboBox = new JComboBox<>( user );
+        passwordPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
+
+        GridBagConstraints userLabelConstraints = new GridBagConstraints();
+        userLabelConstraints.gridx = 0;
+        userLabelConstraints.gridy = 0;
+        userLabelConstraints.insets = new Insets( 0, 0, 0, 5 );
+        passwordPanel.add( userLabel, userLabelConstraints );
+        GridBagConstraints userComboBoxConstraints = new GridBagConstraints();
+        userComboBoxConstraints.gridx = 1;
+        userComboBoxConstraints.gridy = 0;
+        userComboBoxConstraints.fill = GridBagConstraints.HORIZONTAL;
+        passwordPanel.add( userComboBox, userComboBoxConstraints );
+        GridBagConstraints newPasswordConstraints = new GridBagConstraints();
+        newPasswordConstraints.gridx = 0;
+        newPasswordConstraints.gridy = 1;
+        newPasswordConstraints.insets = new Insets( 10, 0, 30, 5 );
+        passwordPanel.add( newPassword, newPasswordConstraints );
+        GridBagConstraints passwordFieldConstraints = new GridBagConstraints();
+        passwordFieldConstraints.gridx = 1;
+        passwordFieldConstraints.gridy = 1;
+        passwordFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
+        passwordFieldConstraints.insets = new Insets( 10, 0, 30, 0 );
+        passwordPanel.add( passwordField, passwordFieldConstraints );
+        GridBagConstraints saveButtonConstraints = new GridBagConstraints();
+        saveButtonConstraints.gridx = 0;
+        saveButtonConstraints.gridy = 2;
+        passwordPanel.add( saveButton, saveButtonConstraints );
+        GridBagConstraints abortButtonConstraints = new GridBagConstraints();
+        abortButtonConstraints.gridx = 1;
+        abortButtonConstraints.gridy = 2;
+        passwordPanel.add( abortButton, abortButtonConstraints );
+
+
+        abortButton.addActionListener( new ActionListener()
+        {
+          @Override
+          public void actionPerformed( ActionEvent e )
+          {
+            passwordFrame.dispose();
+          }
+        } );
+        saveButton.addActionListener( new ActionListener()
+        {
+          @Override
+          public void actionPerformed( ActionEvent e )
+          {
+            ServerCommunication.getInstance().changePassword( String.valueOf( userComboBox.getSelectedItem() ),
+                Login.getInstance().getHash( passwordField.getText() ) );
+            passwordFrame.dispose();
+          }
+        } );
+
+
+        passwordFrame.add( passwordPanel );
+        passwordFrame.setSize( 300, 160 );
+        passwordFrame.setLocationRelativeTo( Mainframe.getInstance() );
+        passwordFrame.setVisible( true );
+        passwordFrame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+      }
+    } );
 
     setAdminBalanceButton.addActionListener( new ActionListener()
     {
@@ -128,7 +216,7 @@ public class Adminview extends JPanel
    */
   private void addAllDrinks()
   {
-    int index = 2;
+    int index = 3;
     for ( String drink : ServerCommunication.getInstance().getDrinkNames() )
     {
       drinkAmountPanel = new JPanel( new GridBagLayout() );

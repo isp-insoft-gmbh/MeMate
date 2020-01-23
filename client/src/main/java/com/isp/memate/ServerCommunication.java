@@ -35,6 +35,7 @@ import com.isp.memate.Shared.Operation;
 public class ServerCommunication
 {
   private static final ServerCommunication    instance            = new ServerCommunication();
+  private String[]                            userArray           = null;
   private final Map<String, Float>            priceMap            = new HashMap<>();
   private final Map<String, ImageIcon>        imageMap            = new HashMap<>();
   private final Map<String, Integer>          amountMap           = new HashMap<>();
@@ -130,6 +131,8 @@ public class ServerCommunication
             case PIGGYBANK_BALANCE:
               Adminview.getInstance().updatePiggybankBalanceLabel( shared.userBalance );
               break;
+            case GET_USERS_RESULT:
+              userArray = shared.users;
             default :
               break;
           }
@@ -153,11 +156,13 @@ public class ServerCommunication
         tellServerToSendDrinkInformations();
       }
     };
+    tellServertoSendUserArray();
     Timer timer = new Timer();
     timer.schedule( task, 0, 100 );
     Timer timer2 = new Timer();
     timer2.schedule( task2, 10000, 30000 );
   }
+
 
   /**
    * @param history
@@ -296,6 +301,21 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       System.out.println( "Die Historie konnte nicht geladen werden. " + exception );
+    }
+  }
+
+  /**
+   * Sagt dem Server, dass er ein Array mit allen Nutzern schicken soll
+   */
+  private void tellServertoSendUserArray()
+  {
+    try
+    {
+      outStream.writeObject( new Shared( Operation.GET_USERS, null ) );
+    }
+    catch ( Exception exception )
+    {
+      System.out.println( "Die Nutzer konnten nicht geladen werden. " + exception );
     }
   }
 
@@ -674,6 +694,30 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Ausloggen fehlgeschlagen", "Ausloggen" );
+    }
+  }
+
+  /**
+   * @return
+   */
+  public String[] getAllUsers()
+  {
+    return userArray;
+  }
+
+  /**
+   * @param username
+   * @param password
+   */
+  public void changePassword( String username, String password )
+  {
+    try
+    {
+      outStream.writeObject( new Shared( Operation.CHANGE_PASSWORD, new User( username, password, 0f, 1 ) ) );
+    }
+    catch ( IOException exception )
+    {
+      showErrorDialog( "Passwort ändern fehlgeschlagen.", "Passwort" );
     }
   }
 }

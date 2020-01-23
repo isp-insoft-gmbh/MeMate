@@ -36,8 +36,8 @@ import com.isp.memate.Shared.Operation;
  */
 public class Database
 {
-  private Connection conn = null;
-  ReentrantLock      lock = new ReentrantLock( true );
+  private Connection          conn = null;
+  private final ReentrantLock lock = new ReentrantLock( true );
 
   /**
    * @return path for all configuration / data; changes depending on OS
@@ -975,5 +975,52 @@ public class Database
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return null;
+  }
+
+  /**
+   * @return
+   */
+  public String[] getUser()
+  {
+    ArrayList<String> user = new ArrayList<>();
+    String sql = "SELECT username FROM user";
+    try ( Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery( sql ) )
+    {
+      while ( rs.next() )
+      {
+        user.add( rs.getString( "username" ) );
+      }
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    String[] userAsArray = user.toArray( new String[user.size()] );
+    return userAsArray;
+  }
+
+  /**
+   * @param name
+   * @param password
+   */
+  public void changePassword( String name, String password )
+  {
+    lock.lock();
+    String sql = "UPDATE user SET password = ? WHERE username = ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
+    {
+      pstmt.setString( 1, password );
+      pstmt.setString( 2, name );
+      pstmt.executeUpdate();
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
+    }
   }
 }

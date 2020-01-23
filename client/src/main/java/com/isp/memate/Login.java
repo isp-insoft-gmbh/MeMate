@@ -329,7 +329,7 @@ public class Login extends JFrame
    * @param input eingebenes Passwort
    * @return gehashtes Passwort
    */
-  private String getHash( String input )
+  public String getHash( String input )
   {
     try
     {

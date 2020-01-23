@@ -95,6 +95,10 @@ public class SocketThread extends Thread
               sendHistoryData();
               break;
 
+            case GET_USERS:
+              sendUsers();
+              break;
+
             case REGISTER_DRINK:
               registerDrink( shared.drink );
               break;
@@ -155,6 +159,10 @@ public class SocketThread extends Thread
 
             case LOGOUT:
               resetUser();
+              break;
+
+            case CHANGE_PASSWORD:
+              database.changePassword( shared.user.name, shared.user.password );
               break;
 
             default :
@@ -263,6 +271,21 @@ public class SocketThread extends Thread
     catch ( IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die Historie konnte nicht geladen werden. " + exception );
+    }
+  }
+
+  /**
+   * Sendet ein Array mit allen Nutzern an den Client
+   */
+  private void sendUsers()
+  {
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_USERS_RESULT, database.getUser() ) );
+    }
+    catch ( IOException exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
     }
   }
 

@@ -23,6 +23,7 @@ public class Shared implements Serializable
   DrinkIngredients drinkIngredients = null;
   Drink[]          drinkInfos       = null;
   String[][]       history;
+  String[]         users;
   Float            userBalance;
   String           consumedDrink;
   String           registrationResult;
@@ -117,6 +118,14 @@ public class Shared implements Serializable
         break;
       case LOGOUT:
         break;
+      case GET_USERS:
+        break;
+      case GET_USERS_RESULT:
+        users = (String[]) object;
+        break;
+      case CHANGE_PASSWORD:
+        user = (User) object;
+        break;
       default :
         break;
     }
@@ -130,6 +139,8 @@ public class Shared implements Serializable
     GET_BALANCE_RESULT,
     GET_HISTORY,
     GET_DRINKINFO,
+    GET_USERS,
+    GET_USERS_RESULT,
     REGISTER_DRINK,
     REGISTER_INGREDIENTS,
     REMOVE_DRINK,
@@ -149,6 +160,7 @@ public class Shared implements Serializable
     NO_MORE_DRINKS_AVAIBLE,
     SET_DRINK_AMOUNT,
     UNDO,
+    CHANGE_PASSWORD,
     LOGOUT;
   }
 
