@@ -41,6 +41,7 @@ public class Adminview extends JPanel
 {
   private static final Adminview instance              = new Adminview();
   private final JButton          setAdminBalanceButton = new JButton( "Guthaben setzen" );
+  private final JButton          exportButton          = new JButton( "Daten exportieren" );
   private final JButton          resetPasswordButton   = new JButton( "Passwort ändern" );
   private final JTextField       balanceField          = new JTextField();
   private final JLabel           piggyBankLabel        = new JLabel();
@@ -98,7 +99,22 @@ public class Adminview extends JPanel
     resetPasswordButtonConstraints.gridwidth = 2;
     resetPasswordButtonConstraints.insets = new Insets( 5, 0, 5, 0 );
     add( resetPasswordButton, resetPasswordButtonConstraints );
+    GridBagConstraints exportButtonConstraints = new GridBagConstraints();
+    exportButtonConstraints.gridx = 0;
+    exportButtonConstraints.gridy = 3;
+    exportButtonConstraints.gridwidth = 2;
+    exportButtonConstraints.insets = new Insets( 5, 0, 5, 0 );
+    add( exportButton, exportButtonConstraints );
     addAllDrinks();
+
+    exportButton.addActionListener( new ActionListener()
+    {
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        new DataExport();
+      }
+    } );
 
     resetPasswordButton.addActionListener( new ActionListener()
     {
@@ -216,7 +232,7 @@ public class Adminview extends JPanel
    */
   private void addAllDrinks()
   {
-    int index = 3;
+    int index = 4;
     for ( String drink : ServerCommunication.getInstance().getDrinkNames() )
     {
       drinkAmountPanel = new JPanel( new GridBagLayout() );

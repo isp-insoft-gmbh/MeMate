@@ -24,6 +24,7 @@ public class Shared implements Serializable
   Drink[]          drinkInfos       = null;
   String[][]       history;
   String[]         users;
+  User[]           fullUserArray;
   Float            userBalance;
   String           consumedDrink;
   String           registrationResult;
@@ -123,6 +124,9 @@ public class Shared implements Serializable
       case GET_USERS_RESULT:
         users = (String[]) object;
         break;
+      case GET_FULLUSERS_RESULT:
+        fullUserArray = (User[]) object;
+        break;
       case CHANGE_PASSWORD:
         user = (User) object;
         break;
@@ -141,6 +145,7 @@ public class Shared implements Serializable
     GET_DRINKINFO,
     GET_USERS,
     GET_USERS_RESULT,
+    GET_FULLUSERS_RESULT,
     REGISTER_DRINK,
     REGISTER_INGREDIENTS,
     REMOVE_DRINK,

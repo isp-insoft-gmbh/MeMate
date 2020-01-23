@@ -1001,6 +1001,29 @@ public class Database
   }
 
   /**
+   * @return
+   */
+  public User[] getFullUser()
+  {
+    ArrayList<User> user = new ArrayList<>();
+    String sql = "SELECT * FROM user";
+    try ( Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery( sql ) )
+    {
+      while ( rs.next() )
+      {
+        user.add( new User( rs.getString( "username" ), rs.getString( "password" ), rs.getFloat( "guthaben" ), rs.getInt( "ID" ) ) );
+      }
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    User[] userAsArray = user.toArray( new User[user.size()] );
+    return userAsArray;
+  }
+
+  /**
    * @param name
    * @param password
    */

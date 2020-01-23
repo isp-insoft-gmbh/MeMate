@@ -36,6 +36,8 @@ public class ServerCommunication
 {
   private static final ServerCommunication    instance            = new ServerCommunication();
   private String[]                            userArray           = null;
+  private User[]                              fullUserArray       = null;
+  private Drink[]                             drinkArray          = null;
   private final Map<String, Float>            priceMap            = new HashMap<>();
   private final Map<String, ImageIcon>        imageMap            = new HashMap<>();
   private final Map<String, Integer>          amountMap           = new HashMap<>();
@@ -97,6 +99,7 @@ public class ServerCommunication
           switch ( operation )
           {
             case GET_DRINKINFO:
+              drinkArray = shared.drinkInfos;
               updateMaps( shared.drinkInfos );
               break;
             case LOGIN_RESULT:
@@ -133,6 +136,9 @@ public class ServerCommunication
               break;
             case GET_USERS_RESULT:
               userArray = shared.users;
+            case GET_FULLUSERS_RESULT:
+              fullUserArray = shared.fullUserArray;
+              break;
             default :
               break;
           }
@@ -719,5 +725,22 @@ public class ServerCommunication
     {
       showErrorDialog( "Passwort ändern fehlgeschlagen.", "Passwort" );
     }
+  }
+
+  /**
+   * @return ein user Array mit allen Informationen um diese zu exportieren.
+   */
+  public User[] getUserArray()
+  {
+    System.out.println( fullUserArray.length );
+    return fullUserArray;
+  }
+
+  /**
+   * @return
+   */
+  public Drink[] getDrinkArray()
+  {
+    return drinkArray;
   }
 }

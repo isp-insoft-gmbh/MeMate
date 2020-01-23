@@ -287,6 +287,14 @@ public class SocketThread extends Thread
     {
       ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
     }
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_FULLUSERS_RESULT, database.getFullUser() ) );
+    }
+    catch ( Exception exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
+    }
   }
 
   /**
