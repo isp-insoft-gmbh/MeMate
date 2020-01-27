@@ -45,7 +45,7 @@ public class DataExport
    */
   private void historyExport()
   {
-    String[][] history = ServerCommunication.getInstance().getHistoryData();
+    String[][] history = ServerCommunication.getInstance().getHistoryData( true );
     try
     {
       DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();

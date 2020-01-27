@@ -317,7 +317,7 @@ public class Adminview extends JPanel
   private Float getDaysLeft( String drink )
   {
     Float amount = 0f;
-    String[][] historyData = ServerCommunication.getInstance().getHistoryData();
+    String[][] historyData = ServerCommunication.getInstance().getHistoryData( true );
     if ( historyData != null )
     {
       for ( String[] data : historyData )
@@ -327,7 +327,7 @@ public class Adminview extends JPanel
         {
           if ( action.contains( drink ) )
           {
-            String dateAsString = data[ 4 ];
+            String dateAsString = data[ 4 ].substring( 0, 10 );
             Date date;
             try
             {

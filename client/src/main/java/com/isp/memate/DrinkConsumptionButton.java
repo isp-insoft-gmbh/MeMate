@@ -226,10 +226,10 @@ public class DrinkConsumptionButton extends JPanel
               amountLabel.setText( " " + ingredients.fatty_acids + "g" );
               break;
             case "Kohlenhydrate":
-              amountLabel.setText( String.format( " %.2fg", ingredients.carbs ) );
+              amountLabel.setText( String.format( " %.1fg", ingredients.carbs ) );
               break;
             case "Zucker":
-              amountLabel.setText( String.format( " %.2fg", ingredients.sugar ) );
+              amountLabel.setText( String.format( " %.1fg", ingredients.sugar ) );
             default :
               break;
           }

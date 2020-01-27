@@ -182,7 +182,7 @@ public class ServerCommunication
   {
     List<String[]> list = Arrays.asList( history );
     Collections.reverse( list );
-    this.history = list.toArray( history );
+    this.history = list.toArray( history ).clone();
     History.getInstance().updateHistory();
     Stats.getInstance().addGraph();
     Adminview.getInstance().updateDrinkAmounts();
@@ -464,18 +464,24 @@ public class ServerCommunication
    * 
    * @return Die Historydaten als 2D Array
    */
-  public String[][] getHistoryData()
+  public String[][] getHistoryData( boolean shortDate )
   {
-    String[][] historyArray = history;
     if ( history == null )
     {
       return history;
     }
-    for ( int i = 0; i < historyArray.length; i++ )
+    String[][] historyArray = new String[history.length][];
+    for ( int i = 0; i < history.length; i++ )
     {
-      historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 10 );
+      historyArray[ i ] = Arrays.copyOf( history[ i ], history[ i ].length );
     }
-
+    if ( shortDate )
+    {
+      for ( int i = 0; i < historyArray.length; i++ )
+      {
+        historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 10 );
+      }
+    }
     return historyArray;
   }
 

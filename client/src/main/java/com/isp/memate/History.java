@@ -43,8 +43,8 @@ public class History extends JPanel
   public History()
   {
     super( new BorderLayout() );
-    historyTable = new JTable( ServerCommunication.getInstance().getHistoryData(), columnNames );
-    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData(), columnNames )
+    historyTable = new JTable( ServerCommunication.getInstance().getHistoryData( true ), columnNames );
+    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( true ), columnNames )
     {
       @Override
       public boolean isCellEditable( int row, int column )
@@ -65,7 +65,7 @@ public class History extends JPanel
   @SuppressWarnings( "javadoc" )
   public void updateHistory()
   {
-    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData(), columnNames )
+    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( true ), columnNames )
     {
       @Override
       public boolean isCellEditable( int row, int column )
