@@ -107,6 +107,11 @@ public class Adminview extends JPanel
     add( exportButton, exportButtonConstraints );
     addAllDrinks();
 
+    ActionListener[] exportButtonListener = exportButton.getActionListeners();
+    for ( ActionListener actionListener : exportButtonListener )
+    {
+      exportButton.removeActionListener( actionListener );
+    }
     exportButton.addActionListener( new ActionListener()
     {
       @Override
@@ -116,12 +121,17 @@ public class Adminview extends JPanel
       }
     } );
 
+
+    ActionListener[] resetPasswordButtonListeners = resetPasswordButton.getActionListeners();
+    for ( ActionListener actionListener : resetPasswordButtonListeners )
+    {
+      resetPasswordButton.removeActionListener( actionListener );
+    }
     resetPasswordButton.addActionListener( new ActionListener()
     {
       @Override
       public void actionPerformed( ActionEvent e )
       {
-        //FIXME Die Methode und die piggybank balance werden 3x aufgerufen wenn man den Button drückt.
         passwordFrame.setTitle( "Passwort zurücksetzen" );
         String[] user = ServerCommunication.getInstance().getAllUsers();
         JPanel passwordPanel = new JPanel( new GridBagLayout() );
@@ -182,8 +192,6 @@ public class Adminview extends JPanel
             passwordFrame.dispose();
           }
         } );
-
-
         passwordFrame.add( passwordPanel );
         passwordFrame.setSize( 300, 160 );
         passwordFrame.setLocationRelativeTo( Mainframe.getInstance() );
@@ -192,6 +200,11 @@ public class Adminview extends JPanel
       }
     } );
 
+    ActionListener[] setAdminBalanceButtonListeners = setAdminBalanceButton.getActionListeners();
+    for ( ActionListener actionListener : setAdminBalanceButtonListeners )
+    {
+      setAdminBalanceButton.removeActionListener( actionListener );
+    }
     setAdminBalanceButton.addActionListener( new ActionListener()
     {
       @Override

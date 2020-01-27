@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.FocusManager;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -34,6 +35,7 @@ import com.isp.memate.Shared.Operation;
  */
 public class ServerCommunication
 {
+  static String                               version             = "x";
   private static final ServerCommunication    instance            = new ServerCommunication();
   private String[]                            userArray           = null;
   private User[]                              fullUserArray       = null;
@@ -138,6 +140,9 @@ public class ServerCommunication
               userArray = shared.users;
             case GET_FULLUSERS_RESULT:
               fullUserArray = shared.fullUserArray;
+              break;
+            case GET_VERSION:
+              version = shared.version;
               break;
             default :
               break;
@@ -322,6 +327,21 @@ public class ServerCommunication
     catch ( Exception exception )
     {
       System.out.println( "Die Nutzer konnten nicht geladen werden. " + exception );
+    }
+  }
+
+  /**
+   * Sagt dem Server, dass er die aktuelle Versionsnummer schicken soll
+   */
+  public void tellServertoSendVersionNumber()
+  {
+    try
+    {
+      outStream.writeObject( new Shared( Operation.GET_VERSION, "x" ) );
+    }
+    catch ( Exception exception )
+    {
+      System.out.println( "Die Versionsnummer konnte nicht geladen werden. " + exception );
     }
   }
 
@@ -742,5 +762,23 @@ public class ServerCommunication
   public Drink[] getDrinkArray()
   {
     return drinkArray;
+  }
+
+  /**
+   * @param clientVersion
+   */
+  public void checkVersion( String clientVersion )
+  {
+    System.out.println( "CHECK" );
+    System.out.println( version );
+    System.out.println( clientVersion );
+    if ( !version.equals( clientVersion ) )
+    {
+      JOptionPane.showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(),
+          "Es sind Updates verfügbar.\nInstallierte Produkt-Version: " + Main.version + "\nServer-Version: "
+              + ServerCommunication.version,
+          "Update",
+          JOptionPane.ERROR_MESSAGE, null );
+    }
   }
 }

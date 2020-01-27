@@ -30,6 +30,7 @@ public class Shared implements Serializable
   String           registrationResult;
   String           username;
   String           userSessionID;
+  String           version;
   int              balanceToAdd;
   Operation        operation;
   LoginResult      loginResult;
@@ -130,6 +131,9 @@ public class Shared implements Serializable
       case CHANGE_PASSWORD:
         user = (User) object;
         break;
+      case GET_VERSION:
+        version = (String) object;
+        break;
       default :
         break;
     }
@@ -146,6 +150,7 @@ public class Shared implements Serializable
     GET_USERS,
     GET_USERS_RESULT,
     GET_FULLUSERS_RESULT,
+    GET_VERSION,
     REGISTER_DRINK,
     REGISTER_INGREDIENTS,
     REMOVE_DRINK,

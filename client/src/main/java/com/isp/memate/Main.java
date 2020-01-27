@@ -18,6 +18,8 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class Main
 {
+  static String version = "1.0.0";
+
   /**
    * @param args unused
    */
@@ -61,25 +63,30 @@ public class Main
     }
     if ( sessionID == null || sessionID.equals( "null" ) )
     {
+      ServerCommunication.getInstance().tellServertoSendVersionNumber();
       Login login = Login.getInstance();
       login.setVisible( true );
+      ServerCommunication.getInstance().checkVersion( version );
     }
     else
     {
       ServerCommunication.getInstance().sessionID = sessionID;
       ServerCommunication.getInstance().checkLoginForSessionID( sessionID );
+      ServerCommunication.getInstance().tellServertoSendVersionNumber();
       Mainframe mainframe = Mainframe.getInstance();
       if ( ServerCommunication.getInstance().currentUser == null )
       {
         System.out.println( "Es wurde kein Nutzer für die angegeben Session gefunden." );
         Login login = Login.getInstance();
         login.setVisible( true );
+        ServerCommunication.getInstance().checkVersion( version );
       }
       else
       {
         mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         mainframe.setVisible( true );
         ServerCommunication.getInstance().tellServerToSendHistoryData();
+        ServerCommunication.getInstance().checkVersion( version );
         History.getInstance().updateHistory();
         mainframe.toggleAdminView();
         mainframe.requestFocus();

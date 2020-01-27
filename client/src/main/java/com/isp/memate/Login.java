@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -435,7 +436,18 @@ public class Login extends JFrame
   {
     Font headerLabelFont = headerLabel.getFont();
     String fontName = LABEL_FONT.getFontName();
-    headerLabel.setFont( new Font( "Comic Sans MS", headerLabelFont.getStyle(), (int) (headerLabelFont.getSize() * 3f) ) );
+    GraphicsEnvironment g = null;
+    g = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    String[] fonts = g.getAvailableFontFamilyNames();
+    for ( int i = 0; i < fonts.length; i++ )
+    {
+      if ( fonts[ i ].equals( "Century Gothic" ) )
+      {
+        headerLabel.setFont( new Font( "Century Gothic", headerLabelFont.getStyle(), (int) (headerLabelFont.getSize() * 3f) ) );
+        break;
+      }
+      headerLabel.setFont( new Font( "Comic Sans MS", headerLabelFont.getStyle(), (int) (headerLabelFont.getSize() * 3f) ) );
+    }
     usernameLabel.setFont( LABEL_FONT );
     passwordLabel.setFont( LABEL_FONT );
     stayLoggedInLabel.setFont( LABEL_FONT );

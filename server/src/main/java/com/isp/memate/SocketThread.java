@@ -26,6 +26,7 @@ import com.isp.memate.Shared.Operation;
  */
 public class SocketThread extends Thread
 {
+  String               version = "1.0.0";
   Database             database;
   protected Socket     socket;
   Map<String, Integer> userIDMap;
@@ -97,6 +98,10 @@ public class SocketThread extends Thread
 
             case GET_USERS:
               sendUsers();
+              break;
+
+            case GET_VERSION:
+              sendVersion();
               break;
 
             case REGISTER_DRINK:
@@ -256,6 +261,21 @@ public class SocketThread extends Thread
     catch ( IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Das Guthaben des Spaarschweins konnte nicht geladen werden. " + exception );
+    }
+  }
+
+  /**
+   * Sendet die aktuelle Versionsnummer an den Client
+   */
+  private void sendVersion()
+  {
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_VERSION, version ) );
+    }
+    catch ( IOException exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Die Versionsnummer konnte nicht geladen werden. " + exception );
     }
   }
 
