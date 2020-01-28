@@ -8,20 +8,13 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,8 +23,6 @@ import javax.swing.UIManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -43,9 +34,9 @@ import org.jfree.data.xy.XYDataset;
  * @since 19.12.2019
  *
  */
-public class Stats extends JPanel
+public class ConsumptionRate extends JPanel
 {
-  private static final Stats instance  = new Stats();
+  private static final ConsumptionRate instance  = new ConsumptionRate();
   XYDataset                  dataset;
   JFreeChart                 chart;
   ChartPanel                 chartPanel;
@@ -54,7 +45,7 @@ public class Stats extends JPanel
   /**
    * 
    */
-  public Stats()
+  public ConsumptionRate()
   {
     setLayout( new GridBagLayout() );
     setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
@@ -100,42 +91,6 @@ public class Stats extends JPanel
     return new TimeSeriesCollection( series );
   }
 
-  private DefaultCategoryDataset createBalanceDataset()
-  {
-    DateFormat dateFormat = new SimpleDateFormat( "dd-MMM HH:mm:ss" );
-    DateFormat oldFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS" );
-    String[][] historyData = ServerCommunication.getInstance().getHistoryData( false );
-    for ( int i = 0; i < historyData.length / 2; i++ )
-    {
-      String[] temp = historyData[ i ];
-      historyData[ i ] = historyData[ historyData.length - i - 1 ];
-      historyData[ historyData.length - i - 1 ] = temp;
-    }
-    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-    for ( String[] data : historyData )
-    {
-      String action = data[ 0 ];
-      if ( data[ 1 ].equals( ServerCommunication.getInstance().currentUser ) )
-      {
-        if ( action.contains( "Guthaben" ) || action.contains( "getrunken" ) )
-        {
-          Date date = null;
-          try
-          {
-            date = oldFormat.parse( data[ 4 ] );
-          }
-          catch ( ParseException exception )
-          {
-            System.out.println( "Das Datum konnt nicht formatiert werden." + exception );
-          }
-          dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
-              dateFormat.format( date ) );
-        }
-      }
-    }
-    return dataset;
-  }
 
   private JFreeChart createChart( final XYDataset dataset )
   {
@@ -152,7 +107,7 @@ public class Stats extends JPanel
   /**
    * @return static Instance of Stats
    */
-  public static Stats getInstance()
+  public static ConsumptionRate getInstance()
   {
     return instance;
 
@@ -177,15 +132,6 @@ public class Stats extends JPanel
     chartPanelConstraits.weightx = 1;
     chartPanelConstraits.weighty = 1;
     add( chartPanel, chartPanelConstraits );
-    JButton nextGraphButton = new JButton( "Nächster Graph" );
-    // nextGraphButton.setEnabled( false );
-    GridBagConstraints nextGraphButtonConstraints = new GridBagConstraints();
-    nextGraphButtonConstraints.gridx = 1;
-    nextGraphButtonConstraints.gridy = 1;
-    nextGraphButtonConstraints.insets = new Insets( 10, 0, 0, 10 );
-    nextGraphButtonConstraints.anchor = GridBagConstraints.NORTH;
-    nextGraphButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
-    add( nextGraphButton, nextGraphButtonConstraints );
     String[] values = new String[ServerCommunication.getInstance().getDrinkNames().size()];
     values = ServerCommunication.getInstance().getDrinkNames().toArray( values );
     JComboBox<String> selectDrinkComboBox = new JComboBox<>( values );
@@ -202,64 +148,10 @@ public class Stats extends JPanel
             String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
     GridBagConstraints averageConsumptionConstraints = new GridBagConstraints();
     averageConsumptionConstraints.gridx = 1;
-    averageConsumptionConstraints.gridy = 2;
+    averageConsumptionConstraints.gridy = 1;
     averageConsumptionConstraints.insets = new Insets( 10, 0, 0, 10 );
     averageConsumptionConstraints.anchor = GridBagConstraints.NORTH;
     add( averageConsumption, averageConsumptionConstraints );
-
-
-    nextGraphButton.addActionListener( new ActionListener()
-    {
-      @Override
-      public void actionPerformed( ActionEvent e )
-      {
-        remove( chartPanel );
-        remove( selectDrinkComboBox );
-        remove( averageConsumption );
-        JFreeChart lineChart = ChartFactory.createLineChart(
-            "Guthabenverlauf",
-            "Datum", "Guthaben",
-            createBalanceDataset(),
-            PlotOrientation.VERTICAL,
-            true, true, false );
-
-        chartPanel = new ChartPanel( lineChart );
-        chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
-        chartPanel.setMouseZoomable( true, false );
-        GridBagConstraints chartPanelConstraits = new GridBagConstraints();
-        chartPanelConstraits.gridx = 0;
-        chartPanelConstraits.gridy = 0;
-        chartPanelConstraits.gridheight = 3;
-        chartPanelConstraits.fill = GridBagConstraints.BOTH;
-        chartPanelConstraits.weightx = 1;
-        chartPanelConstraits.weighty = 1;
-        add( chartPanel, chartPanelConstraits );
-        remove( nextGraphButton );
-        GridBagConstraints nextGraphButtonConstraints = new GridBagConstraints();
-        nextGraphButtonConstraints.gridx = 1;
-        nextGraphButtonConstraints.gridy = 1;
-        nextGraphButtonConstraints.insets = new Insets( 65, 0, 0, 10 );
-        nextGraphButtonConstraints.anchor = GridBagConstraints.NORTH;
-        nextGraphButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
-        add( nextGraphButton, nextGraphButtonConstraints );
-        nextGraphButton.setText( "Vorheriger Graph" );
-        repaint();
-        revalidate();
-
-        nextGraphButton.removeActionListener( this );
-        nextGraphButton.addActionListener( new ActionListener()
-        {
-          @Override
-          public void actionPerformed( ActionEvent e )
-          {
-            addGraph();
-            repaint();
-            revalidate();
-            nextGraphButton.removeActionListener( this );
-          }
-        } );
-      }
-    } );
 
 
     selectDrinkComboBox.addItemListener( new ItemListener()

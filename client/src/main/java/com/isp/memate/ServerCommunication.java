@@ -184,7 +184,8 @@ public class ServerCommunication
     Collections.reverse( list );
     this.history = list.toArray( history ).clone();
     History.getInstance().updateHistory();
-    Stats.getInstance().addGraph();
+    ConsumptionRate.getInstance().addGraph();
+    CreditHistory.getInstance().addChart();
     Adminview.getInstance().updateDrinkAmounts();
   }
 

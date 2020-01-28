@@ -62,7 +62,8 @@ public class Mainframe extends JFrame
     setBorderAndDeriveFonts();
     tabbedPane.addTab( "Dashboard", Dashboard.getInstance() );
     tabbedPane.addTab( "Historie", History.getInstance() );
-    tabbedPane.addTab( "Stats", Stats.getInstance() );
+    tabbedPane.addTab( "Vebrauchsrate", ConsumptionRate.getInstance() );
+    tabbedPane.addTab( "Guthabenverlauf", CreditHistory.getInstance() );
     // tabbedPane.addTab( "Präferenzen", PreferencesTab.getInstance() );
 
     layoutComponents();
@@ -192,10 +193,10 @@ public class Mainframe extends JFrame
     }
     else
     {
-      if ( tabbedPane.getTabCount() > 3 )
+      if ( tabbedPane.getTabCount() > 4 )
       {
+        tabbedPane.removeTabAt( 5 );
         tabbedPane.removeTabAt( 4 );
-        tabbedPane.removeTabAt( 3 );
       }
     }
   }
