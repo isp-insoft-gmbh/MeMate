@@ -425,6 +425,11 @@ public class DrinkConsumptionButton extends JPanel
    */
   private void askWhetherToReallyConsume( String drinkName, ActionListener abortButtonListener )
   {
+    if ( Dashboard.getInstance().drinkButtonActive )
+    {
+      return;
+    }
+    Dashboard.getInstance().drinkButtonActive = true;
     infoButton.setEnabled( false );
     DrinkConsumptionButton.this.removeMouseListener( mouseListener );
     DrinkConsumptionButton.this.removeKeyListener( keyListener );
@@ -459,6 +464,7 @@ public class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         Dashboard.getInstance().undoButton.setEnabled( true );
         infoButton.setEnabled( true );
+        Dashboard.getInstance().drinkButtonActive = false;
       }
     };
     acceptButton.addActionListener( actionListener );
@@ -472,6 +478,7 @@ public class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         abortButton.removeActionListener( this );
         infoButton.setEnabled( true );
+        Dashboard.getInstance().drinkButtonActive = false;
       }
     };
     abortButton.addActionListener( actionListener2 );

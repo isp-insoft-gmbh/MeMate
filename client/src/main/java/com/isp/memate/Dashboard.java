@@ -43,10 +43,11 @@ import net.miginfocom.swing.MigLayout;
 public class Dashboard extends JPanel
 {
   private final Mainframe        mainFrame;
-  private static final Dashboard instance   = new Dashboard( Mainframe.getInstance() );
-  final ImageIcon                undoIcon   = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
-  final JButton                  undoButton = new JButton( undoIcon );
-  JScrollPane                    scrollpane;
+  private static final Dashboard instance          = new Dashboard( Mainframe.getInstance() );
+  final ImageIcon                undoIcon          = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
+  final JButton                  undoButton        = new JButton( undoIcon );
+  private JScrollPane            scrollpane;
+  boolean                        drinkButtonActive = false;
 
   /**
    * @return static instance of Dashboard
