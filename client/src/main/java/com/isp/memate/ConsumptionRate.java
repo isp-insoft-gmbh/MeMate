@@ -13,6 +13,8 @@ import java.awt.event.ItemListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import javax.swing.JComboBox;
@@ -36,11 +38,13 @@ import org.jfree.data.xy.XYDataset;
  */
 public class ConsumptionRate extends JPanel
 {
-  private static final ConsumptionRate instance  = new ConsumptionRate();
-  XYDataset                  dataset;
-  JFreeChart                 chart;
-  ChartPanel                 chartPanel;
-  final Map<String, Integer> amountMap = new HashMap<>();
+  private static final ConsumptionRate instance       = new ConsumptionRate();
+  XYDataset                            dataset;
+  JFreeChart                           chart;
+  ChartPanel                           chartPanel;
+  final Map<String, Integer>           amountMap      = new HashMap<>();
+  JComboBox<String>                    selectDrinkComboBox;
+  HashSet<String>                      consumedDrinks = new LinkedHashSet<>();
 
   /**
    * 
@@ -67,6 +71,8 @@ public class ConsumptionRate extends JPanel
       String action = data[ 0 ];
       if ( action.contains( "getrunken" ) )
       {
+        String drinkname = action.substring( 0, action.length() - 10 );
+        consumedDrinks.add( drinkname );
         if ( drink.equals( "Alle" ) )
         {
           String date = data[ 4 ];
@@ -132,11 +138,13 @@ public class ConsumptionRate extends JPanel
     chartPanelConstraits.weightx = 1;
     chartPanelConstraits.weighty = 1;
     add( chartPanel, chartPanelConstraits );
-    String[] values = new String[ServerCommunication.getInstance().getDrinkNames().size()];
-    values = ServerCommunication.getInstance().getDrinkNames().toArray( values );
-    JComboBox<String> selectDrinkComboBox = new JComboBox<>( values );
+    selectDrinkComboBox = new JComboBox<>();
     selectDrinkComboBox.addItem( "Alle" );
     selectDrinkComboBox.setSelectedItem( "Alle" );
+    for ( String string : consumedDrinks )
+    {
+      selectDrinkComboBox.addItem( string );
+    }
     GridBagConstraints selectedDrinkComboboxConstraints = new GridBagConstraints();
     selectedDrinkComboboxConstraints.gridx = 1;
     selectedDrinkComboboxConstraints.gridy = 0;
