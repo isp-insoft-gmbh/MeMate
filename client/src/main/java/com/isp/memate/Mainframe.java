@@ -5,25 +5,26 @@ package com.isp.memate;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+
+import com.isp.memate.actionbar.MeMateActionBar;
+import com.isp.memate.actionbar.MeMateActionBarButton;
 
 /**
  * Der Mainframe bildet das Gerüst für Dashboard, Historie und den Getränkemanager.
@@ -36,14 +37,36 @@ import javax.swing.border.EmptyBorder;
  */
 public class Mainframe extends JFrame
 {
-  private static final Mainframe instance        = new Mainframe();
-  private final JPanel           mainPanel       = new JPanel( new BorderLayout() );
-  private final JPanel           headerPanel     = new JPanel( new GridBagLayout() );
-  private final JLabel           kontostandLabel = new JLabel();
-  private final JLabel           helloUserLabel  = new JLabel( "Hallo User" );
-  private final JButton          logOutButton    =
-      new JButton( new ImageIcon( getClass().getClassLoader().getResource( "logout.png" ) ) );
-  private final JTabbedPane      tabbedPane      = new JTabbedPane();
+  private static final Mainframe instance               = new Mainframe();
+  private JPanel                 contentPanel           = new JPanel( new BorderLayout() );
+  private JPanel                 headerPanel            = new JPanel();
+  private final Color            color                  = new Color( 29, 164, 165 );
+  private final JLabel           balanceLabel           = new JLabel();
+  private final JLabel           helloUserLabel         = new JLabel( "Hallo User" );
+  private final Icon             dashboardIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_black.png" ) );
+  private final Icon             dashboardIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_white.png" ) );
+  private final Icon             historyIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "history_black.png" ) );
+  private final Icon             historyIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "history_white.png" ) );
+  private final Icon             adminViewIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_black.png" ) );
+  private final Icon             adminViewIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_white.png" ) );
+  private final Icon             drinkManagerIconBlack  =
+      new ImageIcon( getClass().getClassLoader().getResource( "drinkmanager_black.png" ) );
+  private final Icon             drinkManagerIconWhite  =
+      new ImageIcon( getClass().getClassLoader().getResource( "drinkmanager_white.png" ) );
+  private final Icon             logoutIconBlack        = new ImageIcon( getClass().getClassLoader().getResource( "logout_black_24.png" ) );
+  private final Icon             logoutIconWhite        = new ImageIcon( getClass().getClassLoader().getResource( "logout_white_24.png" ) );
+  private final Icon             consumptionIconBlack   =
+      new ImageIcon( getClass().getClassLoader().getResource( "consumption_black.png" ) );
+  private final Icon             consumptionIconWhite   =
+      new ImageIcon( getClass().getClassLoader().getResource( "consumption_white.png" ) );
+  private final Icon             creditHistoryIconBlack =
+      new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_black.png" ) );
+  private final Icon             creditHistoryIconWhite =
+      new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_white.png" ) );
+  private MeMateActionBar        bar                    = new MeMateActionBar( Color.white, Color.black );
+  MeMateActionBarButton          drinkManagerButton;
+  MeMateActionBarButton          adminViewButton;
+  MeMateActionBarButton          logoutButton;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -59,27 +82,96 @@ public class Mainframe extends JFrame
    */
   public Mainframe()
   {
-    setBorderAndDeriveFonts();
-    tabbedPane.addTab( "Dashboard", Dashboard.getInstance() );
-    tabbedPane.addTab( "Historie", History.getInstance() );
-    tabbedPane.addTab( "Vebrauchsrate", ConsumptionRate.getInstance() );
-    tabbedPane.addTab( "Guthabenverlauf", CreditHistory.getInstance() );
-    // tabbedPane.addTab( "Präferenzen", PreferencesTab.getInstance() );
-
-    layoutComponents();
-    add( mainPanel );
+    deriveFontsAndSetLayout();
+    addActionBar();
     setIconImage(
         Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-    setSize( 1170, 790 );
+    setMinimumSize( new Dimension( 380, 470 ) );
+    setSize( 1185, 790 );
     setLocationRelativeTo( null );
-    logOutButton.setToolTipText( "Ausloggen" );
+  }
 
-    logOutButton.addActionListener( new ActionListener()
+  /**
+   * 
+   */
+  private void addActionBar()
+  {
+    headerPanel.add( bar.createToggleButtonTitleVisibleState().getBarButton(), BorderLayout.WEST );
+
+    bar.addActionButton( dashboardIconBlack, dashboardIconWhite, "Dashboard", "Dashboard öffnen", color, new Runnable()
+    {
+      public void run()
+      {
+        contentPanel.removeAll();
+        contentPanel.add( Dashboard.getInstance(), BorderLayout.CENTER );
+        contentPanel.repaint();
+        contentPanel.revalidate();
+      }
+    } );
+    bar.addActionButton( historyIconBlack, historyIconWhite, "Historie", "Historie öffnen", color, new Runnable()
+    {
+      public void run()
+      {
+        contentPanel.removeAll();
+        contentPanel.add( History.getInstance(), BorderLayout.CENTER );
+        contentPanel.repaint();
+        contentPanel.revalidate();
+      }
+    } );
+    bar.addActionButton( consumptionIconBlack, consumptionIconWhite, "Verbrauchsrate",
+        "Hier können sie ihren durchschnittlichen Konsum sehen", color, new Runnable()
+        {
+          public void run()
+          {
+            contentPanel.removeAll();
+            contentPanel.add( ConsumptionRate.getInstance(), BorderLayout.CENTER );
+            contentPanel.repaint();
+            contentPanel.revalidate();
+          }
+        } );
+    bar.addActionButton( creditHistoryIconBlack, creditHistoryIconWhite, "Guthabenverlauf",
+        "Hier können sie den Verlauf ihres Guthabens betrachten", color, new Runnable()
+        {
+          public void run()
+          {
+            contentPanel.removeAll();
+            contentPanel.add( CreditHistory.getInstance() );
+            contentPanel.repaint();
+            contentPanel.revalidate();
+          }
+        } );
+    drinkManagerButton = bar.addActionButton( drinkManagerIconBlack, drinkManagerIconWhite, "Getränkemanager",
+        "Getränkemanager öffnen", color, new Runnable()
+        {
+          public void run()
+          {
+            contentPanel.removeAll();
+            contentPanel.add( Drinkmanager.getInstance() );
+            contentPanel.repaint();
+            contentPanel.revalidate();
+          }
+        } );
+    drinkManagerButton.setEnabled( false );
+    adminViewButton = bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Adminview",
+        "Adminansicht öffnen", color, new Runnable()
+        {
+          public void run()
+          {
+            contentPanel.removeAll();
+            contentPanel.add( Adminview.getInstance() );
+            contentPanel.repaint();
+            contentPanel.revalidate();
+          }
+        } );
+    adminViewButton.setEnabled( false );
+
+    bar.addVariableGlue();
+    logoutButton = bar.addActionButton( logoutIconBlack, logoutIconWhite, "Logout", "Ausloggen", new Runnable()
     {
       @Override
-      public void actionPerformed( ActionEvent e )
+      public void run()
       {
         ServerCommunication.getInstance().sessionID = null;
         ServerCommunication.getInstance().currentUser = null;
@@ -100,10 +192,14 @@ public class Mainframe extends JFrame
         dispose();
         Login login = Login.getInstance();
         login.setVisible( true );
+        logoutButton.setBackground( bar.getBackground() );
       }
     } );
+    add( bar, BorderLayout.WEST );
+    add( headerPanel, BorderLayout.NORTH );
+    add( contentPanel, BorderLayout.CENTER );
+    bar.selectButton( "Dashboard" );
   }
-
 
   /**
    * Setzt den Text Im Begrüßungslabel.
@@ -115,41 +211,31 @@ public class Mainframe extends JFrame
     helloUserLabel.setText( "Hallo " + username );
   }
 
-  /**
-   * Setzt das Layout für das Kontostandlabel und das Begrüßungslabel und fügt diese dem Headerpanel hinzu.
-   */
-  private void layoutComponents()
-  {
-    final GridBagConstraints kontoStandLabelConstraints = new GridBagConstraints();
-    kontoStandLabelConstraints.anchor = GridBagConstraints.LINE_START;
-    kontoStandLabelConstraints.gridx = 0;
-    kontoStandLabelConstraints.weightx = 0.5;
-    headerPanel.add( kontostandLabel, kontoStandLabelConstraints );
-
-    final GridBagConstraints halloLabelConstraints = new GridBagConstraints();
-    halloLabelConstraints.anchor = GridBagConstraints.LINE_END;
-    halloLabelConstraints.gridx = 1;
-    halloLabelConstraints.weightx = 1;
-    headerPanel.add( helloUserLabel, halloLabelConstraints );
-
-    final GridBagConstraints logOutButtonConstraints = new GridBagConstraints();
-    logOutButtonConstraints.anchor = GridBagConstraints.LINE_END;
-    logOutButtonConstraints.gridx = 2;
-    logOutButtonConstraints.weightx = 0.01;
-    headerPanel.add( logOutButton, logOutButtonConstraints );
-
-    mainPanel.add( headerPanel, BorderLayout.NORTH );
-    mainPanel.add( tabbedPane, BorderLayout.CENTER );
-  }
 
   /**
    * Setzt Border und ändert ein paar Schriftgrößen
    */
-  private void setBorderAndDeriveFonts()
+  private void deriveFontsAndSetLayout()
   {
-    mainPanel.setBorder( new EmptyBorder( 10, 10, 10, 10 ) );
-    kontostandLabel.setFont( kontostandLabel.getFont().deriveFont( 20f ) );
+    balanceLabel.setFont( balanceLabel.getFont().deriveFont( 20f ) );
     helloUserLabel.setFont( helloUserLabel.getFont().deriveFont( 20f ) );
+    balanceLabel.setForeground( Color.white );
+    helloUserLabel.setForeground( Color.white );
+    headerPanel.setLayout( new BorderLayout() );
+    JPanel titlePanel = new JPanel();
+    titlePanel.setLayout( new BoxLayout( titlePanel, BoxLayout.X_AXIS ) );
+    titlePanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 10 ) );
+
+    setLayout( new BorderLayout() );
+    contentPanel.add( Dashboard.getInstance() );
+    headerPanel.setBackground( color );
+    contentPanel.setBackground( Color.white );
+    contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
+    titlePanel.add( helloUserLabel );
+    titlePanel.add( Box.createHorizontalGlue() );
+    titlePanel.add( balanceLabel );
+    titlePanel.setOpaque( false );
+    headerPanel.add( titlePanel, BorderLayout.CENTER );
   }
 
   /**
@@ -170,14 +256,14 @@ public class Mainframe extends JFrame
    */
   public void updateBalanceLabel( Float newBalance )
   {
-    kontostandLabel.setText( String.format( "Kontostand: %.2f €", newBalance ) );
+    balanceLabel.setText( String.format( "Kontostand: %.2f €", newBalance ) );
     if ( newBalance.floatValue() >= 0 )
     {
-      kontostandLabel.setForeground( UIManager.getColor( "Label.foreground" ) );
+      balanceLabel.setForeground( Color.white );
     }
     else
     {
-      kontostandLabel.setForeground( Color.RED );
+      balanceLabel.setForeground( Color.RED );
     }
   }
 
@@ -188,16 +274,14 @@ public class Mainframe extends JFrame
   {
     if ( ServerCommunication.getInstance().currentUser.equals( "admin" ) )
     {
-      tabbedPane.addTab( "Getränkemanager", Drinkmanager.getInstance() );
-      tabbedPane.addTab( "Adminview", Adminview.getInstance() );
+      drinkManagerButton.setEnabled( true );
+      adminViewButton.setEnabled( true );
     }
     else
     {
-      if ( tabbedPane.getTabCount() > 4 )
-      {
-        tabbedPane.removeTabAt( 5 );
-        tabbedPane.removeTabAt( 4 );
-      }
+      drinkManagerButton.setEnabled( false );
+      adminViewButton.setEnabled( false );
     }
+
   }
 }

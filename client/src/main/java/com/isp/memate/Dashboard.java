@@ -4,6 +4,7 @@
 package com.isp.memate;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -94,11 +95,10 @@ public class Dashboard extends JPanel
 
 
     setLayout( new BorderLayout() );
-    setBorder( new EmptyBorder( 5, 10, 10, 10 ) );
     add( upperPanel, BorderLayout.NORTH );
     add( scrollpane, BorderLayout.CENTER );
     add( createLowerPanel(), BorderLayout.SOUTH );
-    setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    setBackground( Color.white );
   }
 
   /**
@@ -111,6 +111,9 @@ public class Dashboard extends JPanel
     final JPanel panel = new JPanel();
     final SpinnerNumberModel spinnerModel = new SpinnerNumberModel( 1, 1, 1000, 1 );
     final JSpinner valueSpinner = new JSpinner( spinnerModel );
+    //    String pattern = "0€";
+    //    JSpinner.NumberEditor editor = new JSpinner.NumberEditor( valueSpinner, pattern );
+    //    valueSpinner.setEditor( editor );
 
     final JButton aufladenButton = new JButton( "Einzahlen" );
     final JSeparator seperator = new JSeparator( JSeparator.VERTICAL );
