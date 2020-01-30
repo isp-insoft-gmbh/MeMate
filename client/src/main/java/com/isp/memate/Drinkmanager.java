@@ -30,15 +30,15 @@ import javax.swing.event.ListSelectionListener;
  */
 public class Drinkmanager extends JPanel
 {
+  private static final Drinkmanager instance          = new Drinkmanager();
   private String[]                  data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
   private JList<String>             drinkList         = new JList<>( data );
   private final JScrollPane         scrollpane        = new JScrollPane();
   private int                       currentSelection;
-  final JButton                     addButton         = new JButton( "Hinzufügen" );
-  final JButton                     editButton        = new JButton( "Bearbeiten" );
-  final JButton                     removeButton      = new JButton( "Entfernen" );
-  final JButton                     ingredientsButton = new JButton( "Inhaltsstoffe" );
-  private static final Drinkmanager instance          = new Drinkmanager();
+  private final JButton             addButton         = new JButton( "Hinzufügen" );
+  private final JButton             editButton        = new JButton( "Bearbeiten" );
+  private final JButton             removeButton      = new JButton( "Entfernen" );
+  private final JButton             ingredientsButton = new JButton( "Inhaltsstoffe" );
 
   /**
    * @return static instance of {@link Drinkmanager}

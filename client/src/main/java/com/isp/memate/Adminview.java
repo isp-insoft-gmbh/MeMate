@@ -45,8 +45,8 @@ public class Adminview extends JPanel
   private final JButton          resetPasswordButton   = new JButton( "Passwort ändern" );
   private final JTextField       balanceField          = new JTextField();
   private final JLabel           piggyBankLabel        = new JLabel();
+  private final JDialog          passwordFrame         = new JDialog( Mainframe.getInstance() );
   private JPanel                 drinkAmountPanel      = new JPanel( new FlowLayout() );
-  private JDialog                passwordFrame         = new JDialog( Mainframe.getInstance() );
 
   /**
    * @return static instance of Adminview

@@ -21,6 +21,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.actionbar.MeMateActionBar;
@@ -67,11 +68,11 @@ public class Mainframe extends JFrame
       new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_black.png" ) );
   private final Icon             creditHistoryIconWhite =
       new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_white.png" ) );
-  private MeMateActionBar        bar                    = new MeMateActionBar( Color.white, Color.black );
-  MeMateActionBarButton          drinkManagerButton;
-  MeMateActionBarButton          adminViewButton;
-  MeMateActionBarButton          logoutButton;
-  MeMateActionBarButton          darkModeButton;
+  private final MeMateActionBar  bar                    = new MeMateActionBar( new Color( 225, 225, 225 ), Color.black );
+  private MeMateActionBarButton  drinkManagerButton;
+  private MeMateActionBarButton  adminViewButton;
+  private MeMateActionBarButton  logoutButton;
+  private MeMateActionBarButton  darkModeButton;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -93,7 +94,7 @@ public class Mainframe extends JFrame
         Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-    setMinimumSize( new Dimension( 380, 470 ) );
+    setMinimumSize( new Dimension( 380, 475 ) );
     setSize( 1185, 790 );
     setLocationRelativeTo( null );
   }
@@ -181,12 +182,14 @@ public class Mainframe extends JFrame
         bar.toggleDarkmode();
         if ( bar.darkModeOn() )
         {
+          UIManager.put( "Label.disabledShadow", Color.DARK_GRAY );
           darkModeButton.setIcon( dayModeIconWhite );
           darkModeButton.setPressedIcon( dayModeIconBlack );
           darkModeButton.setTooltip( "Wechselt in den Daymode" );
         }
         else
         {
+          UIManager.put( "Label.disabledShadow", Color.white );
           darkModeButton.setIcon( darkModeIconBlack );
           darkModeButton.setPressedIcon( darkModeIconWhite );
           darkModeButton.setTooltip( "Wechselt in den Darkmode" );

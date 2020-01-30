@@ -39,12 +39,12 @@ import org.jfree.data.xy.XYDataset;
 public class ConsumptionRate extends JPanel
 {
   private static final ConsumptionRate instance       = new ConsumptionRate();
-  XYDataset                            dataset;
-  JFreeChart                           chart;
-  ChartPanel                           chartPanel;
-  final Map<String, Integer>           amountMap      = new HashMap<>();
-  JComboBox<String>                    selectDrinkComboBox;
-  HashSet<String>                      consumedDrinks = new LinkedHashSet<>();
+  private XYDataset                    dataset;
+  private JFreeChart                   chart;
+  private ChartPanel                   chartPanel;
+  private final Map<String, Integer>   amountMap      = new HashMap<>();
+  private JComboBox<String>            selectDrinkComboBox;
+  private HashSet<String>              consumedDrinks = new LinkedHashSet<>();
 
   /**
    * 

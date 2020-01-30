@@ -58,11 +58,11 @@ public class DrinkConsumptionButton extends JPanel
       BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createCompoundBorder(
           BorderFactory.createEmptyBorder( 1, 1, 1, 1 ), BorderFactory.createDashedBorder( Color.BLACK, 1f, 1f ) ) );
 
-  private JLabel             nameLabel;
+  private final JLabel       nameLabel;
   private final JLabel       priceLabel;
   private final JLabel       iconLabel;
-  JPanel                     infoPanel                              = new JPanel( new GridBagLayout() );
-  JPanel                     nameLabelAndDrinkInfoButtonPanel       = new JPanel( new GridBagLayout() );
+  private final JPanel       infoPanel                              = new JPanel( new GridBagLayout() );
+  private final JPanel       nameLabelAndDrinkInfoButtonPanel       = new JPanel( new GridBagLayout() );
   private final JButton      acceptButton                           = new JButton( "Ja" );
   private final JButton      abortButton                            = new JButton( "Nein" );
   private final JButton      infoButton                             = new JButton( "Info" );
@@ -289,6 +289,7 @@ public class DrinkConsumptionButton extends JPanel
 
     acceptAction = new ActionListener()
     {
+
       @Override
       public void actionPerformed( ActionEvent e )
       {

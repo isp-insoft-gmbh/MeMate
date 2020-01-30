@@ -24,11 +24,11 @@ import org.w3c.dom.Element;
  */
 public class DataExport
 {
-  String path           = System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator;
-  String userXMLPath    = path + "users.xml";
-  String drinksXMLPath  = path + "drinks.xml";
-  String historyXMLPath = path + "history.xml";
-  User[] userArray;
+  private final String path           = System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator;
+  private final String userXMLPath    = path + "users.xml";
+  private final String drinksXMLPath  = path + "drinks.xml";
+  private final String historyXMLPath = path + "history.xml";
+  private User[]       userArray;
 
   /**
    * 

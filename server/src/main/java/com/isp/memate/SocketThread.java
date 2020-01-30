@@ -26,19 +26,19 @@ import com.isp.memate.Shared.Operation;
  */
 public class SocketThread extends Thread
 {
-  String               version = "0.9.1";
-  Database             database;
-  protected Socket     socket;
-  Map<String, Integer> userIDMap;
-  ObjectInputStream    objectInputStream;
-  ObjectOutputStream   objectOutputStream;
-  String               currentUser;
-  String               currentSessionID;
+  private final String         version = "0.9.1";
+  private Database             database;
+  protected Socket             socket;
+  private Map<String, Integer> userIDMap;
+  private ObjectInputStream    objectInputStream;
+  private ObjectOutputStream   objectOutputStream;
+  private String               currentUser;
+  private String               currentSessionID;
   //REDO
-  boolean lastActionDrink   = false;
-  boolean lastActionDeposit = false;
-  String  lastDrinkName;
-  float   lastTransaction;
+  boolean        lastActionDrink   = false;
+  boolean        lastActionDeposit = false;
+  private String lastDrinkName;
+  private float  lastTransaction;
 
   /**
    * @param clientSocket userSocket

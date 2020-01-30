@@ -35,7 +35,7 @@ import com.isp.memate.Shared.Operation;
  */
 public class ServerCommunication
 {
-  static String                               version             = "x";
+  private static String                       version             = "x";
   private static final ServerCommunication    instance            = new ServerCommunication();
   private String[]                            userArray           = null;
   private User[]                              fullUserArray       = null;
@@ -48,13 +48,13 @@ public class ServerCommunication
   private final Map<String, DrinkIngredients> IngredientsMap      = new HashMap<>();
   private final ArrayList<Byte>               byteImageList       = new ArrayList<>();
 
-  final List<String> drinkNames  = new ArrayList<>();
-  String[][]         history;
-  String             sessionID;
-  Socket             socket;
-  ObjectInputStream  inStream;
-  ObjectOutputStream outStream;
-  String             currentUser = null;
+  private final List<String> drinkNames  = new ArrayList<>();
+  private String[][]         history;
+  private Socket             socket;
+  private ObjectInputStream  inStream;
+  private ObjectOutputStream outStream;
+  String                     sessionID;
+  String                     currentUser = null;
 
   /**
    * @return the static instance of {@link ServerCommunication}

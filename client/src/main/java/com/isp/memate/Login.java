@@ -56,6 +56,8 @@ import com.isp.memate.util.SwingUtil;
  */
 public class Login extends JFrame
 {
+  private static final Login   instance                = new Login();
+  private static String        currentUsername;
   private final JPanel         loginPanel              = new JPanel( new GridBagLayout() );
   private final JLabel         headerLabel             = new JLabel( "Willkommen bei MeMate" );
   private final JLabel         usernameLabel           = new JLabel( "Benutzername" );
@@ -66,8 +68,6 @@ public class Login extends JFrame
   private final JButton        loginButton             = new JButton( "Anmelden" );
   private final JCheckBox      stayLoggedInCheckBox    = new JCheckBox();
   private final Font           LABEL_FONT              = UIManager.getFont( "Label.font" ).deriveFont( 15f );
-  private static final Login   instance                = new Login();
-  private static String        currentUsername;
   private final JTextPane      registerHyperLink       = new JTextPane();
   private final JTextPane      forgotPasswordHyperLink = new JTextPane();
 

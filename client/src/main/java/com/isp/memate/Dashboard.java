@@ -43,12 +43,12 @@ import net.miginfocom.swing.MigLayout;
  */
 public class Dashboard extends JPanel
 {
-  private final Mainframe           mainFrame;
-  private static final Dashboard    instance   = new Dashboard( Mainframe.getInstance() );
-  final ImageIcon                   undoIcon   = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
-  final JButton                     undoButton = new JButton( undoIcon );
-  private JScrollPane               scrollpane;
-  ArrayList<DrinkConsumptionButton> buttonList = new ArrayList<>();
+  private static final Dashboard            instance   = new Dashboard( Mainframe.getInstance() );
+  private final Mainframe                   mainFrame;
+  private final ImageIcon                   undoIcon   = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
+  private final JScrollPane                 scrollpane;
+  private ArrayList<DrinkConsumptionButton> buttonList = new ArrayList<>();
+  final JButton                             undoButton = new JButton( undoIcon );
 
   /**
    * @return static instance of Dashboard
@@ -68,6 +68,7 @@ public class Dashboard extends JPanel
     this.mainFrame = mainFrame;
     scrollpane = new JScrollPane( createDrinkButtonPanel() );
     scrollpane.getVerticalScrollBar().setUnitIncrement( 16 );
+    scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
 
     final JPanel upperPanel = new JPanel( new GridBagLayout() );
     final JLabel consumeLabel = new JLabel( "Getränk konsumieren" );
@@ -151,6 +152,7 @@ public class Dashboard extends JPanel
     SwingUtil.setPreferredWidth( 50, valueSpinner );
 
     panel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    panel.setBorder( new EmptyBorder( 0, 20, 10, 0 ) );
 
     aufladenButton.addActionListener( new ActionListener()
     {

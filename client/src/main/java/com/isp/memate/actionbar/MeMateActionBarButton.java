@@ -262,12 +262,10 @@ public class MeMateActionBarButton
   {
     if ( darkModeOn )
     {
-      changeButtonStyle( pressedIcon, background.brighter().brighter(), Color.black );
-      System.out.println( background.brighter().brighter().toString() );
+      changeButtonStyle( pressedIcon, background.brighter().brighter().brighter(), Color.black );
     }
     else
     {
-      System.out.println( "lol" );
       changeButtonStyle( pressedIcon, background.darker(), Color.WHITE );
     }
   }
