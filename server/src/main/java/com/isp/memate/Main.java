@@ -32,7 +32,7 @@ public class Main
     Socket socket = null;
     try
     {
-      serverSocket = new ServerSocket( 3142 ); //Default is 3141 
+      serverSocket = new ServerSocket( 3141 ); //Default is 3141 
       ServerLog.newLog( logType.INFO, "Starte MateServer auf Port: " + serverSocket.getLocalPort() );
     }
     catch ( IOException e )

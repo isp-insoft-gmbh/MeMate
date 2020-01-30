@@ -18,8 +18,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -514,12 +516,15 @@ public class Login extends JFrame
     ServerCommunication.getInstance().sessionID = uuid.toString();
     if ( stayLoggedInCheckBox.isSelected() )
     {
-      try ( OutputStream output = new FileOutputStream(
-          new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ), false ); )
+      try
       {
+        File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+        InputStream input = new FileInputStream( file );
         Properties userProperties = new Properties();
+        userProperties.load( input );
         userProperties.setProperty( "SessionID", uuid.toString() );
-        userProperties.store( output, "SessionID" );
+        OutputStream output = new FileOutputStream( file );
+        userProperties.store( output, "" );
       }
       catch ( IOException exception )
       {

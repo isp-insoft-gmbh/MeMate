@@ -8,8 +8,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
@@ -186,6 +188,21 @@ public class Mainframe extends JFrame
           darkModeButton.setIcon( dayModeIconWhite );
           darkModeButton.setPressedIcon( dayModeIconBlack );
           darkModeButton.setTooltip( "Wechselt in den Daymode" );
+          try
+          {
+            File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+            InputStream input = new FileInputStream( file );
+            Properties userProperties = new Properties();
+            userProperties.load( input );
+            userProperties.setProperty( "Darkmode", "on" );
+            OutputStream output = new FileOutputStream( file );
+            userProperties.store( output, "" );
+          }
+          catch ( IOException exception )
+          {
+            System.out.println( "Der Darkmodestatus konnte nicht gespeichert werden." );
+            exception.printStackTrace();
+          }
         }
         else
         {
@@ -193,6 +210,21 @@ public class Mainframe extends JFrame
           darkModeButton.setIcon( darkModeIconBlack );
           darkModeButton.setPressedIcon( darkModeIconWhite );
           darkModeButton.setTooltip( "Wechselt in den Darkmode" );
+          try
+          {
+            File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+            InputStream input = new FileInputStream( file );
+            Properties userProperties = new Properties();
+            userProperties.load( input );
+            userProperties.setProperty( "Darkmode", "off" );
+            OutputStream output = new FileOutputStream( file );
+            userProperties.store( output, "" );
+          }
+          catch ( IOException exception )
+          {
+            System.out.println( "Der Darkmodestatus konnte nicht gespeichert werden." );
+            exception.printStackTrace();
+          }
         }
       }
     } );
@@ -205,12 +237,15 @@ public class Mainframe extends JFrame
         ServerCommunication.getInstance().currentUser = null;
         ServerCommunication.getInstance().logout();
         Dashboard.getInstance().undoButton.setEnabled( false );
-        try ( OutputStream output = new FileOutputStream(
-            new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ), false ); )
+        try
         {
+          File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+          InputStream input = new FileInputStream( file );
           Properties userProperties = new Properties();
+          userProperties.load( input );
           userProperties.setProperty( "SessionID", "null" );
-          userProperties.store( output, "SessionID" );
+          OutputStream output = new FileOutputStream( file );
+          userProperties.store( output, "" );
         }
         catch ( IOException exception )
         {
@@ -227,6 +262,24 @@ public class Mainframe extends JFrame
     add( headerPanel, BorderLayout.NORTH );
     add( contentPanel, BorderLayout.CENTER );
     bar.selectButton( "Dashboard" );
+    try
+    {
+      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+      InputStream input = new FileInputStream( file );
+      Properties userProperties = new Properties();
+      userProperties.load( input );
+
+      if ( userProperties.getProperty( "Darkmode" ) != null && userProperties.getProperty( "Darkmode" ).equals( "on" ) )
+      {
+        UIManager.put( "Label.disabledShadow", Color.DARK_GRAY );
+        bar.toggleDarkmode();
+      }
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Die SessionID konnte nicht gespeichert werden." );
+      exception.printStackTrace();
+    }
   }
 
   /**

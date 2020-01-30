@@ -18,7 +18,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class Main
 {
-  final static String version = "0.9.1";
+  final static String version = "0.9.2";
 
   /**
    * @param args unused
