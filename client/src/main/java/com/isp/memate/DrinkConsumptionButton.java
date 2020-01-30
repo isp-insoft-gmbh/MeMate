@@ -24,6 +24,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.NumberFormat;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -31,6 +33,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -415,6 +418,18 @@ public class DrinkConsumptionButton extends JPanel
         }
       }
     };
+    Action abortAction = new AbstractAction()
+    {
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        reset();
+      }
+    };
+    acceptButton.getInputMap().put( KeyStroke.getKeyStroke( "ESCAPE" ), "Abbrechen" );
+    acceptButton.getActionMap().put( "Abbrechen", abortAction );
+    abortButton.getInputMap().put( KeyStroke.getKeyStroke( "ESCAPE" ), "Abbrechen" );
+    abortButton.getActionMap().put( "Abbrechen", abortAction );
     addMouseListener( mouseListener );
     addFocusListener( focusListener );
     addKeyListener( keyListener );
@@ -447,7 +462,7 @@ public class DrinkConsumptionButton extends JPanel
     add( overlay, BorderLayout.CENTER );
     repaint();
     revalidate();
-    requestFocus();
+    acceptButton.requestFocus();
     ActionListener actionListener = new ActionListener()
     {
       @Override
