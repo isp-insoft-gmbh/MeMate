@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,12 +43,12 @@ import net.miginfocom.swing.MigLayout;
  */
 public class Dashboard extends JPanel
 {
-  private final Mainframe        mainFrame;
-  private static final Dashboard instance          = new Dashboard( Mainframe.getInstance() );
-  final ImageIcon                undoIcon          = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
-  final JButton                  undoButton        = new JButton( undoIcon );
-  private JScrollPane            scrollpane;
-  boolean                        drinkButtonActive = false;
+  private final Mainframe           mainFrame;
+  private static final Dashboard    instance   = new Dashboard( Mainframe.getInstance() );
+  final ImageIcon                   undoIcon   = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
+  final JButton                     undoButton = new JButton( undoIcon );
+  private JScrollPane               scrollpane;
+  ArrayList<DrinkConsumptionButton> buttonList = new ArrayList<>();
 
   /**
    * @return static instance of Dashboard
@@ -185,6 +186,7 @@ public class Dashboard extends JPanel
    */
   public JPanel createDrinkButtonPanel()
   {
+    buttonList.clear();
     JPanel panel = new JPanel( new WrapLayout( FlowLayout.LEFT ) );
     for ( String drink : ServerCommunication.getInstance().getDrinkNames() )
     {
@@ -213,7 +215,9 @@ public class Dashboard extends JPanel
       {
         newImage = image.getScaledInstance( 70, 220, Image.SCALE_SMOOTH );
       }
-      panel.add( new DrinkConsumptionButton( mainFrame, drinkPrice, drinkName, new ImageIcon( newImage ) ) );
+      DrinkConsumptionButton button = new DrinkConsumptionButton( mainFrame, drinkPrice, drinkName, new ImageIcon( newImage ) );
+      buttonList.add( button );
+      panel.add( button );
     }
     panel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
     return panel;
@@ -255,5 +259,19 @@ public class Dashboard extends JPanel
   {
     JOptionPane.showMessageDialog( mainFrame, "<html><b>" + name + " </b>ist leider nicht mehr verfügbar</html>", "Getränk nicht verfügbar",
         JOptionPane.ERROR_MESSAGE, null );
+  }
+
+  /**
+   * 
+   */
+  public void resetAllDrinkButtons()
+  {
+    for ( DrinkConsumptionButton drinkConsumptionButton : buttonList )
+    {
+      if ( drinkConsumptionButton.askWhetherToReallyConsumeLabelIsActive )
+      {
+        drinkConsumptionButton.reset();
+      }
+    }
   }
 }

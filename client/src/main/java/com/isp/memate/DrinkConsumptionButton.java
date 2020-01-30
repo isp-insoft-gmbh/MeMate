@@ -47,7 +47,7 @@ import javax.swing.border.EmptyBorder;
  */
 public class DrinkConsumptionButton extends JPanel
 {
-  private static final Color HOVER_BACKGROUND_COLOR = new Color( 143, 203, 255 );
+  private static final Color HOVER_BACKGROUND_COLOR = new Color( 29, 164, 165 ); // before 134,203,255
   private final Border       DEFAULT_LINE_BORDER    = BorderFactory.createLineBorder( UIManager.getColor( "Panel.borderColor" ) );
   private final Border       DEFAULT_BORDER         =
       BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
@@ -58,15 +58,19 @@ public class DrinkConsumptionButton extends JPanel
   private JLabel             nameLabel;
   private final JLabel       priceLabel;
   private final JLabel       iconLabel;
-  JPanel                     infoPanel                      = new JPanel( new GridBagLayout() );
-  private final JButton      acceptButton                   = new JButton( "Ja" );
-  private final JButton      abortButton                    = new JButton( "Nein" );
-  private final JButton      infoButton                     = new JButton( "Info" );
-  private final JLayeredPane overlay                        = new JLayeredPane();
-  private final JLabel       askWhetherToReallyConsumeLabel = new JLabel( "Wirklich konsumieren?" );
+  JPanel                     infoPanel                              = new JPanel( new GridBagLayout() );
+  JPanel                     nameLabelAndDrinkInfoButtonPanel       = new JPanel( new GridBagLayout() );
+  private final JButton      acceptButton                           = new JButton( "Ja" );
+  private final JButton      abortButton                            = new JButton( "Nein" );
+  private final JButton      infoButton                             = new JButton( "Info" );
+  private final JLayeredPane overlay                                = new JLayeredPane();
+  private final JLabel       askWhetherToReallyConsumeLabel         = new JLabel( "Wirklich konsumieren?" );
   private MouseListener      mouseListener;
   private FocusListener      focusListener;
   private KeyListener        keyListener;
+  private ActionListener     acceptAction;
+  private ActionListener     abortAction;
+  boolean                    askWhetherToReallyConsumeLabelIsActive = false;
 
   /**
    * Erzeugt eine Komponente, welche auf einem {@link JPanel} basiert, aber einen Button nachahmt.
@@ -79,8 +83,6 @@ public class DrinkConsumptionButton extends JPanel
   public DrinkConsumptionButton( Mainframe mainFrame, String price, String name, Icon icon )
   {
     setLayout( new BorderLayout() );
-
-    JPanel nameLabelAndDrinkInfoButtonPanel = new JPanel( new GridBagLayout() );
     nameLabel = new JLabel( name );
     nameLabel.setFont( nameLabel.getFont().deriveFont( 14f ) );
     nameLabel.setHorizontalAlignment( JLabel.CENTER );
@@ -211,19 +213,19 @@ public class DrinkConsumptionButton extends JPanel
           switch ( ingredient )
           {
             case "Salz":
-              amountLabel.setText( " " + ingredients.salt + "g" );
+              amountLabel.setText( String.format( " %.2fg", ingredients.salt ) );
               break;
             case "Eiweiß":
-              amountLabel.setText( " " + ingredients.protein + "g" );
+              amountLabel.setText( String.format( " %.1fg", ingredients.protein ) );
               break;
             case "Energie":
               amountLabel.setText( " " + ingredients.energy_kJ + " kJ (" + ingredients.energy_kcal + " kcal)" );
               break;
             case "Fett":
-              amountLabel.setText( " " + ingredients.fat + "g" );
+              amountLabel.setText( String.format( " %.1fg", ingredients.fat ) );
               break;
             case "davon gesättigte Fettsäuren":
-              amountLabel.setText( " " + ingredients.fatty_acids + "g" );
+              amountLabel.setText( String.format( " %.1fg", ingredients.fatty_acids ) );
               break;
             case "Kohlenhydrate":
               amountLabel.setText( String.format( " %.1fg", ingredients.carbs ) );
@@ -281,21 +283,8 @@ public class DrinkConsumptionButton extends JPanel
     askWhetherToReallyConsumeLabel.setBorder( new EmptyBorder( 40, 0, 30, 0 ) );
     askWhetherToReallyConsumeLabel.setFont( askWhetherToReallyConsumeLabel.getFont().deriveFont( 16f ) );
 
-    acceptButton.addActionListener( new ActionListener()
-    {
-      @Override
-      public void actionPerformed( ActionEvent e )
-      {
-        remove( overlay );
-        remove( askWhetherToReallyConsumeLabel );
-        iconLabel.setVisible( true );
-        repaint();
-        revalidate();
-        requestFocus();
-      }
-    } );
 
-    ActionListener abortButtonListener = new ActionListener()
+    acceptAction = new ActionListener()
     {
       @Override
       public void actionPerformed( ActionEvent e )
@@ -308,7 +297,23 @@ public class DrinkConsumptionButton extends JPanel
         requestFocus();
       }
     };
-    abortButton.addActionListener( abortButtonListener );
+    acceptButton.addActionListener( acceptAction );
+
+    abortAction = new ActionListener()
+    {
+
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        remove( overlay );
+        remove( askWhetherToReallyConsumeLabel );
+        iconLabel.setVisible( true );
+        repaint();
+        revalidate();
+        requestFocus();
+      }
+    };
+    abortButton.addActionListener( abortAction );
 
     //The following listeners correctly implement the semantics for a button.
     //That is focus behavior, mouse movement / click behavior and confirmation via keyboard.
@@ -317,7 +322,7 @@ public class DrinkConsumptionButton extends JPanel
       @Override
       public void mouseClicked( MouseEvent __ )
       {
-        askWhetherToReallyConsume( name, abortButtonListener );
+        askWhetherToReallyConsume( name, abortAction );
       }
 
       @Override
@@ -370,7 +375,7 @@ public class DrinkConsumptionButton extends JPanel
           {
             component.setBackground( HOVER_BACKGROUND_COLOR );
           }
-          askWhetherToReallyConsume( name, abortButtonListener );
+          askWhetherToReallyConsume( name, abortAction );
         }
         else
         {
@@ -406,7 +411,7 @@ public class DrinkConsumptionButton extends JPanel
       {
         if ( event.getKeyCode() == KeyEvent.VK_ENTER || event.getKeyCode() == KeyEvent.VK_SPACE )
         {
-          askWhetherToReallyConsume( name, abortButtonListener );
+          askWhetherToReallyConsume( name, abortAction );
         }
       }
     };
@@ -425,11 +430,8 @@ public class DrinkConsumptionButton extends JPanel
    */
   private void askWhetherToReallyConsume( String drinkName, ActionListener abortButtonListener )
   {
-    if ( Dashboard.getInstance().drinkButtonActive )
-    {
-      return;
-    }
-    Dashboard.getInstance().drinkButtonActive = true;
+    Dashboard.getInstance().resetAllDrinkButtons();
+    askWhetherToReallyConsumeLabelIsActive = true;
     infoButton.setEnabled( false );
     DrinkConsumptionButton.this.removeMouseListener( mouseListener );
     DrinkConsumptionButton.this.removeKeyListener( keyListener );
@@ -464,7 +466,7 @@ public class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         Dashboard.getInstance().undoButton.setEnabled( true );
         infoButton.setEnabled( true );
-        Dashboard.getInstance().drinkButtonActive = false;
+        askWhetherToReallyConsumeLabelIsActive = false;
       }
     };
     acceptButton.addActionListener( actionListener );
@@ -478,9 +480,44 @@ public class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         abortButton.removeActionListener( this );
         infoButton.setEnabled( true );
-        Dashboard.getInstance().drinkButtonActive = false;
+        askWhetherToReallyConsumeLabelIsActive = false;
       }
     };
     abortButton.addActionListener( actionListener2 );
+  }
+
+  void reset()
+  {
+    ActionListener[] abortListenerArray = abortButton.getActionListeners();
+    for ( ActionListener actionListener : abortListenerArray )
+    {
+      abortButton.removeActionListener( actionListener );
+    }
+    ActionListener[] acceptListenerArray = abortButton.getActionListeners();
+    for ( ActionListener actionListener : acceptListenerArray )
+    {
+      acceptButton.removeActionListener( actionListener );
+    }
+    abortButton.addActionListener( abortAction );
+    acceptButton.addActionListener( acceptAction );
+
+    DrinkConsumptionButton.this.addMouseListener( mouseListener );
+    DrinkConsumptionButton.this.addKeyListener( keyListener );
+    infoButton.setEnabled( true );
+    remove( overlay );
+    remove( askWhetherToReallyConsumeLabel );
+    iconLabel.setVisible( true );
+    repaint();
+    revalidate();
+    requestFocus();
+    setBackground( UIManager.getColor( "Panel.background" ) );
+    nameLabelAndDrinkInfoButtonPanel.setBackground( UIManager.getColor( "Panel.background" ) );
+    infoPanel.setBackground( UIManager.getColor( "Panel.background" ) );
+    Component[] components = infoPanel.getComponents();
+    for ( Component component : components )
+    {
+      component.setBackground( UIManager.getColor( "Panel.background" ) );
+    }
+    askWhetherToReallyConsumeLabelIsActive = false;
   }
 }
