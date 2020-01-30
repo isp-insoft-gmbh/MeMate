@@ -68,7 +68,7 @@ public class MeMateActionBar extends JPanel
 
   private Color backgroundColor;
   private Color foregoundColor;
-  private Color darkModeBackground = Color.gray;//168.168.168
+  private Color darkModeBackground = new Color( 29, 164, 165 );//Color.gray;//168.168.168
 
   private MeMateActionBarButton burgerButton;
 
@@ -452,6 +452,7 @@ public class MeMateActionBar extends JPanel
         btn.setIcon( pressedIcon );
         btn.setPressedIcon( icon );
         btn.toggleFontColor();
+        btn.setMarker( new Color( 29, 164, 165 ) );
       } );
       Icon icon = burgerButton.getIcon();
       Icon pressedIcon = burgerButton.getPressedIcon();
@@ -475,6 +476,7 @@ public class MeMateActionBar extends JPanel
         btn.setIcon( icon );
         btn.setPressedIcon( pressedIcon );
         btn.toggleFontColor();
+        btn.setMarker( Color.white );
       } );
       Icon icon = burgerButton.getPressedIcon();
       Icon pressedIcon = burgerButton.getIcon();

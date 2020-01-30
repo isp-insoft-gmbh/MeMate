@@ -33,9 +33,9 @@ public class MeMateActionBarButton
   private final String title;
   private String       tooltip;
 
-  private Color       background;
-  private Color       foreground;
-  private final Color marker;
+  private Color background;
+  private Color foreground;
+  private Color marker;
 
   private Runnable runnable;
 
@@ -423,6 +423,15 @@ public class MeMateActionBarButton
   public Color getMarker()
   {
     return marker;
+  }
+
+  public void setMarker( Color marker )
+  {
+    this.marker = marker;
+    if ( isMarked )
+    {
+      markerPanels.forEach( markerPanel -> markerPanel.setBackground( marker ) );
+    }
   }
 
 
