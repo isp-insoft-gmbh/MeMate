@@ -26,7 +26,7 @@ import com.isp.memate.Shared.Operation;
  */
 public class SocketThread extends Thread
 {
-  String               version = "0.9.0";
+  String               version = "0.9.1";
   Database             database;
   protected Socket     socket;
   Map<String, Integer> userIDMap;

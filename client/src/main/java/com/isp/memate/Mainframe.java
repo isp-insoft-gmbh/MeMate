@@ -38,8 +38,8 @@ import com.isp.memate.actionbar.MeMateActionBarButton;
 public class Mainframe extends JFrame
 {
   private static final Mainframe instance               = new Mainframe();
-  private JPanel                 contentPanel           = new JPanel( new BorderLayout() );
-  private JPanel                 headerPanel            = new JPanel();
+  private final JPanel           contentPanel           = new JPanel( new BorderLayout() );
+  private final JPanel           headerPanel            = new JPanel();
   private final Color            color                  = new Color( 29, 164, 165 );
   private final JLabel           balanceLabel           = new JLabel();
   private final JLabel           helloUserLabel         = new JLabel( "Hallo User" );
@@ -49,6 +49,10 @@ public class Mainframe extends JFrame
   private final Icon             historyIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "history_white.png" ) );
   private final Icon             adminViewIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_black.png" ) );
   private final Icon             adminViewIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_white.png" ) );
+  private final Icon             darkModeIconBlack      = new ImageIcon( getClass().getClassLoader().getResource( "darkmode_black.png" ) );
+  private final Icon             darkModeIconWhite      = new ImageIcon( getClass().getClassLoader().getResource( "darkmode_white.png" ) );
+  private final Icon             dayModeIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_black.png" ) );
+  private final Icon             dayModeIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_white.png" ) );
   private final Icon             drinkManagerIconBlack  =
       new ImageIcon( getClass().getClassLoader().getResource( "drinkmanager_black.png" ) );
   private final Icon             drinkManagerIconWhite  =
@@ -67,6 +71,7 @@ public class Mainframe extends JFrame
   MeMateActionBarButton          drinkManagerButton;
   MeMateActionBarButton          adminViewButton;
   MeMateActionBarButton          logoutButton;
+  MeMateActionBarButton          darkModeButton;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -168,6 +173,26 @@ public class Mainframe extends JFrame
     adminViewButton.setEnabled( false );
 
     bar.addVariableGlue();
+    darkModeButton = bar.addActionButton( darkModeIconBlack, darkModeIconWhite, "Darkmode", "Wechselt in den Darkmode", new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        bar.toggleDarkmode();
+        if ( bar.darkModeOn() )
+        {
+          darkModeButton.setIcon( dayModeIconWhite );
+          darkModeButton.setPressedIcon( dayModeIconBlack );
+          darkModeButton.setTooltip( "Wechselt in den Daymode" );
+        }
+        else
+        {
+          darkModeButton.setIcon( darkModeIconBlack );
+          darkModeButton.setPressedIcon( darkModeIconWhite );
+          darkModeButton.setTooltip( "Wechselt in den Darkmode" );
+        }
+      }
+    } );
     logoutButton = bar.addActionButton( logoutIconBlack, logoutIconWhite, "Logout", "Ausloggen", new Runnable()
     {
       @Override

@@ -54,18 +54,23 @@ public class MeMateActionBar extends JPanel
 
   private boolean labelsVisible = false;
 
+  private boolean darkModeOn = false;
+
   private Optional<Component> lastSeparator = Optional.empty();
 
   private final int MIN_GROUP_INSET = 25;
 
-  private final Icon viewBlack = new ImageIcon( getClass().getClassLoader().getResource( "view_black_24.png" ) );
-  private final Icon viewWhite = new ImageIcon( getClass().getClassLoader().getResource( "view_white_24.png" ) );
+  private Icon viewBlack = new ImageIcon( getClass().getClassLoader().getResource( "view_black_24.png" ) );
+  private Icon viewWhite = new ImageIcon( getClass().getClassLoader().getResource( "view_white_24.png" ) );
 
   private final Icon arrowBlack = new ImageIcon( "C:/Users/nwe/Desktop/IconsMeMate/Burger/arrow_down_black.png" );
   private final Icon arrowWhite = new ImageIcon( "C:/Users/nwe/Desktop/IconsMeMate/Burger/arrow_down_white.png" );
 
   private Color backgroundColor;
   private Color foregoundColor;
+  private Color darkModeBackground = Color.gray;//168.168.168
+
+  private MeMateActionBarButton burgerButton;
 
 
   /**
@@ -73,7 +78,9 @@ public class MeMateActionBar extends JPanel
    *
    * @param type Darstellungsmodi der ButtonBar.
    */
-  public MeMateActionBar( final Color backgroundColor, final Color foregoundColor )
+  public MeMateActionBar(
+                          final Color backgroundColor,
+                          final Color foregoundColor )
   {
     super( new BorderLayout() );
     this.backgroundColor = backgroundColor;
@@ -232,20 +239,20 @@ public class MeMateActionBar extends JPanel
 
   public MeMateActionBarButton createToggleButtonTitleVisibleState()
   {
-    final MeMateActionBarButton button =
+    burgerButton =
         new MeMateActionBarButton( viewBlack, viewWhite, backgroundColor, () -> changeLabelVisibleState() );
 
-    button.addMouseListener( new MeMateActionBarListener( button,
+    burgerButton.addMouseListener( new MeMateActionBarListener( burgerButton,
         () ->
         {//Standard-Darstellung.
-          button.setBackground( backgroundColor );
+          burgerButton.setBackground( backgroundColor );
         },
         () ->
         {//Maus-Hover
-          button.setBackground( backgroundColor.darker() );
+          burgerButton.setBackground( backgroundColor.darker() );
         } ) );
 
-    return button;
+    return burgerButton;
   }
 
   @SuppressWarnings( "javadoc" )
@@ -424,5 +431,65 @@ public class MeMateActionBar extends JPanel
     {
       allButtons.forEach( buttons -> buttons.setBackground( bg ) );
     }
+  }
+
+  /**
+   * 
+   */
+  public void toggleDarkmode()
+  {
+    if ( darkModeOn )
+    {
+      setBackground( Color.white );
+      burgerButton.setBackground( Color.white );
+      Icon temp = viewBlack;
+      viewBlack = viewWhite;
+      viewWhite = temp;
+      allButtons.forEach( btn ->
+      {
+        Icon icon = btn.getIcon();
+        Icon pressedIcon = btn.getPressedIcon();
+        btn.setIcon( pressedIcon );
+        btn.setPressedIcon( icon );
+        btn.toggleFontColor();
+      } );
+      Icon icon = burgerButton.getIcon();
+      Icon pressedIcon = burgerButton.getPressedIcon();
+      burgerButton.setIcon( pressedIcon );
+      burgerButton.setPressedIcon( icon );
+      burgerButton.toggleFontColor();
+
+      darkModeOn = false;
+    }
+    else
+    {
+      setBackground( darkModeBackground );
+      burgerButton.setBackground( darkModeBackground );
+      Icon temp = viewBlack;
+      viewBlack = viewWhite;
+      viewWhite = temp;
+      allButtons.forEach( btn ->
+      {
+        Icon icon = btn.getPressedIcon();
+        Icon pressedIcon = btn.getIcon();
+        btn.setIcon( icon );
+        btn.setPressedIcon( pressedIcon );
+        btn.toggleFontColor();
+      } );
+      Icon icon = burgerButton.getPressedIcon();
+      Icon pressedIcon = burgerButton.getIcon();
+      burgerButton.setIcon( icon );
+      burgerButton.setPressedIcon( pressedIcon );
+      burgerButton.toggleFontColor();
+      darkModeOn = true;
+    }
+  }
+
+  /**
+   * @return ob der Darkmode an oder aus ist
+   */
+  public boolean darkModeOn()
+  {
+    return darkModeOn;
   }
 }

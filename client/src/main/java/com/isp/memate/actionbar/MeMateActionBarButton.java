@@ -39,7 +39,8 @@ public class MeMateActionBarButton
 
   private Runnable runnable;
 
-  private boolean enabled = true;
+  private boolean enabled    = true;
+  private boolean darkModeOn = false;
 
   private JPanel barPanel;
   private JPanel menuPanel;
@@ -259,7 +260,16 @@ public class MeMateActionBarButton
    */
   public void showPressedStyle()
   {
-    changeButtonStyle( pressedIcon, background.darker(), Color.WHITE );
+    if ( darkModeOn )
+    {
+      changeButtonStyle( pressedIcon, background.brighter().brighter(), Color.black );
+      System.out.println( background.brighter().brighter().toString() );
+    }
+    else
+    {
+      System.out.println( "lol" );
+      changeButtonStyle( pressedIcon, background.darker(), Color.WHITE );
+    }
   }
 
   /**
@@ -267,7 +277,14 @@ public class MeMateActionBarButton
    */
   public void hidePressedStyle()
   {
-    changeButtonStyle( icon, background, foreground );
+    if ( darkModeOn )
+    {
+      changeButtonStyle( icon, background, Color.white );
+    }
+    else
+    {
+      changeButtonStyle( icon, background, foreground );
+    }
   }
 
   private void changeButtonStyle( final Icon buttonIcon, final Color background, final Color foreground )
@@ -412,6 +429,20 @@ public class MeMateActionBarButton
   public Runnable getRunnable()
   {
     return runnable;
+  }
+
+  public void toggleFontColor()
+  {
+    if ( darkModeOn )
+    {
+      titleLabels.forEach( label -> label.setForeground( foreground ) );
+      darkModeOn = false;
+    }
+    else
+    {
+      titleLabels.forEach( label -> label.setForeground( Color.white ) );
+      darkModeOn = true;
+    }
   }
 
   public void setRunnable( final Runnable runnable )
