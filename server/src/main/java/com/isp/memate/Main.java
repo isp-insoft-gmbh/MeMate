@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import com.isp.memate.ServerLog.logType;
+
 
 /**
  * Die Mainklasse startet den Server und verbindet
@@ -30,11 +32,12 @@ public class Main
     Socket socket = null;
     try
     {
-      serverSocket = new ServerSocket( 3141 ); //Default is 3141 
+      serverSocket = new ServerSocket( 3142 ); //Default is 3141 
+      ServerLog.newLog( logType.INFO, "Starte MateServer auf Port: " + serverSocket.getLocalPort() );
     }
     catch ( IOException e )
     {
-      System.out.println( "Der Server konnte nicht gestartet werden" );
+      ServerLog.newLog( logType.ERROR, "Der Server konnte nicht gestartet werden" );
       e.printStackTrace();
     }
     final String dataBasePath;
@@ -46,6 +49,7 @@ public class Main
     {
       dataBasePath = Database.getTargetFolder().toFile().toString() + File.separator + "MeMate.db";
     }
+    ServerLog.newLog( logType.INFO, "Datenbankverbindung wird hergestellt...." );
     Database database = new Database( dataBasePath );
     while ( true )
     {
@@ -55,9 +59,9 @@ public class Main
       }
       catch ( IOException e )
       {
-        System.out.println( "Es konnte keine Verbindung zwischen Client und Server aufgebaut werden\n" + "I/O error: " + e );
+        ServerLog.newLog( logType.ERROR, "Es konnte keine Verbindung zwischen Client und Server aufgebaut werden" );
+        e.printStackTrace();
       }
-
       new SocketThread( socket, database ).start();
     }
   }

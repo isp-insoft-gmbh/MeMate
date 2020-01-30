@@ -9,6 +9,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+import com.isp.memate.ServerLog.logType;
+
 /**
  * Die Klasse sorgt dafür, dass wenn ein Client in dem Netzwerk nach einem Server sucht, das Clientpacket
  * empfangen wird und neues Packet an den Client zurück gesendet wird, damit der Client Serveradresse und
@@ -34,7 +36,7 @@ public class SendServerInformationsToClients extends Thread
     }
     catch ( SocketException exception )
     {
-      System.out.println( "Es konnte kein neuer DatagramSocket erstellt werden." );
+      ServerLog.newLog( logType.ERROR, "Es konnte kein neuer DatagramSocket erstellt werden." );
       exception.printStackTrace();
     }
   }
@@ -51,7 +53,7 @@ public class SendServerInformationsToClients extends Thread
       }
       catch ( IOException exception )
       {
-        System.out.println( "Das vom Client gesendete Packet konnte nicht richtig empfangen werden." );
+        ServerLog.newLog( logType.ERROR, "Das vom Client gesendete Packet konnte nicht richtig empfangen werden." );
         exception.printStackTrace();
       }
       InetAddress clientAddress = clientPacket.getAddress();
@@ -74,7 +76,7 @@ public class SendServerInformationsToClients extends Thread
       }
       catch ( IOException exception )
       {
-        System.out.println( "Das Paket vom Server konnte nicht gesendet werden" );
+        ServerLog.newLog( logType.ERROR, "Es konnte kein Paket den den Client zurück gesendet werden" );
         exception.printStackTrace();
       }
     }
