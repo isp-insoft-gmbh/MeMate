@@ -6,6 +6,8 @@ package com.isp.memate;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,7 +56,8 @@ public class CreditHistory extends JPanel
         "Datum", "Guthaben",
         createBalanceDataset(),
         PlotOrientation.VERTICAL,
-        true, true, false );
+        false, true, false );
+    lineChart.getCategoryPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
 
     ChartPanel chartPanel = new ChartPanel( lineChart );
     chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
@@ -67,6 +70,23 @@ public class CreditHistory extends JPanel
     chartPanelConstraits.weightx = 1;
     chartPanelConstraits.weighty = 1;
     add( chartPanel, chartPanelConstraits );
+    chartPanel.setMaximumDrawHeight( 1000 );
+    chartPanel.setMaximumDrawWidth( 1000 );
+    chartPanel.setMinimumDrawWidth( 10 );
+    chartPanel.setMinimumDrawHeight( 10 );
+
+    Mainframe.getInstance().addComponentListener( new ComponentAdapter()
+    {
+      @Override
+      public void componentResized( final ComponentEvent e )
+      {
+        //Chart beim Verkleinern/Vergrößern anpassen
+        chartPanel.setMaximumDrawHeight( e.getComponent().getHeight() );
+        chartPanel.setMaximumDrawWidth( e.getComponent().getWidth() );
+        chartPanel.setMinimumDrawWidth( e.getComponent().getWidth() );
+        chartPanel.setMinimumDrawHeight( e.getComponent().getHeight() );
+      }
+    } );
     repaint();
     revalidate();
   }

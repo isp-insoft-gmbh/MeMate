@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.time.LocalDateTime;
@@ -25,6 +27,7 @@ import javax.swing.UIManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -100,7 +103,7 @@ public class ConsumptionRate extends JPanel
 
   private JFreeChart createChart( final XYDataset dataset )
   {
-    return ChartFactory.createTimeSeriesChart(
+    JFreeChart freeChart = ChartFactory.createTimeSeriesChart(
         "Konsum von Flaschen pro Tag",
         "Datum",
         "Anzahl Getränke",
@@ -108,6 +111,12 @@ public class ConsumptionRate extends JPanel
         false,
         false,
         false );
+
+    freeChart.getXYPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
+
+    freeChart.getXYPlot().getRangeAxis().setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
+
+    return freeChart;
   }
 
   /**
@@ -162,6 +171,24 @@ public class ConsumptionRate extends JPanel
     add( averageConsumption, averageConsumptionConstraints );
 
 
+    chartPanel.setMaximumDrawHeight( 1000 );
+    chartPanel.setMaximumDrawWidth( 1000 );
+    chartPanel.setMinimumDrawWidth( 10 );
+    chartPanel.setMinimumDrawHeight( 10 );
+
+    Mainframe.getInstance().addComponentListener( new ComponentAdapter()
+    {
+      @Override
+      public void componentResized( final ComponentEvent e )
+      {
+        //Chart beim Verkleinern/Vergrößern anpassen
+        chartPanel.setMaximumDrawHeight( e.getComponent().getHeight() );
+        chartPanel.setMaximumDrawWidth( e.getComponent().getWidth() );
+        chartPanel.setMinimumDrawWidth( e.getComponent().getWidth() );
+        chartPanel.setMinimumDrawHeight( e.getComponent().getHeight() );
+      }
+    } );
+
     selectDrinkComboBox.addItemListener( new ItemListener()
     {
       @Override
@@ -170,14 +197,15 @@ public class ConsumptionRate extends JPanel
         remove( chartPanel );
         dataset = createDataset( String.valueOf( e.getItem() ) );
         chart = createChart( dataset );
-        chartPanel = new ChartPanel( chart );
-        chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
-        chartPanel.setMouseZoomable( true, false );
+        chartPanel.setChart( chart );
+
+
         averageConsumption
             .setText(
                 String.format( "Ø %.2f Flaschen/Tag", getAverage(),
                     String.valueOf( e.getItem() ) ) );
         add( chartPanel, chartPanelConstraits );
+
         repaint();
         revalidate();
       }
