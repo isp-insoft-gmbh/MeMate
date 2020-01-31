@@ -9,9 +9,16 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -246,13 +253,40 @@ public class MeMateActionBar extends JPanel
         () ->
         {//Standard-Darstellung.
           burgerButton.setBackground( backgroundColor );
+
         },
         () ->
         {//Maus-Hover
           burgerButton.setBackground( backgroundColor.darker() );
         } ) );
 
+    checkUserConfig();
+
     return burgerButton;
+  }
+
+  /**
+   * 
+   */
+  private void checkUserConfig()
+  {
+    try
+    {
+      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+      InputStream input = new FileInputStream( file );
+      Properties userProperties = new Properties();
+      userProperties.load( input );
+      if ( userProperties.getProperty( "Expand" ) != null && userProperties.getProperty( "Expand" ).equals( "true" ) )
+      {
+        changeLabelVisibleState();
+      }
+
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Der Ausklappstatus konnte nicht gespeichert werden." );
+      exception.printStackTrace();
+    }
   }
 
   @SuppressWarnings( "javadoc" )
@@ -302,6 +336,21 @@ public class MeMateActionBar extends JPanel
   public void changeLabelVisibleState()
   {
     setLabelsVisible( !labelsVisible );
+    try
+    {
+      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+      InputStream input = new FileInputStream( file );
+      Properties userProperties = new Properties();
+      userProperties.load( input );
+      userProperties.setProperty( "Expand", String.valueOf( labelsVisible ) );
+      OutputStream output = new FileOutputStream( file );
+      userProperties.store( output, "" );
+    }
+    catch ( IOException exception )
+    {
+      System.out.println( "Der Ausklappstatus konnte nicht gespeichert werden." );
+      exception.printStackTrace();
+    }
   }
 
   /**

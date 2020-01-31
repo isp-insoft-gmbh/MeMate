@@ -30,8 +30,8 @@ public class MeMateActionBarButton
   private Icon icon;
   private Icon pressedIcon;
 
-  private final String title;
-  private String       tooltip;
+  private String title;
+  private String tooltip;
 
   private Color background;
   private Color foreground;
@@ -239,6 +239,12 @@ public class MeMateActionBarButton
   {
     setComponentsEnabled( barPanel, enabled );
     setComponentsEnabled( menuPanel, enabled );
+  }
+
+  public void setTitle( String title )
+  {
+    this.title = title;
+    titleLabels.forEach( label -> label.setText( title ) );
   }
 
   private void setComponentsEnabled( final Component comp, final boolean enabled )
