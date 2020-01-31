@@ -1,5 +1,6 @@
 package com.isp.memate;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +19,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class Main
 {
-  final static String version = "0.9.2";
+  final static String version = "0.9.3";
 
   /**
    * @param args unused
@@ -29,6 +30,8 @@ public class Main
     try
     {
       UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+      UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0, 0 ) );
+      UIManager.put( "AppColor", new Color( 29, 164, 165 ) );
     }
     catch ( ClassNotFoundException | InstantiationException | IllegalAccessException
         | UnsupportedLookAndFeelException exception )

@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -712,7 +714,8 @@ public class Database
         String consumer = rs.getString( "consumer" );
         if ( consumer.equals( currentUser ) || currentUser.equals( "admin" ) )
         {
-          String[] log = { rs.getString( "action" ), consumer, String.valueOf( rs.getFloat( "transaction_price" ) + "0€" ),
+          String[] log = { rs.getString( "action" ), consumer,
+              NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString(),
               balance, rs.getString( "date" ) };
           history.add( log );
         }

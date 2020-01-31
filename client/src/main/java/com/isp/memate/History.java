@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -70,6 +71,7 @@ public class History extends JPanel
     setBackground( Color.white );
     scrollPane.setBackground( Color.white );
     scrollPane.getViewport().setBackground( Color.white );
+    historyTable.setSelectionBackground( UIManager.getColor( "AppColor" ) );
   }
 
 

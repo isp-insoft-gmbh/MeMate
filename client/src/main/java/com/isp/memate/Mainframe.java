@@ -43,7 +43,7 @@ public class Mainframe extends JFrame
   private static final Mainframe instance               = new Mainframe();
   private final JPanel           contentPanel           = new JPanel( new BorderLayout() );
   private final JPanel           headerPanel            = new JPanel();
-  private final Color            color                  = new Color( 29, 164, 165 );
+  private final Color            color                  = UIManager.getColor( "AppColor" );
   private final JLabel           balanceLabel           = new JLabel();
   private final JLabel           helloUserLabel         = new JLabel( "Hallo User" );
   private final Icon             dashboardIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_black.png" ) );
@@ -97,7 +97,7 @@ public class Mainframe extends JFrame
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     setMinimumSize( new Dimension( 380, 475 ) );
-    setSize( 1185, 790 );
+    setSize( 1185, 770 );
     setLocationRelativeTo( null );
   }
 
@@ -114,6 +114,7 @@ public class Mainframe extends JFrame
       {
         contentPanel.removeAll();
         contentPanel.add( Dashboard.getInstance(), BorderLayout.CENTER );
+        contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
         contentPanel.repaint();
         contentPanel.revalidate();
       }
@@ -124,6 +125,7 @@ public class Mainframe extends JFrame
       {
         contentPanel.removeAll();
         contentPanel.add( History.getInstance(), BorderLayout.CENTER );
+        contentPanel.setBorder( new EmptyBorder( 0, 0, 5, 0 ) );
         contentPanel.repaint();
         contentPanel.revalidate();
       }
@@ -135,6 +137,7 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             contentPanel.add( ConsumptionRate.getInstance(), BorderLayout.CENTER );
+            contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
           }
@@ -146,6 +149,7 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             contentPanel.add( CreditHistory.getInstance() );
+            contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
           }
@@ -157,6 +161,7 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             contentPanel.add( Drinkmanager.getInstance() );
+            contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
           }
@@ -169,6 +174,7 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             contentPanel.add( Adminview.getInstance() );
+            contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
           }
@@ -184,10 +190,10 @@ public class Mainframe extends JFrame
         bar.toggleDarkmode();
         if ( bar.darkModeOn() )
         {
-          UIManager.put( "Label.disabledShadow", Color.DARK_GRAY );
           darkModeButton.setIcon( dayModeIconWhite );
           darkModeButton.setPressedIcon( dayModeIconBlack );
           darkModeButton.setTooltip( "Wechselt in den Daymode" );
+          darkModeButton.setTitle( "Daymode" );
           try
           {
             File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
@@ -206,10 +212,10 @@ public class Mainframe extends JFrame
         }
         else
         {
-          UIManager.put( "Label.disabledShadow", Color.white );
           darkModeButton.setIcon( darkModeIconBlack );
           darkModeButton.setPressedIcon( darkModeIconWhite );
           darkModeButton.setTooltip( "Wechselt in den Darkmode" );
+          darkModeButton.setTitle( "Darkmode" );
           try
           {
             File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
@@ -271,7 +277,10 @@ public class Mainframe extends JFrame
 
       if ( userProperties.getProperty( "Darkmode" ) != null && userProperties.getProperty( "Darkmode" ).equals( "on" ) )
       {
-        UIManager.put( "Label.disabledShadow", Color.DARK_GRAY );
+        darkModeButton.setIcon( dayModeIconBlack );
+        darkModeButton.setPressedIcon( dayModeIconWhite );
+        darkModeButton.setTooltip( "Wechselt in den Daymode" );
+        darkModeButton.setTitle( "Daymode" );
         bar.toggleDarkmode();
       }
     }

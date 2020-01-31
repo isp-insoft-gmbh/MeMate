@@ -154,6 +154,7 @@ public class Dashboard extends JPanel
     panel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
     panel.setBorder( new EmptyBorder( 0, 20, 10, 0 ) );
 
+
     aufladenButton.addActionListener( new ActionListener()
     {
       @Override
