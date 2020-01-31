@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -315,7 +316,10 @@ public class MeMateActionBar extends JPanel
         {
           if ( button.isEnabled() )
           {
-            selectButton( button.getTitle() );
+            if ( SwingUtilities.getLocalBounds( button.getBarButton() ).contains( e.getPoint() ) )
+            {
+              selectButton( button.getTitle() );
+            }
           }
         };
       } );

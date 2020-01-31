@@ -715,7 +715,8 @@ public class Database
         if ( consumer.equals( currentUser ) || currentUser.equals( "admin" ) )
         {
           String[] log = { rs.getString( "action" ), consumer,
-              NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString(),
+              NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString()
+                  .replace( " ", "" ),
               balance, rs.getString( "date" ) };
           history.add( log );
         }

@@ -463,9 +463,11 @@ public class ServerCommunication
   /**
    * Gibt die Historydaten zurück.
    * 
+   * @param dateType gibt an in welchem Format das Datum zurück gegeben werden soll
+   * 
    * @return Die Historydaten als 2D Array
    */
-  public String[][] getHistoryData( boolean shortDate )
+  public String[][] getHistoryData( dateType dateType )
   {
     if ( history == null )
     {
@@ -476,16 +478,29 @@ public class ServerCommunication
     {
       historyArray[ i ] = Arrays.copyOf( history[ i ], history[ i ].length );
     }
-    if ( shortDate )
+    if ( dateType != null && dateType == com.isp.memate.ServerCommunication.dateType.SHORT )
     {
       for ( int i = 0; i < historyArray.length; i++ )
       {
         historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 10 );
       }
     }
+    else if ( dateType == com.isp.memate.ServerCommunication.dateType.MIDDLE )
+    {
+      for ( int i = 0; i < historyArray.length; i++ )
+      {
+        historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 16 ).replace( "T", " " );
+      }
+    }
     return historyArray;
   }
 
+  enum dateType
+  {
+    SHORT,
+    LONG,
+    MIDDLE;
+  };
 
   /**
    * Es wird ein Shared-Objekt mit dem Befehl REGISTER_USER und einem User-Objekt
