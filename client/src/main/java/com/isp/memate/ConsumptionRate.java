@@ -57,7 +57,7 @@ public class ConsumptionRate extends JPanel
   public ConsumptionRate()
   {
     setLayout( new GridBagLayout() );
-    setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
   }
 
   private XYDataset createDataset( String drink )

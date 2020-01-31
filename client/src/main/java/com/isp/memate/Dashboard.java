@@ -4,7 +4,6 @@
 package com.isp.memate;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -101,7 +100,7 @@ public class Dashboard extends JPanel
     add( upperPanel, BorderLayout.NORTH );
     add( scrollpane, BorderLayout.CENTER );
     add( createLowerPanel(), BorderLayout.SOUTH );
-    setBackground( Color.white );
+    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
   }
 
   /**
