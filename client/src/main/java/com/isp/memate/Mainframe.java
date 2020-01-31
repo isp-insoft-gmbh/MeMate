@@ -161,7 +161,7 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             contentPanel.add( Drinkmanager.getInstance() );
-            contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
+            contentPanel.setBorder( new EmptyBorder( 0, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
           }
@@ -319,7 +319,7 @@ public class Mainframe extends JFrame
     setLayout( new BorderLayout() );
     contentPanel.add( Dashboard.getInstance() );
     headerPanel.setBackground( color );
-    contentPanel.setBackground( Color.white );
+    contentPanel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
     titlePanel.add( helloUserLabel );
     titlePanel.add( Box.createHorizontalGlue() );

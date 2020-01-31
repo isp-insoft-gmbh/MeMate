@@ -33,6 +33,8 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
+import com.isp.memate.ServerCommunication.dateType;
+
 
 /**
  * @author nwe
@@ -68,7 +70,7 @@ public class ConsumptionRate extends JPanel
       amountMap.put( formatter.format( now.minusDays( i ) ).toString(), 0 );
     }
 
-    String[][] historyData = ServerCommunication.getInstance().getHistoryData( true ).clone();
+    String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.SHORT ).clone();
     for ( String[] data : historyData )
     {
       String action = data[ 0 ];
@@ -116,6 +118,8 @@ public class ConsumptionRate extends JPanel
 
     freeChart.getXYPlot().getRangeAxis().setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
 
+    freeChart.setBackgroundPaint( UIManager.getColor( "DefaultBrightColor" ) );
+
     return freeChart;
   }
 
@@ -134,6 +138,7 @@ public class ConsumptionRate extends JPanel
   public void addGraph()
   {
     removeAll();
+    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     dataset = createDataset( "Alle" );
     chart = createChart( dataset );
     chartPanel = new ChartPanel( chart );
@@ -189,6 +194,7 @@ public class ConsumptionRate extends JPanel
       }
     } );
 
+
     selectDrinkComboBox.addItemListener( new ItemListener()
     {
       @Override
@@ -205,7 +211,6 @@ public class ConsumptionRate extends JPanel
                 String.format( "Ø %.2f Flaschen/Tag", getAverage(),
                     String.valueOf( e.getItem() ) ) );
         add( chartPanel, chartPanelConstraits );
-
         repaint();
         revalidate();
       }

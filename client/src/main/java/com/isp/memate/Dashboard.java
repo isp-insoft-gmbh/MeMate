@@ -84,7 +84,7 @@ public class Dashboard extends JPanel
     undoButtonConstraints.gridx = 2;
     undoButtonConstraints.gridy = 0;
     upperPanel.add( undoButton, undoButtonConstraints );
-    upperPanel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    upperPanel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     undoButton.setEnabled( false );
     undoButton.setToolTipText( "Letzte Aktion rückgängig machen" );
     undoButton.addActionListener( new ActionListener()
@@ -151,7 +151,7 @@ public class Dashboard extends JPanel
 
     SwingUtil.setPreferredWidth( 50, valueSpinner );
 
-    panel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     panel.setBorder( new EmptyBorder( 0, 20, 10, 0 ) );
 
 
@@ -222,7 +222,7 @@ public class Dashboard extends JPanel
       buttonList.add( button );
       panel.add( button );
     }
-    panel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     return panel;
   }
 

@@ -81,7 +81,6 @@ public class Drinkmanager extends JPanel
       public void valueChanged( ListSelectionEvent e )
       {
         currentSelection = drinkList.getSelectedIndex();
-
       }
     } );
   }
@@ -98,7 +97,7 @@ public class Drinkmanager extends JPanel
     final GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
     panel.setBorder( new EmptyBorder( 5, 5, 5, 5 ) );
-    panel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     panel.setLayout( new GridBagLayout() );
     gridBagConstraints.anchor = GridBagConstraints.LINE_START;
     gridBagConstraints.gridx = 0;

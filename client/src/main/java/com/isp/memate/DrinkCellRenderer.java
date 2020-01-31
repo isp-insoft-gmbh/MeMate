@@ -73,7 +73,7 @@ public class DrinkCellRenderer implements ListCellRenderer<Object>
     priceLabelConstraints.insets = new Insets( 0, 0, 0, 30 );
     renderComponent.add( priceLabel, priceLabelConstraints );
 
-    renderComponent.setBackground( UIManager.getColor( "List.background" ) );
+    renderComponent.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
   }
 
   @Override
@@ -129,7 +129,7 @@ public class DrinkCellRenderer implements ListCellRenderer<Object>
     }
     else
     {
-      renderComponent.setBackground( UIManager.getColor( "Table.background" ) );
+      renderComponent.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
       priceLabel.setForeground( UIManager.getColor( "Table.foreground" ) );
       drinkNameLabel.setForeground( UIManager.getColor( "Table.foreground" ) );
     }

@@ -22,6 +22,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import com.isp.memate.ServerCommunication.dateType;
+
 /**
  * @author nwe
  * @since 28.01.2020
@@ -41,7 +43,7 @@ public class CreditHistory extends JPanel
   public CreditHistory()
   {
     setLayout( new GridBagLayout() );
-    setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     addChart();
   }
 
@@ -58,6 +60,7 @@ public class CreditHistory extends JPanel
         PlotOrientation.VERTICAL,
         false, true, false );
     lineChart.getCategoryPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
+    lineChart.setBackgroundPaint( UIManager.getColor( "DefaultBrightColor" ) );
 
     ChartPanel chartPanel = new ChartPanel( lineChart );
     chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
@@ -95,7 +98,7 @@ public class CreditHistory extends JPanel
   {
     DateFormat dateFormat = new SimpleDateFormat( "dd-MMM HH:mm:ss" );
     DateFormat oldFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS" );
-    String[][] historyData = ServerCommunication.getInstance().getHistoryData( false );
+    String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
     DefaultCategoryDataset dataset = new DefaultCategoryDataset();
     if ( historyData != null )
     {

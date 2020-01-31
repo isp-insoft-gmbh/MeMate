@@ -17,6 +17,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.isp.memate.ServerCommunication.dateType;
+
 /**
  * @author nwe
  * @since 23.01.2020
@@ -45,7 +47,7 @@ public class DataExport
    */
   private void historyExport()
   {
-    String[][] history = ServerCommunication.getInstance().getHistoryData( true );
+    String[][] history = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
     try
     {
       DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();

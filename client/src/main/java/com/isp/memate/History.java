@@ -4,7 +4,6 @@
 package com.isp.memate;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -16,6 +15,8 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+
+import com.isp.memate.ServerCommunication.dateType;
 
 /**
  * In der Historie soll der Nutzer alle bisherigen Buchungen (auch von Kollegen) sehen, egal ob etwas
@@ -48,9 +49,8 @@ public class History extends JPanel
   public History()
   {
     super( new BorderLayout() );
-    setBackground( Color.BLUE );
-    historyTable = new JTable( ServerCommunication.getInstance().getHistoryData( true ), columnNames );
-    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( true ), columnNames )
+    historyTable = new JTable( ServerCommunication.getInstance().getHistoryData( dateType.MIDDLE ), columnNames );
+    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( dateType.MIDDLE ), columnNames )
     {
       @Override
       public boolean isCellEditable( int row, int column )
@@ -68,9 +68,10 @@ public class History extends JPanel
     scrollPane.setBorder( BorderFactory.createEmptyBorder() );
     scrollPane.setViewportView( historyTable );
     add( scrollPane, BorderLayout.CENTER );
-    setBackground( Color.white );
-    scrollPane.setBackground( Color.white );
-    scrollPane.getViewport().setBackground( Color.white );
+    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
+    scrollPane.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
+    scrollPane.getViewport().setBackground( UIManager.getColor( "DefaultBrightColor" ) );
+    historyTable.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     historyTable.setSelectionBackground( UIManager.getColor( "AppColor" ) );
   }
 
@@ -78,7 +79,7 @@ public class History extends JPanel
   @SuppressWarnings( "javadoc" )
   public void updateHistory()
   {
-    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( true ), columnNames )
+    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( dateType.MIDDLE ), columnNames )
     {
       @Override
       public boolean isCellEditable( int row, int column )

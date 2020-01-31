@@ -29,6 +29,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import com.isp.memate.ServerCommunication.dateType;
+
 /**
  * In der Adminview kann man das Guthaben des Spaarschweins setzen/sehen.
  * Außerdem kann man die gesamte Historie sehen und die Anzahl der Getränke festlegen.
@@ -70,6 +72,7 @@ public class Adminview extends JPanel
   private void loadDefaultSettings()
   {
     setLayout( new GridBagLayout() );
+    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     balanceField.setPreferredSize( new Dimension( 100, 20 ) );
     piggyBankLabel.setPreferredSize( new Dimension( 1100, 100 ) );
     piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 18f ) );
@@ -92,7 +95,6 @@ public class Adminview extends JPanel
     setAdminBalanceButtonConstraints.weightx = 1;
     setAdminBalanceButtonConstraints.anchor = GridBagConstraints.LINE_START;
     add( setAdminBalanceButton, setAdminBalanceButtonConstraints );
-    setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
     GridBagConstraints resetPasswordButtonConstraints = new GridBagConstraints();
     resetPasswordButtonConstraints.gridx = 0;
     resetPasswordButtonConstraints.gridy = 2;
@@ -306,7 +308,7 @@ public class Adminview extends JPanel
       drinkAmountPanelConstraints.gridy = index;
       drinkAmountPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
       add( drinkAmountPanel, drinkAmountPanelConstraints );
-      drinkAmountPanel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
+      drinkAmountPanel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
       index++;
     }
   }
@@ -317,7 +319,7 @@ public class Adminview extends JPanel
   private Float getDaysLeft( String drink )
   {
     Float amount = 0f;
-    String[][] historyData = ServerCommunication.getInstance().getHistoryData( true );
+    String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
     if ( historyData != null )
     {
       for ( String[] data : historyData )

@@ -32,6 +32,7 @@ public class Main
       UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
       UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0, 0 ) );
       UIManager.put( "AppColor", new Color( 29, 164, 165 ) );
+      UIManager.put( "DefaultBrightColor", Color.white );
     }
     catch ( ClassNotFoundException | InstantiationException | IllegalAccessException
         | UnsupportedLookAndFeelException exception )
