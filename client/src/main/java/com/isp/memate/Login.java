@@ -8,7 +8,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -30,6 +29,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 import javax.swing.FocusManager;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -61,7 +61,8 @@ public class Login extends JFrame
   private static final Login   instance                = new Login();
   private static String        currentUsername;
   private final JPanel         loginPanel              = new JPanel( new GridBagLayout() );
-  private final JLabel         headerLabel             = new JLabel( "Willkommen bei MeMate" );
+  private final JLabel         headerLabel             =
+      new JLabel( new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
   private final JLabel         usernameLabel           = new JLabel( "Benutzername" );
   private final JLabel         passwordLabel           = new JLabel( "Passwort" );
   private final JLabel         stayLoggedInLabel       = new JLabel( "Eingeloggt bleiben" );
@@ -436,20 +437,7 @@ public class Login extends JFrame
 
   private void deriveFonts()
   {
-    Font headerLabelFont = headerLabel.getFont();
     String fontName = LABEL_FONT.getFontName();
-    GraphicsEnvironment g = null;
-    g = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    String[] fonts = g.getAvailableFontFamilyNames();
-    for ( int i = 0; i < fonts.length; i++ )
-    {
-      if ( fonts[ i ].equals( "Century Gothic" ) )
-      {
-        headerLabel.setFont( new Font( "Century Gothic", headerLabelFont.getStyle(), (int) (headerLabelFont.getSize() * 3f) ) );
-        break;
-      }
-      headerLabel.setFont( new Font( "Comic Sans MS", headerLabelFont.getStyle(), (int) (headerLabelFont.getSize() * 3f) ) );
-    }
     usernameLabel.setFont( LABEL_FONT );
     passwordLabel.setFont( LABEL_FONT );
     stayLoggedInLabel.setFont( LABEL_FONT );
