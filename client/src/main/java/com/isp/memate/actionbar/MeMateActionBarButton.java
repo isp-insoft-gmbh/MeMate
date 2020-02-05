@@ -61,6 +61,15 @@ public class MeMateActionBarButton
   }
 
   /**
+   *
+   */
+  public MeMateActionBarButton( final String title, final String tooltip, final Color background, final Color foreground,
+                                final Runnable runnable )
+  {
+    this( title, tooltip, null, null, background, foreground, null, runnable, null );
+  }
+
+  /**
   *
   */
   public MeMateActionBarButton( final Icon icon, final Icon pressedIcon, final Color background, final String iconOrientation )
@@ -123,22 +132,34 @@ public class MeMateActionBarButton
     {
       actionPanel.setToolTipText( tooltip );
     }
+    if ( icon != null )
+    {
+      if ( !isNullOrEmpty( title ) )
+      {//nur wenn der Titel nicht leer ist muss ein Label gesetzt werden
 
-    if ( !isNullOrEmpty( title ) )
-    {//nur wenn der Titel nicht leer ist muss ein Label gesetzt werden
-      actionPanel.add( createIconLable(), iconOrientation );
+        actionPanel.add( createIconLable(), iconOrientation );
 
+
+        final JLabel titleLabel = createTitleLable( foreground, 0, title );
+        titleLabel.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 15 ) );
+        titleLabels.add( titleLabel );
+
+        actionPanel.add( titleLabel, BorderLayout.CENTER );
+      }
+      else
+      {//wenn es kein Titel gibt soll das Icon zentriert werden.
+        actionPanel.add( createIconLable(), iconOrientation );
+      }
+    }
+    else
+    {
+      actionPanel.setBorder( BorderFactory.createLineBorder( new Color( 173, 173, 173 ) ) );
       final JLabel titleLabel = createTitleLable( foreground, 0, title );
-      titleLabel.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 15 ) );
+      titleLabel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
       titleLabels.add( titleLabel );
 
       actionPanel.add( titleLabel, BorderLayout.CENTER );
     }
-    else
-    {//wenn es kein Titel gibt soll das Icon zentriert werden.
-      actionPanel.add( createIconLable(), iconOrientation );
-    }
-
     //Die Buttons sollen eine feste größe Bekommen.
     actionPanel.setMaximumSize( new Dimension( actionPanel.getMaximumSize().width, actionPanel.getPreferredSize().height ) );
     actionPanel.setEnabled( false );
@@ -293,7 +314,10 @@ public class MeMateActionBarButton
 
   private void changeButtonStyle( final Icon buttonIcon, final Color background, final Color foreground )
   {
-    iconLabels.forEach( lable -> lable.setIcon( buttonIcon ) );
+    if ( buttonIcon != null )
+    {
+      iconLabels.forEach( lable -> lable.setIcon( buttonIcon ) );
+    }
     barPanel.setBackground( background );
     menuPanel.setBackground( background );
 
@@ -449,6 +473,7 @@ public class MeMateActionBarButton
     if ( darkModeOn )
     {
       titleLabels.forEach( label -> label.setForeground( foreground ) );
+
       darkModeOn = false;
     }
     else
@@ -456,6 +481,16 @@ public class MeMateActionBarButton
       titleLabels.forEach( label -> label.setForeground( Color.white ) );
       darkModeOn = true;
     }
+  }
+
+  public void toggleDarkMode( Color background, Color foreground )
+  {
+    changeButtonStyle( null, background, foreground );
+  }
+
+  public void setDarkModeState( boolean state )
+  {
+    darkModeOn = state;
   }
 
   public void setRunnable( final Runnable runnable )

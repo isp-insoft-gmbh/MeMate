@@ -4,6 +4,7 @@
 package com.isp.memate;
 
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -34,6 +35,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.MeMateUIManager;
 
 
 /**
@@ -57,7 +59,6 @@ public class ConsumptionRate extends JPanel
   public ConsumptionRate()
   {
     setLayout( new GridBagLayout() );
-    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
   }
 
   private XYDataset createDataset( String drink )
@@ -118,8 +119,25 @@ public class ConsumptionRate extends JPanel
 
     freeChart.getXYPlot().getRangeAxis().setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
 
-    freeChart.setBackgroundPaint( UIManager.getColor( "DefaultBrightColor" ) );
 
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
+      freeChart.getTitle().setPaint( Color.white );
+      freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.white );
+      freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.white );
+      freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.white );
+      freeChart.getXYPlot().getRangeAxis().setLabelPaint( Color.white );
+    }
+    else
+    {
+      freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
+      freeChart.getTitle().setPaint( Color.black );
+      freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.black );
+      freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.black );
+      freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.black );
+      freeChart.getXYPlot().getRangeAxis().setLabelPaint( Color.black );
+    }
     return freeChart;
   }
 
@@ -138,7 +156,6 @@ public class ConsumptionRate extends JPanel
   public void addGraph()
   {
     removeAll();
-    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     dataset = createDataset( "Alle" );
     chart = createChart( dataset );
     chartPanel = new ChartPanel( chart );
@@ -175,11 +192,23 @@ public class ConsumptionRate extends JPanel
     averageConsumptionConstraints.anchor = GridBagConstraints.NORTH;
     add( averageConsumption, averageConsumptionConstraints );
 
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
+      averageConsumption.setForeground( MeMateUIManager.getForeground( "default" ).getDarkColor() );
+    }
+    else
+    {
+      setBackground( MeMateUIManager.getBackground( "default" ).getDayColor() );
+      averageConsumption.setForeground( MeMateUIManager.getForeground( "default" ).getDayColor() );
+    }
+
 
     chartPanel.setMaximumDrawHeight( 1000 );
     chartPanel.setMaximumDrawWidth( 1000 );
     chartPanel.setMinimumDrawWidth( 10 );
     chartPanel.setMinimumDrawHeight( 10 );
+
 
     Mainframe.getInstance().addComponentListener( new ComponentAdapter()
     {

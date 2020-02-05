@@ -28,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.actionbar.MeMateActionBar;
 import com.isp.memate.actionbar.MeMateActionBarButton;
+import com.isp.memate.util.MeMateUIManager;
 
 /**
  * Der Mainframe bildet das Gerüst für Dashboard, Historie und den Getränkemanager.
@@ -41,7 +42,7 @@ import com.isp.memate.actionbar.MeMateActionBarButton;
 public class Mainframe extends JFrame
 {
   private static final Mainframe instance               = new Mainframe();
-  private final JPanel           contentPanel           = new JPanel( new BorderLayout() );
+  private final JPanel           contentPanel           = MeMateUIManager.createJPanel();
   private final JPanel           headerPanel            = new JPanel();
   private final Color            color                  = UIManager.getColor( "AppColor" );
   private final JLabel           balanceLabel           = new JLabel();
@@ -70,7 +71,7 @@ public class Mainframe extends JFrame
       new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_black.png" ) );
   private final Icon             creditHistoryIconWhite =
       new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_white.png" ) );
-  private final MeMateActionBar  bar                    = new MeMateActionBar( new Color( 225, 225, 225 ), Color.black );
+  private final MeMateActionBar  bar;
   private MeMateActionBarButton  drinkManagerButton;
   private MeMateActionBarButton  adminViewButton;
   private MeMateActionBarButton  logoutButton;
@@ -90,6 +91,9 @@ public class Mainframe extends JFrame
    */
   public Mainframe()
   {
+    contentPanel.setLayout( new BorderLayout() );
+    bar = new MeMateActionBar( new Color( 225, 225, 225 ), Color.black );
+
     deriveFontsAndSetLayout();
     addActionBar();
     setIconImage(
@@ -97,7 +101,7 @@ public class Mainframe extends JFrame
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     setMinimumSize( new Dimension( 380, 475 ) );
-    setSize( 1185, 770 );
+    setSize( 1170, 770 );
     setLocationRelativeTo( null );
   }
 
@@ -190,10 +194,13 @@ public class Mainframe extends JFrame
         bar.toggleDarkmode();
         if ( bar.darkModeOn() )
         {
+          MeMateUIManager.showDarkMode();
           darkModeButton.setIcon( dayModeIconWhite );
           darkModeButton.setPressedIcon( dayModeIconBlack );
           darkModeButton.setTooltip( "Wechselt in den Daymode" );
           darkModeButton.setTitle( "Daymode" );
+
+
           try
           {
             File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
@@ -212,6 +219,7 @@ public class Mainframe extends JFrame
         }
         else
         {
+          MeMateUIManager.showDayMode();
           darkModeButton.setIcon( darkModeIconBlack );
           darkModeButton.setPressedIcon( darkModeIconWhite );
           darkModeButton.setTooltip( "Wechselt in den Darkmode" );
@@ -282,6 +290,11 @@ public class Mainframe extends JFrame
         darkModeButton.setTooltip( "Wechselt in den Daymode" );
         darkModeButton.setTitle( "Daymode" );
         bar.toggleDarkmode();
+        MeMateUIManager.showDarkMode();
+      }
+      else
+      {
+        MeMateUIManager.showDayMode();
       }
     }
     catch ( IOException exception )
@@ -299,6 +312,14 @@ public class Mainframe extends JFrame
   public void setHelloLabel( String username )
   {
     helloUserLabel.setText( "Hallo " + username );
+  }
+
+  /**
+   * @return Actionbar
+   */
+  public MeMateActionBar getActionBar()
+  {
+    return bar;
   }
 
 

@@ -334,6 +334,18 @@ public class MeMateActionBar extends JPanel
     return button;
   }
 
+  public MeMateActionBarButton getExternalButton( final String title, final String tooltip, final Color background, final Color foreground,
+                                                  final Runnable runnable )
+  {
+    final MeMateActionBarButton button =
+        new MeMateActionBarButton( title, tooltip, background, foreground, runnable );
+    button.addMouseListener( new MeMateActionBarListener( button,
+        () -> button.setBackground( backgroundColor ),
+        () -> button.setBackground( backgroundColor.darker() ) ) );
+    //allButtons.add( button );
+    return button;
+  }
+
   /**
    * Ändert die Sichtbarkeit der Labels der hinzugefügten Buttons.
    */
@@ -491,6 +503,7 @@ public class MeMateActionBar extends JPanel
    */
   public void toggleDarkmode()
   {
+
     if ( darkModeOn )
     {
       setBackground( new Color( 225, 225, 225 ) );
@@ -536,6 +549,7 @@ public class MeMateActionBar extends JPanel
       burgerButton.toggleFontColor();
       darkModeOn = true;
     }
+
   }
 
   /**

@@ -25,6 +25,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
 
 import net.miginfocom.layout.CC;
@@ -42,12 +43,16 @@ import net.miginfocom.swing.MigLayout;
  */
 public class Dashboard extends JPanel
 {
-  private static final Dashboard            instance   = new Dashboard( Mainframe.getInstance() );
+  private static final Dashboard            instance      = new Dashboard( Mainframe.getInstance() );
   private final Mainframe                   mainFrame;
-  private final ImageIcon                   undoIcon   = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
+  private final ImageIcon                   undoIcon      = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
+  private final ImageIcon                   infoIcon      = new ImageIcon( getClass().getClassLoader().getResource( "infoicon.png" ) );
+  private final ImageIcon                   infoIconWhite =
+      new ImageIcon( getClass().getClassLoader().getResource( "infoicon_white.png" ) );
+  private final JLabel                      infoIconLabel = new JLabel( infoIcon );
   private final JScrollPane                 scrollpane;
-  private ArrayList<DrinkConsumptionButton> buttonList = new ArrayList<>();
-  final JButton                             undoButton = new JButton( undoIcon );
+  private ArrayList<DrinkConsumptionButton> buttonList    = new ArrayList<>();
+  final JButton                             undoButton    = new JButton( undoIcon );
 
   /**
    * @return static instance of Dashboard
@@ -69,8 +74,10 @@ public class Dashboard extends JPanel
     scrollpane.getVerticalScrollBar().setUnitIncrement( 16 );
     scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
 
-    final JPanel upperPanel = new JPanel( new GridBagLayout() );
-    final JLabel consumeLabel = new JLabel( "Getränk konsumieren" );
+    final JPanel upperPanel = MeMateUIManager.createJPanel();
+    upperPanel.setLayout( new GridBagLayout() );
+    final JLabel consumeLabel = MeMateUIManager.createJLabel();
+    consumeLabel.setText( "Getränk konsumieren" );
     consumeLabel.setHorizontalAlignment( JLabel.CENTER );
     consumeLabel.setFont( consumeLabel.getFont().deriveFont( 20f ) );
     upperPanel.setBorder( new EmptyBorder( 0, 0, 5, 0 ) );
@@ -101,6 +108,7 @@ public class Dashboard extends JPanel
     add( scrollpane, BorderLayout.CENTER );
     add( createLowerPanel(), BorderLayout.SOUTH );
     setBackground( UIManager.getColor( "DefaultBrightColor" ) );
+    MeMateUIManager.registerPanel( "default", this );
   }
 
   /**
@@ -110,52 +118,18 @@ public class Dashboard extends JPanel
    */
   private JPanel createLowerPanel()
   {
-    final JPanel panel = new JPanel();
+    final JPanel panel = MeMateUIManager.createJPanel();
     final SpinnerNumberModel spinnerModel = new SpinnerNumberModel( 1, 1, 1000, 1 );
     final JSpinner valueSpinner = new JSpinner( spinnerModel );
     //    String pattern = "0€";
     //    JSpinner.NumberEditor editor = new JSpinner.NumberEditor( valueSpinner, pattern );
     //    valueSpinner.setEditor( editor );
 
-    final JButton aufladenButton = new JButton( "Einzahlen" );
-    final JSeparator seperator = new JSeparator( JSeparator.VERTICAL );
-    final JLabel aufladenlabel = new JLabel( "Kontostand aufladen" );
-    final String infoText1 =
-        "Einzahlung sind nur in Höhe von gültigen Kombination von 1€ und 2€ Münzen, 5€ Scheinen, 10€ Scheinen und 20€ Scheinen möglich.";
-    final String infoText2 =
-        "Einmal eingezahltes Guthaben kann nicht wieder ausgezahlt werden und muss durch den Konsum von Getränken aufgebraucht werden.";
-    final JLabel infoTextLabel1 = new JLabel( infoText1 );
-    final JLabel infoTextLabel2 = new JLabel( infoText2 );
-
-    final ImageIcon infoIcon = new ImageIcon( getClass().getClassLoader().getResource( "infoicon.png" ) );
-    final JLabel infoIconLabel = new JLabel( infoIcon );
-    infoIconLabel.setBorder( new MatteBorder( 0, 1, 0, 0, UIManager.getColor( "separator.background" ) ) );
-
-    String infoTextToolTip = "<html>" + infoText1 + "<br>" + infoText2 + "</html>";
-    infoTextLabel1.setToolTipText( infoTextToolTip );
-    infoTextLabel2.setToolTipText( infoTextToolTip );
-
-    infoTextLabel1.setFont( infoTextLabel1.getFont().deriveFont( 13f ) );
-    infoTextLabel2.setFont( infoTextLabel2.getFont().deriveFont( 13f ) );
-    aufladenlabel.setFont( aufladenlabel.getFont().deriveFont( 15f ) );
-
-    panel.setLayout( new MigLayout( new LC().flowX().fill().insets( "10px", "0", "0", "0" ) ) );
-    panel.add( aufladenlabel, new CC().spanX( 2 ) );
-    panel.add( seperator, new CC().spanY().growY() );
-    panel.add( infoIconLabel, new CC().spanY() );
-    panel.add( infoTextLabel1, new CC().minWidth( "0" ).pushX().wrap() );
-    panel.add( valueSpinner, new CC() );
-    panel.add( aufladenButton, new CC() );
-    panel.add( infoTextLabel2, new CC().skip( 1 ).minWidth( "0" ).pushX() );
-
-    SwingUtil.setPreferredWidth( 50, valueSpinner );
-
-    panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
-    panel.setBorder( new EmptyBorder( 0, 20, 10, 0 ) );
-
-
+    final JButton aufladenButton = MeMateUIManager.createNormalButton( "button" );
+    aufladenButton.setText( "Einzahlen" );
     aufladenButton.addActionListener( new ActionListener()
     {
+
       @Override
       public void actionPerformed( ActionEvent e )
       {
@@ -173,6 +147,67 @@ public class Dashboard extends JPanel
         }
       }
     } );
+
+
+    //    final MeMateActionBarButton aufladenButton = MeMateUIManager.createButton( "Einzahlen",
+    //        "Guthaben einzahlen", UIManager.getColor( "AppColor" ),
+    //        Color.white, new Runnable()
+    //        {
+    //          @Override
+    //          public void run()
+    //          {
+    //            Object value = valueSpinner.getValue();
+    //            System.out.println( String.valueOf( valueSpinner.getValue() ) );
+    //            int result =
+    //                JOptionPane.showConfirmDialog( Dashboard.this, "<html>Wollen Sie wirklich <b>" + value + "€</b> einzahlen?",
+    //                    "Guthaben hinzufügen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE );
+    //            if ( result == JOptionPane.YES_OPTION )
+    //            {
+    //              ServerCommunication sc = ServerCommunication.getInstance();
+    //              sc.addBalance( (int) value );
+    //              ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
+    //              undoButton.setEnabled( true );
+    //            }
+    //          }
+    //        }, "button" );
+
+
+    final JSeparator seperator = new JSeparator( JSeparator.VERTICAL );
+    final JLabel aufladenlabel = MeMateUIManager.createJLabel();
+    aufladenlabel.setText( "Kontostand aufladen" );
+    final String infoText1 =
+        "Einzahlung sind nur in Höhe von gültigen Kombination von 1€ und 2€ Münzen, 5€ Scheinen, 10€ Scheinen und 20€ Scheinen möglich.";
+    final String infoText2 =
+        "Einmal eingezahltes Guthaben kann nicht wieder ausgezahlt werden und muss durch den Konsum von Getränken aufgebraucht werden.";
+    final JLabel infoTextLabel1 = MeMateUIManager.createJLabel();
+    final JLabel infoTextLabel2 = MeMateUIManager.createJLabel();
+    infoTextLabel1.setText( infoText1 );
+    infoTextLabel2.setText( infoText2 );
+
+    infoIconLabel.setBorder( new MatteBorder( 0, 1, 0, 0, UIManager.getColor( "separator.background" ) ) );
+
+    String infoTextToolTip = "<html>" + infoText1 + "<br>" + infoText2 + "</html>";
+    infoTextLabel1.setToolTipText( infoTextToolTip );
+    infoTextLabel2.setToolTipText( infoTextToolTip );
+
+    infoTextLabel1.setFont( infoTextLabel1.getFont().deriveFont( 13f ) );
+    infoTextLabel2.setFont( infoTextLabel2.getFont().deriveFont( 13f ) );
+    aufladenlabel.setFont( aufladenlabel.getFont().deriveFont( 15f ) );
+
+    panel.setLayout( new MigLayout( new LC().flowX().fill().insets( "10px", "0", "0", "0" ) ) );
+    panel.add( aufladenlabel, new CC().spanX( 2 ) );
+    panel.add( seperator, new CC().spanY().growY() );
+    panel.add( infoIconLabel, new CC().spanY() );
+    panel.add( infoTextLabel1, new CC().minWidth( "0" ).pushX().wrap() );
+    panel.add( valueSpinner, new CC() );
+    panel.add( aufladenButton, new CC() ); // Wenn der Button ein MeMateActionBarButton ist, dann getbarbutton ergänzen
+    panel.add( infoTextLabel2, new CC().skip( 1 ).minWidth( "0" ).pushX() );
+
+    SwingUtil.setPreferredWidth( 50, valueSpinner );
+
+    panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
+    panel.setBorder( new EmptyBorder( 0, 20, 10, 0 ) );
+
     return panel;
   }
 
@@ -189,7 +224,8 @@ public class Dashboard extends JPanel
   public JPanel createDrinkButtonPanel()
   {
     buttonList.clear();
-    JPanel panel = new JPanel( new WrapLayout( FlowLayout.LEFT ) );
+    JPanel panel = MeMateUIManager.createJPanel();
+    panel.setLayout( new WrapLayout( FlowLayout.LEFT ) );
     for ( String drink : ServerCommunication.getInstance().getDrinkNames() )
     {
       if ( ServerCommunication.getInstance().getAmount( drink ) == 0 )
@@ -261,6 +297,18 @@ public class Dashboard extends JPanel
   {
     JOptionPane.showMessageDialog( mainFrame, "<html><b>" + name + " </b>ist leider nicht mehr verfügbar</html>", "Getränk nicht verfügbar",
         JOptionPane.ERROR_MESSAGE, null );
+  }
+
+  public void toggleInfoIcon()
+  {
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      infoIconLabel.setIcon( infoIconWhite );
+    }
+    else
+    {
+      infoIconLabel.setIcon( infoIcon );
+    }
   }
 
   /**

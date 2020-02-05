@@ -15,10 +15,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import com.isp.memate.util.MeMateUIManager;
 
 /**
  * Im Getränkemanager kann man einstellen, welche Getränke derzeit verfügbar sind und somit im
@@ -35,10 +36,10 @@ public class Drinkmanager extends JPanel
   private JList<String>             drinkList         = new JList<>( data );
   private final JScrollPane         scrollpane        = new JScrollPane();
   private int                       currentSelection;
-  private final JButton             addButton         = new JButton( "Hinzufügen" );
-  private final JButton             editButton        = new JButton( "Bearbeiten" );
-  private final JButton             removeButton      = new JButton( "Entfernen" );
-  private final JButton             ingredientsButton = new JButton( "Inhaltsstoffe" );
+  private final JButton             addButton         = MeMateUIManager.createNormalButton( "button" );
+  private final JButton             editButton        = MeMateUIManager.createNormalButton( "button" );
+  private final JButton             removeButton      = MeMateUIManager.createNormalButton( "button" );
+  private final JButton             ingredientsButton = MeMateUIManager.createNormalButton( "button" );
 
   /**
    * @return static instance of {@link Drinkmanager}
@@ -54,6 +55,10 @@ public class Drinkmanager extends JPanel
    */
   public Drinkmanager()
   {
+    addButton.setText( "Hinzufügen" );
+    editButton.setText( "Bearbeiten" );
+    removeButton.setText( "Entfernen" );
+    ingredientsButton.setText( "Inhaltsstoffe" );
     data = ServerCommunication.getInstance().getDrinkNames().toArray( data );
     setLayout( new BorderLayout() );
     add( scrollpane, BorderLayout.CENTER );
@@ -63,6 +68,7 @@ public class Drinkmanager extends JPanel
     drinkList.setFixedCellHeight( 150 );
     drinkList.setFont( drinkList.getFont().deriveFont( 20f ) );
     scrollpane.setViewportView( drinkList );
+    MeMateUIManager.registerScrollPane( "scroll", scrollpane );
 
     if ( data.length == 0 )
     {
@@ -83,6 +89,7 @@ public class Drinkmanager extends JPanel
         currentSelection = drinkList.getSelectedIndex();
       }
     } );
+    MeMateUIManager.registerPanel( "default", this );
   }
 
   /**
@@ -93,11 +100,10 @@ public class Drinkmanager extends JPanel
   private JPanel createButtonPanel()
   {
 
-    final JPanel panel = new JPanel();
+    final JPanel panel = MeMateUIManager.createJPanel();
     final GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
     panel.setBorder( new EmptyBorder( 5, 5, 5, 5 ) );
-    panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     panel.setLayout( new GridBagLayout() );
     gridBagConstraints.anchor = GridBagConstraints.LINE_START;
     gridBagConstraints.gridx = 0;
@@ -112,6 +118,7 @@ public class Drinkmanager extends JPanel
     gridBagConstraints.gridx = 3;
     gridBagConstraints.anchor = GridBagConstraints.LINE_END;
     panel.add( removeButton, gridBagConstraints );
+
 
     removeButton.addActionListener( new ActionListener()
     {

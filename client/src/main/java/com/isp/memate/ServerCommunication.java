@@ -495,7 +495,7 @@ public class ServerCommunication
     return historyArray;
   }
 
-  enum dateType
+  public enum dateType
   {
     SHORT,
     LONG,

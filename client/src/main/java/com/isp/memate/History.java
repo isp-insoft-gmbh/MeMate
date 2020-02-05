@@ -17,6 +17,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.MeMateUIManager;
 
 /**
  * In der Historie soll der Nutzer alle bisherigen Buchungen (auch von Kollegen) sehen, egal ob etwas
@@ -63,16 +64,15 @@ public class History extends JPanel
     historyTable.setShowGrid( false );
     JTableHeader header = historyTable.getTableHeader();
     header.setOpaque( false );
-    header.setBackground( header.getBackground().darker() );
     historyTable.setRowHeight( 30 );
     scrollPane.setBorder( BorderFactory.createEmptyBorder() );
     scrollPane.setViewportView( historyTable );
     add( scrollPane, BorderLayout.CENTER );
-    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
-    scrollPane.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
-    scrollPane.getViewport().setBackground( UIManager.getColor( "DefaultBrightColor" ) );
-    historyTable.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
+
     historyTable.setSelectionBackground( UIManager.getColor( "AppColor" ) );
+    MeMateUIManager.registerPanel( "default", this );
+    MeMateUIManager.registerTable( "table", historyTable );
+    MeMateUIManager.registerScrollPane( "scroll", scrollPane );
   }
 
 

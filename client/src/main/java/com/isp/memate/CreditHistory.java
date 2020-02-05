@@ -3,6 +3,7 @@
  */
 package com.isp.memate;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -23,6 +24,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.MeMateUIManager;
 
 /**
  * @author nwe
@@ -43,7 +45,6 @@ public class CreditHistory extends JPanel
   public CreditHistory()
   {
     setLayout( new GridBagLayout() );
-    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     addChart();
   }
 
@@ -60,7 +61,24 @@ public class CreditHistory extends JPanel
         PlotOrientation.VERTICAL,
         false, true, false );
     lineChart.getCategoryPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
-    lineChart.setBackgroundPaint( UIManager.getColor( "DefaultBrightColor" ) );
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
+      lineChart.getTitle().setPaint( Color.white );
+      lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.white );
+      lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.white );
+      lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( Color.white );
+      lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( Color.white );
+    }
+    else
+    {
+      lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
+      lineChart.getTitle().setPaint( Color.black );
+      lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.black );
+      lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.black );
+      lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( Color.black );
+      lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( Color.black );
+    }
 
     ChartPanel chartPanel = new ChartPanel( lineChart );
     chartPanel.setPreferredSize( new Dimension( 760, 570 ) );

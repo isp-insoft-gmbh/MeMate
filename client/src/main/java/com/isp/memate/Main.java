@@ -11,6 +11,9 @@ import java.util.Properties;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.isp.memate.util.MeMateUIManager;
+import com.isp.memate.util.MeMateUIManager.DarkDayColor;
+
 /**
  * Die Mainklasse setzt das Look and Feel und öffnet den LoginFrame.
  * 
@@ -19,26 +22,43 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class Main
 {
-  final static String version = "0.9.3";
+  final static String version = "0.9.4";
 
   /**
    * @param args unused
    */
   public static void main( String[] args )
   {
-
     try
     {
       UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
       UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0, 0 ) );
       UIManager.put( "AppColor", new Color( 29, 164, 165 ) );
       UIManager.put( "DefaultBrightColor", Color.white );
+      UIManager.put( "DefaultButtonBackground", new Color( 225, 225, 225 ) );
+      UIManager.put( "DefaultButtonForeground", new Color( 0, 0, 0 ) );
+      UIManager.put( "DefaultButtonBorderColor", new Color( 173, 173, 173 ) );
+      UIManager.put( "DefaultButtonBorderHover", new Color( 0, 120, 215 ) );
+      UIManager.put( "DefaultButtonBackgroundHover", new Color( 229, 241, 251 ) );
+      UIManager.put( "DefaultButtonPressedBackground", new Color( 204, 228, 247 ) );
+
     }
     catch ( ClassNotFoundException | InstantiationException | IllegalAccessException
         | UnsupportedLookAndFeelException exception )
     {
       // We don't mind if we aren't able to set a Look and Feel, therefore we just ignore the exceptions.
     }
+    MeMateUIManager.installDefaults();
+    MeMateUIManager.installNewKey( "button", new DarkDayColor( Color.DARK_GRAY, new Color( 225, 225, 225 ) ),
+        new DarkDayColor( Color.white, Color.black ) );
+    MeMateUIManager.installNewKey( "drinkButtons", new DarkDayColor( new Color( 75, 75, 75 ), new Color( 240, 240, 240 ) ),
+        new DarkDayColor( Color.white, Color.black ) );
+    MeMateUIManager.installNewKey( "table", new DarkDayColor( Color.DARK_GRAY.brighter(), Color.white ),
+        new DarkDayColor( Color.white, Color.black ) );
+    MeMateUIManager.installNewKey( "scroll", new DarkDayColor( Color.DARK_GRAY.brighter(), Color.white ),
+        new DarkDayColor( Color.white, Color.black ) );
+
+
     String sessionID = null;
     File meMateFolder = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" );
     File userPropFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );

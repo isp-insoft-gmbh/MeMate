@@ -26,10 +26,10 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.MeMateUIManager;
 
 /**
  * In der Adminview kann man das Guthaben des Spaarschweins setzen/sehen.
@@ -42,11 +42,11 @@ import com.isp.memate.ServerCommunication.dateType;
 public class Adminview extends JPanel
 {
   private static final Adminview instance              = new Adminview();
-  private final JButton          setAdminBalanceButton = new JButton( "Guthaben setzen" );
-  private final JButton          exportButton          = new JButton( "Daten exportieren" );
-  private final JButton          resetPasswordButton   = new JButton( "Passwort ändern" );
+  private final JButton          setAdminBalanceButton = MeMateUIManager.createNormalButton( "button" );
+  private final JButton          exportButton          = MeMateUIManager.createNormalButton( "button" );
+  private final JButton          resetPasswordButton   = MeMateUIManager.createNormalButton( "button" );
   private final JTextField       balanceField          = new JTextField();
-  private final JLabel           piggyBankLabel        = new JLabel();
+  private final JLabel           piggyBankLabel        = MeMateUIManager.createJLabel();
   private final JDialog          passwordFrame         = new JDialog( Mainframe.getInstance() );
   private JPanel                 drinkAmountPanel      = new JPanel( new FlowLayout() );
 
@@ -71,8 +71,10 @@ public class Adminview extends JPanel
    */
   private void loadDefaultSettings()
   {
+    setAdminBalanceButton.setText( "Guthaben setzen" );
+    exportButton.setText( "Daten exportieren" );
+    resetPasswordButton.setText( "Passwort ändern" );
     setLayout( new GridBagLayout() );
-    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     balanceField.setPreferredSize( new Dimension( 100, 20 ) );
     piggyBankLabel.setPreferredSize( new Dimension( 1100, 100 ) );
     piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 18f ) );
@@ -240,6 +242,7 @@ public class Adminview extends JPanel
       }
     } );
     ServerCommunication.getInstance().tellServerToSendPiggybankBalance();
+    MeMateUIManager.registerPanel( "default", this );
   }
 
   /**
@@ -250,8 +253,10 @@ public class Adminview extends JPanel
     int index = 4;
     for ( String drink : ServerCommunication.getInstance().getDrinkNames() )
     {
-      drinkAmountPanel = new JPanel( new GridBagLayout() );
-      JLabel drinkNameLabel = new JLabel( drink );
+      drinkAmountPanel = MeMateUIManager.createJPanel();
+      drinkAmountPanel.setLayout( new GridBagLayout() );
+      JLabel drinkNameLabel = MeMateUIManager.createJLabel();
+      drinkNameLabel.setText( drink );
       drinkNameLabel.setPreferredSize( new Dimension( 150, 30 ) );
       GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
       drinkNameLabelConstraints.gridy = 0;
@@ -265,13 +270,15 @@ public class Adminview extends JPanel
       amountSpinnerConstraints.gridy = 0;
       amountSpinnerConstraints.insets = new Insets( 0, 0, 0, 5 );
       drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
-      JButton setAmountButton = new JButton( "Anzahl setzen" );
+      JButton setAmountButton = MeMateUIManager.createNormalButton( "button" );
+      setAmountButton.setText( "Anzahl setzen" );
       GridBagConstraints setAmountButtonConstraints = new GridBagConstraints();
       setAmountButtonConstraints.gridx = 2;
       setAmountButtonConstraints.gridy = 0;
       setAmountButtonConstraints.insets = new Insets( 0, 0, 0, 5 );
       drinkAmountPanel.add( setAmountButton, setAmountButtonConstraints );
-      JLabel daysLeftLabel = new JLabel( String.format( "in etwa %.2f Tagen leer.", getDaysLeft( drink ) ) );
+      JLabel daysLeftLabel = MeMateUIManager.createJLabel();
+      daysLeftLabel.setText( String.format( "in etwa %.2f Tagen leer.", getDaysLeft( drink ) ) );
       GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
       daysLeftLabelConstraints.gridx = 3;
       daysLeftLabelConstraints.gridy = 0;
@@ -308,7 +315,6 @@ public class Adminview extends JPanel
       drinkAmountPanelConstraints.gridy = index;
       drinkAmountPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
       add( drinkAmountPanel, drinkAmountPanelConstraints );
-      drinkAmountPanel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
       index++;
     }
   }
