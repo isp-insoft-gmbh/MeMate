@@ -64,6 +64,7 @@ public class History extends JPanel
     historyTable.setShowGrid( false );
     JTableHeader header = historyTable.getTableHeader();
     header.setOpaque( false );
+    header.setReorderingAllowed( false );
     historyTable.setRowHeight( 30 );
     scrollPane.setBorder( BorderFactory.createEmptyBorder() );
     scrollPane.setViewportView( historyTable );

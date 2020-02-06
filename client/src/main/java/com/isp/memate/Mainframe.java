@@ -103,7 +103,7 @@ public class Mainframe extends JFrame
         Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-    setMinimumSize( new Dimension( 380, 475 ) );
+    setMinimumSize( new Dimension( 380, 510 ) );
     setSize( 1170, 770 );
     setLocationRelativeTo( null );
   }

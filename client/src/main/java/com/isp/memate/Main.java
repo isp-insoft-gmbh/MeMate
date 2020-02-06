@@ -22,7 +22,7 @@ import com.isp.memate.util.MeMateUIManager.DarkDayColor;
  */
 public class Main
 {
-  final static String version = "0.9.4";
+  final static String version = "0.9.5";
 
   /**
    * @param args unused
@@ -56,7 +56,7 @@ public class Main
         new DarkDayColor( Color.white, Color.black ) );
     MeMateUIManager.installNewKey( "table", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "scroll", new DarkDayColor( new Color( 36, 43, 55 ).brighter(), Color.white ),
+    MeMateUIManager.installNewKey( "scroll", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
 
 
