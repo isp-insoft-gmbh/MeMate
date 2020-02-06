@@ -1,4 +1,4 @@
-﻿# MeMate
+![MeMate Logo](https://i.imgur.com/HohmXqd.png)
 
 ## Description
 
@@ -52,8 +52,88 @@ If you encounter any Problem while starting the `.exe` its likely because it cou
 To avoid this problem simply create a folder named `./jre` next to the `.exe`.
 You can download a JRE [here](https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.242-1.b08/java-1.8.0-openjdk-jre-1.8.0.242-1.b08.ojdkbuild.windows.x86_64.zip). Unzip the File inside the `./jre` Folder and you're done. 
 
-## Credits
+## Screenshots
+<details>
+<summary>
+Darkmode
+</summary>
+<details>
+<summary>
+Dashboard
+</summary>	
+	
+![Dashboard_Darkmode](https://i.imgur.com/MfXdZ7x.png)	
+	
+</details>
+<details>
+<summary>
+History
+</summary>	
+	
+![History_Darkmode](https://i.imgur.com/ZeTXwoX.png)	
+	
+</details>
+<details>
+<summary>
+Consumptionrate
+</summary>	
+	
+![Consumptionrate_Darkmode](https://i.imgur.com/RPXrAjb.png)	
+	
+</details>
+<details>
+<summary>
+Drinkmanager
+</summary>	
+	
+![Drinkmanager_Darkmode](https://i.imgur.com/E4kdCu3.png)	
+	
+</details>
+</details>
 
+
+
+<details>
+<summary>
+Daymode
+</summary>
+<details>
+<summary>
+Dashboard
+</summary>	
+	
+![Dashboard_Daymode](https://i.imgur.com/9Qx41Pn.png)	
+	
+</details>
+<details>
+<summary>
+History
+</summary>	
+	
+![History_Daymode](https://i.imgur.com/GZhZPPa.png)	
+	
+</details>
+<details>
+<summary>
+Consumptionrate
+</summary>	
+	
+![Consumptionrate_Daymode](https://i.imgur.com/pbOHEXK.png)	
+	
+</details>
+<details>
+<summary>
+Drinkmanager
+</summary>	
+	
+![Drinkmanager_Daymode](https://i.imgur.com/UXtCp00.png)
+	
+</details>
+</details>
+	
+
+## Credits
 Application icon by [Stefania Servidio](https://www.graficheria.it/), with some modifications.
-Charts in the Stats-Pane are created with JFreeChart (http://www.jfree.org/jfreechart/)
+
+All Charts are created with JFreeChart (http://www.jfree.org/jfreechart/)
 
