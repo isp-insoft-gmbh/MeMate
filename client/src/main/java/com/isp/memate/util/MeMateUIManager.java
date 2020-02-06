@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.JTableHeader;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -115,6 +116,10 @@ public class MeMateUIManager
   public static void showDayMode()
   {
     darkModeState = false;
+    UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
+    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
+    UIManager.put( "OptionPane.messageForeground", Color.black );
+    UIManager.put( "Label.foreground", Color.black );
     Dashboard.getInstance().toggleInfoIcon();
     setUISettings();
   }
@@ -122,6 +127,10 @@ public class MeMateUIManager
   public static void showDarkMode()
   {
     darkModeState = true;
+    UIManager.put( "OptionPane.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "OptionPane.messageForeground", Color.white );
+    UIManager.put( "Label.foreground", Color.white );
     Dashboard.getInstance().toggleInfoIcon();
     setUISettings();
   }

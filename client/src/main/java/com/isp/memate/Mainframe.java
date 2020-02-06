@@ -144,6 +144,7 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             contentPanel.add( ConsumptionRate.getInstance(), BorderLayout.CENTER );
+            ConsumptionRate.getInstance().addGraph();
             contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
@@ -156,6 +157,7 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             contentPanel.add( CreditHistory.getInstance() );
+            CreditHistory.getInstance().addChart();
             contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();

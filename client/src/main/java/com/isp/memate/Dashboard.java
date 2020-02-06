@@ -17,7 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
@@ -146,7 +145,6 @@ public class Dashboard extends JPanel
     //        }, "button" );
 
 
-    final JSeparator seperator = new JSeparator( JSeparator.VERTICAL );
     final JLabel aufladenlabel = MeMateUIManager.createJLabel();
     aufladenlabel.setText( "Kontostand aufladen" );
     final String infoText1 =
@@ -170,7 +168,6 @@ public class Dashboard extends JPanel
 
     panel.setLayout( new MigLayout( new LC().flowX().fill().insets( "10px", "0", "0", "0" ) ) );
     panel.add( aufladenlabel, new CC().spanX( 2 ) );
-    // panel.add( seperator, new CC().spanY().growY() );
     panel.add( infoIconLabel, new CC().spanY() );
     panel.add( infoTextLabel1, new CC().minWidth( "0" ).pushX().wrap() );
     panel.add( valueSpinner, new CC() );

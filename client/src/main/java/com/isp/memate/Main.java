@@ -41,7 +41,6 @@ public class Main
       UIManager.put( "DefaultButtonBorderHover", new Color( 0, 120, 215 ) );
       UIManager.put( "DefaultButtonBackgroundHover", new Color( 229, 241, 251 ) );
       UIManager.put( "DefaultButtonPressedBackground", new Color( 204, 228, 247 ) );
-
     }
     catch ( ClassNotFoundException | InstantiationException | IllegalAccessException
         | UnsupportedLookAndFeelException exception )
@@ -58,6 +57,8 @@ public class Main
         new DarkDayColor( Color.white, Color.black ) );
     MeMateUIManager.installNewKey( "scroll", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
+    MeMateUIManager.installNewKey( "adminButton", new DarkDayColor( new Color( 29, 164, 165 ), Color.WHITE ),
+        new DarkDayColor( Color.WHITE, Color.BLACK ) );
 
 
     String sessionID = null;
