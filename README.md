@@ -1,5 +1,4 @@
 ![MeMate Logo](https://i.imgur.com/HohmXqd.png)
-# MeMate
 
 ## Description
 
@@ -127,7 +126,7 @@ Consumptionrate
 Drinkmanager
 </summary>	
 	
-![Drinkmanager_Daymode](https://i.imgur.com/UXtCp00.png	
+![Drinkmanager_Daymode](https://i.imgur.com/UXtCp00.png)
 	
 </details>
 </details>
