@@ -57,6 +57,8 @@ public class Mainframe extends JFrame
   private final Icon             darkModeIconWhite      = new ImageIcon( getClass().getClassLoader().getResource( "darkmode_white.png" ) );
   private final Icon             dayModeIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_black.png" ) );
   private final Icon             dayModeIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_white.png" ) );
+  private final Icon             undoBlackIcon          = new ImageIcon( getClass().getClassLoader().getResource( "back_black.png" ) );
+  private final Icon             undoWhiteIcon          = new ImageIcon( getClass().getClassLoader().getResource( "back_white.png" ) );
   private final Icon             drinkManagerIconBlack  =
       new ImageIcon( getClass().getClassLoader().getResource( "drinkmanager_black.png" ) );
   private final Icon             drinkManagerIconWhite  =
@@ -76,6 +78,7 @@ public class Mainframe extends JFrame
   private MeMateActionBarButton  adminViewButton;
   private MeMateActionBarButton  logoutButton;
   private MeMateActionBarButton  darkModeButton;
+  private MeMateActionBarButton  undoButton;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -186,6 +189,16 @@ public class Mainframe extends JFrame
     adminViewButton.setEnabled( false );
 
     bar.addVariableGlue();
+    undoButton = bar.addActionButton( undoBlackIcon, undoWhiteIcon, "Rückgänig", "Letzte Aktion rückgängig machen", new Runnable()
+    {
+
+      @Override
+      public void run()
+      {
+        ServerCommunication.getInstance().undoLastAction();
+      }
+    } );
+    undoButton.setEnabled( false );
     darkModeButton = bar.addActionButton( darkModeIconBlack, darkModeIconWhite, "Darkmode", "Wechselt in den Darkmode", new Runnable()
     {
       @Override
@@ -250,7 +263,7 @@ public class Mainframe extends JFrame
         ServerCommunication.getInstance().sessionID = null;
         ServerCommunication.getInstance().currentUser = null;
         ServerCommunication.getInstance().logout();
-        Dashboard.getInstance().undoButton.setEnabled( false );
+        setUndoButtonEnabled( false );
         try
         {
           File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
@@ -394,5 +407,13 @@ public class Mainframe extends JFrame
       adminViewButton.setEnabled( false );
     }
 
+  }
+
+  /**
+   * @param state
+   */
+  public void setUndoButtonEnabled( boolean state )
+  {
+    undoButton.setEnabled( state );
   }
 }

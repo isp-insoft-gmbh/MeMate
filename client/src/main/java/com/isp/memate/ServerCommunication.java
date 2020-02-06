@@ -351,7 +351,7 @@ public class ServerCommunication
     try
     {
       outStream.writeObject( new Shared( Operation.UNDO, null ) );
-      Dashboard.getInstance().undoButton.setEnabled( false );
+      Mainframe.getInstance().setUndoButtonEnabled( false );
     }
     catch ( IOException exception )
     {

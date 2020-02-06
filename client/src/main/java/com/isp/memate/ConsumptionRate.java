@@ -13,8 +13,12 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -82,12 +86,38 @@ public class ConsumptionRate extends JPanel
         if ( drink.equals( "Alle" ) )
         {
           String date = data[ 4 ];
-          amountMap.put( date, amountMap.get( date ) + 1 );
+          ZonedDateTime today = ZonedDateTime.now();
+          ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
+          try
+          {
+            Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
+            if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+            {
+              amountMap.put( date, amountMap.get( date ) + 1 );
+            }
+          }
+          catch ( ParseException exception )
+          {
+            System.out.println( "Das Datum ist out of range." + exception );
+          }
         }
         else if ( action.contains( drink ) )
         {
           String date = data[ 4 ];
-          amountMap.put( date, amountMap.get( date ) + 1 );
+          ZonedDateTime today = ZonedDateTime.now();
+          ZonedDateTime thirtyDaysAgo = today.minusDays( 31 );
+          try
+          {
+            Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
+            if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+            {
+              amountMap.put( date, amountMap.get( date ) + 1 );
+            }
+          }
+          catch ( ParseException exception )
+          {
+            System.out.println( "Das Datum ist out of range." + exception );
+          }
         }
       }
     }
@@ -124,6 +154,9 @@ public class ConsumptionRate extends JPanel
     {
       freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
       freeChart.getTitle().setPaint( Color.white );
+      freeChart.getXYPlot().setBackgroundPaint( new Color( 36, 43, 55 ).brighter() );
+      freeChart.getXYPlot().setDomainGridlinesVisible( false );
+      freeChart.getXYPlot().setRangeGridlinesVisible( false );
       freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.white );
       freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.white );
       freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.white );
@@ -132,6 +165,9 @@ public class ConsumptionRate extends JPanel
     else
     {
       freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
+      freeChart.getXYPlot().setBackgroundPaint( new Color( 192, 192, 192 ) );
+      freeChart.getXYPlot().setDomainGridlinesVisible( false );
+      freeChart.getXYPlot().setRangeGridlinesVisible( false );
       freeChart.getTitle().setPaint( Color.black );
       freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.black );
       freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.black );

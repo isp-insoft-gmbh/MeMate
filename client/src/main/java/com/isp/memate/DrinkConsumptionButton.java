@@ -54,7 +54,7 @@ public class DrinkConsumptionButton extends JPanel
 {
   private static final Color HOVER_BACKGROUND_COLOR = new Color( 186, 232, 232 );
   private static final Color PRESSED_BACKGROUND     = UIManager.getColor( "AppColor" );
-  private final Border       DEFAULT_LINE_BORDER    = BorderFactory.createLineBorder( new Color( 173, 173, 173 ) );
+  private final Border       DEFAULT_LINE_BORDER    = BorderFactory.createLineBorder( new Color( 173, 173, 173, 0 ) );
   private final Border       DEFAULT_BORDER         =
       BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
   private final Border       FOCUS_BORDER           =
@@ -543,7 +543,7 @@ public class DrinkConsumptionButton extends JPanel
         abortButton.addActionListener( abortButtonListener );
         DrinkConsumptionButton.this.addMouseListener( mouseListener );
         DrinkConsumptionButton.this.addKeyListener( keyListener );
-        Dashboard.getInstance().undoButton.setEnabled( true );
+        Mainframe.getInstance().setUndoButtonEnabled( true );
         infoButton.setEnabled( true );
         askWhetherToReallyConsumeLabelIsActive = false;
       }

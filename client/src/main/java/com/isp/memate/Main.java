@@ -49,13 +49,14 @@ public class Main
       // We don't mind if we aren't able to set a Look and Feel, therefore we just ignore the exceptions.
     }
     MeMateUIManager.installDefaults();
-    MeMateUIManager.installNewKey( "button", new DarkDayColor( Color.DARK_GRAY, new Color( 225, 225, 225 ) ),
+    MeMateUIManager.installNewKey( "button",
+        new DarkDayColor( new Color( 36, 43, 55 ).brighter(), new Color( 225, 225, 225 ) ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "drinkButtons", new DarkDayColor( new Color( 75, 75, 75 ), new Color( 240, 240, 240 ) ),
+    MeMateUIManager.installNewKey( "drinkButtons", new DarkDayColor( new Color( 36, 43, 55 ).brighter(), new Color( 240, 240, 240 ) ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "table", new DarkDayColor( Color.DARK_GRAY.brighter(), Color.white ),
+    MeMateUIManager.installNewKey( "table", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "scroll", new DarkDayColor( Color.DARK_GRAY.brighter(), Color.white ),
+    MeMateUIManager.installNewKey( "scroll", new DarkDayColor( new Color( 36, 43, 55 ).brighter(), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
 
 

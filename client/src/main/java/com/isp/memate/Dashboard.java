@@ -5,7 +5,6 @@ package com.isp.memate;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -45,14 +44,12 @@ public class Dashboard extends JPanel
 {
   private static final Dashboard            instance      = new Dashboard( Mainframe.getInstance() );
   private final Mainframe                   mainFrame;
-  private final ImageIcon                   undoIcon      = new ImageIcon( getClass().getClassLoader().getResource( "undo.png" ) );
   private final ImageIcon                   infoIcon      = new ImageIcon( getClass().getClassLoader().getResource( "infoicon.png" ) );
   private final ImageIcon                   infoIconWhite =
       new ImageIcon( getClass().getClassLoader().getResource( "infoicon_white.png" ) );
   private final JLabel                      infoIconLabel = new JLabel( infoIcon );
   private final JScrollPane                 scrollpane;
   private ArrayList<DrinkConsumptionButton> buttonList    = new ArrayList<>();
-  final JButton                             undoButton    = new JButton( undoIcon );
 
   /**
    * @return static instance of Dashboard
@@ -76,31 +73,7 @@ public class Dashboard extends JPanel
 
     final JPanel upperPanel = MeMateUIManager.createJPanel();
     upperPanel.setLayout( new GridBagLayout() );
-    final JLabel consumeLabel = MeMateUIManager.createJLabel();
-    consumeLabel.setText( "Getränk konsumieren" );
-    consumeLabel.setHorizontalAlignment( JLabel.CENTER );
-    consumeLabel.setFont( consumeLabel.getFont().deriveFont( 20f ) );
-    upperPanel.setBorder( new EmptyBorder( 0, 0, 5, 0 ) );
-    GridBagConstraints consumeLabelConstraints = new GridBagConstraints();
-    consumeLabelConstraints.gridx = 1;
-    consumeLabelConstraints.gridy = 0;
-    consumeLabelConstraints.weightx = 1;
-    upperPanel.add( consumeLabel, consumeLabelConstraints );
-    GridBagConstraints undoButtonConstraints = new GridBagConstraints();
-    undoButtonConstraints.gridx = 2;
-    undoButtonConstraints.gridy = 0;
-    upperPanel.add( undoButton, undoButtonConstraints );
     upperPanel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
-    undoButton.setEnabled( false );
-    undoButton.setToolTipText( "Letzte Aktion rückgängig machen" );
-    undoButton.addActionListener( new ActionListener()
-    {
-      @Override
-      public void actionPerformed( ActionEvent e )
-      {
-        ServerCommunication.getInstance().undoLastAction();
-      }
-    } );
 
 
     setLayout( new BorderLayout() );
@@ -109,6 +82,7 @@ public class Dashboard extends JPanel
     add( createLowerPanel(), BorderLayout.SOUTH );
     setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     MeMateUIManager.registerPanel( "default", this );
+    MeMateUIManager.registerScrollPane( "scroll", scrollpane );
   }
 
   /**
@@ -143,7 +117,7 @@ public class Dashboard extends JPanel
           ServerCommunication sc = ServerCommunication.getInstance();
           sc.addBalance( (int) value );
           ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
-          undoButton.setEnabled( true );
+          Mainframe.getInstance().setUndoButtonEnabled( true );
         }
       }
     } );
@@ -196,7 +170,7 @@ public class Dashboard extends JPanel
 
     panel.setLayout( new MigLayout( new LC().flowX().fill().insets( "10px", "0", "0", "0" ) ) );
     panel.add( aufladenlabel, new CC().spanX( 2 ) );
-    panel.add( seperator, new CC().spanY().growY() );
+    // panel.add( seperator, new CC().spanY().growY() );
     panel.add( infoIconLabel, new CC().spanY() );
     panel.add( infoTextLabel1, new CC().minWidth( "0" ).pushX().wrap() );
     panel.add( valueSpinner, new CC() );

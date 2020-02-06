@@ -54,7 +54,8 @@ public class MeMateUIManager
 
   public static void installDefaults()
   {
-    installNewKey( defaultKey, new DarkDayColor( Color.DARK_GRAY.brighter(), Color.WHITE ), new DarkDayColor( Color.WHITE, Color.BLACK ) );
+    installNewKey( defaultKey, new DarkDayColor( new Color( 36, 43, 55 ), Color.WHITE ), new DarkDayColor( Color.WHITE, Color.BLACK ) );
+
   }
 
   public static void installNewKey( final String key, final DarkDayColor backgroundColors, final DarkDayColor foregroundColors )
@@ -105,7 +106,7 @@ public class MeMateUIManager
     button.setContentAreaFilled( false );
     button.setOpaque( true );
     button.setBorder(
-        BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( new Color( 173, 173, 173 ) ),
+        BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( new Color( 41, 48, 60 ).brighter() ),
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
     normalButtonList.put( key, button );
     return button;
@@ -210,11 +211,17 @@ public class MeMateUIManager
         {
           button.setBackground( backgroundMap.get( key ).getDarkColor() );
           button.setForeground( foregroundMap.get( key ).getDarkColor() );
+          button.setBorder(
+              BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( new Color( 50, 70, 70 ) ),
+                  BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
         }
         else
         {
           button.setBackground( backgroundMap.get( key ).getDayColor() );
           button.setForeground( foregroundMap.get( key ).getDayColor() );
+          button.setBorder(
+              BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( new Color( 230, 230, 230 ) ),
+                  BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
 
         }
       }
@@ -224,7 +231,7 @@ public class MeMateUIManager
         {
           table.setBackground( backgroundMap.get( key ).getDarkColor() );
           JTableHeader header = table.getTableHeader();
-          header.setBackground( backgroundMap.get( key ).getDarkColor().darker().darker() );
+          header.setBackground( backgroundMap.get( key ).getDarkColor().brighter().brighter() );
           header.setForeground( foregroundMap.get( key ).getDarkColor() );
           table.setForeground( foregroundMap.get( key ).getDarkColor() );
         }
@@ -241,15 +248,14 @@ public class MeMateUIManager
       {
         if ( darkModeState )
         {
-          scrollPane.setBackground( backgroundMap.get( key ).getDarkColor().darker().darker() );
-          scrollPane.getVerticalScrollBar().setUI( new ScrollBarUI() );
+          scrollPane.setBackground( backgroundMap.get( key ).getDarkColor().brighter() );
+          scrollPane.getVerticalScrollBar().setUI( new DarkScrollBarUI() );
           scrollPane.getViewport().setBackground( backgroundMap.get( key ).getDarkColor() );
         }
         else
         {
           scrollPane.setBackground( backgroundMap.get( key ).getDayColor().darker() );
-          JScrollPane temp = new JScrollPane();
-          scrollPane.getVerticalScrollBar().setUI( temp.getVerticalScrollBar().getUI() );
+          scrollPane.getVerticalScrollBar().setUI( new BrightScrollBarUI() );
           scrollPane.getViewport().setBackground( backgroundMap.get( key ).getDayColor() );
         }
       }

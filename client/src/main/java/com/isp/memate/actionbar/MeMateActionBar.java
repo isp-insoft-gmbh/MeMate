@@ -76,7 +76,7 @@ public class MeMateActionBar extends JPanel
 
   private Color backgroundColor;
   private Color foregoundColor;
-  private Color darkModeBackground = Color.DARK_GRAY;
+  private Color darkModeBackground = new Color( 42, 51, 64 );
 
   private MeMateActionBarButton burgerButton;
 

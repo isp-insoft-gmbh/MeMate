@@ -64,6 +64,9 @@ public class CreditHistory extends JPanel
     if ( MeMateUIManager.getDarkModeState() )
     {
       lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
+      lineChart.getCategoryPlot().setBackgroundPaint( new Color( 36, 43, 55 ).brighter() );
+      lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
+      lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
       lineChart.getTitle().setPaint( Color.white );
       lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.white );
       lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.white );
@@ -73,6 +76,9 @@ public class CreditHistory extends JPanel
     else
     {
       lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
+      lineChart.getCategoryPlot().setBackgroundPaint( new Color( 192, 192, 192 ) );
+      lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
+      lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
       lineChart.getTitle().setPaint( Color.black );
       lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.black );
       lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.black );
