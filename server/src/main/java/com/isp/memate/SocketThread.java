@@ -26,7 +26,7 @@ import com.isp.memate.Shared.Operation;
  */
 public class SocketThread extends Thread
 {
-  private final String         version = "0.9.5";
+  private final String         version = "0.9.6";
   private Database             database;
   protected Socket             socket;
   private Map<String, Integer> userIDMap;
@@ -496,7 +496,7 @@ public class SocketThread extends Thread
   {
     String name = drink.name;
     Float price = drink.price;
-    String picture = drink.pictureInBytes;
+    byte[] picture = drink.pictureInBytes;
     database.registerNewDrink( name, price, picture );
     ServerLog.newLog( logType.INFO, "Ein neues Getränk wurde registriert." );
     ServerLog.newLog( logType.INFO, "Name: " + name );

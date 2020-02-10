@@ -15,7 +15,7 @@ public class Drink implements Serializable
   String           name;
   Float            price;
   String           picturePath;
-  String           pictureInBytes;
+  byte[]           pictureInBytes;
   int              id;
   int              amount;
   boolean          ingredients;
@@ -23,7 +23,7 @@ public class Drink implements Serializable
 
 
   @SuppressWarnings( "javadoc" )
-  public Drink( String name, Float price, String picturePath, int id, String pictureInBytes, int amount, boolean ingredients,
+  public Drink( String name, Float price, String picturePath, int id, byte[] pictureInBytes, int amount, boolean ingredients,
                 DrinkIngredients drinkIngredients )
   {
     this.name = name;

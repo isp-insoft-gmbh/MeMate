@@ -22,7 +22,7 @@ import com.isp.memate.util.MeMateUIManager.DarkDayColor;
  */
 public class Main
 {
-  final static String version = "0.9.5";
+  final static String version = "0.9.6";
 
   /**
    * @param args unused

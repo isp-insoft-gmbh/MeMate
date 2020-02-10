@@ -277,19 +277,15 @@ public class ServerCommunication
       String name = drink.name;
       Float price = drink.price;
       int amount = drink.amount;
-      String pictureInBytes = drink.pictureInBytes;
+      byte[] pictureInBytes = drink.pictureInBytes;
       Integer id = drink.id;
-      String[] byteValues = pictureInBytes.substring( 1, pictureInBytes.length() - 1 ).split( "," );
-      byte[] bytes = new byte[byteValues.length];
-      for ( int i = 0, len = bytes.length; i < len; i++ )
-      {
-        bytes[ i ] = Byte.parseByte( byteValues[ i ].trim() );
-      }
-      ImageIcon icon = new ImageIcon( bytes );
+      ImageIcon icon = new ImageIcon( pictureInBytes );
       priceMap.put( name, price );
       imageMap.put( name, icon );
       amountMap.put( name, amount );
-      byteImageList.add( bytes[ 355 ] );
+      //FIXME Das muss besser werden
+      //Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend mit der vorherigen Liste verglichen wird. 
+      byteImageList.add( pictureInBytes[ 355 ] );
       drinkIDMap.put( name, id );
       drinkNames.add( name );
       drinkIngredientsMap.put( name, drink.ingredients );
@@ -394,6 +390,7 @@ public class ServerCommunication
     try
     {
       outStream.writeObject( new Shared( Operation.GET_DRINKINFO, new Drink[0] ) );
+      outStream.reset();
     }
     catch ( IOException exception )
     {

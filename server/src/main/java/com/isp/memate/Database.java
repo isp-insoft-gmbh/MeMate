@@ -19,7 +19,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -431,14 +430,14 @@ public class Database
         {
           drinkInfos
               .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
-                  Arrays.toString( rs.getBytes( "picture" ) ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ),
+                  rs.getBytes( "picture" ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ),
                   getIngredients( rs.getInt( "ID" ) ) ) );
         }
         else
         {
           drinkInfos
               .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
-                  Arrays.toString( rs.getBytes( "picture" ) ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ), null ) );
+                  rs.getBytes( "picture" ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ), null ) );
         }
       }
     }
@@ -456,7 +455,7 @@ public class Database
    * @param price Preis des Getränks
    * @param picture Bild des Getränks
    */
-  public void registerNewDrink( String name, Float price, String picture )
+  public void registerNewDrink( String name, Float price, byte[] picture )
   {
     lock.lock();
     String sql = "INSERT INTO drink(name,preis,picture) VALUES(?,?,?)";
@@ -464,13 +463,7 @@ public class Database
     {
       pstmt.setString( 1, name );
       pstmt.setFloat( 2, price );
-      String[] byteValues = picture.substring( 1, picture.length() - 1 ).split( "," );
-      byte[] bytes = new byte[byteValues.length];
-      for ( int i = 0, len = bytes.length; i < len; i++ )
-      {
-        bytes[ i ] = Byte.parseByte( byteValues[ i ].trim() );
-      }
-      pstmt.setBytes( 3, bytes );
+      pstmt.setBytes( 3, picture );
       pstmt.executeUpdate();
     }
     catch ( SQLException e )

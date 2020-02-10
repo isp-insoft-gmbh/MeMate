@@ -21,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -414,7 +413,7 @@ public class DrinkManagerDialog
           }
           byte[] bytes = bos.toByteArray();
           ServerCommunication.getInstance()
-              .registerNewDrink( new Drink( name, price, drinkPicturePath, -1, Arrays.toString( bytes ), 0, false, null ) );
+              .registerNewDrink( new Drink( name, price, drinkPicturePath, -1, bytes, 0, false, null ) );
           dialog.dispose();
         }
       }
