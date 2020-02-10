@@ -3,6 +3,7 @@
  */
 package com.isp.memate;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -49,6 +50,9 @@ public class Adminview extends JPanel
   private final JLabel           piggyBankLabel        = MeMateUIManager.createJLabel();
   private final JDialog          passwordFrame         = new JDialog( Mainframe.getInstance() );
   private JPanel                 drinkAmountPanel      = new JPanel( new FlowLayout() );
+  private final JPanel           upperPanel            = MeMateUIManager.createJPanel();
+  private final JPanel           centerPanel           = MeMateUIManager.createJPanel();
+
 
   /**
    * @return static instance of Adminview
@@ -71,10 +75,14 @@ public class Adminview extends JPanel
    */
   private void loadDefaultSettings()
   {
+    upperPanel.removeAll();
+    centerPanel.removeAll();
     setAdminBalanceButton.setText( "Guthaben setzen" );
     exportButton.setText( "Daten exportieren" );
     resetPasswordButton.setText( "Passwort ändern" );
-    setLayout( new FlowLayout() );
+    setLayout( new BorderLayout() );
+    upperPanel.setLayout( new WrapLayout() );
+    centerPanel.setLayout( new WrapLayout() );
     balanceField.setPreferredSize( new Dimension( 100, 20 ) );
     piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 25f ) );
     piggyBankLabel.setHorizontalAlignment( JLabel.CENTER );
@@ -85,7 +93,7 @@ public class Adminview extends JPanel
     piggybankLabelConstraints.gridx = 0;
     piggybankLabelConstraints.gridy = 0;
     piggybankLabelConstraints.gridwidth = 2;
-    piggybankLabelConstraints.insets = new Insets( 5, 5, 5, 5 );
+    piggybankLabelConstraints.insets = new Insets( 5, 5, 15, 5 );
     piggyBankPanel.add( piggyBankLabel, piggybankLabelConstraints );
     GridBagConstraints balanceFieldConstraints = new GridBagConstraints();
     balanceFieldConstraints.gridx = 0;
@@ -99,27 +107,33 @@ public class Adminview extends JPanel
     setAdminBalanceButtonConstraints.insets = new Insets( 0, 0, 5, 5 );
     setAdminBalanceButtonConstraints.anchor = GridBagConstraints.LINE_END;
     piggyBankPanel.add( setAdminBalanceButton, setAdminBalanceButtonConstraints );
-    add( piggyBankPanel );
+    upperPanel.add( piggyBankPanel );
 
 
-    JPanel adminPanel = MeMateUIManager.createJPanel( "adminButton" );
-    adminPanel.setLayout( new GridBagLayout() );
-    GridBagConstraints resetPasswordButtonConstraints = new GridBagConstraints();
-    resetPasswordButtonConstraints.gridx = 0;
-    resetPasswordButtonConstraints.gridy = 0;
-    resetPasswordButtonConstraints.weighty = 1;
-    resetPasswordButtonConstraints.fill = GridBagConstraints.BOTH;
-    resetPasswordButtonConstraints.insets = new Insets( 5, 5, 5, 5 );
-    adminPanel.add( resetPasswordButton, resetPasswordButtonConstraints );
-    GridBagConstraints exportButtonConstraints = new GridBagConstraints();
-    exportButtonConstraints.gridx = 0;
-    exportButtonConstraints.gridy = 1;
-    exportButtonConstraints.weighty = 1;
-    exportButtonConstraints.fill = GridBagConstraints.BOTH;
-    exportButtonConstraints.insets = new Insets( 5, 5, 5, 5 );
-    adminPanel.add( exportButton, exportButtonConstraints );
-    adminPanel.setPreferredSize( new Dimension( 110, 110 ) );
-    add( adminPanel );
+    JPanel pwChangePanel = MeMateUIManager.createJPanel( "adminButton" );
+    pwChangePanel.setLayout( new GridBagLayout() );
+    GridBagConstraints pwChangePanelConstraints = new GridBagConstraints();
+    pwChangePanelConstraints.gridx = 0;
+    pwChangePanelConstraints.gridy = 0;
+    pwChangePanelConstraints.weightx = 1;
+    pwChangePanelConstraints.weighty = 1;
+    pwChangePanelConstraints.fill = GridBagConstraints.BOTH;
+    pwChangePanelConstraints.insets = new Insets( 5, 5, 5, 5 );
+    pwChangePanel.add( resetPasswordButton, pwChangePanelConstraints );
+    pwChangePanel.setPreferredSize( new Dimension( 150, 90 ) );
+    JPanel exportPanel = MeMateUIManager.createJPanel( "adminButton" );
+    exportPanel.setLayout( new GridBagLayout() );
+    GridBagConstraints exportPanelConstraints = new GridBagConstraints();
+    exportPanelConstraints.gridx = 0;
+    exportPanelConstraints.gridy = 0;
+    exportPanelConstraints.weightx = 1;
+    exportPanelConstraints.weighty = 1;
+    exportPanelConstraints.fill = GridBagConstraints.BOTH;
+    exportPanelConstraints.insets = new Insets( 5, 5, 5, 5 );
+    exportPanel.setPreferredSize( new Dimension( 150, 90 ) );
+    exportPanel.add( exportButton, exportPanelConstraints );
+    upperPanel.add( pwChangePanel );
+    upperPanel.add( exportPanel );
     addAllDrinks();
 
     ActionListener[] exportButtonListener = exportButton.getActionListeners();
@@ -254,6 +268,8 @@ public class Adminview extends JPanel
     } );
     ServerCommunication.getInstance().tellServerToSendPiggybankBalance();
     MeMateUIManager.registerPanel( "default", this );
+    add( upperPanel, BorderLayout.NORTH );
+    add( centerPanel, BorderLayout.CENTER );
   }
 
   /**
@@ -297,7 +313,7 @@ public class Adminview extends JPanel
       GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
       daysLeftLabelConstraints.gridx = 0;
       daysLeftLabelConstraints.gridy = 1;
-      daysLeftLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
+      daysLeftLabelConstraints.insets = new Insets( 0, 5, 10, 0 );
       drinkAmountPanel.add( daysLeftLabel, daysLeftLabelConstraints );
 
       setAmountButton.addActionListener( new ActionListener()
@@ -325,7 +341,7 @@ public class Adminview extends JPanel
           return true;
         }
       } );
-      add( drinkAmountPanel );
+      centerPanel.add( drinkAmountPanel );
     }
   }
 
