@@ -454,7 +454,8 @@ public class Login extends JFrame
     registerHyperLink.setBackground( loginPanel.getBackground() );
     forgotPasswordHyperLink.setEditable( false );
     forgotPasswordHyperLink.setContentType( "text/html" );
-    forgotPasswordHyperLink.setText( "<html><font face='" + fontName + "'><a href>Passwort vergessen ?</a></font></html>" );
+    forgotPasswordHyperLink
+        .setText( "<html><font color=blue><font face='" + fontName + "'><a href>Passwort vergessen ?</a></font></font></html>" );
     forgotPasswordHyperLink.setBackground( loginPanel.getBackground() );
   }
 
@@ -547,11 +548,17 @@ public class Login extends JFrame
   {
     String fontName = LABEL_FONT.getFontName();
     headerLabel.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "welcome_white.png" ) ) );
+    registerHyperLink.setText( "<html><font color=white><font face='" + fontName + "'><a href>Konto erstellen</a></font></font></html>" );
+    forgotPasswordHyperLink
+        .setText( "<html><font color=white><font face='" + fontName + "'><a href>Passwort vergessen ?</a></font></font></html>" );
   }
 
   public void showDayHeader()
   {
     String fontName = LABEL_FONT.getFontName();
     headerLabel.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
+    registerHyperLink.setText( "<html><font color=blue><font face='" + fontName + "'><a href>Konto erstellen</a></font></font></html>" );
+    forgotPasswordHyperLink
+        .setText( "<html><font color=blue><font face='" + fontName + "'><a href>Passwort vergessen ?</a></font></font></html>" );
   }
 }

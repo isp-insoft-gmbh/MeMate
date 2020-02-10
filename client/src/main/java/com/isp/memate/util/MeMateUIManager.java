@@ -25,6 +25,7 @@ import javax.swing.table.JTableHeader;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import com.isp.memate.Adminview;
 import com.isp.memate.ConsumptionRate;
 import com.isp.memate.CreditHistory;
 import com.isp.memate.Dashboard;
@@ -139,6 +140,7 @@ public class MeMateUIManager
     UIManager.put( "OptionPane.messageForeground", Color.black );
     UIManager.put( "Label.foreground", Color.black );
     Dashboard.getInstance().toggleInfoIcon();
+    Adminview.getInstance().updateButtonIcons();
     setUISettings();
   }
 
@@ -150,6 +152,7 @@ public class MeMateUIManager
     UIManager.put( "OptionPane.messageForeground", Color.white );
     UIManager.put( "Label.foreground", Color.white );
     Dashboard.getInstance().toggleInfoIcon();
+    Adminview.getInstance().updateButtonIcons();
     setUISettings();
   }
 
