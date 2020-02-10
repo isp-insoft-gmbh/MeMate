@@ -12,11 +12,13 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.table.JTableHeader;
 
@@ -26,6 +28,7 @@ import com.google.common.collect.Multimap;
 import com.isp.memate.ConsumptionRate;
 import com.isp.memate.CreditHistory;
 import com.isp.memate.Dashboard;
+import com.isp.memate.Login;
 import com.isp.memate.ServerCommunication;
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.actionbar.MeMateActionBarButton;
@@ -49,6 +52,8 @@ public class MeMateUIManager
   private static final Multimap<String, JComponent>            separatorList    = ArrayListMultimap.create();
   private static final Multimap<String, JTable>                tableList        = ArrayListMultimap.create();
   private static final Multimap<String, JScrollPane>           scrollPaneList   = ArrayListMultimap.create();
+  private static final Multimap<String, JTextPane>             textPaneList     = ArrayListMultimap.create();
+  private static final Multimap<String, JCheckBox>             checkBoxList     = ArrayListMultimap.create();
   private static final Set<String>                             keySet           = new HashSet<>();
 
   private static boolean darkModeState = false;
@@ -81,7 +86,6 @@ public class MeMateUIManager
   public static JLabel createJLabel()
   {
     return createJLabel( defaultKey );
-
   }
 
   public static JLabel createJLabel( final String key )
@@ -89,6 +93,20 @@ public class MeMateUIManager
     final JLabel label = new JLabel();
     labelList.put( key, label );
     return label;
+  }
+
+  public static JTextPane createTextPane()
+  {
+    final JTextPane textpane = new JTextPane();
+    textPaneList.put( "default", textpane );
+    return textpane;
+  }
+
+  public static JCheckBox createCheckbox()
+  {
+    final JCheckBox checkbox = new JCheckBox();
+    checkBoxList.put( "default", checkbox );
+    return checkbox;
   }
 
   @SuppressWarnings( "javadoc" )
@@ -234,6 +252,28 @@ public class MeMateUIManager
 
         }
       }
+      for ( final JTextPane textPane : textPaneList.get( key ) )
+      {
+        if ( darkModeState )
+        {
+          textPane.setBackground( backgroundMap.get( key ).getDarkColor() );
+        }
+        else
+        {
+          textPane.setBackground( backgroundMap.get( key ).getDayColor() );
+        }
+      }
+      for ( final JCheckBox checkBox : checkBoxList.get( key ) )
+      {
+        if ( darkModeState )
+        {
+          checkBox.setBackground( backgroundMap.get( key ).getDarkColor() );
+        }
+        else
+        {
+          checkBox.setBackground( backgroundMap.get( key ).getDayColor() );
+        }
+      }
       for ( final JTable table : tableList.get( key ) )
       {
         if ( darkModeState )
@@ -325,6 +365,17 @@ public class MeMateUIManager
             }
           } ) );
         }
+      }
+    }
+    if ( Login.getInstance() != null )
+    {
+      if ( darkModeState )
+      {
+        Login.getInstance().showDarkHeader();
+      }
+      else
+      {
+        Login.getInstance().showDayHeader();
       }
     }
     if ( ServerCommunication.getInstance().getHistoryData( dateType.SHORT ) != null

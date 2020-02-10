@@ -47,6 +47,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.isp.memate.Shared.LoginResult;
+import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
 
 /**
@@ -60,19 +61,19 @@ public class Login extends JFrame
 {
   private static final Login   instance                = new Login();
   private static String        currentUsername;
-  private final JPanel         loginPanel              = new JPanel( new GridBagLayout() );
+  private final JPanel         loginPanel              = MeMateUIManager.createJPanel();
   private final JLabel         headerLabel             =
       new JLabel( new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
-  private final JLabel         usernameLabel           = new JLabel( "Benutzername" );
-  private final JLabel         passwordLabel           = new JLabel( "Passwort" );
-  private final JLabel         stayLoggedInLabel       = new JLabel( "Eingeloggt bleiben" );
+  private final JLabel         usernameLabel           = MeMateUIManager.createJLabel();
+  private final JLabel         passwordLabel           = MeMateUIManager.createJLabel();
+  private final JLabel         stayLoggedInLabel       = MeMateUIManager.createJLabel();
   private final JTextField     usernameTextField       = new JTextField();
   private final JPasswordField passwordField           = new JPasswordField();
-  private final JButton        loginButton             = new JButton( "Anmelden" );
-  private final JCheckBox      stayLoggedInCheckBox    = new JCheckBox();
+  private final JButton        loginButton             = MeMateUIManager.createNormalButton( "button" );
+  private final JCheckBox      stayLoggedInCheckBox    = MeMateUIManager.createCheckbox();
   private final Font           LABEL_FONT              = UIManager.getFont( "Label.font" ).deriveFont( 15f );
-  private final JTextPane      registerHyperLink       = new JTextPane();
-  private final JTextPane      forgotPasswordHyperLink = new JTextPane();
+  private final JTextPane      registerHyperLink       = MeMateUIManager.createTextPane();
+  private final JTextPane      forgotPasswordHyperLink = MeMateUIManager.createTextPane();
 
   /**
    * @return static instance of Login
@@ -89,6 +90,11 @@ public class Login extends JFrame
    */
   public Login()
   {
+    loginPanel.setLayout( new GridBagLayout() );
+    loginButton.setText( "Anmelden" );
+    passwordLabel.setText( "Passwort" );
+    usernameLabel.setText( "Benutzername" );
+    stayLoggedInLabel.setText( "Eingeloggt bleiben" );
     setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
     deriveFonts();
@@ -425,6 +431,7 @@ public class Login extends JFrame
     loginPanel.add( new JSeparator( SwingConstants.HORIZONTAL ), seperatorConstraints );
 
     add( loginPanel );
+    MeMateUIManager.registerPanel( "default", loginPanel );
   }
 
   private void setBordersAndPreferredSize()
@@ -443,7 +450,7 @@ public class Login extends JFrame
     stayLoggedInLabel.setFont( LABEL_FONT );
     registerHyperLink.setEditable( false );
     registerHyperLink.setContentType( "text/html" );
-    registerHyperLink.setText( "<html><font face='" + fontName + "'><a href>Konto erstellen</a></font></html>" );
+    registerHyperLink.setText( "<html><font color=blue><font face='" + fontName + "'><a href>Konto erstellen</a></font></font></html>" );
     registerHyperLink.setBackground( loginPanel.getBackground() );
     forgotPasswordHyperLink.setEditable( false );
     forgotPasswordHyperLink.setContentType( "text/html" );
@@ -534,5 +541,17 @@ public class Login extends JFrame
       JOptionPane.showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(), registrationResult,
           "Registrierung fehlgeschlagen", JOptionPane.ERROR_MESSAGE, null );
     }
+  }
+
+  public void showDarkHeader()
+  {
+    String fontName = LABEL_FONT.getFontName();
+    headerLabel.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "welcome_white.png" ) ) );
+  }
+
+  public void showDayHeader()
+  {
+    String fontName = LABEL_FONT.getFontName();
+    headerLabel.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
   }
 }
