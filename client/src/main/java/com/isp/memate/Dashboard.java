@@ -197,6 +197,7 @@ public class Dashboard extends JPanel
     buttonList.clear();
     JPanel panel = MeMateUIManager.createJPanel();
     panel.setLayout( new WrapLayout( FlowLayout.LEFT ) );
+
     for ( String drink : ServerCommunication.getInstance().getDrinkNames() )
     {
       if ( ServerCommunication.getInstance().getAmount( drink ) == 0 )
@@ -228,6 +229,7 @@ public class Dashboard extends JPanel
       buttonList.add( button );
       panel.add( button );
     }
+
     panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     return panel;
   }

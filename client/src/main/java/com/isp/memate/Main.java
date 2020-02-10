@@ -57,7 +57,7 @@ public class Main
         new DarkDayColor( Color.white, Color.black ) );
     MeMateUIManager.installNewKey( "scroll", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "adminButton", new DarkDayColor( new Color( 29, 164, 165 ), Color.WHITE ),
+    MeMateUIManager.installNewKey( "adminButton", new DarkDayColor( new Color( 29, 164, 165 ), new Color( 240, 240, 240 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
 
 

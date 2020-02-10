@@ -532,6 +532,7 @@ public class DrinkConsumptionButton extends JPanel
       @Override
       public void actionPerformed( ActionEvent e )
       {
+        ServerCommunication.getInstance().lock.lock();
         ServerCommunication.getInstance().consumeDrink( drinkName );
         ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
         acceptButton.removeActionListener( this );
@@ -546,6 +547,7 @@ public class DrinkConsumptionButton extends JPanel
         Mainframe.getInstance().setUndoButtonEnabled( true );
         infoButton.setEnabled( true );
         askWhetherToReallyConsumeLabelIsActive = false;
+        ServerCommunication.getInstance().lock.unlock();
       }
     };
     acceptButton.addActionListener( actionListener );

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.FocusManager;
 import javax.swing.ImageIcon;
@@ -47,6 +48,7 @@ public class ServerCommunication
   private final Map<String, Boolean>          drinkIngredientsMap = new HashMap<>();
   private final Map<String, DrinkIngredients> IngredientsMap      = new HashMap<>();
   private final ArrayList<Byte>               byteImageList       = new ArrayList<>();
+  public final ReentrantLock                  lock                = new ReentrantLock( true );
 
   private final List<String> drinkNames  = new ArrayList<>();
   private String[][]         history;
@@ -254,6 +256,7 @@ public class ServerCommunication
    */
   private void updateMaps( Drink[] drinkInfos )
   {
+    lock.lock();
     List<String> oldDrinkNames = new ArrayList<>( drinkNames );
     Map<String, Float> oldPriceMap = new HashMap<>();
     oldPriceMap.putAll( priceMap );
@@ -298,8 +301,10 @@ public class ServerCommunication
       System.out.println( "GUIUPDATE" );
       Mainframe.getInstance().updateDashboardAndDrinkmanager();
     }
+    lock.unlock();
     Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
   }
+
 
   /**
    * Sagt dem Server, dass er die Histore schicken soll.
@@ -607,7 +612,14 @@ public class ServerCommunication
   @SuppressWarnings( "javadoc" )
   public List<String> getDrinkNames()
   {
-    return new ArrayList<>( drinkNames );
+    if ( drinkNames != null )
+    {
+      return new ArrayList<>( drinkNames );
+    }
+    else
+    {
+      return new ArrayList<>();
+    }
   }
 
   /**
