@@ -56,6 +56,10 @@ public class Database
   }
 
   /**
+   * Erstellt zuerst den Ordner in dem die Datenbank liegen soll, wenn nicht vorhanden.
+   * Dannach wird versucht eine Verbindung aufzubauen, einige Tables hinzugefügt
+   * und die SessionID werden aufgeräumt.
+   * 
    * @param dataBasePath Startparameter Pfad der Datenbank
    */
   public Database( String dataBasePath )
@@ -169,7 +173,7 @@ public class Database
   }
 
   /**
-   * 
+   * Erstellt den SessionID-Table in der Datenbank, falls dieser noch nicht existiert.
    */
   private void addSessionIDTable()
   {
@@ -597,6 +601,8 @@ public class Database
   }
 
   /**
+   * Setzt das LastLogin für die SessionID.
+   * 
    * @param sessionID
    */
   private void updateLastLogin( String sessionID )
@@ -650,7 +656,7 @@ public class Database
     }
     catch ( Exception exception )
     {
-      // TODO: handle exception
+      ServerLog.newLog( logType.SQL, exception.getMessage() );
     }
     for ( String date : delList )
     {
@@ -975,7 +981,7 @@ public class Database
   }
 
   /**
-   * @return
+   * @return alle Nutzernamen
    */
   public String[] getUser()
   {
@@ -998,7 +1004,7 @@ public class Database
   }
 
   /**
-   * @return
+   * @return alle user
    */
   public User[] getFullUser()
   {
@@ -1021,8 +1027,8 @@ public class Database
   }
 
   /**
-   * @param name
-   * @param password
+   * @param name Nutzername
+   * @param password Passwort
    */
   public void changePassword( String name, String password )
   {

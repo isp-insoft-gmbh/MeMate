@@ -27,14 +27,14 @@ import com.isp.memate.Shared.Operation;
 public class SocketThread extends Thread
 {
   private final String         version = "0.9.6";
+  private ObjectOutputStream   objectOutputStream;
+  private ObjectInputStream    objectInputStream;
+  private String               currentSessionID;
+  private String               currentUser;
+  private Map<String, Integer> userIDMap;
   private Database             database;
   protected Socket             socket;
-  private Map<String, Integer> userIDMap;
-  private ObjectInputStream    objectInputStream;
-  private ObjectOutputStream   objectOutputStream;
-  private String               currentUser;
-  private String               currentSessionID;
-  //REDO
+  //UNDO
   boolean        lastActionDrink   = false;
   boolean        lastActionDeposit = false;
   private String lastDrinkName;
@@ -73,7 +73,6 @@ public class SocketThread extends Thread
           {
             ServerLog.newLog( logType.COMMAND, operation.toString() );
           }
-
           switch ( operation )
           {
             case REGISTER_USER:
@@ -176,7 +175,7 @@ public class SocketThread extends Thread
         }
         catch ( ClassNotFoundException exception )
         {
-          exception.printStackTrace();
+          ServerLog.newLog( logType.ERROR, exception.getMessage() );
         }
       }
     }
@@ -197,7 +196,7 @@ public class SocketThread extends Thread
   }
 
   /**
-   * 
+   * Alle Nutzerdaten werden resetet nach dem Logout.
    */
   private void resetUser()
   {
@@ -209,7 +208,7 @@ public class SocketThread extends Thread
   }
 
   /**
-   * 
+   * Die letzte AKtion wird rückgänig gemacht.
    */
   private void undoLastAction()
   {
@@ -318,6 +317,8 @@ public class SocketThread extends Thread
   }
 
   /**
+   * Enfernt das angegebene Getränk.
+   * 
    * @param consumedDrink
    */
   private void removeBalance( DrinkPrice consumedDrink )
@@ -337,7 +338,7 @@ public class SocketThread extends Thread
       }
       catch ( IOException exception )
       {
-        // TODO(nwe|17.12.2019): Fehlerbehandlung muss noch implementiert werden!
+        ServerLog.newLog( logType.ERROR, exception.getMessage() );
       }
       return;
     }
@@ -371,6 +372,8 @@ public class SocketThread extends Thread
   }
 
   /**
+   * Fügt dem Guthaben Geld hinzu.
+   * 
    * @param balanceToAdd
    */
   private void addBalance( int balanceToAdd )
@@ -393,6 +396,8 @@ public class SocketThread extends Thread
   }
 
   /**
+   * sendet den passenden Nutzernamen der SessionID an den Client zurück.
+   * 
    * @param sessionID
    */
   private void sendUsernameForSessionID( String sessionID )
@@ -412,6 +417,8 @@ public class SocketThread extends Thread
   }
 
   /**
+   * Verbindet die SessionID mit dem Nutzer
+   * 
    * @param sessionID
    */
   private void connectSessionID( SessionID sessionID )

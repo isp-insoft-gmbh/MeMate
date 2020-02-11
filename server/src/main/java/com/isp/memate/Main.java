@@ -12,8 +12,7 @@ import com.isp.memate.ServerLog.logType;
 
 
 /**
- * Die Mainklasse startet den Server und verbindet
- * jeden User mit einem eigenen Socket.
+ * Die Mainklasse startet den Server und verbindet jeden User mit einem eigenen Socket.
  * 
  * @author nwe
  * @since 23.10.2019

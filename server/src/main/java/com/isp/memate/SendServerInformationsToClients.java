@@ -72,7 +72,10 @@ public class SendServerInformationsToClients extends Thread
       clientPacket = new DatagramPacket( buf, buf.length, clientAddress, clientPort );
       try
       {
-        socket.send( clientPacket );
+        if ( clientMessage.equals( "MateClient" ) )
+        {
+          socket.send( clientPacket );
+        }
       }
       catch ( IOException exception )
       {

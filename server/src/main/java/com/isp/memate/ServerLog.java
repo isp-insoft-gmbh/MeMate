@@ -12,6 +12,9 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
+ * Die {@link ServerLog} Klasse gibt zum einen alles formatiert und mit Farbe in der Console aus und speichert
+ * den Log in einer .txt Datei.
+ * 
  * @author nwe
  * @since 02.01.2020
  *
@@ -19,19 +22,16 @@ import java.util.logging.SimpleFormatter;
 public class ServerLog
 {
   private static final String            ANSI_RESET  = "\u001B[0m";
-  private static final String            ANSI_BLACK  = "\u001B[30m";
   private static final String            ANSI_RED    = "\u001B[31m";
-  private static final String            ANSI_GREEN  = "\u001B[32m";
   private static final String            ANSI_YELLOW = "\u001B[33m";
-  private static final String            ANSI_BLUE   = "\u001B[34m";
-  private static final String            ANSI_PURPLE = "\u001B[35m";
   private static final String            ANSI_CYAN   = "\u001B[36m";
-  private static final String            ANSI_WHITE  = "\u001B[37m";
   private static final DateTimeFormatter formatter   = DateTimeFormatter.ofPattern( "d MMM HH:mm:ss.SSS" );
 
   /**
-   * @param logType
-   * @param message
+   * Erstellt ein neuen Log, abhänig von den logType
+   * 
+   * @param logType Typ des Logs
+   * @param message Nachricht
    */
   public static void newLog( logType logType, String message )
   {
@@ -66,9 +66,8 @@ public class ServerLog
     }
     catch ( SecurityException | IOException exception )
     {
-      // TODO(nwe|02.01.2020): Fehlerbehandlung muss noch implementiert werden!
+      newLog( ServerLog.logType.ERROR, exception.getMessage() );
     }
-
   }
 
   enum logType
@@ -78,5 +77,4 @@ public class ServerLog
     INFO,
     ERROR;
   }
-
 }
