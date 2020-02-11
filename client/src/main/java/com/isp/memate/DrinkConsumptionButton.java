@@ -63,15 +63,15 @@ public class DrinkConsumptionButton extends JPanel
 
   private final JLabel       nameLabel                              = MeMateUIManager.createJLabel( "drinkButtons" );
   private final JLabel       priceLabel                             = MeMateUIManager.createJLabel( "drinkButtons" );
-  private final JLabel       iconLabel;
   private final JPanel       infoPanel                              = MeMateUIManager.createJPanel( "drinkButtons" );
   private final JPanel       nameLabelAndDrinkInfoButtonPanel       = MeMateUIManager.createJPanel( "drinkButtons" );
   private final JButton      acceptButton                           = MeMateUIManager.createNormalButton( "button" );
   private final JButton      abortButton                            = MeMateUIManager.createNormalButton( "button" );
   private final JButton      infoButton                             = MeMateUIManager.createNormalButton( "button" );
-  private final JLayeredPane overlay                                = new JLayeredPane();
   private final JLabel       askWhetherToReallyConsumeLabel         = MeMateUIManager.createJLabel( "drinkButtons" );
   private final JLabel       textLabel                              = MeMateUIManager.createJLabel();
+  private final JLayeredPane overlay                                = new JLayeredPane();
+  private final JLabel       iconLabel;
   private MouseListener      mouseListener;
   private FocusListener      focusListener;
   private KeyListener        keyListener;
@@ -265,7 +265,6 @@ public class DrinkConsumptionButton extends JPanel
           return panel;
         }
       } );
-
     }
 
     price = price.replace( "€", "" );
@@ -298,7 +297,6 @@ public class DrinkConsumptionButton extends JPanel
 
     acceptAction = new ActionListener()
     {
-
       @Override
       public void actionPerformed( ActionEvent e )
       {

@@ -34,7 +34,8 @@ import net.miginfocom.swing.MigLayout;
  * Auf dem {@link Dashboard} soll der Nutzer die Auswahl an Getränken sehen
  * und sich nach Bedarf, welche kaufen können.
  * Tut er dies, so wird der Preis des Getränks von seinem Guthaben abgezogen.
- * Außerdem hat der Benutzer auf dem Dashboard die Möglichkeit sein Kontostand aufzuladen.
+ * Außerdem hat der Benutzer auf dem Dashboard die Möglichkeit sein Kontostand aufzuladen
+ * und Getränkeinformationen zu erhalten.
  * 
  * @author nwe
  * @since 15.10.2019
@@ -102,7 +103,6 @@ public class Dashboard extends JPanel
     aufladenButton.setText( "Einzahlen" );
     aufladenButton.addActionListener( new ActionListener()
     {
-
       @Override
       public void actionPerformed( ActionEvent e )
       {
@@ -121,42 +121,18 @@ public class Dashboard extends JPanel
       }
     } );
 
-
-    //    final MeMateActionBarButton aufladenButton = MeMateUIManager.createButton( "Einzahlen",
-    //        "Guthaben einzahlen", UIManager.getColor( "AppColor" ),
-    //        Color.white, new Runnable()
-    //        {
-    //          @Override
-    //          public void run()
-    //          {
-    //            Object value = valueSpinner.getValue();
-    //            System.out.println( String.valueOf( valueSpinner.getValue() ) );
-    //            int result =
-    //                JOptionPane.showConfirmDialog( Dashboard.this, "<html>Wollen Sie wirklich <b>" + value + "€</b> einzahlen?",
-    //                    "Guthaben hinzufügen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE );
-    //            if ( result == JOptionPane.YES_OPTION )
-    //            {
-    //              ServerCommunication sc = ServerCommunication.getInstance();
-    //              sc.addBalance( (int) value );
-    //              ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
-    //              undoButton.setEnabled( true );
-    //            }
-    //          }
-    //        }, "button" );
-
-
     final JLabel aufladenlabel = MeMateUIManager.createJLabel();
-    aufladenlabel.setText( "Kontostand aufladen" );
     final String infoText1 =
         "Einzahlung sind nur in Höhe von gültigen Kombination von 1€ und 2€ Münzen, 5€ Scheinen, 10€ Scheinen und 20€ Scheinen möglich.";
     final String infoText2 =
         "Einmal eingezahltes Guthaben kann nicht wieder ausgezahlt werden und muss durch den Konsum von Getränken aufgebraucht werden.";
     final JLabel infoTextLabel1 = MeMateUIManager.createJLabel();
     final JLabel infoTextLabel2 = MeMateUIManager.createJLabel();
+    aufladenlabel.setText( "Kontostand aufladen" );
     infoTextLabel1.setText( infoText1 );
     infoTextLabel2.setText( infoText2 );
 
-    infoIconLabel.setBorder( new MatteBorder( 0, 1, 0, 0, UIManager.getColor( "separator.background" ) ) );
+    infoIconLabel.setBorder( new MatteBorder( 0, 20, 0, 0, UIManager.getColor( "separator.background" ) ) );
 
     String infoTextToolTip = "<html>" + infoText1 + "<br>" + infoText2 + "</html>";
     infoTextLabel1.setToolTipText( infoTextToolTip );
@@ -176,9 +152,7 @@ public class Dashboard extends JPanel
 
     SwingUtil.setPreferredWidth( 50, valueSpinner );
 
-    panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     panel.setBorder( new EmptyBorder( 0, 20, 10, 0 ) );
-
     return panel;
   }
 
@@ -186,7 +160,7 @@ public class Dashboard extends JPanel
   /**
    * Es wird eine Liste von der Klasse {@link ServerCommunication}
    * genommen, welche die Namen aller Getränke enthält.
-   * Auf Grundlage dieser Liste, wird für jedes Getränk
+   * Auf Grundlage dieser Liste, wird für jedes Getränk (wenn Anzahl>0)
    * ein Button, mit zugehörigen Preis und Bild
    * erstellt und dem Panel hinzugefügt.
    * 
@@ -262,7 +236,8 @@ public class Dashboard extends JPanel
   }
 
   /**
-   * Wenn die Anzahl des Getränks 0 beträgt, so wird ein
+   * Wenn die Anzahl des Getränks 0 beträgt, so wird ein Dialog angezeigt, dass
+   * das gewünschte Getränk leer ist.
    * 
    * @param name Getränkenaame
    */
@@ -272,6 +247,9 @@ public class Dashboard extends JPanel
         JOptionPane.ERROR_MESSAGE, null );
   }
 
+  /**
+   * Wenn der State des Darkmodes gewechselt wird, so wird auch das Icon geändert.
+   */
   public void toggleInfoIcon()
   {
     if ( MeMateUIManager.getDarkModeState() )
@@ -285,7 +263,8 @@ public class Dashboard extends JPanel
   }
 
   /**
-   * 
+   * Resetet alle drinkButtons, dies tritt nur auf wenn man bereits ein
+   * Getränk angeklickt hat und nun ein weiteres anklicken möchte.
    */
   public void resetAllDrinkButtons()
   {

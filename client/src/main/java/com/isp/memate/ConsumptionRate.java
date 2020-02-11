@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.ParseException;
@@ -43,6 +44,10 @@ import com.isp.memate.util.MeMateUIManager;
 
 
 /**
+ * In diesem Panel kann der Nutzer sein Konsum von Flaschen pro Tag im letzten Monat anschauen.
+ * Man hat die Möglichkeit zwischen verschiedenen Getränken zu filtern oder sich alle
+ * an zu schauen. Der Admin sieht hier die Daten von allen Usern.
+ * 
  * @author nwe
  * @since 19.12.2019
  *
@@ -50,21 +55,36 @@ import com.isp.memate.util.MeMateUIManager;
 public class ConsumptionRate extends JPanel
 {
   private static final ConsumptionRate instance       = new ConsumptionRate();
+  private final Map<String, Integer>   amountMap      = new HashMap<>();
   private XYDataset                    dataset;
   private JFreeChart                   chart;
   private ChartPanel                   chartPanel;
-  private final Map<String, Integer>   amountMap      = new HashMap<>();
   private JComboBox<String>            selectDrinkComboBox;
   private HashSet<String>              consumedDrinks = new LinkedHashSet<>();
 
+
   /**
-   * 
+   * @return static Instance of {@link ConsumptionRate}
+   */
+  public static ConsumptionRate getInstance()
+  {
+    return instance;
+  }
+
+  /**
+   * Setzt das Layout
    */
   public ConsumptionRate()
   {
     setLayout( new GridBagLayout() );
   }
 
+  /**
+   * Erstellt einen neuen Datensatz für das angegebene Getränk.
+   * 
+   * @param drink Name des Getränks.
+   * @return Datensatz für den Graphen.
+   */
   private XYDataset createDataset( String drink )
   {
     amountMap.clear();
@@ -121,8 +141,6 @@ public class ConsumptionRate extends JPanel
         }
       }
     }
-
-
     final TimeSeries series = new TimeSeries( "DrinksOverTime" );
 
     for ( int i = 0; i < 31; i++ )
@@ -133,7 +151,13 @@ public class ConsumptionRate extends JPanel
     return new TimeSeriesCollection( series );
   }
 
-
+  /**
+   * Erzeugt aus dem Datensatz einen neuen Graphen und lädt
+   * anschließend noch Settings, abhängig vom State des Darkmodes.
+   * 
+   * @param dataset Datensatz
+   * @return chart
+   */
   private JFreeChart createChart( final XYDataset dataset )
   {
     JFreeChart freeChart = ChartFactory.createTimeSeriesChart(
@@ -146,9 +170,7 @@ public class ConsumptionRate extends JPanel
         false );
 
     freeChart.getXYPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
-
     freeChart.getXYPlot().getRangeAxis().setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
-
 
     if ( MeMateUIManager.getDarkModeState() )
     {
@@ -178,16 +200,8 @@ public class ConsumptionRate extends JPanel
   }
 
   /**
-   * @return static Instance of Stats
-   */
-  public static ConsumptionRate getInstance()
-  {
-    return instance;
-
-  }
-
-  /**
-   * 
+   * Zuerst wird ein neuer Datensatz generiert und anhand davon das neue chartPanel.
+   * Außerdem wird das Layout gesetzt, einige Settings geladen und Component- und ItemListener angemeldet.
    */
   public void addGraph()
   {
@@ -197,68 +211,20 @@ public class ConsumptionRate extends JPanel
     chartPanel = new ChartPanel( chart );
     chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
     chartPanel.setMouseZoomable( true, false );
-    GridBagConstraints chartPanelConstraits = new GridBagConstraints();
-    chartPanelConstraits.gridx = 0;
-    chartPanelConstraits.gridy = 0;
-    chartPanelConstraits.gridheight = 3;
-    chartPanelConstraits.fill = GridBagConstraints.BOTH;
-    chartPanelConstraits.weightx = 1;
-    chartPanelConstraits.weighty = 1;
+    GridBagConstraints chartPanelConstraits = getChartPanelConstraits();
     add( chartPanel, chartPanelConstraits );
-    selectDrinkComboBox = new JComboBox<>();
-    selectDrinkComboBox.addItem( "Alle" );
-    selectDrinkComboBox.setSelectedItem( "Alle" );
-    for ( String string : consumedDrinks )
-    {
-      selectDrinkComboBox.addItem( string );
-    }
-    GridBagConstraints selectedDrinkComboboxConstraints = new GridBagConstraints();
-    selectedDrinkComboboxConstraints.gridx = 1;
-    selectedDrinkComboboxConstraints.gridy = 0;
-    selectedDrinkComboboxConstraints.insets = new Insets( 35, 0, 0, 10 );
-    selectedDrinkComboboxConstraints.anchor = GridBagConstraints.NORTH;
+
+    addDrinkComboBoxItems();
+
+    GridBagConstraints selectedDrinkComboboxConstraints = getSelectedDrinkComboboxConstraits();
     add( selectDrinkComboBox, selectedDrinkComboboxConstraints );
-    JLabel averageConsumption =
-        new JLabel(
-            String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
-    GridBagConstraints averageConsumptionConstraints = new GridBagConstraints();
-    averageConsumptionConstraints.gridx = 1;
-    averageConsumptionConstraints.gridy = 1;
-    averageConsumptionConstraints.insets = new Insets( 10, 0, 0, 10 );
-    averageConsumptionConstraints.anchor = GridBagConstraints.NORTH;
+
+    JLabel averageConsumption = new JLabel( String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
+    GridBagConstraints averageConsumptionConstraints = getAverageConsumptionConstraints();
     add( averageConsumption, averageConsumptionConstraints );
 
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-      averageConsumption.setForeground( MeMateUIManager.getForeground( "default" ).getDarkColor() );
-    }
-    else
-    {
-      setBackground( MeMateUIManager.getBackground( "default" ).getDayColor() );
-      averageConsumption.setForeground( MeMateUIManager.getForeground( "default" ).getDayColor() );
-    }
-
-
-    chartPanel.setMaximumDrawHeight( 1000 );
-    chartPanel.setMaximumDrawWidth( 1000 );
-    chartPanel.setMinimumDrawWidth( 10 );
-    chartPanel.setMinimumDrawHeight( 10 );
-
-
-    Mainframe.getInstance().addComponentListener( new ComponentAdapter()
-    {
-      @Override
-      public void componentResized( final ComponentEvent e )
-      {
-        //Chart beim Verkleinern/Vergrößern anpassen
-        chartPanel.setMaximumDrawHeight( e.getComponent().getHeight() );
-        chartPanel.setMaximumDrawWidth( e.getComponent().getWidth() );
-        chartPanel.setMinimumDrawWidth( e.getComponent().getWidth() );
-        chartPanel.setMinimumDrawHeight( e.getComponent().getHeight() );
-      }
-    } );
-
+    toggleDarkMode( averageConsumption );
+    appendComponentListener();
 
     selectDrinkComboBox.addItemListener( new ItemListener()
     {
@@ -269,12 +235,7 @@ public class ConsumptionRate extends JPanel
         dataset = createDataset( String.valueOf( e.getItem() ) );
         chart = createChart( dataset );
         chartPanel.setChart( chart );
-
-
-        averageConsumption
-            .setText(
-                String.format( "Ø %.2f Flaschen/Tag", getAverage(),
-                    String.valueOf( e.getItem() ) ) );
+        averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage(), String.valueOf( e.getItem() ) ) );
         add( chartPanel, chartPanelConstraits );
         repaint();
         revalidate();
@@ -283,7 +244,45 @@ public class ConsumptionRate extends JPanel
   }
 
   /**
-   * @return
+   * Fügt einen {@link ComponentListener} hinzu, damit sich die Chart beim Verkleinern/Vergrößern anpasst.
+   */
+  private void appendComponentListener()
+  {
+    chartPanel.setMaximumDrawHeight( 1000 );
+    chartPanel.setMaximumDrawWidth( 1000 );
+    chartPanel.setMinimumDrawWidth( 10 );
+    chartPanel.setMinimumDrawHeight( 10 );
+
+    Mainframe.getInstance().addComponentListener( new ComponentAdapter()
+    {
+      @Override
+      public void componentResized( final ComponentEvent e )
+      {
+        chartPanel.setMaximumDrawHeight( e.getComponent().getHeight() );
+        chartPanel.setMaximumDrawWidth( e.getComponent().getWidth() );
+        chartPanel.setMinimumDrawWidth( e.getComponent().getWidth() );
+        chartPanel.setMinimumDrawHeight( e.getComponent().getHeight() );
+      }
+    } );
+  }
+
+  /**
+   * Fügt jedes bisher getrunkene Getränk in die Combobox hinzu.
+   */
+  private void addDrinkComboBoxItems()
+  {
+    selectDrinkComboBox = new JComboBox<>();
+    selectDrinkComboBox.addItem( "Alle" );
+    selectDrinkComboBox.setSelectedItem( "Alle" );
+    for ( String string : consumedDrinks )
+    {
+      selectDrinkComboBox.addItem( string );
+    }
+  }
+
+
+  /**
+   * Teilt die Anzahl der kosumierten Getränke des letzen Monats durch 31.
    */
   private Float getAverage()
   {
@@ -295,5 +294,52 @@ public class ConsumptionRate extends JPanel
       counter = counter + amountMap.get( formatter.format( now.minusDays( i ) ).toString() );
     }
     return counter / 31f;
+  }
+
+
+  private void toggleDarkMode( JLabel averageConsumption )
+  {
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
+      averageConsumption.setForeground( MeMateUIManager.getForeground( "default" ).getDarkColor() );
+    }
+    else
+    {
+      setBackground( MeMateUIManager.getBackground( "default" ).getDayColor() );
+      averageConsumption.setForeground( MeMateUIManager.getForeground( "default" ).getDayColor() );
+    }
+  }
+
+  private GridBagConstraints getAverageConsumptionConstraints()
+  {
+    GridBagConstraints averageConsumptionConstraints = new GridBagConstraints();
+    averageConsumptionConstraints.gridx = 1;
+    averageConsumptionConstraints.gridy = 1;
+    averageConsumptionConstraints.insets = new Insets( 10, 0, 0, 10 );
+    averageConsumptionConstraints.anchor = GridBagConstraints.NORTH;
+    return averageConsumptionConstraints;
+  }
+
+  private GridBagConstraints getSelectedDrinkComboboxConstraits()
+  {
+    GridBagConstraints selectedDrinkComboboxConstraints = new GridBagConstraints();
+    selectedDrinkComboboxConstraints.gridx = 1;
+    selectedDrinkComboboxConstraints.gridy = 0;
+    selectedDrinkComboboxConstraints.insets = new Insets( 35, 0, 0, 10 );
+    selectedDrinkComboboxConstraints.anchor = GridBagConstraints.NORTH;
+    return selectedDrinkComboboxConstraints;
+  }
+
+  private GridBagConstraints getChartPanelConstraits()
+  {
+    GridBagConstraints chartPanelConstraits = new GridBagConstraints();
+    chartPanelConstraits.gridx = 0;
+    chartPanelConstraits.gridy = 0;
+    chartPanelConstraits.gridheight = 3;
+    chartPanelConstraits.fill = GridBagConstraints.BOTH;
+    chartPanelConstraits.weightx = 1;
+    chartPanelConstraits.weighty = 1;
+    return chartPanelConstraits;
   }
 }

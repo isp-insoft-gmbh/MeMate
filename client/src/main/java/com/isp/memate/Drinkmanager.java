@@ -22,9 +22,10 @@ import javax.swing.event.ListSelectionListener;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
- * Im Getränkemanager kann man einstellen, welche Getränke derzeit verfügbar sind und somit im
- * {@link Dashboard} angezeigt werden. Man kann neue Getränke hinzufügen, Getränke entfernen
+ * Im Getränkemanager kann der Admin einstellen, welche Getränke es gibt.
+ * Man kann neue Getränke hinzufügen, Getränke entfernen
  * und Getränke beearbeiten, sollte sich zum Beispiel der Preis ändern.
+ * Außerdem kann man Getränkeinformationen hinzufügen wie z.B Zutatenliste.
  * 
  * @author nwe
  * @since 15.10.2019
@@ -33,13 +34,13 @@ public class Drinkmanager extends JPanel
 {
   private static final Drinkmanager instance          = new Drinkmanager();
   private String[]                  data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
-  private JList<String>             drinkList         = new JList<>( data );
-  private final JScrollPane         scrollpane        = new JScrollPane();
-  private int                       currentSelection;
   private final JButton             addButton         = MeMateUIManager.createNormalButton( "button" );
   private final JButton             editButton        = MeMateUIManager.createNormalButton( "button" );
   private final JButton             removeButton      = MeMateUIManager.createNormalButton( "button" );
   private final JButton             ingredientsButton = MeMateUIManager.createNormalButton( "button" );
+  private JList<String>             drinkList         = new JList<>( data );
+  private final JScrollPane         scrollpane        = new JScrollPane();
+  private int                       currentSelection;
 
   /**
    * @return static instance of {@link Drinkmanager}
@@ -93,13 +94,12 @@ public class Drinkmanager extends JPanel
   }
 
   /**
-   * Erzeugt ein Jpanel mit den Buttons zum Hinzufügen, Bearbeiten und Entfernen von Getränken.
+   * Erzeugt ein JPanel mit den Buttons zum Hinzufügen, Bearbeiten und Entfernen von Getränken.
    *
    * @return JPanel mit den genannten Buttons.
    */
   private JPanel createButtonPanel()
   {
-
     final JPanel panel = MeMateUIManager.createJPanel();
     final GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
@@ -118,7 +118,6 @@ public class Drinkmanager extends JPanel
     gridBagConstraints.gridx = 3;
     gridBagConstraints.anchor = GridBagConstraints.LINE_END;
     panel.add( removeButton, gridBagConstraints );
-
 
     removeButton.addActionListener( new ActionListener()
     {
@@ -167,8 +166,9 @@ public class Drinkmanager extends JPanel
     return panel;
   }
 
-
-  @SuppressWarnings( "javadoc" )
+  /**
+   * Sollte es neue Getränke geben so kann hier von Außen die Liste aktualisiert werden.
+   */
   public void updateList()
   {
     data = new String[ServerCommunication.getInstance().getDrinkNames().size()];
@@ -197,7 +197,6 @@ public class Drinkmanager extends JPanel
       public void valueChanged( ListSelectionEvent e )
       {
         currentSelection = drinkList.getSelectedIndex();
-
       }
     } );
   }

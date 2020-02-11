@@ -42,19 +42,16 @@ import com.isp.memate.util.MeMateUIManager;
 public class Mainframe extends JFrame
 {
   private static final Mainframe instance               = new Mainframe();
-  private final JPanel           contentPanel           = MeMateUIManager.createJPanel();
-  private final JPanel           headerPanel            = new JPanel();
-  private final Color            color                  = UIManager.getColor( "AppColor" );
-  private final JLabel           balanceLabel           = new JLabel();
-  private final JLabel           helloUserLabel         = new JLabel( "Hallo User" );
   private final Icon             dashboardIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_black.png" ) );
   private final Icon             dashboardIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_white.png" ) );
-  private final Icon             historyIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "history_black.png" ) );
-  private final Icon             historyIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "history_white.png" ) );
   private final Icon             adminViewIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_black.png" ) );
   private final Icon             adminViewIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_white.png" ) );
+  private final Icon             logoutIconBlack        = new ImageIcon( getClass().getClassLoader().getResource( "logout_black_24.png" ) );
+  private final Icon             logoutIconWhite        = new ImageIcon( getClass().getClassLoader().getResource( "logout_white_24.png" ) );
   private final Icon             darkModeIconBlack      = new ImageIcon( getClass().getClassLoader().getResource( "darkmode_black.png" ) );
   private final Icon             darkModeIconWhite      = new ImageIcon( getClass().getClassLoader().getResource( "darkmode_white.png" ) );
+  private final Icon             historyIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "history_black.png" ) );
+  private final Icon             historyIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "history_white.png" ) );
   private final Icon             dayModeIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_black.png" ) );
   private final Icon             dayModeIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_white.png" ) );
   private final Icon             undoBlackIcon          = new ImageIcon( getClass().getClassLoader().getResource( "back_black.png" ) );
@@ -63,8 +60,6 @@ public class Mainframe extends JFrame
       new ImageIcon( getClass().getClassLoader().getResource( "drinkmanager_black.png" ) );
   private final Icon             drinkManagerIconWhite  =
       new ImageIcon( getClass().getClassLoader().getResource( "drinkmanager_white.png" ) );
-  private final Icon             logoutIconBlack        = new ImageIcon( getClass().getClassLoader().getResource( "logout_black_24.png" ) );
-  private final Icon             logoutIconWhite        = new ImageIcon( getClass().getClassLoader().getResource( "logout_white_24.png" ) );
   private final Icon             consumptionIconBlack   =
       new ImageIcon( getClass().getClassLoader().getResource( "consumption_black.png" ) );
   private final Icon             consumptionIconWhite   =
@@ -73,12 +68,17 @@ public class Mainframe extends JFrame
       new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_black.png" ) );
   private final Icon             creditHistoryIconWhite =
       new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_white.png" ) );
-  private final MeMateActionBar  bar;
+  private final Color            color                  = UIManager.getColor( "AppColor" );
+  private final JPanel           contentPanel           = MeMateUIManager.createJPanel();
+  private final JLabel           helloUserLabel         = new JLabel( "Hallo User" );
+  private final JLabel           balanceLabel           = new JLabel();
+  private final JPanel           headerPanel            = new JPanel();
   private MeMateActionBarButton  drinkManagerButton;
   private MeMateActionBarButton  adminViewButton;
   private MeMateActionBarButton  logoutButton;
   private MeMateActionBarButton  darkModeButton;
   private MeMateActionBarButton  undoButton;
+  private final MeMateActionBar  bar;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -109,7 +109,7 @@ public class Mainframe extends JFrame
   }
 
   /**
-   * 
+   * Fügt die Actionbar hinzu.
    */
   private void addActionBar()
   {
@@ -330,15 +330,6 @@ public class Mainframe extends JFrame
   }
 
   /**
-   * @return Actionbar
-   */
-  public MeMateActionBar getActionBar()
-  {
-    return bar;
-  }
-
-
-  /**
    * Setzt Border und ändert ein paar Schriftgrößen
    */
   private void deriveFontsAndSetLayout()
@@ -412,7 +403,9 @@ public class Mainframe extends JFrame
   }
 
   /**
-   * @param state
+   * Bestimmt ob der undoButton aktiviert sein soll oder nicht
+   * 
+   * @param state true or false
    */
   public void setUndoButtonEnabled( boolean state )
   {

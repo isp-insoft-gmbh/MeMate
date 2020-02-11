@@ -60,20 +60,20 @@ import com.isp.memate.util.SwingUtil;
 public class Login extends JFrame
 {
   private static final Login   instance                = new Login();
-  private static String        currentUsername;
-  private final JPanel         loginPanel              = MeMateUIManager.createJPanel();
+  private final Font           LABEL_FONT              = UIManager.getFont( "Label.font" ).deriveFont( 15f );
+  private final JButton        loginButton             = MeMateUIManager.createNormalButton( "button" );
   private final JLabel         headerLabel             =
       new JLabel( new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
+  private final JCheckBox      stayLoggedInCheckBox    = MeMateUIManager.createCheckbox();
+  private final JTextPane      registerHyperLink       = MeMateUIManager.createTextPane();
+  private final JTextPane      forgotPasswordHyperLink = MeMateUIManager.createTextPane();
+  private final JPanel         loginPanel              = MeMateUIManager.createJPanel();
   private final JLabel         usernameLabel           = MeMateUIManager.createJLabel();
   private final JLabel         passwordLabel           = MeMateUIManager.createJLabel();
   private final JLabel         stayLoggedInLabel       = MeMateUIManager.createJLabel();
-  private final JTextField     usernameTextField       = new JTextField();
   private final JPasswordField passwordField           = new JPasswordField();
-  private final JButton        loginButton             = MeMateUIManager.createNormalButton( "button" );
-  private final JCheckBox      stayLoggedInCheckBox    = MeMateUIManager.createCheckbox();
-  private final Font           LABEL_FONT              = UIManager.getFont( "Label.font" ).deriveFont( 15f );
-  private final JTextPane      registerHyperLink       = MeMateUIManager.createTextPane();
-  private final JTextPane      forgotPasswordHyperLink = MeMateUIManager.createTextPane();
+  private final JTextField     usernameTextField       = new JTextField();
+  private static String        currentUsername;
 
   /**
    * @return static instance of Login
@@ -544,6 +544,9 @@ public class Login extends JFrame
     }
   }
 
+  /**
+   * zeigt den Darkmode Header
+   */
   public void showDarkHeader()
   {
     String fontName = LABEL_FONT.getFontName();
@@ -553,6 +556,9 @@ public class Login extends JFrame
         .setText( "<html><font color=white><font face='" + fontName + "'><a href>Passwort vergessen ?</a></font></font></html>" );
   }
 
+  /**
+   * zeigt den Daymode Header
+   */
   public void showDayHeader()
   {
     String fontName = LABEL_FONT.getFontName();

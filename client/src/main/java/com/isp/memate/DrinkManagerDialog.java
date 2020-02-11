@@ -52,24 +52,24 @@ import com.isp.memate.util.MeMateUIManager;
  * Der {@linkplain DrinkManagerDialog} erzeugt einen neuen Frame,
  * wenn im {@linkplain Drinkmanager} ein Getränk hinzugefügt oder bearbeitet wird.
  * In diesem Frame kann man den Name, Preis, und ein Bild des Getränks angeben oder editieren.
+ * Des weiteren gibt es einen Dialog um Getränkeinformationen zu ergänzen.
  * 
  * @author nwe
  * @since 18.10.2019
  */
 public class DrinkManagerDialog
 {
-  private JDialog                  dialog;
-  private final JPanel             layout            = new JPanel( new GridBagLayout() );
-  private final JTextField         drinkNameField    = new JTextField();
   private final SpinnerNumberModel spinnerModel      = new SpinnerNumberModel( 0, 0, 1000, 0.10 );
+  private final JPanel             layout            = new JPanel( new GridBagLayout() );
   private final JSpinner           drinkPriceSpinner = new JSpinner( spinnerModel );
-  private final JButton            confirmButton     = new JButton();
   private final JButton            cancelButton      = new JButton( "Abbrechen" );
   private final JFileChooser       fileChooser       = new JFileChooser();
+  private final JTextField         drinkNameField    = new JTextField();
+  private final JButton            confirmButton     = new JButton();
   private final JLabel             pictureLabel      = new JLabel();
-  private ImageIcon                currentImage;
   private String                   drinkPicturePath  = null;
-
+  private ImageIcon                currentImage;
+  private JDialog                  dialog;
 
   /**
    * Erzeugt den Frame und setzt das Layout der vorhandenen Kompnenten.
@@ -199,7 +199,7 @@ public class DrinkManagerDialog
         }
         catch ( HeadlessException | IOException exception )
         {
-          // TODO(nwe|03.12.2019): Fehlerbehandlung muss noch implementiert werden!
+          exception.printStackTrace();
         }
         drinkPicturePath = selectedFile.getPath();
         File image = new File( drinkPicturePath );
@@ -224,6 +224,16 @@ public class DrinkManagerDialog
     confirmButton.setOpaque( true );
     cancelButton.setContentAreaFilled( false );
     cancelButton.setOpaque( true );
+    toggleDarkMode( drinkName, drinkPrice, buttonBar );
+  }
+
+  /**
+   * @param drinkName
+   * @param drinkPrice
+   * @param buttonBar
+   */
+  private void toggleDarkMode( final JLabel drinkName, final JLabel drinkPrice, JPanel buttonBar )
+  {
     if ( MeMateUIManager.getDarkModeState() )
     {
       layout.setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
@@ -425,8 +435,8 @@ public class DrinkManagerDialog
   }
 
   /**
-   * @param DrinkID
-   * 
+   * Zeigt einen Dialog an, um Informationen über das Getränk zu ergänzen.
+   * Beispielsweise Zutatenliste, Fettgehalt oder Zuckergehalt.
    */
   public void showIngredientsDialog( int DrinkID )
   {
@@ -563,33 +573,8 @@ public class DrinkManagerDialog
     buttonBarConstraints.anchor = GridBagConstraints.LINE_END;
     layout.add( buttonBar, buttonBarConstraints );
 
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      buttonBar.setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-      ingredientsLabel.setForeground( Color.white );
-      energyKCALLabel.setForeground( Color.white );
-      energyKJLabel.setForeground( Color.white );
-      fatLabel.setForeground( Color.white );
-      fattyAcidsLabel.setForeground( Color.white );
-      proteinLabel.setForeground( Color.white );
-      saltLabel.setForeground( Color.white );
-      carbsLabel.setForeground( Color.white );
-      sugarLabel.setForeground( Color.white );
-
-    }
-    else
-    {
-      buttonBar.setBackground( new Color( 240, 240, 240 ) );
-      ingredientsLabel.setForeground( Color.black );
-      energyKCALLabel.setForeground( Color.black );
-      energyKJLabel.setForeground( Color.black );
-      fatLabel.setForeground( Color.black );
-      fattyAcidsLabel.setForeground( Color.black );
-      proteinLabel.setForeground( Color.black );
-      saltLabel.setForeground( Color.black );
-      carbsLabel.setForeground( Color.black );
-      sugarLabel.setForeground( Color.black );
-    }
+    toggleDarkMode( ingredientsLabel, energyKJLabel, energyKCALLabel, fatLabel, fattyAcidsLabel, carbsLabel, sugarLabel, proteinLabel,
+        saltLabel, buttonBar );
 
     ActionListener[] listeners = confirmButton.getActionListeners();
     for ( ActionListener actionListener : listeners )
@@ -630,5 +615,50 @@ public class DrinkManagerDialog
     dialog.setSize( new Dimension( oldPreferredSize.width, oldPreferredSize.height ) );
     dialog.setLocationRelativeTo( dialog.getOwner() );
     dialog.setVisible( true );
+  }
+
+  /**
+   * @param ingredientsLabel
+   * @param energyKJLabel
+   * @param energyKCALLabel
+   * @param fatLabel
+   * @param fattyAcidsLabel
+   * @param carbsLabel
+   * @param sugarLabel
+   * @param proteinLabel
+   * @param saltLabel
+   * @param buttonBar
+   */
+  private void toggleDarkMode( JLabel ingredientsLabel, JLabel energyKJLabel, JLabel energyKCALLabel, JLabel fatLabel,
+                               JLabel fattyAcidsLabel, JLabel carbsLabel, JLabel sugarLabel, JLabel proteinLabel, JLabel saltLabel,
+                               JPanel buttonBar )
+  {
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      buttonBar.setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
+      ingredientsLabel.setForeground( Color.white );
+      energyKCALLabel.setForeground( Color.white );
+      energyKJLabel.setForeground( Color.white );
+      fatLabel.setForeground( Color.white );
+      fattyAcidsLabel.setForeground( Color.white );
+      proteinLabel.setForeground( Color.white );
+      saltLabel.setForeground( Color.white );
+      carbsLabel.setForeground( Color.white );
+      sugarLabel.setForeground( Color.white );
+
+    }
+    else
+    {
+      buttonBar.setBackground( new Color( 240, 240, 240 ) );
+      ingredientsLabel.setForeground( Color.black );
+      energyKCALLabel.setForeground( Color.black );
+      energyKJLabel.setForeground( Color.black );
+      fatLabel.setForeground( Color.black );
+      fattyAcidsLabel.setForeground( Color.black );
+      proteinLabel.setForeground( Color.black );
+      saltLabel.setForeground( Color.black );
+      carbsLabel.setForeground( Color.black );
+      sugarLabel.setForeground( Color.black );
+    }
   }
 }

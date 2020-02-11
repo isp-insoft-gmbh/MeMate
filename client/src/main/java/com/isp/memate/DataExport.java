@@ -20,6 +20,10 @@ import org.w3c.dom.Element;
 import com.isp.memate.ServerCommunication.dateType;
 
 /**
+ * Die Klasse wird nur aufgerufen sobald der Admin den Export Button im AdminPanel drückt.
+ * Anschließend werden alle Nutzer-, Getränke, und Historydaten in Form von
+ * XML-Datein exportiert.
+ * 
  * @author nwe
  * @since 23.01.2020
  *
@@ -33,7 +37,7 @@ public class DataExport
   private User[]       userArray;
 
   /**
-   * 
+   * Exportiert zuerst Nutzerdaten, dann Getränkedaten und Historydaten.
    */
   public DataExport()
   {
@@ -43,7 +47,7 @@ public class DataExport
   }
 
   /**
-   * 
+   * Exportiert die Historydaten.
    */
   private void historyExport()
   {
@@ -80,7 +84,7 @@ public class DataExport
       DOMSource domSource = new DOMSource( document );
       StreamResult streamResult = new StreamResult( new File( historyXMLPath ) );
       transformer.transform( domSource, streamResult );
-      System.out.println( "Done creating XML File" );
+      System.out.println( "Done creating History-XML File" );
     }
     catch ( ParserConfigurationException pce )
     {
@@ -93,7 +97,7 @@ public class DataExport
   }
 
   /**
-   * 
+   * Exportiert die Getränkedaten.
    */
   private void drinksExport()
   {
@@ -160,7 +164,7 @@ public class DataExport
       DOMSource domSource = new DOMSource( document );
       StreamResult streamResult = new StreamResult( new File( drinksXMLPath ) );
       transformer.transform( domSource, streamResult );
-      System.out.println( "Done creating XML File" );
+      System.out.println( "Done creating Drink-XML File" );
     }
     catch ( ParserConfigurationException pce )
     {
@@ -173,7 +177,7 @@ public class DataExport
   }
 
   /**
-   * 
+   * Exportiert die Nutzerdaten.
    */
   private void userExport()
   {
@@ -208,7 +212,7 @@ public class DataExport
       DOMSource domSource = new DOMSource( document );
       StreamResult streamResult = new StreamResult( new File( userXMLPath ) );
       transformer.transform( domSource, streamResult );
-      System.out.println( "Done creating XML File" );
+      System.out.println( "Done creating user-XML File" );
     }
     catch ( ParserConfigurationException pce )
     {

@@ -29,34 +29,33 @@ import com.isp.memate.Shared.Operation;
  * und schickt verschiedenen Shared-Objekte an der Server.
  * Beispielsweise bei checkLogin schickt die Klasse ein Objekt, welches
  * den Befehl CHECK_LOGIN und ein Userobjekt, welches Nutzername und
- * gehastes Passwort enthält an der Server.
+ * gehashtes Passwort enthält an der Server.
  * 
  * @author nwe
  * @since 24.10.2019
  */
 public class ServerCommunication
 {
-  private static String                       version             = "x";
   private static final ServerCommunication    instance            = new ServerCommunication();
-  private String[]                            userArray           = null;
-  private User[]                              fullUserArray       = null;
-  private Drink[]                             drinkArray          = null;
+  public final ReentrantLock                  lock                = new ReentrantLock( true );
+  private final ArrayList<Byte>               byteImageList       = new ArrayList<>();
+  private final List<String>                  drinkNames          = new ArrayList<>();
   private final Map<String, Float>            priceMap            = new HashMap<>();
   private final Map<String, ImageIcon>        imageMap            = new HashMap<>();
   private final Map<String, Integer>          amountMap           = new HashMap<>();
   private final Map<String, Integer>          drinkIDMap          = new HashMap<>();
   private final Map<String, Boolean>          drinkIngredientsMap = new HashMap<>();
   private final Map<String, DrinkIngredients> IngredientsMap      = new HashMap<>();
-  private final ArrayList<Byte>               byteImageList       = new ArrayList<>();
-  public final ReentrantLock                  lock                = new ReentrantLock( true );
-
-  private final List<String> drinkNames  = new ArrayList<>();
-  private String[][]         history;
-  private Socket             socket;
-  private ObjectInputStream  inStream;
-  private ObjectOutputStream outStream;
-  String                     sessionID;
-  String                     currentUser = null;
+  private static String                       version             = "x";
+  private String[]                            userArray           = null;
+  private User[]                              fullUserArray       = null;
+  private Drink[]                             drinkArray          = null;
+  String                                      currentUser         = null;
+  private String[][]                          history;
+  private Socket                              socket;
+  private ObjectInputStream                   inStream;
+  private ObjectOutputStream                  outStream;
+  String                                      sessionID;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -303,7 +302,7 @@ public class ServerCommunication
 
 
   /**
-   * Sagt dem Server, dass er die Histore schicken soll.
+   * Sagt dem Server, dass er die Historie schicken soll.
    */
   public void tellServerToSendHistoryData()
   {
@@ -318,7 +317,7 @@ public class ServerCommunication
   }
 
   /**
-   * Sagt dem Server, dass er ein Array mit allen Nutzern schicken soll
+   * Sagt dem Server, dass er ein Array mit allen Nutzern schicken soll.
    */
   private void tellServertoSendUserArray()
   {
@@ -333,7 +332,7 @@ public class ServerCommunication
   }
 
   /**
-   * Sagt dem Server, dass er die aktuelle Versionsnummer schicken soll
+   * Sagt dem Server, dass er die aktuelle Versionsnummer schicken soll.
    */
   public void tellServertoSendVersionNumber()
   {
@@ -347,6 +346,9 @@ public class ServerCommunication
     }
   }
 
+  /**
+   * Sagt dem Server, dass die letzte Aktion rückgängig gemacht werden soll.
+   */
   public void undoLastAction()
   {
     try
@@ -713,7 +715,9 @@ public class ServerCommunication
   }
 
 
-  @SuppressWarnings( "javadoc" )
+  /**
+   * Sagt dem Server, dass er Den Kontostand des Spaarschweins schicken soll.
+   */
   public void tellServerToSendPiggybankBalance()
   {
     try
@@ -723,6 +727,7 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Das Guthaben des Spaarschweins konnte nicht geladen werden.", "Admin-Error" );
+      exception.printStackTrace();
     }
   }
 
@@ -735,12 +740,12 @@ public class ServerCommunication
     }
     catch ( IOException exception )
     {
-      // TODO(nwe|17.12.2019): Fehlerbehandlung muss noch implementiert werden!
+      exception.printStackTrace();
     }
   }
 
   /**
-   * 
+   * Teilt dem Server mit, dass der Nutzer sich ausgeloggt hat.
    */
   public void logout()
   {
@@ -751,20 +756,22 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Ausloggen fehlgeschlagen", "Ausloggen" );
+      exception.printStackTrace();
     }
   }
 
-  /**
-   * @return
-   */
+
+  @SuppressWarnings( "javadoc" )
   public String[] getAllUsers()
   {
     return userArray;
   }
 
   /**
-   * @param username
-   * @param password
+   * Teilt dem Server eine Passwortänderung mit.
+   * 
+   * @param username Nutzername
+   * @param password neues Passwort
    */
   public void changePassword( String username, String password )
   {
@@ -775,6 +782,7 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Passwort ändern fehlgeschlagen.", "Passwort" );
+      exception.printStackTrace();
     }
   }
 
@@ -783,12 +791,11 @@ public class ServerCommunication
    */
   public User[] getUserArray()
   {
-    System.out.println( fullUserArray.length );
     return fullUserArray;
   }
 
   /**
-   * @return
+   * @return ein Array mit allen Getränken.
    */
   public Drink[] getDrinkArray()
   {
@@ -796,7 +803,9 @@ public class ServerCommunication
   }
 
   /**
-   * @param clientVersion
+   * Überprüft Server- und Clientversion, wenn diese nicht übereinstimmen folgt ein Dialog.
+   * 
+   * @param clientVersion Version des Clients
    */
   public void checkVersion( String clientVersion )
   {

@@ -37,15 +37,15 @@ import com.isp.memate.actionbar.MeMateActionBarListener;
 
 
 /**
- * @author dtr
+ * Der {@link MeMateUIManager} enthält Listen von allen Komponenten den App und kann somit global
+ * den Darkmode togglen.
+ * 
+ * @author nwe
  * @since 04.02.2020
  *
  */
 public class MeMateUIManager
 {
-  private static final Map<String, DarkDayColor>               backgroundMap    = new HashMap<>();
-  private static final Map<String, DarkDayColor>               foregroundMap    = new HashMap<>();
-  private static final String                                  defaultKey       = "default";
   private static final Multimap<String, JLabel>                labelList        = ArrayListMultimap.create();
   private static final Multimap<String, JPanel>                panelList        = ArrayListMultimap.create();
   private static final Multimap<String, MeMateActionBarButton> buttonList       = ArrayListMultimap.create();
@@ -55,6 +55,9 @@ public class MeMateUIManager
   private static final Multimap<String, JScrollPane>           scrollPaneList   = ArrayListMultimap.create();
   private static final Multimap<String, JTextPane>             textPaneList     = ArrayListMultimap.create();
   private static final Multimap<String, JCheckBox>             checkBoxList     = ArrayListMultimap.create();
+  private static final Map<String, DarkDayColor>               backgroundMap    = new HashMap<>();
+  private static final Map<String, DarkDayColor>               foregroundMap    = new HashMap<>();
+  private static final String                                  defaultKey       = "default";
   private static final Set<String>                             keySet           = new HashSet<>();
 
   private static boolean darkModeState = false;

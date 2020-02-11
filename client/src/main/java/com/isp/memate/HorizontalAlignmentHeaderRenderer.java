@@ -11,6 +11,8 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 /**
+ * Die Klasse sorgt dafür, dass die Title der Spalten zentriert sind.
+ * 
  * @author nwe
  * @since 29.01.2020
  *
@@ -25,7 +27,6 @@ public class HorizontalAlignmentHeaderRenderer implements TableCellRenderer
     this.horizontalAlignment = horizontalAlignment;
   }
 
-  @SuppressWarnings( "javadoc" )
   @Override
   public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected,
                                                   boolean hasFocus, int row, int column )
@@ -36,6 +37,4 @@ public class HorizontalAlignmentHeaderRenderer implements TableCellRenderer
     l.setHorizontalAlignment( horizontalAlignment );
     return l;
   }
-
-
 }

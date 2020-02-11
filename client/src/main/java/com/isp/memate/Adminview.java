@@ -37,8 +37,8 @@ import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
- * In der Adminview kann man das Guthaben des Spaarschweins setzen/sehen.
- * Außerdem kann man die gesamte Historie sehen und die Anzahl der Getränke festlegen.
+ * In der Adminview kann man das Guthaben des Spaarschweins setzen/sehen,
+ * Passwörter der User ändern, Daten exportieren und die Anzahl der Getränke festlegen.
  * 
  * @author nwe
  * @since 09.12.2019
@@ -50,13 +50,13 @@ public class Adminview extends JPanel
   private final JButton          setAdminBalanceButton = MeMateUIManager.createNormalButton( "button" );
   private final JButton          exportButton          = MeMateUIManager.createNormalButton( "button" );
   private final JButton          resetPasswordButton   = MeMateUIManager.createNormalButton( "button" );
-  private final JTextField       balanceField          = new JTextField();
-  private final JLabel           piggyBankLabel        = MeMateUIManager.createJLabel();
   private final JDialog          passwordFrame         = new JDialog( Mainframe.getInstance() );
-  private JPanel                 drinkAmountPanel      = new JPanel( new FlowLayout() );
+  private final JLabel           piggyBankLabel        = MeMateUIManager.createJLabel();
   private final JPanel           upperPanel            = MeMateUIManager.createJPanel();
   private final JPanel           upperUpperPanel       = MeMateUIManager.createJPanel();
   private final JPanel           centerPanel           = MeMateUIManager.createJPanel();
+  private JPanel                 drinkAmountPanel      = new JPanel( new FlowLayout() );
+  private final JTextField       balanceField          = new JTextField();
 
 
   /**
@@ -68,7 +68,7 @@ public class Adminview extends JPanel
   }
 
   /**
-   * 
+   * Der Konstruktor lädt die Einstellungen für das Adminpanel.
    */
   public Adminview()
   {
@@ -76,96 +76,87 @@ public class Adminview extends JPanel
   }
 
   /**
-   * 
+   * Als erstes wird alles bisherige entfernt und nun für die 3 Buttons oben im Adminpanel generiert.
+   * Die Buttons werden gelayoutet und anschließend die Buttons mit der Getränkeanzahl hinzugefügt.
+   * Dann werden noch ActionListener auf die Buttons angemeldet und die Komponenten hinzugefügt.
    */
   private void loadDefaultSettings()
   {
-    upperPanel.removeAll();
-    centerPanel.removeAll();
-    upperUpperPanel.removeAll();
-    setAdminBalanceButton.setText( "Guthaben setzen" );
-    resetPasswordButton.setToolTipText( "Passwörter zurücksetzen." );
-    exportButton.setToolTipText( "Daten exportieren" );
-    setLayout( new BorderLayout() );
-    upperPanel.setLayout( new WrapLayout() );
-    centerPanel.setLayout( new WrapLayout() );
-    upperUpperPanel.setLayout( new BorderLayout() );
-    balanceField.setPreferredSize( new Dimension( 100, 20 ) );
-    piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 25f ) );
-    piggyBankLabel.setHorizontalAlignment( JLabel.CENTER );
     JPanel piggyBankPanel = MeMateUIManager.createJPanel( "adminButton" );
-    piggyBankPanel.setPreferredSize( new Dimension( 430, 90 ) );
-    piggyBankPanel.setLayout( new GridBagLayout() );
-
-    GridBagConstraints piggybankLabelConstraints = new GridBagConstraints();
-    piggybankLabelConstraints.gridx = 0;
-    piggybankLabelConstraints.gridy = 0;
-    piggybankLabelConstraints.gridwidth = 2;
-    piggybankLabelConstraints.insets = new Insets( 5, 5, 15, 5 );
-    piggyBankPanel.add( piggyBankLabel, piggybankLabelConstraints );
-    GridBagConstraints balanceFieldConstraints = new GridBagConstraints();
-    balanceFieldConstraints.gridx = 0;
-    balanceFieldConstraints.gridy = 1;
-    balanceFieldConstraints.insets = new Insets( 0, 5, 5, 0 );
-    balanceFieldConstraints.anchor = GridBagConstraints.LINE_END;
-    piggyBankPanel.add( balanceField, balanceFieldConstraints );
-    GridBagConstraints setAdminBalanceButtonConstraints = new GridBagConstraints();
-    setAdminBalanceButtonConstraints.gridx = 1;
-    setAdminBalanceButtonConstraints.gridy = 1;
-    setAdminBalanceButtonConstraints.insets = new Insets( 0, 0, 5, 5 );
-    setAdminBalanceButtonConstraints.anchor = GridBagConstraints.LINE_END;
-    piggyBankPanel.add( setAdminBalanceButton, setAdminBalanceButtonConstraints );
-
-
     JPanel pwChangePanel = MeMateUIManager.createJPanel( "adminButton" );
-    pwChangePanel.setPreferredSize( new Dimension( 100, 90 ) );
-    pwChangePanel.setLayout( new GridBagLayout() );
-    GridBagConstraints pwChangePanelConstraints = new GridBagConstraints();
-    pwChangePanelConstraints.gridx = 0;
-    pwChangePanelConstraints.gridy = 0;
-    pwChangePanelConstraints.weightx = 1;
-    pwChangePanelConstraints.weighty = 1;
-    pwChangePanelConstraints.fill = GridBagConstraints.BOTH;
-    pwChangePanelConstraints.insets = new Insets( 5, 5, 5, 5 );
-    pwChangePanel.add( resetPasswordButton, pwChangePanelConstraints );
-    pwChangePanel.setPreferredSize( new Dimension( 150, 90 ) );
     JPanel exportPanel = MeMateUIManager.createJPanel( "adminButton" );
-    exportPanel.setLayout( new GridBagLayout() );
-    GridBagConstraints exportPanelConstraints = new GridBagConstraints();
-    exportPanelConstraints.gridx = 0;
-    exportPanelConstraints.gridy = 0;
-    exportPanelConstraints.weightx = 1;
-    exportPanelConstraints.weighty = 1;
-    exportPanelConstraints.fill = GridBagConstraints.BOTH;
-    exportPanelConstraints.insets = new Insets( 5, 5, 5, 5 );
-    exportPanel.setPreferredSize( new Dimension( 150, 90 ) );
-    exportPanel.add( exportButton, exportPanelConstraints );
-    upperPanel.add( pwChangePanel );
-    upperPanel.add( piggyBankPanel );
-    upperPanel.add( exportPanel );
-    upperUpperPanel.add( upperPanel, BorderLayout.CENTER );
-    JSeparator separator = new JSeparator( SwingConstants.HORIZONTAL );
-    upperUpperPanel.add( separator, BorderLayout.SOUTH );
-    upperPanel.setBorder( new EmptyBorder( 0, 0, 20, 0 ) );
-    upperUpperPanel.setBorder( new EmptyBorder( 40, 0, 20, 0 ) );
 
+    removeAllAndLayout();
+    setToolTipAndText();
+
+    loadPiggyBankPanelSettings( piggyBankPanel );
+    loadPWChangePanelSettings( pwChangePanel );
+    loadExportPanelSettings( exportPanel );
+
+    layoutHeaderComponents( pwChangePanel, piggyBankPanel, exportPanel );
     addAllDrinks();
 
-    ActionListener[] exportButtonListener = exportButton.getActionListeners();
-    for ( ActionListener actionListener : exportButtonListener )
+    loadExportButtonAction();
+    loadResetPasswordButtonAction();
+    loadAdminBalanceButtonAction();
+
+    ServerCommunication.getInstance().tellServerToSendPiggybankBalance();
+    MeMateUIManager.registerPanel( "default", this );
+    add( upperUpperPanel, BorderLayout.NORTH );
+    add( centerPanel, BorderLayout.CENTER );
+  }
+
+  /**
+   * Setzt die Action für das Guthabensetzen des Sparschweins.
+   */
+  private void loadAdminBalanceButtonAction()
+  {
+    ActionListener[] setAdminBalanceButtonListeners = setAdminBalanceButton.getActionListeners();
+    for ( ActionListener actionListener : setAdminBalanceButtonListeners )
     {
-      exportButton.removeActionListener( actionListener );
+      setAdminBalanceButton.removeActionListener( actionListener );
     }
-    exportButton.addActionListener( new ActionListener()
+    setAdminBalanceButton.addActionListener( new ActionListener()
     {
       @Override
       public void actionPerformed( ActionEvent e )
       {
-        new DataExport();
+        String balanceAsString = balanceField.getText();
+        Float balance = null;
+        if ( isNumber( balanceAsString ) )
+        {
+          balance = Float.valueOf( balanceAsString );
+          ServerCommunication.getInstance().setAdminBalance( Float.valueOf( balance ) );
+          piggyBankLabel.setText( String.format( "Im Sparschwein befinden sich %.2f€", balance ) );
+        }
+        else
+        {
+          JOptionPane.showMessageDialog( Mainframe.getInstance(), "Bitte geben Sie einen gültigen Wert an." );
+        }
+      }
+
+      private boolean isNumber( String balanceAsString )
+      {
+        try
+        {
+          Float.parseFloat( balanceAsString );
+        }
+        catch ( Exception exception )
+        {
+          return false;
+        }
+        return true;
       }
     } );
+  }
 
-
+  /**
+   * Sobald der Admin auf den Passwort reset Button drückt, öffnet sich ein neues
+   * Fenster, in welchem man aus allen bisherigen Usern einen auswählen kann und
+   * das Passwort festlegen kann.
+   */
+  private void loadResetPasswordButtonAction()
+  {
     ActionListener[] resetPasswordButtonListeners = resetPasswordButton.getActionListeners();
     for ( ActionListener actionListener : resetPasswordButtonListeners )
     {
@@ -245,52 +236,122 @@ public class Adminview extends JPanel
         passwordFrame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
       }
     } );
+  }
 
-    ActionListener[] setAdminBalanceButtonListeners = setAdminBalanceButton.getActionListeners();
-    for ( ActionListener actionListener : setAdminBalanceButtonListeners )
+  /**
+   * Setzt die Action für das Exportieren von Daten.
+   */
+  private void loadExportButtonAction()
+  {
+    ActionListener[] exportButtonListener = exportButton.getActionListeners();
+    for ( ActionListener actionListener : exportButtonListener )
     {
-      setAdminBalanceButton.removeActionListener( actionListener );
+      exportButton.removeActionListener( actionListener );
     }
-    setAdminBalanceButton.addActionListener( new ActionListener()
+    exportButton.addActionListener( new ActionListener()
     {
       @Override
       public void actionPerformed( ActionEvent e )
       {
-        String balanceAsString = balanceField.getText();
-        Float balance = null;
-        if ( isNumber( balanceAsString ) )
-        {
-          balance = Float.valueOf( balanceAsString );
-          ServerCommunication.getInstance().setAdminBalance( Float.valueOf( balance ) );
-          piggyBankLabel.setText( String.format( "Im Sparschwein befinden sich %.2f€", balance ) );
-        }
-        else
-        {
-          JOptionPane.showMessageDialog( Mainframe.getInstance(), "Bitte geben Sie einen gültigen Wert an." );
-        }
-      }
-
-      private boolean isNumber( String balanceAsString )
-      {
-        try
-        {
-          Float.parseFloat( balanceAsString );
-        }
-        catch ( Exception exception )
-        {
-          return false;
-        }
-        return true;
+        new DataExport();
       }
     } );
-    ServerCommunication.getInstance().tellServerToSendPiggybankBalance();
-    MeMateUIManager.registerPanel( "default", this );
-    add( upperUpperPanel, BorderLayout.NORTH );
-    add( centerPanel, BorderLayout.CENTER );
+  }
+
+  private void layoutHeaderComponents( JPanel pwChangePanel, JPanel piggyBankPanel, JPanel exportPanel )
+  {
+    upperPanel.add( pwChangePanel );
+    upperPanel.add( piggyBankPanel );
+    upperPanel.add( exportPanel );
+    upperUpperPanel.add( upperPanel, BorderLayout.CENTER );
+    JSeparator separator = new JSeparator( SwingConstants.HORIZONTAL );
+    upperUpperPanel.add( separator, BorderLayout.SOUTH );
+    upperPanel.setBorder( new EmptyBorder( 0, 0, 20, 0 ) );
+    upperUpperPanel.setBorder( new EmptyBorder( 40, 20, 20, 20 ) );
+  }
+
+
+  private void loadExportPanelSettings( JPanel exportPanel )
+  {
+    exportPanel.setLayout( new GridBagLayout() );
+    GridBagConstraints exportPanelConstraints = new GridBagConstraints();
+    exportPanelConstraints.gridx = 0;
+    exportPanelConstraints.gridy = 0;
+    exportPanelConstraints.weightx = 1;
+    exportPanelConstraints.weighty = 1;
+    exportPanelConstraints.fill = GridBagConstraints.BOTH;
+    exportPanelConstraints.insets = new Insets( 5, 5, 5, 5 );
+    exportPanel.setPreferredSize( new Dimension( 150, 90 ) );
+    exportPanel.add( exportButton, exportPanelConstraints );
+  }
+
+
+  private void loadPWChangePanelSettings( JPanel pwChangePanel )
+  {
+    pwChangePanel.setPreferredSize( new Dimension( 100, 90 ) );
+    pwChangePanel.setLayout( new GridBagLayout() );
+    GridBagConstraints pwChangePanelConstraints = new GridBagConstraints();
+    pwChangePanelConstraints.gridx = 0;
+    pwChangePanelConstraints.gridy = 0;
+    pwChangePanelConstraints.weightx = 1;
+    pwChangePanelConstraints.weighty = 1;
+    pwChangePanelConstraints.fill = GridBagConstraints.BOTH;
+    pwChangePanelConstraints.insets = new Insets( 5, 5, 5, 5 );
+    pwChangePanel.add( resetPasswordButton, pwChangePanelConstraints );
+    pwChangePanel.setPreferredSize( new Dimension( 150, 90 ) );
+  }
+
+  private void loadPiggyBankPanelSettings( JPanel piggyBankPanel )
+  {
+    piggyBankPanel.setPreferredSize( new Dimension( 430, 90 ) );
+    piggyBankPanel.setLayout( new GridBagLayout() );
+    piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 25f ) );
+    piggyBankLabel.setHorizontalAlignment( JLabel.CENTER );
+
+    GridBagConstraints piggybankLabelConstraints = new GridBagConstraints();
+    piggybankLabelConstraints.gridx = 0;
+    piggybankLabelConstraints.gridy = 0;
+    piggybankLabelConstraints.gridwidth = 2;
+    piggybankLabelConstraints.insets = new Insets( 5, 5, 15, 5 );
+    piggyBankPanel.add( piggyBankLabel, piggybankLabelConstraints );
+    GridBagConstraints balanceFieldConstraints = new GridBagConstraints();
+    balanceFieldConstraints.gridx = 0;
+    balanceFieldConstraints.gridy = 1;
+    balanceFieldConstraints.insets = new Insets( 0, 5, 5, 0 );
+    balanceFieldConstraints.anchor = GridBagConstraints.LINE_END;
+    piggyBankPanel.add( balanceField, balanceFieldConstraints );
+    GridBagConstraints setAdminBalanceButtonConstraints = new GridBagConstraints();
+    setAdminBalanceButtonConstraints.gridx = 1;
+    setAdminBalanceButtonConstraints.gridy = 1;
+    setAdminBalanceButtonConstraints.insets = new Insets( 0, 0, 5, 5 );
+    setAdminBalanceButtonConstraints.anchor = GridBagConstraints.LINE_END;
+    piggyBankPanel.add( setAdminBalanceButton, setAdminBalanceButtonConstraints );
+  }
+
+
+  private void setToolTipAndText()
+  {
+    setAdminBalanceButton.setText( "Guthaben setzen" );
+    resetPasswordButton.setToolTipText( "Passwörter zurücksetzen." );
+    exportButton.setToolTipText( "Daten exportieren" );
+  }
+
+
+  private void removeAllAndLayout()
+  {
+    upperPanel.removeAll();
+    centerPanel.removeAll();
+    upperUpperPanel.removeAll();
+    setLayout( new BorderLayout() );
+    upperPanel.setLayout( new WrapLayout() );
+    centerPanel.setLayout( new WrapLayout() );
+    upperUpperPanel.setLayout( new BorderLayout() );
+    balanceField.setPreferredSize( new Dimension( 100, 20 ) );
   }
 
   /**
-   * Fügt für jedes Getränk einen Spinner und ein Speicher-Button an
+   * Erzeugt für jeden vorhandenes Getränk ein eigens Panel mit Name, wann es in etwa leer sein wird
+   * und einem Spinner und Button zum Festlegen der Anzahl.
    */
   private void addAllDrinks()
   {
@@ -364,7 +425,8 @@ public class Adminview extends JPanel
   }
 
   /**
-   * @return
+   * Berechnet zuerst den Durchschnittswert der letzten Monats aus.
+   * Nun wird die Anzahl an noch vorhandenen Getränken durch den Wert geteilt.
    */
   private Float getDaysLeft( String drink )
   {
@@ -393,7 +455,8 @@ public class Adminview extends JPanel
             }
             catch ( ParseException exception )
             {
-              // TODO(nwe|20.01.2020): Fehlerbehandlung muss noch implementiert werden!
+              System.out.println( "Das Datum für die Berechnung der noch übrigen Tage konnte nicht geparst werden" );
+              exception.printStackTrace();
             }
           }
         }
@@ -403,7 +466,10 @@ public class Adminview extends JPanel
     return ServerCommunication.getInstance().getAmount( drink ) / averageConsumption;
   }
 
-  @SuppressWarnings( "javadoc" )
+
+  /**
+   * Generiert das AdminPanel neu
+   */
   public void updateDrinkAmounts()
   {
     removeAll();
@@ -422,6 +488,9 @@ public class Adminview extends JPanel
     piggyBankLabel.setText( String.format( "Im Sparschwein befinden sich %.2f€", balance ) );
   }
 
+  /**
+   * updated die Icons, je nach State des Darkmodes.
+   */
   public void updateButtonIcons()
   {
     if ( MeMateUIManager.getDarkModeState() )

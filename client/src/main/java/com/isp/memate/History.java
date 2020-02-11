@@ -20,9 +20,10 @@ import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
- * In der Historie soll der Nutzer alle bisherigen Buchungen (auch von Kollegen) sehen, egal ob etwas
+ * In der Historie soll der Nutzer alle bisherigen Buchungen sehen, egal ob er etwas
  * gekauft oder das Konto aufgeladen wurde. Die Buchungen sollen in Aktion, Konsument,
  * Transaktionsmenge, neuer Kontostand und Datum angezeigt werden.
+ * Der normale User sieht nur seine eigenen Aktionen, der Admin jedoch alle.
  * 
  * @author nwe
  * @since 15.10.2019
@@ -30,10 +31,10 @@ import com.isp.memate.util.MeMateUIManager;
 public class History extends JPanel
 {
   private final String[]       columnNames = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
+  private final JScrollPane    scrollPane  = new JScrollPane();
   private static final History instance    = new History();
   private JTable               historyTable;
   private DefaultTableModel    tableModel;
-  private final JScrollPane    scrollPane  = new JScrollPane();
 
   /**
    * @return static instance of {@linkplain History}
@@ -44,8 +45,7 @@ public class History extends JPanel
   }
 
   /**
-   * Erzeugt einen Table mit Daten von dem Server
-   * und fügt diesen dem HistoryPanel hinzu.
+   * Erzeugt einen Table mit Daten von dem Server und fügt diesen dem HistoryPanel hinzu.
    */
   public History()
   {
@@ -76,8 +76,10 @@ public class History extends JPanel
     MeMateUIManager.registerScrollPane( "scroll", scrollPane );
   }
 
-
-  @SuppressWarnings( "javadoc" )
+  /**
+   * Sollte man selber oder ein anderer Nutzer etwas machen, so kann mit dieser
+   * Methode die History von Außen geupdated werden.
+   */
   public void updateHistory()
   {
     tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( dateType.MIDDLE ), columnNames )
