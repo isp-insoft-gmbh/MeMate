@@ -52,6 +52,8 @@ public class ServerCommunication
   private Drink[]                             drinkArray          = null;
   String                                      currentUser         = null;
   private String[][]                          history;
+  private String[][]                          shortHistory;
+  private String[][]                          scoreboard;
   private Socket                              socket;
   private ObjectInputStream                   inStream;
   private ObjectOutputStream                  outStream;
@@ -117,6 +119,12 @@ public class ServerCommunication
             case GET_HISTORY:
               updateHistory( shared.history );
               break;
+            case GET_HISTORY_LAST_5:
+              updateShortHistory( shared.shortHistory );
+              break;
+            case GET_SCOREBOARD:
+              updateScoreboard( shared.scoreboard );
+              break;
             case GET_USERNAME_FOR_SESSION_ID_RESULT:
               String username = shared.username;
               updateCurrentUser( username );
@@ -168,11 +176,21 @@ public class ServerCommunication
         tellServerToSendDrinkInformations();
       }
     };
+    TimerTask task3 = new TimerTask()
+    {
+      @Override
+      public void run()
+      {
+        tellServerToSendHistoryData();
+      }
+    };
     tellServertoSendUserArray();
     Timer timer = new Timer();
     timer.schedule( task, 0, 100 );
     Timer timer2 = new Timer();
     timer2.schedule( task2, 10000, 30000 );
+    Timer timer3 = new Timer();
+    timer3.schedule( task3, 20000, 300000 );
   }
 
 
@@ -188,8 +206,26 @@ public class ServerCommunication
     ConsumptionRate.getInstance().addGraph();
     CreditHistory.getInstance().addChart();
     Adminview.getInstance().updateDrinkAmounts();
+    Social.update();
   }
 
+  /**
+   * @param history
+   */
+  protected void updateShortHistory( String[][] history )
+  {
+    this.shortHistory = history;
+    Social.update();
+  }
+
+  /**
+   * @param history
+   */
+  protected void updateScoreboard( String[][] history )
+  {
+    this.scoreboard = history;
+    Social.update();
+  }
 
   /**
    * @param name Name des Getränks
@@ -497,6 +533,35 @@ public class ServerCommunication
       }
     }
     return historyArray;
+  }
+
+  /**
+   * @return die letzten fünf Einträge der History.
+   */
+  public String[][] getShortHistory()
+  {
+    if ( shortHistory == null )
+    {
+      return shortHistory;
+    }
+    else
+    {
+      String[][] historyArray = new String[shortHistory.length][];
+      for ( int i = 0; i < shortHistory.length; i++ )
+      {
+        historyArray[ i ] = Arrays.copyOf( shortHistory[ i ], shortHistory[ i ].length );
+      }
+      for ( int i = 0; i < historyArray.length; i++ )
+      {
+        historyArray[ i ][ 2 ] = historyArray[ i ][ 2 ].substring( 0, 16 ).replace( "T", " " );
+      }
+      return historyArray;
+    }
+  }
+
+  public String[][] getScoreboard()
+  {
+    return scoreboard;
   }
 
   public enum dateType

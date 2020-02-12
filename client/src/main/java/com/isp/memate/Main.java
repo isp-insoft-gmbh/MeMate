@@ -23,7 +23,7 @@ import com.isp.memate.util.MeMateUIManager.DarkDayColor;
  */
 public class Main
 {
-  final static String version = "0.9.6";
+  final static String version = "0.9.7";
 
   /**
    * @param args unused
@@ -120,16 +120,16 @@ public class Main
   {
     MeMateUIManager.installDefaults();
     MeMateUIManager.installNewKey( "button",
-        new DarkDayColor( new Color( 36, 43, 55 ).brighter(), new Color( 225, 225, 225 ) ),
+        new DarkDayColor( new Color( 36, 43, 55 ).brighter(), new Color( 215, 215, 215 ) ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "drinkButtons", new DarkDayColor( new Color( 36, 43, 55 ).brighter(), new Color( 240, 240, 240 ) ),
+    MeMateUIManager.installNewKey( "drinkButtons", new DarkDayColor( new Color( 36, 43, 55 ).brighter(), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.white, Color.black ) );
     MeMateUIManager.installNewKey( "table", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
     MeMateUIManager.installNewKey( "scroll", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
     MeMateUIManager.installNewKey( "adminButton",
-        new DarkDayColor( new Color( 29, 164, 165 ).darker(), new Color( 240, 240, 240 ) ),
+        new DarkDayColor( new Color( 52, 73, 94 ), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
   }
 }

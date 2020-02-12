@@ -26,7 +26,7 @@ import com.isp.memate.Shared.Operation;
  */
 public class SocketThread extends Thread
 {
-  private final String         version = "0.9.6";
+  private final String         version = "0.9.7";
   private ObjectOutputStream   objectOutputStream;
   private ObjectInputStream    objectInputStream;
   private String               currentSessionID;
@@ -290,6 +290,22 @@ public class SocketThread extends Thread
     catch ( IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die Historie konnte nicht geladen werden. " + exception );
+    }
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_HISTORY_LAST_5, database.getLast5HistoryEntries() ) );
+    }
+    catch ( IOException exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Die Historie konnte nicht geladen werden. " + exception );
+    }
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_SCOREBOARD, database.getScoreboard() ) );
+    }
+    catch ( IOException exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Das Scoreboard konnte nicht geladen werden. " + exception );
     }
   }
 

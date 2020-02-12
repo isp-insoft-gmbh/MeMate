@@ -23,6 +23,8 @@ public class Shared implements Serializable
   DrinkIngredients drinkIngredients = null;
   Drink[]          drinkInfos       = null;
   String[][]       history;
+  String[][]       shortHistory;
+  String[][]       scoreboard;
   String[]         users;
   User[]           fullUserArray;
   Float            userBalance;
@@ -61,6 +63,12 @@ public class Shared implements Serializable
         break;
       case GET_HISTORY:
         history = (String[][]) object;
+        break;
+      case GET_HISTORY_LAST_5:
+        shortHistory = (String[][]) object;
+        break;
+      case GET_SCOREBOARD:
+        scoreboard = (String[][]) object;
         break;
       case REGISTER_DRINK:
         drink = (Drink) object;
@@ -146,6 +154,8 @@ public class Shared implements Serializable
     GET_BALANCE,
     GET_BALANCE_RESULT,
     GET_HISTORY,
+    GET_HISTORY_LAST_5,
+    GET_SCOREBOARD,
     GET_DRINKINFO,
     GET_USERS,
     GET_USERS_RESULT,

@@ -80,7 +80,6 @@ public class Dashboard extends JPanel
     add( upperPanel, BorderLayout.NORTH );
     add( scrollpane, BorderLayout.CENTER );
     add( createLowerPanel(), BorderLayout.SOUTH );
-    setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     MeMateUIManager.registerPanel( "default", this );
     MeMateUIManager.registerScrollPane( "scroll", scrollpane );
   }
@@ -203,8 +202,6 @@ public class Dashboard extends JPanel
       buttonList.add( button );
       panel.add( button );
     }
-
-    panel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
     return panel;
   }
 

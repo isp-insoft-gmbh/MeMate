@@ -54,6 +54,8 @@ public class Mainframe extends JFrame
   private final Icon             historyIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "history_white.png" ) );
   private final Icon             dayModeIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_black.png" ) );
   private final Icon             dayModeIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_white.png" ) );
+  private final Icon             socialBlackIcon        = new ImageIcon( getClass().getClassLoader().getResource( "social_black.png" ) );
+  private final Icon             socialWhiteIcon        = new ImageIcon( getClass().getClassLoader().getResource( "social_white.png" ) );
   private final Icon             undoBlackIcon          = new ImageIcon( getClass().getClassLoader().getResource( "back_black.png" ) );
   private final Icon             undoWhiteIcon          = new ImageIcon( getClass().getClassLoader().getResource( "back_white.png" ) );
   private final Icon             drinkManagerIconBlack  =
@@ -103,7 +105,7 @@ public class Mainframe extends JFrame
         Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-    setMinimumSize( new Dimension( 380, 510 ) );
+    setMinimumSize( new Dimension( 380, 550 ) );
     setSize( 1170, 770 );
     setLocationRelativeTo( null );
   }
@@ -163,6 +165,20 @@ public class Mainframe extends JFrame
             contentPanel.revalidate();
           }
         } );
+    bar.addActionButton( socialBlackIcon, socialWhiteIcon, "Scoreboard", "Scoreboard", color, new Runnable()
+    {
+
+      @Override
+      public void run()
+      {
+        contentPanel.removeAll();
+        contentPanel.add( new Social() );
+        contentPanel.repaint();
+        contentPanel.revalidate();
+
+      }
+    } );
+
     drinkManagerButton = bar.addActionButton( drinkManagerIconBlack, drinkManagerIconWhite, "Getränkemanager",
         "Getränkemanager öffnen", color, new Runnable()
         {
@@ -189,6 +205,7 @@ public class Mainframe extends JFrame
           }
         } );
     adminViewButton.setEnabled( false );
+
 
     bar.addVariableGlue();
     undoButton = bar.addActionButton( undoBlackIcon, undoWhiteIcon, "Rückgänig", "Letzte Aktion rückgängig machen", new Runnable()

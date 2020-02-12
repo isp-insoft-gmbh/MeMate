@@ -89,6 +89,7 @@ public class Database
     addPiggyBankTable();
     addIngredientsTable();
     cleanSessionIDTable();
+    getLast5HistoryEntries();
   }
 
 
@@ -711,12 +712,67 @@ public class Database
       {
         String balance = String.format( "%.2f€", rs.getFloat( "balance" ) );
         String consumer = rs.getString( "consumer" );
-        if ( consumer.equals( currentUser ) || currentUser.equals( "admin" ) )
+        if ( currentUser != null )
         {
-          String[] log = { rs.getString( "action" ), consumer,
-              NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString()
-                  .replace( " ", "" ),
-              balance, rs.getString( "date" ) };
+          if ( consumer.equals( currentUser ) || currentUser.equals( "admin" ) )
+          {
+            String[] log = { rs.getString( "action" ), consumer,
+                NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString()
+                    .replace( " ", "" ),
+                balance, rs.getString( "date" ) };
+            history.add( log );
+          }
+        }
+      }
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    String[][] historyAsArray = history.toArray( new String[history.size()][] );
+    return historyAsArray;
+  }
+
+  /**
+   * @return die letzten fünf Einträge der Historie werden ausgegeben.
+   */
+  public String[][] getLast5HistoryEntries()
+  {
+    ArrayList<String[]> history = new ArrayList<>();
+    String sql = "SELECT action,consumer,date FROM historie_log ORDER BY date DESC LIMIT 5";
+    try ( Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery( sql ) )
+    {
+      while ( rs.next() )
+      {
+        String[] log = { rs.getString( "action" ), rs.getString( "consumer" ), rs.getString( "date" ) };
+        history.add( log );
+      }
+
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    String[][] historyAsArray = history.toArray( new String[history.size()][] );
+    return historyAsArray;
+  }
+
+  /**
+   * @return die Daten für das Scoreboard
+   */
+  public String[][] getScoreboard()
+  {
+    ArrayList<String[]> history = new ArrayList<>();
+    String sql = "SELECT action,consumer FROM historie_log";
+    try ( Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery( sql ) )
+    {
+      while ( rs.next() )
+      {
+        if ( rs.getString( "action" ).contains( "getrunken" ) )
+        {
+          String[] log = { rs.getString( "action" ), rs.getString( "consumer" ) };
           history.add( log );
         }
       }
@@ -727,8 +783,6 @@ public class Database
     }
     String[][] historyAsArray = history.toArray( new String[history.size()][] );
     return historyAsArray;
-
-
   }
 
   /**

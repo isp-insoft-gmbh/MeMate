@@ -586,6 +586,16 @@ public class DrinkConsumptionButton extends JPanel
     remove( overlay );
     remove( askWhetherToReallyConsumeLabel );
     iconLabel.setVisible( true );
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
+      nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
+    }
+    else
+    {
+      setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
+      nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
+    }
     repaint();
     revalidate();
     requestFocus();
