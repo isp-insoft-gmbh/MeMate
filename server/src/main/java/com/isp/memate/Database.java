@@ -89,7 +89,6 @@ public class Database
     addPiggyBankTable();
     addIngredientsTable();
     cleanSessionIDTable();
-    getLast5HistoryEntries();
   }
 
 
@@ -127,7 +126,8 @@ public class Database
         + "consumer REFERENCES user(username),"
         + "transaction_price double NOT NULL,"
         + "balance double NOT NULL,"
-        + "date string NOT NULL"
+        + "date string NOT NULL,"
+        + "undo BOOLEAN DEFAULT (false)"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -764,7 +764,7 @@ public class Database
   public String[][] getScoreboard()
   {
     ArrayList<String[]> history = new ArrayList<>();
-    String sql = "SELECT action,consumer FROM historie_log";
+    String sql = "SELECT action,consumer,undo,date FROM historie_log";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
@@ -772,8 +772,11 @@ public class Database
       {
         if ( rs.getString( "action" ).contains( "getrunken" ) )
         {
-          String[] log = { rs.getString( "action" ), rs.getString( "consumer" ) };
-          history.add( log );
+          if ( !rs.getBoolean( "undo" ) )
+          {
+            String[] log = { rs.getString( "action" ), rs.getString( "consumer" ), rs.getString( "date" ) };
+            history.add( log );
+          }
         }
       }
     }
@@ -805,6 +808,31 @@ public class Database
       pstmt.setFloat( 3, transaction );
       pstmt.setFloat( 4, newBalance );
       pstmt.setString( 5, date );
+      pstmt.executeUpdate();
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Entfernt einen Log wenn die Aktion rückgängig gemacht wurde
+   * 
+   * @param date Datum des Ereignisses
+   */
+  public void disableLog( String date )
+  {
+    lock.lock();
+    String sql = "UPDATE historie_log SET undo=? WHERE date=?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
+    {
+      pstmt.setBoolean( 1, true );
+      pstmt.setString( 2, date );
       pstmt.executeUpdate();
     }
     catch ( SQLException e )

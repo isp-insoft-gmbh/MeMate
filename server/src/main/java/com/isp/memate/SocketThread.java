@@ -38,6 +38,7 @@ public class SocketThread extends Thread
   boolean        lastActionDrink   = false;
   boolean        lastActionDeposit = false;
   private String lastDrinkName;
+  private String lastDate;
   private float  lastTransaction;
 
   /**
@@ -218,6 +219,7 @@ public class SocketThread extends Thread
       database.updateBalance( currentSessionID, newBalance );
       database.addLog( "Letzte Aktion rückgängig", currentUser, Float.valueOf( lastTransaction ) * -1f, newBalance,
           LocalDateTime.now().toString() );
+      database.disableLog( lastDate );
       ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
       sendHistoryData();
       getBalance( currentUser );
@@ -237,6 +239,7 @@ public class SocketThread extends Thread
       database.updateBalance( currentSessionID, newBalance );
       database.addLog( "Letzte Aktion rückgängig", currentUser, lastTransaction, newBalance,
           LocalDateTime.now().toString() );
+      database.disableLog( lastDate );
       database.increaseAmountOfDrinks( lastDrinkName );
       sendHistoryData();
       getBalance( currentUser );
@@ -245,6 +248,7 @@ public class SocketThread extends Thread
       lastActionDrink = false;
       lastActionDeposit = false;
       lastTransaction = 0;
+      lastDate = "null";
     }
   }
 
@@ -375,8 +379,8 @@ public class SocketThread extends Thread
     }
     Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - drinkPrice;
     database.updateBalance( currentSessionID, newBalance );
-    database.addLog( consumedDrink.name + " getrunken", currentUser, drinkPrice * -1, newBalance,
-        LocalDateTime.now().toString() );
+    String date = LocalDateTime.now().toString();
+    database.addLog( consumedDrink.name + " getrunken", currentUser, drinkPrice * -1, newBalance, date );
     database.decreaseAmountOfDrinks( consumedDrink.name );
     sendHistoryData();
 
@@ -385,6 +389,7 @@ public class SocketThread extends Thread
     lastActionDeposit = false;
     lastTransaction = drinkPrice;
     lastDrinkName = consumedDrink.name;
+    lastDate = date;
   }
 
   /**
@@ -396,8 +401,8 @@ public class SocketThread extends Thread
   {
     Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + balanceToAdd;
     database.updateBalance( currentSessionID, newBalance );
-    database.addLog( "Guthaben aufgeladen", currentUser, Float.valueOf( balanceToAdd ), newBalance,
-        LocalDateTime.now().toString() );
+    String date = LocalDateTime.now().toString();
+    database.addLog( "Guthaben aufgeladen", currentUser, Float.valueOf( balanceToAdd ), newBalance, date );
     ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
     sendHistoryData();
 
@@ -409,6 +414,7 @@ public class SocketThread extends Thread
     lastActionDeposit = true;
     lastActionDrink = false;
     lastTransaction = balanceToAdd;
+    lastDate = date;
   }
 
   /**

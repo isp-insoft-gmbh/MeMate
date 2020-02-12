@@ -190,7 +190,7 @@ public class ServerCommunication
     Timer timer2 = new Timer();
     timer2.schedule( task2, 10000, 30000 );
     Timer timer3 = new Timer();
-    timer3.schedule( task3, 20000, 300000 );
+    timer3.schedule( task3, 5000, 300000 );
   }
 
 

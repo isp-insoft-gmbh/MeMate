@@ -33,9 +33,10 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class Social extends JPanel
 {
-  private static JPanel mainPanel       = MeMateUIManager.createJPanel();
-  private static JPanel scoreBoardPanel = MeMateUIManager.createJPanel();
-  private static JPanel activityPanel   = MeMateUIManager.createJPanel();
+  private static JPanel mainPanel             = MeMateUIManager.createJPanel();
+  private static JPanel scoreBoardPanel       = MeMateUIManager.createJPanel();
+  private static JPanel weeklyScoreBoardPanel = MeMateUIManager.createJPanel();
+  private static JPanel activityPanel         = MeMateUIManager.createJPanel();
 
   /**
    * 
@@ -43,7 +44,8 @@ public class Social extends JPanel
   public Social()
   {
     setLayout( new BorderLayout() );
-    add( mainPanel );
+    mainPanel.setLayout( new GridBagLayout() );
+    add( mainPanel, BorderLayout.CENTER );
   }
 
   /**
@@ -54,10 +56,22 @@ public class Social extends JPanel
     mainPanel.removeAll();
     scoreBoardPanel.removeAll();
     activityPanel.removeAll();
+    weeklyScoreBoardPanel.removeAll();
     loadScoreBoardSettings();
     loadActivityPanelSettings();
-    mainPanel.add( scoreBoardPanel, BorderLayout.CENTER );
-    mainPanel.add( activityPanel, BorderLayout.EAST );
+    loadWeeklyScoreBoardSettings();
+    GridBagConstraints scoreBoardPaneLConstraints = new GridBagConstraints();
+    scoreBoardPaneLConstraints.gridx = 2;
+    scoreBoardPaneLConstraints.gridy = 0;
+    GridBagConstraints weeklyScoreBoardPaneLConstraints = new GridBagConstraints();
+    weeklyScoreBoardPaneLConstraints.gridx = 0;
+    weeklyScoreBoardPaneLConstraints.gridy = 0;
+    GridBagConstraints activityConstraints = new GridBagConstraints();
+    activityConstraints.gridx = 1;
+    activityConstraints.gridy = 0;
+    mainPanel.add( scoreBoardPanel, scoreBoardPaneLConstraints );
+    mainPanel.add( activityPanel, activityConstraints );
+    mainPanel.add( weeklyScoreBoardPanel, weeklyScoreBoardPaneLConstraints );
     mainPanel.revalidate();
     mainPanel.repaint();
   }
@@ -161,20 +175,32 @@ public class Social extends JPanel
     }
     Collections.sort( scoreList, Comparator.comparing( Score::getScore ) );
     Collections.reverse( scoreList );
-    scoreBoardPanel.setLayout( new GridBagLayout() );
+    loadScoreBoard( scoreList, scoreBoardPanel, "overall" );
+  }
+
+  /**
+   * @param scoreList
+   * @param scoreBoardPanel2
+   */
+  private static void loadScoreBoard( List<Score> scoreList, JPanel panel, String title )
+  {
+    panel.setLayout( new GridBagLayout() );
     JLabel scoreBoardLabel = MeMateUIManager.createJLabel();
+    JLabel overallLabel = MeMateUIManager.createJLabel();
     JLabel firstPlaceLabel = new JLabel();
     JLabel secondPlaceLabel = new JLabel();
     JLabel thirdPlaceLabel = new JLabel();
     JLabel fourthPlaceLabel = new JLabel();
     JLabel fifthPlaceLabel = new JLabel();
     scoreBoardLabel.setText( " - Scoreboard - " );
+    overallLabel.setText( title );
     firstPlaceLabel.setText( "1. " + scoreList.get( 0 ).name + " - " + scoreList.get( 0 ).score );
     secondPlaceLabel.setText( "2. " + scoreList.get( 1 ).name + " - " + scoreList.get( 1 ).score );
     thirdPlaceLabel.setText( "3. " + scoreList.get( 2 ).name + " - " + scoreList.get( 2 ).score );
     fourthPlaceLabel.setText( "4. " + scoreList.get( 3 ).name + " - " + scoreList.get( 3 ).score );
     fifthPlaceLabel.setText( "5. " + scoreList.get( 4 ).name + " - " + scoreList.get( 4 ).score ); //FIXME this will throw out of bounds
     scoreBoardLabel.setFont( new Font( "Courier New", Font.BOLD, 30 ) );
+    overallLabel.setFont( new Font( "Courier New", Font.BOLD, 19 ) );
     firstPlaceLabel.setFont( new Font( "Courier New", Font.BOLD, 25 ) );
     secondPlaceLabel.setFont( new Font( "Courier New", Font.BOLD, 23 ) );
     thirdPlaceLabel.setFont( new Font( "Courier New", Font.BOLD, 21 ) );
@@ -185,24 +211,69 @@ public class Social extends JPanel
     thirdPlaceLabel.setForeground( new Color( 204, 142, 52 ) );
     fourthPlaceLabel.setForeground( new Color( 127, 118, 121 ) );
     fifthPlaceLabel.setForeground( new Color( 127, 118, 121 ) );
+    GridBagConstraints overallLabelConstraints = new GridBagConstraints();
+    overallLabelConstraints.gridx = 0;
+    overallLabelConstraints.gridy = 0;
+    overallLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
+    panel.add( overallLabel, overallLabelConstraints );
     GridBagConstraints scoreBoardLabelConstraints = new GridBagConstraints();
     scoreBoardLabelConstraints.gridx = 0;
-    scoreBoardLabelConstraints.gridy = 0;
-    scoreBoardLabelConstraints.insets = new Insets( 5, 5, 15, 5 );
-    scoreBoardPanel.add( scoreBoardLabel, scoreBoardLabelConstraints );
+    scoreBoardLabelConstraints.gridy = 1;
+    scoreBoardLabelConstraints.insets = new Insets( 0, 5, 15, 5 );
+    panel.add( scoreBoardLabel, scoreBoardLabelConstraints );
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
-    constraints.gridy = 1;
-    constraints.insets = new Insets( 0, 0, 5, 0 );
-    scoreBoardPanel.add( firstPlaceLabel, constraints );
     constraints.gridy = 2;
-    scoreBoardPanel.add( secondPlaceLabel, constraints );
+    constraints.insets = new Insets( 0, 0, 5, 0 );
+    panel.add( firstPlaceLabel, constraints );
     constraints.gridy = 3;
-    scoreBoardPanel.add( thirdPlaceLabel, constraints );
+    panel.add( secondPlaceLabel, constraints );
     constraints.gridy = 4;
-    scoreBoardPanel.add( fourthPlaceLabel, constraints );
+    panel.add( thirdPlaceLabel, constraints );
     constraints.gridy = 5;
-    scoreBoardPanel.add( fifthPlaceLabel, constraints );
+    panel.add( fourthPlaceLabel, constraints );
+    constraints.gridy = 6;
+    panel.add( fifthPlaceLabel, constraints );
+  }
+
+  private static void loadWeeklyScoreBoardSettings()
+  {
+    final String[] userNames = ServerCommunication.getInstance().getAllUsers();
+    final Map<String, Integer> scoreMap = new HashMap<>();
+    for ( String username : userNames )
+    {
+      scoreMap.put( username, 0 );
+    }
+    String[][] history = ServerCommunication.getInstance().getScoreboard();
+    if ( history != null )
+    {
+      ZonedDateTime today = ZonedDateTime.now();
+      ZonedDateTime sevenDaysAgo = today.minusDays( 7 );
+      for ( String[] data : history )
+      {
+        String date = data[ 2 ].substring( 0, 10 );
+        try
+        {
+          Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
+          if ( !eventDate.toInstant().isBefore( sevenDaysAgo.toInstant() ) )
+          {
+            scoreMap.put( data[ 1 ], scoreMap.get( data[ 1 ] ) + 1 );
+          }
+        }
+        catch ( ParseException exception )
+        {
+          System.out.println( "Das Datum ist out of range." + exception );
+        }
+      }
+    }
+    List<Score> scoreList = new ArrayList<>();
+    for ( String name : scoreMap.keySet() )
+    {
+      scoreList.add( new Score( name, scoreMap.get( name ) ) );
+    }
+    Collections.sort( scoreList, Comparator.comparing( Score::getScore ) );
+    Collections.reverse( scoreList );
+    loadScoreBoard( scoreList, weeklyScoreBoardPanel, "weekly" );
   }
 }
 

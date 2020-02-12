@@ -380,7 +380,6 @@ public class Mainframe extends JFrame
   {
     Drinkmanager.getInstance().updateList();
     Dashboard.getInstance().updateButtonpanel();
-    Adminview.getInstance().updateDrinkAmounts();
   }
 
   /**
