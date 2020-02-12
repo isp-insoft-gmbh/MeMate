@@ -84,7 +84,7 @@ public class CreditHistory extends JPanel
     chartPanel.setMinimumDrawWidth( 10 );
     chartPanel.setMinimumDrawHeight( 10 );
 
-    Mainframe.getInstance().addComponentListener( new ComponentAdapter()
+    ComponentListener resizeListener = new ComponentAdapter()
     {
       @Override
       public void componentResized( final ComponentEvent e )
@@ -94,7 +94,17 @@ public class CreditHistory extends JPanel
         chartPanel.setMinimumDrawWidth( e.getComponent().getWidth() );
         chartPanel.setMinimumDrawHeight( e.getComponent().getHeight() );
       }
-    } );
+    };
+    try
+    {
+      Mainframe.getInstance().removeComponentListener( resizeListener );
+    }
+    catch ( Exception exception )
+    {
+      System.out.println( "Der ComponentListener konnte nicht entfernt werden." );
+      exception.printStackTrace();
+    }
+    Mainframe.getInstance().addComponentListener( resizeListener );
   }
 
   /**
