@@ -26,12 +26,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import com.isp.memate.Adminview;
-import com.isp.memate.ConsumptionRate;
-import com.isp.memate.CreditHistory;
 import com.isp.memate.Dashboard;
+import com.isp.memate.Drinkmanager;
 import com.isp.memate.Login;
-import com.isp.memate.ServerCommunication;
-import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.actionbar.MeMateActionBarButton;
 import com.isp.memate.actionbar.MeMateActionBarListener;
 
@@ -144,6 +141,7 @@ public class MeMateUIManager
     UIManager.put( "Label.foreground", Color.black );
     Dashboard.getInstance().toggleInfoIcon();
     Adminview.getInstance().updateButtonIcons();
+    Drinkmanager.getInstance().setListBackground( getBackground( defaultKey ).getDayColor() );
     setUISettings();
   }
 
@@ -156,6 +154,7 @@ public class MeMateUIManager
     UIManager.put( "Label.foreground", Color.white );
     Dashboard.getInstance().toggleInfoIcon();
     Adminview.getInstance().updateButtonIcons();
+    Drinkmanager.getInstance().setListBackground( getBackground( defaultKey ).getDarkColor() );
     setUISettings();
   }
 
@@ -383,12 +382,6 @@ public class MeMateUIManager
       {
         Login.getInstance().showDayHeader();
       }
-    }
-    if ( ServerCommunication.getInstance().getHistoryData( dateType.SHORT ) != null
-        && ServerCommunication.getInstance().getHistoryData( dateType.SHORT ).length != 0 )
-    {
-      ConsumptionRate.getInstance().addGraph();
-      CreditHistory.getInstance().addChart();
     }
 
   }

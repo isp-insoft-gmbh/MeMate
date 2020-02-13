@@ -40,6 +40,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 
@@ -54,22 +55,13 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class ConsumptionRate extends JPanel
 {
-  private static final ConsumptionRate instance       = new ConsumptionRate();
-  private final Map<String, Integer>   amountMap      = new HashMap<>();
-  private XYDataset                    dataset;
-  private JFreeChart                   chart;
-  private ChartPanel                   chartPanel;
-  private JComboBox<String>            selectDrinkComboBox;
-  private HashSet<String>              consumedDrinks = new LinkedHashSet<>();
+  private final Map<String, Integer> amountMap      = new HashMap<>();
+  private XYDataset                  dataset;
+  private JFreeChart                 chart;
+  private ChartPanel                 chartPanel;
+  private JComboBox<String>          selectDrinkComboBox;
+  private HashSet<String>            consumedDrinks = new LinkedHashSet<>();
 
-
-  /**
-   * @return static Instance of {@link ConsumptionRate}
-   */
-  public static ConsumptionRate getInstance()
-  {
-    return instance;
-  }
 
   /**
    * Setzt das Layout
@@ -118,7 +110,7 @@ public class ConsumptionRate extends JPanel
           }
           catch ( ParseException exception )
           {
-            System.out.println( "Das Datum ist out of range." + exception );
+            ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
         else if ( action.contains( drink ) )
@@ -136,7 +128,7 @@ public class ConsumptionRate extends JPanel
           }
           catch ( ParseException exception )
           {
-            System.out.println( "Das Datum ist out of range." + exception );
+            ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
       }
@@ -253,7 +245,7 @@ public class ConsumptionRate extends JPanel
     chartPanel.setMinimumDrawWidth( 10 );
     chartPanel.setMinimumDrawHeight( 10 );
 
-    ComponentListener resizeListener = new ComponentAdapter()
+    ComponentListener rateResizeListener = new ComponentAdapter()
     {
       @Override
       public void componentResized( final ComponentEvent e )
@@ -267,14 +259,14 @@ public class ConsumptionRate extends JPanel
 
     try
     {
-      Mainframe.getInstance().removeComponentListener( resizeListener );
+      Mainframe.getInstance().removeComponentListener( rateResizeListener );
     }
     catch ( Exception exception )
     {
-      System.out.println( "Der ComponentListener konnte nicht entfernt werden." );
-      exception.printStackTrace();
+      ClientLog.newLog( "Der ComponentListener konnte nicht entfernt werden." );
+      ClientLog.newLog( exception.getMessage() );
     }
-    Mainframe.getInstance().addComponentListener( resizeListener );
+    Mainframe.getInstance().addComponentListener( rateResizeListener );
   }
 
   /**

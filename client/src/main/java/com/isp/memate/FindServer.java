@@ -14,6 +14,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 
+import com.isp.memate.util.ClientLog;
+
 /**
  * @author nwe
  * @since 10.12.2019
@@ -72,8 +74,8 @@ public class FindServer
     }
     catch ( IOException exception )
     {
-      System.out.println( "Es konnte kein Server gefunden werden." );
-      exception.printStackTrace();
+      ClientLog.newLog( "Es konnte kein Server gefunden werden." );
+      ClientLog.newLog( exception.getMessage() );
     }
   }
 
@@ -106,8 +108,8 @@ public class FindServer
     }
     catch ( IOException exception )
     {
-      System.out.println( "Das Serverpacket konnte nicht richtig empfangen werden." );
-      exception.printStackTrace();
+      ClientLog.newLog( "Das Serverpacket konnte nicht richtig empfangen werden." );
+      ClientLog.newLog( exception.getMessage() );
     }
     serverAddress = serverPacket.getAddress();
     serverPort = serverPacket.getPort();

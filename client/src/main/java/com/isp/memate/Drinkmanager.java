@@ -4,6 +4,7 @@
 package com.isp.memate;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -199,5 +200,11 @@ public class Drinkmanager extends JPanel
         currentSelection = drinkList.getSelectedIndex();
       }
     } );
+  }
+
+
+  public void setListBackground( Color color )
+  {
+    drinkList.setBackground( color );
   }
 }

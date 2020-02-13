@@ -5,7 +5,6 @@ package com.isp.memate;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -71,13 +70,7 @@ public class Dashboard extends JPanel
     scrollpane.getVerticalScrollBar().setUnitIncrement( 16 );
     scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
 
-    final JPanel upperPanel = MeMateUIManager.createJPanel();
-    upperPanel.setLayout( new GridBagLayout() );
-    upperPanel.setBackground( UIManager.getColor( "DefaultBrightColor" ) );
-
-
     setLayout( new BorderLayout() );
-    add( upperPanel, BorderLayout.NORTH );
     add( scrollpane, BorderLayout.CENTER );
     add( createLowerPanel(), BorderLayout.SOUTH );
     MeMateUIManager.registerPanel( "default", this );

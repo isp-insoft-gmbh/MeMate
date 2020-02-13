@@ -46,6 +46,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.isp.memate.Shared.Operation;
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -199,7 +200,7 @@ public class DrinkManagerDialog
         }
         catch ( HeadlessException | IOException exception )
         {
-          exception.printStackTrace();
+          ClientLog.newLog( exception.getMessage() );
         }
         drinkPicturePath = selectedFile.getPath();
         File image = new File( drinkPicturePath );
@@ -283,8 +284,8 @@ public class DrinkManagerDialog
     }
     catch ( IOException exception )
     {
-      System.out.println( "Das Bild zum Bearbeiten von Getränken konnte nicht erzeugt werden" );
-      exception.printStackTrace();
+      ClientLog.newLog( "Das Bild zum Bearbeiten von Getränken konnte nicht erzeugt werden" );
+      ClientLog.newLog( exception.getMessage() );
     }
     return currentImage;
   }
@@ -340,8 +341,8 @@ public class DrinkManagerDialog
             }
             catch ( IOException exception )
             {
-              System.out.println( "Das ausgewählte Bild konnte nicht gespeichert werden." );
-              exception.printStackTrace();
+              ClientLog.newLog( "Das ausgewählte Bild konnte nicht gespeichert werden." );
+              ClientLog.newLog( exception.getMessage() );
             }
             byte[] bytes = bos.toByteArray();
             ServerCommunication.getInstance().updateDrinkInformations( id, Operation.UPDATE_DRINKPICTURE, bytes );
@@ -418,8 +419,8 @@ public class DrinkManagerDialog
           }
           catch ( IOException exception )
           {
-            System.out.println( "Das ausgewählte Bild konnte nicht gespeichert werden." );
-            exception.printStackTrace();
+            ClientLog.newLog( "Das ausgewählte Bild konnte nicht gespeichert werden." );
+            ClientLog.newLog( exception.getMessage() );
           }
           byte[] bytes = bos.toByteArray();
           ServerCommunication.getInstance()

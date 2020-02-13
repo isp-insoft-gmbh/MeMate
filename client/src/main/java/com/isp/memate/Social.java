@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -145,7 +146,7 @@ public class Social extends JPanel
           }
           catch ( ParseException exception )
           {
-            System.out.println( "Das Datum ist out of range." + exception );
+            ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
       }
@@ -194,11 +195,26 @@ public class Social extends JPanel
     JLabel fifthPlaceLabel = new JLabel();
     scoreBoardLabel.setText( " - Scoreboard - " );
     overallLabel.setText( title );
-    firstPlaceLabel.setText( "1. " + scoreList.get( 0 ).name + " - " + scoreList.get( 0 ).score );
-    secondPlaceLabel.setText( "2. " + scoreList.get( 1 ).name + " - " + scoreList.get( 1 ).score );
-    thirdPlaceLabel.setText( "3. " + scoreList.get( 2 ).name + " - " + scoreList.get( 2 ).score );
-    fourthPlaceLabel.setText( "4. " + scoreList.get( 3 ).name + " - " + scoreList.get( 3 ).score );
-    fifthPlaceLabel.setText( "5. " + scoreList.get( 4 ).name + " - " + scoreList.get( 4 ).score ); //FIXME this will throw out of bounds
+    if ( scoreList.size() >= 1 )
+    {
+      firstPlaceLabel.setText( "1. " + scoreList.get( 0 ).name + " - " + scoreList.get( 0 ).score );
+    }
+    if ( scoreList.size() >= 2 )
+    {
+      secondPlaceLabel.setText( "2. " + scoreList.get( 1 ).name + " - " + scoreList.get( 1 ).score );
+    }
+    if ( scoreList.size() >= 3 )
+    {
+      thirdPlaceLabel.setText( "3. " + scoreList.get( 2 ).name + " - " + scoreList.get( 2 ).score );
+    }
+    if ( scoreList.size() >= 4 )
+    {
+      fourthPlaceLabel.setText( "4. " + scoreList.get( 3 ).name + " - " + scoreList.get( 3 ).score );
+    }
+    if ( scoreList.size() >= 5 )
+    {
+      fifthPlaceLabel.setText( "5. " + scoreList.get( 4 ).name + " - " + scoreList.get( 4 ).score );
+    }
     scoreBoardLabel.setFont( new Font( "Courier New", Font.BOLD, 30 ) );
     overallLabel.setFont( new Font( "Courier New", Font.BOLD, 19 ) );
     firstPlaceLabel.setFont( new Font( "Courier New", Font.BOLD, 25 ) );
@@ -262,7 +278,7 @@ public class Social extends JPanel
         }
         catch ( ParseException exception )
         {
-          System.out.println( "Das Datum ist out of range." + exception );
+          ClientLog.newLog( "Das Datum ist out of range." + exception );
         }
       }
     }

@@ -23,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import com.isp.memate.Shared.Operation;
+import com.isp.memate.util.ClientLog;
 
 /**
  * Die Klasse {@link ServerCommunication} kommunizert mit dem Server
@@ -85,6 +86,7 @@ public class ServerCommunication
     }
     catch ( IOException __ )
     {
+      ClientLog.newLog( "Der Server konnte nicht gefunden werden " + __.getMessage() );
       showErrorDialog( "Der Server konnte nicht gefunden werden. Bitte stelle sicher, dass der Server an ist", "Server nicht gefunden" );
     }
     /**
@@ -100,7 +102,7 @@ public class ServerCommunication
         {
           Shared shared = (Shared) inStream.readObject();
           Operation operation = shared.operation;
-          System.out.println( operation );
+          ClientLog.newLog( operation.toString() );
           switch ( operation )
           {
             case GET_DRINKINFO:
@@ -159,7 +161,7 @@ public class ServerCommunication
         }
         catch ( ClassNotFoundException | IOException exception )
         {
-          exception.printStackTrace();
+          ClientLog.newLog( exception.getMessage() );
         }
       }
     };
@@ -203,8 +205,6 @@ public class ServerCommunication
     Collections.reverse( list );
     this.history = list.toArray( history ).clone();
     History.getInstance().updateHistory();
-    ConsumptionRate.getInstance().addGraph();
-    CreditHistory.getInstance().addChart();
     Adminview.getInstance().updateDrinkAmounts();
     Social.update();
   }
@@ -329,11 +329,11 @@ public class ServerCommunication
     if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap ) || !byteImageList.equals( oldByteImageList )
         || !amountMap.equals( oldAmountMap ) )
     {
-      System.out.println( "GUIUPDATE" );
+      ClientLog.newLog( "GUIUPDATE" );
       Mainframe.getInstance().updateDashboardAndDrinkmanager();
+      Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
     }
     lock.unlock();
-    Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
   }
 
 
@@ -348,7 +348,7 @@ public class ServerCommunication
     }
     catch ( IOException exception )
     {
-      System.out.println( "Die Historie konnte nicht geladen werden. " + exception );
+      ClientLog.newLog( "Die Historie konnte nicht geladen werden. " + exception );
     }
   }
 
@@ -363,7 +363,7 @@ public class ServerCommunication
     }
     catch ( Exception exception )
     {
-      System.out.println( "Die Nutzer konnten nicht geladen werden. " + exception );
+      ClientLog.newLog( "Die Nutzer konnten nicht geladen werden. " + exception );
     }
   }
 
@@ -378,7 +378,7 @@ public class ServerCommunication
     }
     catch ( Exception exception )
     {
-      System.out.println( "Die Versionsnummer konnte nicht geladen werden. " + exception );
+      ClientLog.newLog( "Die Versionsnummer konnte nicht geladen werden. " + exception );
     }
   }
 
@@ -394,7 +394,7 @@ public class ServerCommunication
     }
     catch ( IOException exception )
     {
-      System.out.println( "Die letzte Aktion konnte nicht rückgängig gemacht werden. " + exception );
+      ClientLog.newLog( "Die letzte Aktion konnte nicht rückgängig gemacht werden. " + exception );
     }
   }
 
@@ -404,6 +404,7 @@ public class ServerCommunication
    */
   private void showErrorDialog( String message, String title )
   {
+    ClientLog.newLog( message );
     JOptionPane.showMessageDialog( Mainframe.getInstance(), message, title, JOptionPane.ERROR_MESSAGE, null );
   }
 
@@ -701,7 +702,7 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Die SessionID konnte nicht mit dem Nutzernamen verbunden werden.", "Session fehlgeschlagen" );
-      exception.printStackTrace();
+      ClientLog.newLog( exception.getMessage() );
     }
   }
 
@@ -722,7 +723,7 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Die SessionID is ungültig oder bereits abgelaufen", "Session ungültig" );
-      exception.printStackTrace();
+      ClientLog.newLog( exception.getMessage() );
     }
   }
 
@@ -740,7 +741,7 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Das Guthaben konnte nicht hinzugefügt werden", "Guthaben hinzufügen fehlgeschlagen" );
-      exception.printStackTrace();
+      ClientLog.newLog( exception.getMessage() );
     }
 
   }
@@ -792,7 +793,7 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Das Guthaben des Spaarschweins konnte nicht geladen werden.", "Admin-Error" );
-      exception.printStackTrace();
+      ClientLog.newLog( exception.getMessage() );
     }
   }
 
@@ -805,7 +806,7 @@ public class ServerCommunication
     }
     catch ( IOException exception )
     {
-      exception.printStackTrace();
+      ClientLog.newLog( exception.getMessage() );
     }
   }
 
@@ -821,7 +822,7 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Ausloggen fehlgeschlagen", "Ausloggen" );
-      exception.printStackTrace();
+      ClientLog.newLog( exception.getMessage() );
     }
   }
 
@@ -847,7 +848,7 @@ public class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Passwort ändern fehlgeschlagen.", "Passwort" );
-      exception.printStackTrace();
+      ClientLog.newLog( exception.getMessage() );
     }
   }
 

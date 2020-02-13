@@ -39,6 +39,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 
@@ -519,6 +520,7 @@ public class DrinkConsumptionButton extends JPanel
     }
     catch ( Exception exception )
     {
+      ClientLog.newLog( exception.getMessage() );
     }
     add( askWhetherToReallyConsumeLabel, BorderLayout.NORTH );
     add( overlay, BorderLayout.CENTER );

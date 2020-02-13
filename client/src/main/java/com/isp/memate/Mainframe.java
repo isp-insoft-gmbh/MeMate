@@ -28,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.actionbar.MeMateActionBar;
 import com.isp.memate.actionbar.MeMateActionBarButton;
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -73,6 +74,8 @@ public class Mainframe extends JFrame
   private final Color            color                  = UIManager.getColor( "AppColor" );
   private final JPanel           contentPanel           = MeMateUIManager.createJPanel();
   private final JLabel           helloUserLabel         = new JLabel( "Hallo User" );
+  private ConsumptionRate        consumptionRate        = new ConsumptionRate();
+  private CreditHistory          creditHistory          = new CreditHistory();
   private final JLabel           balanceLabel           = new JLabel();
   private final JPanel           headerPanel            = new JPanel();
   private MeMateActionBarButton  drinkManagerButton;
@@ -145,8 +148,8 @@ public class Mainframe extends JFrame
           public void run()
           {
             contentPanel.removeAll();
-            contentPanel.add( ConsumptionRate.getInstance(), BorderLayout.CENTER );
-            ConsumptionRate.getInstance().addGraph();
+            contentPanel.add( consumptionRate );
+            consumptionRate.addGraph();
             contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
@@ -158,8 +161,8 @@ public class Mainframe extends JFrame
           public void run()
           {
             contentPanel.removeAll();
-            contentPanel.add( CreditHistory.getInstance() );
-            CreditHistory.getInstance().addChart();
+            contentPanel.add( creditHistory );
+            creditHistory.addChart();
             contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
@@ -245,8 +248,8 @@ public class Mainframe extends JFrame
           }
           catch ( IOException exception )
           {
-            System.out.println( "Der Darkmodestatus konnte nicht gespeichert werden." );
-            exception.printStackTrace();
+            ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
+            ClientLog.newLog( exception.getMessage() );
           }
         }
         else
@@ -268,8 +271,8 @@ public class Mainframe extends JFrame
           }
           catch ( IOException exception )
           {
-            System.out.println( "Der Darkmodestatus konnte nicht gespeichert werden." );
-            exception.printStackTrace();
+            ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
+            ClientLog.newLog( exception.getMessage() );
           }
         }
       }
@@ -295,8 +298,8 @@ public class Mainframe extends JFrame
         }
         catch ( IOException exception )
         {
-          System.out.println( "Die SessionID konnte nicht resetet werden." );
-          exception.printStackTrace();
+          ClientLog.newLog( "Die SessionID konnte nicht resetet werden." );
+          ClientLog.newLog( exception.getMessage() );
         }
         dispose();
         Login login = Login.getInstance();
@@ -331,8 +334,8 @@ public class Mainframe extends JFrame
     }
     catch ( IOException exception )
     {
-      System.out.println( "Die SessionID konnte nicht gespeichert werden." );
-      exception.printStackTrace();
+      ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
+      ClientLog.newLog( exception.getMessage() );
     }
   }
 

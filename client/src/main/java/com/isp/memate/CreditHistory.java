@@ -25,6 +25,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -36,15 +37,6 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class CreditHistory extends JPanel
 {
-  private static final CreditHistory instance = new CreditHistory();
-
-  /**
-   * @return static instance of {@link CreditHistory}
-   */
-  public static CreditHistory getInstance()
-  {
-    return instance;
-  }
 
   /**
    * Setzt das Layout und fügt die Chart hinzu.
@@ -52,7 +44,6 @@ public class CreditHistory extends JPanel
   public CreditHistory()
   {
     setLayout( new GridBagLayout() );
-    addChart();
   }
 
   /**
@@ -84,7 +75,7 @@ public class CreditHistory extends JPanel
     chartPanel.setMinimumDrawWidth( 10 );
     chartPanel.setMinimumDrawHeight( 10 );
 
-    ComponentListener resizeListener = new ComponentAdapter()
+    ComponentListener creditResizeListener = new ComponentAdapter()
     {
       @Override
       public void componentResized( final ComponentEvent e )
@@ -97,14 +88,14 @@ public class CreditHistory extends JPanel
     };
     try
     {
-      Mainframe.getInstance().removeComponentListener( resizeListener );
+      Mainframe.getInstance().removeComponentListener( creditResizeListener );
     }
     catch ( Exception exception )
     {
-      System.out.println( "Der ComponentListener konnte nicht entfernt werden." );
-      exception.printStackTrace();
+      ClientLog.newLog( "Der ComponentListener konnte nicht entfernt werden." );
+      ClientLog.newLog( exception.getMessage() );
     }
-    Mainframe.getInstance().addComponentListener( resizeListener );
+    Mainframe.getInstance().addComponentListener( creditResizeListener );
   }
 
   /**
@@ -181,7 +172,7 @@ public class CreditHistory extends JPanel
             }
             catch ( ParseException exception )
             {
-              System.out.println( "Das Datum konnt nicht formatiert werden." + exception );
+              ClientLog.newLog( "Das Datum konnt nicht formatiert werden." + exception );
             }
             dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
                 dateFormat.format( date ) );
@@ -191,5 +182,4 @@ public class CreditHistory extends JPanel
     }
     return dataset;
   }
-
 }

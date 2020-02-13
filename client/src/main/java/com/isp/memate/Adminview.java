@@ -34,6 +34,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -455,8 +456,8 @@ public class Adminview extends JPanel
             }
             catch ( ParseException exception )
             {
-              System.out.println( "Das Datum für die Berechnung der noch übrigen Tage konnte nicht geparst werden" );
-              exception.printStackTrace();
+              ClientLog.newLog( "Das Datum für die Berechnung der noch übrigen Tage konnte nicht geparst werden" );
+              ClientLog.newLog( exception.getMessage() );
             }
           }
         }

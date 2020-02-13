@@ -11,6 +11,7 @@ import java.util.Properties;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.MeMateUIManager.DarkDayColor;
 
@@ -40,7 +41,7 @@ public class Main
     catch ( ClassNotFoundException | InstantiationException | IllegalAccessException
         | UnsupportedLookAndFeelException exception )
     {
-      exception.printStackTrace();
+      ClientLog.newLog( exception.getMessage() );
     }
 
     installColorKeys();
@@ -48,8 +49,9 @@ public class Main
     String sessionID = null;
     File meMateFolder = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" );
     File userPropFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+    File clientLogFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "ClientLog.log" );
 
-    createPropFile( meMateFolder, userPropFile );
+    createPropFile( meMateFolder, userPropFile, clientLogFile );
     try ( InputStream input =
         new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
     {
@@ -59,8 +61,8 @@ public class Main
     }
     catch ( Exception exception )
     {
-      System.out.println( "Die userconfig-Properties konnten nicht geladen werden" );
-      exception.printStackTrace();
+      ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
+      ClientLog.newLog( exception.getMessage() );
     }
     if ( sessionID == null || sessionID.equals( "null" ) )
     {
@@ -99,17 +101,18 @@ public class Main
    * @param meMateFolder
    * @param userPropFile
    */
-  private static void createPropFile( File meMateFolder, File userPropFile )
+  private static void createPropFile( File meMateFolder, File userPropFile, File log )
   {
     try
     {
       meMateFolder.mkdir();
       userPropFile.createNewFile();
+      log.createNewFile();
     }
     catch ( IOException exception1 )
     {
-      System.out.println( "Die userconfig-Properties konnten nicht erstellt werden." );
-      exception1.printStackTrace();
+      ClientLog.newLog( "Die userconfig-Properties konnten nicht erstellt werden." );
+      ClientLog.newLog( exception1.getMessage() );
     }
   }
 

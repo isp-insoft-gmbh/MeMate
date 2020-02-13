@@ -47,6 +47,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.isp.memate.Shared.LoginResult;
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
 
@@ -524,8 +525,8 @@ public class Login extends JFrame
       }
       catch ( IOException exception )
       {
-        System.out.println( "Die SessionID konnte nicht gespeichert werden." );
-        exception.printStackTrace();
+        ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
+        ClientLog.newLog( exception.getMessage() );
       }
     }
   }
