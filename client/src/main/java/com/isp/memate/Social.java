@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -264,14 +265,39 @@ public class Social extends JPanel
     if ( history != null )
     {
       ZonedDateTime today = ZonedDateTime.now();
-      ZonedDateTime sevenDaysAgo = today.minusDays( 7 );
+      DayOfWeek day = today.getDayOfWeek();
+      ZonedDateTime xDaysAgo = today;
+      switch ( day )
+      {
+        case MONDAY:
+          xDaysAgo = today.minusDays( 0 );
+          break;
+        case TUESDAY:
+          xDaysAgo = today.minusDays( 1 );
+          break;
+        case WEDNESDAY:
+          xDaysAgo = today.minusDays( 2 );
+          break;
+        case THURSDAY:
+          xDaysAgo = today.minusDays( 3 );
+          break;
+        case FRIDAY:
+          xDaysAgo = today.minusDays( 4 );
+          break;
+        case SATURDAY:
+          xDaysAgo = today.minusDays( 5 );
+          break;
+        case SUNDAY:
+          xDaysAgo = today.minusDays( 6 );
+          break;
+      }
       for ( String[] data : history )
       {
         String date = data[ 2 ].substring( 0, 10 );
         try
         {
           Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
-          if ( !eventDate.toInstant().isBefore( sevenDaysAgo.toInstant() ) )
+          if ( !eventDate.toInstant().isBefore( xDaysAgo.toInstant() ) )
           {
             scoreMap.put( data[ 1 ], scoreMap.get( data[ 1 ] ) + 1 );
           }
