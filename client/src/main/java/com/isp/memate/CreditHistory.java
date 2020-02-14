@@ -3,7 +3,6 @@
  */
 package com.isp.memate;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -56,8 +55,7 @@ public class CreditHistory extends JPanel
         PlotOrientation.VERTICAL, false, true, false );
 
     lineChart.getCategoryPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
-    toggleDarkMode( lineChart );
-
+    MeMateUIManager.registerLineChart( lineChart );
     ChartPanel chartPanel = new ChartPanel( lineChart );
     loadChartpanelSettingsAndAddChartPanel( chartPanel );
     apendComponentListener( chartPanel );
@@ -113,34 +111,6 @@ public class CreditHistory extends JPanel
     chartPanelConstraits.weightx = 1;
     chartPanelConstraits.weighty = 1;
     add( chartPanel, chartPanelConstraits );
-  }
-
-  private void toggleDarkMode( JFreeChart lineChart )
-  {
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-      lineChart.getCategoryPlot().setBackgroundPaint( new Color( 36, 43, 55 ).brighter() );
-      lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
-      lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
-      lineChart.getTitle().setPaint( Color.white );
-      lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.white );
-      lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.white );
-      lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( Color.white );
-      lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( Color.white );
-    }
-    else
-    {
-      lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
-      lineChart.getCategoryPlot().setBackgroundPaint( new Color( 192, 192, 192 ) );
-      lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
-      lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
-      lineChart.getTitle().setPaint( Color.black );
-      lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.black );
-      lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.black );
-      lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( Color.black );
-      lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( Color.black );
-    }
   }
 
   private DefaultCategoryDataset createBalanceDataset()

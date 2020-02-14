@@ -24,6 +24,8 @@ import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.table.JTableHeader;
 
+import org.jfree.chart.JFreeChart;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -58,6 +60,8 @@ public class MeMateUIManager
   private static final Map<String, DarkDayColor>               foregroundMap    = new HashMap<>();
   private static final String                                  defaultKey       = "default";
   private static final Set<String>                             keySet           = new HashSet<>();
+  private static JFreeChart                                    freeChart        = null;
+  private static JFreeChart                                    lineChart        = null;
 
   private static boolean darkModeState = false;
 
@@ -433,6 +437,60 @@ public class MeMateUIManager
         }
       }
     }
+    if ( freeChart != null )
+    {
+      if ( darkModeState )
+      {
+        freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
+        freeChart.getTitle().setPaint( Color.white );
+        freeChart.getXYPlot().setBackgroundPaint( new Color( 36, 43, 55 ).brighter() );
+        freeChart.getXYPlot().setDomainGridlinesVisible( false );
+        freeChart.getXYPlot().setRangeGridlinesVisible( false );
+        freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.white );
+        freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.white );
+        freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.white );
+        freeChart.getXYPlot().getRangeAxis().setLabelPaint( Color.white );
+      }
+      else
+      {
+        freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
+        freeChart.getXYPlot().setBackgroundPaint( new Color( 192, 192, 192 ) );
+        freeChart.getXYPlot().setDomainGridlinesVisible( false );
+        freeChart.getXYPlot().setRangeGridlinesVisible( false );
+        freeChart.getTitle().setPaint( Color.black );
+        freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.black );
+        freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.black );
+        freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.black );
+        freeChart.getXYPlot().getRangeAxis().setLabelPaint( Color.black );
+      }
+    }
+    if ( lineChart != null )
+    {
+      if ( darkModeState )
+      {
+        lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
+        lineChart.getCategoryPlot().setBackgroundPaint( new Color( 36, 43, 55 ).brighter() );
+        lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
+        lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
+        lineChart.getTitle().setPaint( Color.white );
+        lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.white );
+        lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.white );
+        lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( Color.white );
+        lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( Color.white );
+      }
+      else
+      {
+        lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
+        lineChart.getCategoryPlot().setBackgroundPaint( new Color( 192, 192, 192 ) );
+        lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
+        lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
+        lineChart.getTitle().setPaint( Color.black );
+        lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.black );
+        lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.black );
+        lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( Color.black );
+        lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( Color.black );
+      }
+    }
     if ( Login.getInstance() != null )
     {
       if ( darkModeState )
@@ -496,5 +554,22 @@ public class MeMateUIManager
     {
       return darkIcon;
     }
+  }
+
+  /**
+   * @param freeChart
+   * 
+   */
+  public static void registerFreeChart( JFreeChart freeChart )
+  {
+    MeMateUIManager.freeChart = freeChart;
+  }
+
+  /**
+   * @param lineChart
+   */
+  public static void registerLineChart( JFreeChart lineChart )
+  {
+    MeMateUIManager.lineChart = lineChart;
   }
 }

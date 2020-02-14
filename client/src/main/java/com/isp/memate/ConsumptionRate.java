@@ -4,7 +4,6 @@
 package com.isp.memate;
 
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -170,30 +169,7 @@ public class ConsumptionRate extends JPanel
     freeChart.getXYPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
     freeChart.getXYPlot().getRangeAxis().setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
 
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-      freeChart.getTitle().setPaint( Color.white );
-      freeChart.getXYPlot().setBackgroundPaint( new Color( 36, 43, 55 ).brighter() );
-      freeChart.getXYPlot().setDomainGridlinesVisible( false );
-      freeChart.getXYPlot().setRangeGridlinesVisible( false );
-      freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.white );
-      freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.white );
-      freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.white );
-      freeChart.getXYPlot().getRangeAxis().setLabelPaint( Color.white );
-    }
-    else
-    {
-      freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
-      freeChart.getXYPlot().setBackgroundPaint( new Color( 192, 192, 192 ) );
-      freeChart.getXYPlot().setDomainGridlinesVisible( false );
-      freeChart.getXYPlot().setRangeGridlinesVisible( false );
-      freeChart.getTitle().setPaint( Color.black );
-      freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.black );
-      freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.black );
-      freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.black );
-      freeChart.getXYPlot().getRangeAxis().setLabelPaint( Color.black );
-    }
+    MeMateUIManager.registerFreeChart( freeChart );
     return freeChart;
   }
 
@@ -217,11 +193,11 @@ public class ConsumptionRate extends JPanel
     GridBagConstraints selectedDrinkComboboxConstraints = getSelectedDrinkComboboxConstraits();
     add( selectDrinkComboBox, selectedDrinkComboboxConstraints );
 
-    JLabel averageConsumption = new JLabel( String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
+    JLabel averageConsumption = MeMateUIManager.createJLabel();
+    averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
     GridBagConstraints averageConsumptionConstraints = getAverageConsumptionConstraints();
     add( averageConsumption, averageConsumptionConstraints );
 
-    toggleDarkMode( averageConsumption );
     appendComponentListener();
 
     selectDrinkComboBox.addItemListener( new ItemListener()
@@ -235,10 +211,12 @@ public class ConsumptionRate extends JPanel
         chartPanel.setChart( chart );
         averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage(), String.valueOf( e.getItem() ) ) );
         add( chartPanel, chartPanelConstraits );
+        MeMateUIManager.setUISettings();
         repaint();
         revalidate();
       }
     } );
+    MeMateUIManager.registerPanel( "default", this );
   }
 
   /**
@@ -303,21 +281,6 @@ public class ConsumptionRate extends JPanel
       counter = counter + amountMap.get( formatter.format( now.minusDays( i ) ).toString() );
     }
     return counter / 31f;
-  }
-
-
-  private void toggleDarkMode( JLabel averageConsumption )
-  {
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-      averageConsumption.setForeground( MeMateUIManager.getForeground( "default" ).getDarkColor() );
-    }
-    else
-    {
-      setBackground( MeMateUIManager.getBackground( "default" ).getDayColor() );
-      averageConsumption.setForeground( MeMateUIManager.getForeground( "default" ).getDayColor() );
-    }
   }
 
   private GridBagConstraints getAverageConsumptionConstraints()
