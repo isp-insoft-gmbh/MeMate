@@ -11,10 +11,12 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,9 +27,6 @@ import javax.swing.table.JTableHeader;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import com.isp.memate.Adminview;
-import com.isp.memate.Dashboard;
-import com.isp.memate.Drinkmanager;
 import com.isp.memate.Login;
 import com.isp.memate.actionbar.MeMateActionBarButton;
 import com.isp.memate.actionbar.MeMateActionBarListener;
@@ -52,6 +51,9 @@ public class MeMateUIManager
   private static final Multimap<String, JScrollPane>           scrollPaneList   = ArrayListMultimap.create();
   private static final Multimap<String, JTextPane>             textPaneList     = ArrayListMultimap.create();
   private static final Multimap<String, JCheckBox>             checkBoxList     = ArrayListMultimap.create();
+  private static final Multimap<String, JList<?>>              listList         = ArrayListMultimap.create();
+  private static final Map<JButton, DarkDayIcon>               iconList         = new HashMap<>();
+  private static final Map<JLabel, DarkDayIcon>                panelIconList    = new HashMap<>();
   private static final Map<String, DarkDayColor>               backgroundMap    = new HashMap<>();
   private static final Map<String, DarkDayColor>               foregroundMap    = new HashMap<>();
   private static final String                                  defaultKey       = "default";
@@ -132,6 +134,19 @@ public class MeMateUIManager
     return button;
   }
 
+  /**
+   * @param key
+   * @param imageIcon
+   * @param imageIcon2
+   * @return
+   */
+  public static JButton createNormalButton( String key, ImageIcon imageIcon, ImageIcon imageIcon2 )
+  {
+    JButton button = createNormalButton( key );
+    iconList.put( button, new DarkDayIcon( imageIcon, imageIcon2 ) );
+    return button;
+  }
+
   public static void showDayMode()
   {
     darkModeState = false;
@@ -139,9 +154,6 @@ public class MeMateUIManager
     UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
     UIManager.put( "OptionPane.messageForeground", Color.black );
     UIManager.put( "Label.foreground", Color.black );
-    Dashboard.getInstance().toggleInfoIcon();
-    Adminview.getInstance().updateButtonIcons();
-    Drinkmanager.getInstance().setListBackground( getBackground( defaultKey ).getDayColor() );
     setUISettings();
   }
 
@@ -152,10 +164,25 @@ public class MeMateUIManager
     UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
     UIManager.put( "OptionPane.messageForeground", Color.white );
     UIManager.put( "Label.foreground", Color.white );
-    Dashboard.getInstance().toggleInfoIcon();
-    Adminview.getInstance().updateButtonIcons();
-    Drinkmanager.getInstance().setListBackground( getBackground( defaultKey ).getDarkColor() );
     setUISettings();
+  }
+
+  public static void iniDayMode()
+  {
+    darkModeState = false;
+    UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
+    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
+    UIManager.put( "OptionPane.messageForeground", Color.black );
+    UIManager.put( "Label.foreground", Color.black );
+  }
+
+  public static void iniDarkMode()
+  {
+    darkModeState = true;
+    UIManager.put( "OptionPane.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "OptionPane.messageForeground", Color.white );
+    UIManager.put( "Label.foreground", Color.white );
   }
 
   public static boolean getDarkModeState()
@@ -166,19 +193,28 @@ public class MeMateUIManager
   public static void registerPanel( final String key, JPanel panel )
   {
     panelList.put( key, panel );
-    setUISettings();
+  }
+
+
+  public static void registerIconLabel( JLabel infoIconLabel, ImageIcon infoIcon, ImageIcon infoIconWhite )
+  {
+    labelList.put( defaultKey, infoIconLabel );
+    panelIconList.put( infoIconLabel, new DarkDayIcon( infoIconWhite, infoIcon ) );
   }
 
   public static void registerTable( final String key, JTable table )
   {
     tableList.put( key, table );
-    setUISettings();
+  }
+
+  public static void registerList( final String key, JList<?> list )
+  {
+    listList.put( key, list );
   }
 
   public static void registerScrollPane( final String key, JScrollPane scrollPane )
   {
     scrollPaneList.put( key, scrollPane );
-    setUISettings();
   }
 
 
@@ -186,7 +222,6 @@ public class MeMateUIManager
   public static void registerSeparator( final JComponent separator, final String key )
   {
     separatorList.put( key, separator );
-    setUISettings();
   }
 
 
@@ -194,7 +229,6 @@ public class MeMateUIManager
   public static void registerlabel( final JLabel label )
   {
     labelList.put( defaultKey, label );
-    setUISettings();
   }
 
   public static DarkDayColor getBackground( String key )
@@ -210,8 +244,9 @@ public class MeMateUIManager
   /**
    *
    */
-  private static void setUISettings()
+  public static void setUISettings()
   {
+    ClientLog.newLog( "UI-Update" );
     for ( final String key : keySet )
     {
       for ( final JPanel panel : panelList.get( key ) )
@@ -226,15 +261,34 @@ public class MeMateUIManager
           panel.setBackground( backgroundMap.get( key ).getDayColor() );
         }
       }
+      for ( final JList<?> list : listList.get( key ) )
+      {
+        if ( darkModeState )
+        {
+          list.setBackground( getBackground( key ).getDarkColor() );
+        }
+        else
+        {
+          list.setBackground( getBackground( key ).getDayColor() );
+        }
+      }
       for ( final JLabel label : labelList.get( key ) )
       {
         if ( darkModeState )
         {
           label.setForeground( foregroundMap.get( key ).getDarkColor() );
+          if ( panelIconList.get( label ) != null )
+          {
+            label.setIcon( panelIconList.get( label ).getDarkIcon() );
+          }
         }
         else
         {
           label.setForeground( foregroundMap.get( key ).getDayColor() );
+          if ( panelIconList.get( label ) != null )
+          {
+            label.setIcon( panelIconList.get( label ).getDayIcon() );
+          }
         }
       }
       for ( final JButton button : normalButtonList.get( key ) )
@@ -246,6 +300,10 @@ public class MeMateUIManager
           button.setBorder(
               BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( new Color( 50, 70, 70 ) ),
                   BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
+          if ( iconList.get( button ) != null )
+          {
+            button.setIcon( iconList.get( button ).getDarkIcon() );
+          }
         }
         else
         {
@@ -254,7 +312,10 @@ public class MeMateUIManager
           button.setBorder(
               BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( new Color( 230, 230, 230 ) ),
                   BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
-
+          if ( iconList.get( button ) != null )
+          {
+            button.setIcon( iconList.get( button ).getDayIcon() );
+          }
         }
       }
       for ( final JTextPane textPane : textPaneList.get( key ) )
@@ -410,7 +471,30 @@ public class MeMateUIManager
     {
       return darkColor;
     }
-
   }
 
+  public static class DarkDayIcon
+  {
+    private final ImageIcon darkIcon;
+    private final ImageIcon dayIcon;
+
+    /**
+     *
+     */
+    public DarkDayIcon( final ImageIcon darkIcon, final ImageIcon dayIcon )
+    {
+      this.darkIcon = darkIcon;
+      this.dayIcon = dayIcon;
+    }
+
+    public ImageIcon getDayIcon()
+    {
+      return dayIcon;
+    }
+
+    public ImageIcon getDarkIcon()
+    {
+      return darkIcon;
+    }
+  }
 }

@@ -174,8 +174,11 @@ public class CreditHistory extends JPanel
             {
               ClientLog.newLog( "Das Datum konnt nicht formatiert werden." + exception );
             }
-            dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
-                dateFormat.format( date ) );
+            if ( data[ 5 ].equals( "false" ) )
+            {
+              dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
+                  dateFormat.format( date ) );
+            }
           }
         }
       }

@@ -41,7 +41,6 @@ import net.miginfocom.swing.MigLayout;
  */
 public class Dashboard extends JPanel
 {
-  private static final Dashboard            instance      = new Dashboard( Mainframe.getInstance() );
   private final Mainframe                   mainFrame;
   private final ImageIcon                   infoIcon      = new ImageIcon( getClass().getClassLoader().getResource( "infoicon.png" ) );
   private final ImageIcon                   infoIconWhite =
@@ -49,14 +48,6 @@ public class Dashboard extends JPanel
   private final JLabel                      infoIconLabel = new JLabel( infoIcon );
   private final JScrollPane                 scrollpane;
   private ArrayList<DrinkConsumptionButton> buttonList    = new ArrayList<>();
-
-  /**
-   * @return static instance of Dashboard
-   */
-  public static Dashboard getInstance()
-  {
-    return instance;
-  }
 
   /**
    * Passt Layout, Hintergrund und Borders an.
@@ -73,6 +64,7 @@ public class Dashboard extends JPanel
     setLayout( new BorderLayout() );
     add( scrollpane, BorderLayout.CENTER );
     add( createLowerPanel(), BorderLayout.SOUTH );
+    MeMateUIManager.registerIconLabel( infoIconLabel, infoIcon, infoIconWhite );
     MeMateUIManager.registerPanel( "default", this );
     MeMateUIManager.registerScrollPane( "scroll", scrollpane );
   }
@@ -201,7 +193,10 @@ public class Dashboard extends JPanel
   @SuppressWarnings( "javadoc" )
   public void updateButtonpanel()
   {
+    ServerCommunication.getInstance().lock.lock();
     scrollpane.setViewportView( createDrinkButtonPanel() );
+    ServerCommunication.getInstance().lock.unlock();
+    MeMateUIManager.setUISettings();
   }
 
   /**
@@ -237,20 +232,6 @@ public class Dashboard extends JPanel
         JOptionPane.ERROR_MESSAGE, null );
   }
 
-  /**
-   * Wenn der State des Darkmodes gewechselt wird, so wird auch das Icon geändert.
-   */
-  public void toggleInfoIcon()
-  {
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      infoIconLabel.setIcon( infoIconWhite );
-    }
-    else
-    {
-      infoIconLabel.setIcon( infoIcon );
-    }
-  }
 
   /**
    * Resetet alle drinkButtons, dies tritt nur auf wenn man bereits ein

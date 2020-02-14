@@ -55,6 +55,7 @@ public class ServerCommunication
   private String[][]                          history;
   private String[][]                          shortHistory;
   private String[][]                          scoreboard;
+  private Float                               piggyBankBalance;
   private Socket                              socket;
   private ObjectInputStream                   inStream;
   private ObjectOutputStream                  outStream;
@@ -139,13 +140,13 @@ public class ServerCommunication
               getBalance( ServerCommunication.getInstance().currentUser );
               break;
             case PRICE_CHANGED:
-              Dashboard.getInstance().showPriceChangedDialog( shared.drinkPrice.name, shared.drinkPrice.price );
+              Mainframe.getInstance().getDashboard().showPriceChangedDialog( shared.drinkPrice.name, shared.drinkPrice.price );
               break;
             case NO_MORE_DRINKS_AVAIBLE:
-              Dashboard.getInstance().showNoMoreDrinksDialog( shared.consumedDrink );
+              Mainframe.getInstance().getDashboard().showNoMoreDrinksDialog( shared.consumedDrink );
               break;
             case PIGGYBANK_BALANCE:
-              Adminview.getInstance().updatePiggybankBalanceLabel( shared.userBalance );
+              setPiggyBankBalance( shared.userBalance );
               break;
             case GET_USERS_RESULT:
               userArray = shared.users;
@@ -166,6 +167,24 @@ public class ServerCommunication
       }
     };
 
+
+    TimerTask task3 = new TimerTask()
+    {
+      @Override
+      public void run()
+      {
+        tellServerToSendHistoryData();
+      }
+    };
+    tellServertoSendUserArray();
+    Timer timer = new Timer();
+    timer.schedule( task, 0, 100 );
+    Timer timer3 = new Timer();
+    timer3.schedule( task3, 5000, 300000 );
+  }
+
+  public void startDrinkInfoTimer()
+  {
     /**
      * Dieser Task sorgt dafür, dass die Getränke alle 30
      * Sekunden aktualisiert werden.
@@ -178,21 +197,8 @@ public class ServerCommunication
         tellServerToSendDrinkInformations();
       }
     };
-    TimerTask task3 = new TimerTask()
-    {
-      @Override
-      public void run()
-      {
-        tellServerToSendHistoryData();
-      }
-    };
-    tellServertoSendUserArray();
-    Timer timer = new Timer();
-    timer.schedule( task, 0, 100 );
     Timer timer2 = new Timer();
     timer2.schedule( task2, 10000, 30000 );
-    Timer timer3 = new Timer();
-    timer3.schedule( task3, 5000, 300000 );
   }
 
 
@@ -204,9 +210,6 @@ public class ServerCommunication
     List<String[]> list = Arrays.asList( history );
     Collections.reverse( list );
     this.history = list.toArray( history ).clone();
-    History.getInstance().updateHistory();
-    Adminview.getInstance().updateDrinkAmounts();
-    Social.update();
   }
 
   /**
@@ -215,7 +218,6 @@ public class ServerCommunication
   protected void updateShortHistory( String[][] history )
   {
     this.shortHistory = history;
-    Social.update();
   }
 
   /**
@@ -224,7 +226,6 @@ public class ServerCommunication
   protected void updateScoreboard( String[][] history )
   {
     this.scoreboard = history;
-    Social.update();
   }
 
   /**
@@ -329,10 +330,9 @@ public class ServerCommunication
     if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap ) || !byteImageList.equals( oldByteImageList )
         || !amountMap.equals( oldAmountMap ) )
     {
-      ClientLog.newLog( "GUIUPDATE" );
-      Mainframe.getInstance().updateDashboardAndDrinkmanager();
-      Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
+      Mainframe.getInstance().updateDashboard();
     }
+    Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
     lock.unlock();
   }
 
@@ -648,7 +648,6 @@ public class ServerCommunication
       showErrorDialog( "Das Getränk konnte nicht hinzugefügt werden.", "Getränk hinzufügen fehlgeschlagen" );
     }
     tellServerToSendDrinkInformations();
-    Mainframe.getInstance().updateDashboardAndDrinkmanager();
   }
 
   /**
@@ -671,7 +670,6 @@ public class ServerCommunication
       showErrorDialog( "Das Getränk konnte nicht gelöscht werden.", "Getränk löschen fehlgeschlagen" );
     }
     tellServerToSendDrinkInformations();
-    Mainframe.getInstance().updateDashboardAndDrinkmanager();
   }
 
   @SuppressWarnings( "javadoc" )
@@ -875,9 +873,9 @@ public class ServerCommunication
    */
   public void checkVersion( String clientVersion )
   {
-    System.out.println( "CHECK" );
-    System.out.println( version );
-    System.out.println( clientVersion );
+    ClientLog.newLog( "CHECK VERSION" );
+    ClientLog.newLog( "Server: " + version );
+    ClientLog.newLog( "Client: " + clientVersion );
     if ( !version.equals( clientVersion ) )
     {
       JOptionPane.showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(),
@@ -886,5 +884,21 @@ public class ServerCommunication
           "Update",
           JOptionPane.ERROR_MESSAGE, null );
     }
+  }
+
+  /**
+   * @return the piggyBankBalance
+   */
+  public Float getPiggyBankBalance()
+  {
+    return piggyBankBalance;
+  }
+
+  /**
+   * @param piggyBankBalance the piggyBankBalance to set
+   */
+  public void setPiggyBankBalance( Float piggyBankBalance )
+  {
+    this.piggyBankBalance = piggyBankBalance;
   }
 }

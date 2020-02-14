@@ -356,6 +356,7 @@ public class DrinkManagerDialog
             ServerCommunication.getInstance().updateDrinkInformations( id, Operation.UPDATE_DRINKNAME, newName );
           }
           dialog.dispose();
+          Mainframe.getInstance().getDrinkManager().updateList();
         }
       }
     } );
@@ -426,6 +427,7 @@ public class DrinkManagerDialog
           ServerCommunication.getInstance()
               .registerNewDrink( new Drink( name, price, drinkPicturePath, -1, bytes, 0, false, null ) );
           dialog.dispose();
+          Mainframe.getInstance().getDrinkManager().updateList();
         }
       }
     } );

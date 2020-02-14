@@ -4,7 +4,6 @@
 package com.isp.memate;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -33,23 +32,15 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class Drinkmanager extends JPanel
 {
-  private static final Drinkmanager instance          = new Drinkmanager();
-  private String[]                  data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
-  private final JButton             addButton         = MeMateUIManager.createNormalButton( "button" );
-  private final JButton             editButton        = MeMateUIManager.createNormalButton( "button" );
-  private final JButton             removeButton      = MeMateUIManager.createNormalButton( "button" );
-  private final JButton             ingredientsButton = MeMateUIManager.createNormalButton( "button" );
-  private JList<String>             drinkList         = new JList<>( data );
-  private final JScrollPane         scrollpane        = new JScrollPane();
-  private int                       currentSelection;
+  private String[]          data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
+  private final JButton     addButton         = MeMateUIManager.createNormalButton( "button" );
+  private final JButton     editButton        = MeMateUIManager.createNormalButton( "button" );
+  private final JButton     removeButton      = MeMateUIManager.createNormalButton( "button" );
+  private final JButton     ingredientsButton = MeMateUIManager.createNormalButton( "button" );
+  private JList<String>     drinkList         = new JList<>( data );
+  private final JScrollPane scrollpane        = new JScrollPane();
+  private int               currentSelection;
 
-  /**
-   * @return static instance of {@link Drinkmanager}
-   */
-  public static Drinkmanager getInstance()
-  {
-    return instance;
-  }
 
   /**
    * Passt das Layout an und legt den CellRenderer fest.
@@ -133,6 +124,7 @@ public class Drinkmanager extends JPanel
           ServerCommunication.getInstance().removeDrink( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ),
               drinkList.getSelectedValue() );
         }
+        updateList();
       }
     } );
     ingredientsButton.addActionListener( new ActionListener()
@@ -178,6 +170,7 @@ public class Drinkmanager extends JPanel
     drinkList.setCellRenderer( new DrinkCellRenderer() );
     drinkList.setFixedCellHeight( 150 );
     drinkList.setFont( drinkList.getFont().deriveFont( 20f ) );
+    MeMateUIManager.registerList( "default", drinkList );
     scrollpane.setViewportView( drinkList );
     scrollpane.repaint();
 
@@ -200,11 +193,5 @@ public class Drinkmanager extends JPanel
         currentSelection = drinkList.getSelectedIndex();
       }
     } );
-  }
-
-
-  public void setListBackground( Color color )
-  {
-    drinkList.setBackground( color );
   }
 }

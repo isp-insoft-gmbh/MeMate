@@ -24,7 +24,7 @@ import com.isp.memate.util.MeMateUIManager.DarkDayColor;
  */
 public class Main
 {
-  final static String version = "0.9.7";
+  final static String version = "0.9.8";
 
   /**
    * @param args unused
@@ -47,6 +47,7 @@ public class Main
     installColorKeys();
 
     String sessionID = null;
+    String darkmode = null;
     File meMateFolder = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" );
     File userPropFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
     File clientLogFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "ClientLog.log" );
@@ -58,16 +59,26 @@ public class Main
       Properties userProperties = new Properties();
       userProperties.load( input );
       sessionID = userProperties.getProperty( "SessionID" );
+      darkmode = userProperties.getProperty( "Darkmode" );
     }
     catch ( Exception exception )
     {
       ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
       ClientLog.newLog( exception.getMessage() );
     }
+    if ( darkmode != null && darkmode.equals( "on" ) )
+    {
+      MeMateUIManager.iniDarkMode();
+    }
+    else
+    {
+      MeMateUIManager.iniDayMode();
+    }
     if ( sessionID == null || sessionID.equals( "null" ) )
     {
       ServerCommunication.getInstance().tellServertoSendVersionNumber();
       Login login = Login.getInstance();
+      MeMateUIManager.setUISettings();
       login.setVisible( true );
       ServerCommunication.getInstance().checkVersion( version );
     }
@@ -81,6 +92,7 @@ public class Main
       {
         System.out.println( "Es wurde kein Nutzer für die angegeben Session gefunden." );
         Login login = Login.getInstance();
+        MeMateUIManager.setUISettings();
         login.setVisible( true );
         ServerCommunication.getInstance().checkVersion( version );
       }
@@ -88,11 +100,12 @@ public class Main
       {
         mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         mainframe.setVisible( true );
+        ServerCommunication.getInstance().startDrinkInfoTimer();
         ServerCommunication.getInstance().tellServerToSendHistoryData();
         ServerCommunication.getInstance().checkVersion( version );
-        History.getInstance().updateHistory();
         mainframe.toggleAdminView();
         mainframe.requestFocus();
+        MeMateUIManager.setUISettings();
       }
     }
   }

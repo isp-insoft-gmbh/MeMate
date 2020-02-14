@@ -30,36 +30,18 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class History extends JPanel
 {
-  private final String[]       columnNames = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
-  private final JScrollPane    scrollPane  = new JScrollPane();
-  private static final History instance    = new History();
-  private JTable               historyTable;
-  private DefaultTableModel    tableModel;
+  private final String[]    columnNames  = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
+  private final JScrollPane scrollPane   = new JScrollPane();
+  private JTable            historyTable = new JTable();
+  private DefaultTableModel tableModel;
+
 
   /**
-   * @return static instance of {@linkplain History}
-   */
-  public static History getInstance()
-  {
-    return instance;
-  }
-
-  /**
-   * Erzeugt einen Table mit Daten von dem Server und fügt diesen dem HistoryPanel hinzu.
+   * Erzeugt einen Table mit einigen Einstellungen und setzt diesen Table in ein Scrollpane.
    */
   public History()
   {
     super( new BorderLayout() );
-    historyTable = new JTable( ServerCommunication.getInstance().getHistoryData( dateType.MIDDLE ), columnNames );
-    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( dateType.MIDDLE ), columnNames )
-    {
-      @Override
-      public boolean isCellEditable( int row, int column )
-      {
-        return false;
-      }
-    };
-    historyTable.setModel( tableModel );
     historyTable.setAutoCreateRowSorter( true );
     historyTable.setShowGrid( false );
     JTableHeader header = historyTable.getTableHeader();

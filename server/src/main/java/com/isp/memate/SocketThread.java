@@ -26,7 +26,7 @@ import com.isp.memate.Shared.Operation;
  */
 public class SocketThread extends Thread
 {
-  private final String         version = "0.9.7";
+  private final String         version = "0.9.8";
   private ObjectOutputStream   objectOutputStream;
   private ObjectInputStream    objectInputStream;
   private String               currentSessionID;
@@ -70,7 +70,7 @@ public class SocketThread extends Thread
         {
           Shared shared = (Shared) objectInputStream.readObject();
           Operation operation = shared.operation;
-          if ( operation != Operation.GET_DRINKINFO )
+          if ( operation != Operation.GET_DRINKINFO && operation != Operation.PIGGYBANK_BALANCE && operation != Operation.GET_HISTORY )
           {
             ServerLog.newLog( logType.COMMAND, operation.toString() );
           }

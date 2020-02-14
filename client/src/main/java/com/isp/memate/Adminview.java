@@ -47,26 +47,21 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class Adminview extends JPanel
 {
-  private static final Adminview instance              = new Adminview();
-  private final JButton          setAdminBalanceButton = MeMateUIManager.createNormalButton( "button" );
-  private final JButton          exportButton          = MeMateUIManager.createNormalButton( "button" );
-  private final JButton          resetPasswordButton   = MeMateUIManager.createNormalButton( "button" );
-  private final JDialog          passwordFrame         = new JDialog( Mainframe.getInstance() );
-  private final JLabel           piggyBankLabel        = MeMateUIManager.createJLabel();
-  private final JPanel           upperPanel            = MeMateUIManager.createJPanel();
-  private final JPanel           upperUpperPanel       = MeMateUIManager.createJPanel();
-  private final JPanel           centerPanel           = MeMateUIManager.createJPanel();
-  private JPanel                 drinkAmountPanel      = new JPanel( new FlowLayout() );
-  private final JTextField       balanceField          = new JTextField();
+  private final JButton    exportButton          =
+      MeMateUIManager.createNormalButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "export_white.png" ) ),
+          new ImageIcon( getClass().getClassLoader().getResource( "export_black.png" ) ) );
+  private final JButton    resetPasswordButton   =
+      MeMateUIManager.createNormalButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "password_white.png" ) ),
+          new ImageIcon( getClass().getClassLoader().getResource( "password_black.png" ) ) );
+  private final JButton    setAdminBalanceButton = MeMateUIManager.createNormalButton( "button" );
+  private final JDialog    passwordFrame         = new JDialog( Mainframe.getInstance() );
+  private final JLabel     piggyBankLabel        = MeMateUIManager.createJLabel();
+  private final JPanel     upperPanel            = MeMateUIManager.createJPanel();
+  private final JPanel     upperUpperPanel       = MeMateUIManager.createJPanel();
+  private final JPanel     centerPanel           = MeMateUIManager.createJPanel();
+  private JPanel           drinkAmountPanel      = new JPanel( new FlowLayout() );
+  private final JTextField balanceField          = new JTextField();
 
-
-  /**
-   * @return static instance of Adminview
-   */
-  public static Adminview getInstance()
-  {
-    return instance;
-  }
 
   /**
    * Der Konstruktor lädt die Einstellungen für das Adminpanel.
@@ -304,6 +299,7 @@ public class Adminview extends JPanel
 
   private void loadPiggyBankPanelSettings( JPanel piggyBankPanel )
   {
+    updatePiggybankBalanceLabel( ServerCommunication.getInstance().getPiggyBankBalance() );
     piggyBankPanel.setPreferredSize( new Dimension( 430, 90 ) );
     piggyBankPanel.setLayout( new GridBagLayout() );
     piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 25f ) );
@@ -368,7 +364,7 @@ public class Adminview extends JPanel
       drinkNameLabelConstraints.gridy = 0;
       drinkNameLabelConstraints.gridx = 0;
       drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
-      drinkNameLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
+      drinkNameLabelConstraints.insets = new Insets( 0, 10, 5, 0 );
       drinkAmountPanel.add( drinkNameLabel, drinkNameLabelConstraints );
       SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 50, 1 );
       JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
@@ -377,7 +373,7 @@ public class Adminview extends JPanel
       amountSpinnerConstraints.gridx = 0;
       amountSpinnerConstraints.gridy = 2;
       amountSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
-      amountSpinnerConstraints.insets = new Insets( 0, 5, 0, 5 );
+      amountSpinnerConstraints.insets = new Insets( 0, 10, 0, 5 );
       drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
       JButton setAmountButton = MeMateUIManager.createNormalButton( "button" );
       setAmountButton.setText( "Anzahl setzen" );
@@ -392,7 +388,7 @@ public class Adminview extends JPanel
       GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
       daysLeftLabelConstraints.gridx = 0;
       daysLeftLabelConstraints.gridy = 1;
-      daysLeftLabelConstraints.insets = new Insets( 0, 5, 10, 0 );
+      daysLeftLabelConstraints.insets = new Insets( 0, 10, 10, 0 );
       drinkAmountPanel.add( daysLeftLabel, daysLeftLabelConstraints );
 
       setAmountButton.addActionListener( new ActionListener()
@@ -451,7 +447,10 @@ public class Adminview extends JPanel
               ZonedDateTime thirtyDaysAgo = now.minusDays( 30 );
               if ( !date.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
               {
-                amount++;
+                if ( data[ 5 ].equals( "false" ) )
+                {
+                  amount++;
+                }
               }
             }
             catch ( ParseException exception )
@@ -484,7 +483,7 @@ public class Adminview extends JPanel
    * 
    * @param balance Guthaben
    */
-  public void updatePiggybankBalanceLabel( Float balance )
+  private void updatePiggybankBalanceLabel( Float balance )
   {
     piggyBankLabel.setText( String.format( "Im Sparschwein befinden sich %.2f€", balance ) );
   }

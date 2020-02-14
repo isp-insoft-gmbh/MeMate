@@ -469,6 +469,7 @@ public class Login extends JFrame
   {
     if ( loginResult == LoginResult.LOGIN_SUCCESSFULL )
     {
+      ServerCommunication.getInstance().startDrinkInfoTimer();
       ServerCommunication.getInstance().updateCurrentUser( currentUsername );
       generateSessionID( currentUsername );
       dispose();
@@ -479,7 +480,6 @@ public class Login extends JFrame
       ServerCommunication.getInstance().tellServerToSendDrinkInformations();
       ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
       ServerCommunication.getInstance().tellServerToSendHistoryData();
-      History.getInstance().updateHistory();
       mainframe.toggleAdminView();
       mainframe.requestFocus();
     }

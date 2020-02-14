@@ -105,7 +105,10 @@ public class ConsumptionRate extends JPanel
             Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
             if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
             {
-              amountMap.put( date, amountMap.get( date ) + 1 );
+              if ( data[ 5 ].equals( "false" ) )
+              {
+                amountMap.put( date, amountMap.get( date ) + 1 );
+              }
             }
           }
           catch ( ParseException exception )
@@ -123,7 +126,10 @@ public class ConsumptionRate extends JPanel
             Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
             if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
             {
-              amountMap.put( date, amountMap.get( date ) + 1 );
+              if ( data[ 5 ].equals( "false" ) )
+              {
+                amountMap.put( date, amountMap.get( date ) + 1 );
+              }
             }
           }
           catch ( ParseException exception )

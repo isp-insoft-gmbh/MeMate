@@ -73,6 +73,7 @@ public class DrinkConsumptionButton extends JPanel
   private final JLabel       textLabel                              = MeMateUIManager.createJLabel();
   private final JLayeredPane overlay                                = new JLayeredPane();
   private final JLabel       iconLabel;
+  private final JLabel       fillLable                              = new JLabel();
   private MouseListener      mouseListener;
   private FocusListener      focusListener;
   private KeyListener        keyListener;
@@ -115,8 +116,7 @@ public class DrinkConsumptionButton extends JPanel
       infoButtonConstraints.anchor = GridBagConstraints.LINE_END;
       nameLabelAndDrinkInfoButtonPanel.add( infoButton, infoButtonConstraints );
 
-      JLabel fillLable = new JLabel();
-      fillLable.setPreferredSize( new Dimension( 51, 1 ) );
+      fillLable.setPreferredSize( new Dimension( 33, 21 ) );
       GridBagConstraints fillLablenConstraints = new GridBagConstraints();
       fillLablenConstraints.gridx = 0;
       fillLablenConstraints.gridy = 0;
@@ -175,6 +175,7 @@ public class DrinkConsumptionButton extends JPanel
             addPanel( "Eiweiß", 8, infoPanel, ingredients );
             addPanel( "Salz", 9, infoPanel, ingredients );
             add( infoPanel, BorderLayout.CENTER );
+            MeMateUIManager.setUISettings();
           }
           else
           {
@@ -222,8 +223,7 @@ public class DrinkConsumptionButton extends JPanel
           seperatorConstraints.fill = GridBagConstraints.HORIZONTAL;
           panel.add( separator, seperatorConstraints );
 
-          JLabel amountLabel = new JLabel();
-          MeMateUIManager.registerlabel( amountLabel );
+          JLabel amountLabel = MeMateUIManager.createJLabel();
           switch ( ingredient )
           {
             case "Salz":
@@ -304,6 +304,7 @@ public class DrinkConsumptionButton extends JPanel
         remove( overlay );
         remove( askWhetherToReallyConsumeLabel );
         iconLabel.setVisible( true );
+        infoButton.setVisible( true );
         repaint();
         revalidate();
         requestFocus();
@@ -320,6 +321,7 @@ public class DrinkConsumptionButton extends JPanel
         remove( overlay );
         remove( askWhetherToReallyConsumeLabel );
         iconLabel.setVisible( true );
+        infoButton.setVisible( true );
         repaint();
         revalidate();
         requestFocus();
@@ -497,7 +499,9 @@ public class DrinkConsumptionButton extends JPanel
    */
   private void askWhetherToReallyConsume( String drinkName, ActionListener abortButtonListener )
   {
-    Dashboard.getInstance().resetAllDrinkButtons();
+    Mainframe.getInstance().getDashboard().resetAllDrinkButtons();
+    infoButton.setVisible( false );
+    fillLable.setVisible( false );
     askWhetherToReallyConsumeLabelIsActive = true;
     if ( MeMateUIManager.getDarkModeState() )
     {
@@ -546,6 +550,7 @@ public class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         Mainframe.getInstance().setUndoButtonEnabled( true );
         infoButton.setEnabled( true );
+        fillLable.setVisible( true );
         askWhetherToReallyConsumeLabelIsActive = false;
         ServerCommunication.getInstance().lock.unlock();
       }
@@ -561,6 +566,7 @@ public class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         abortButton.removeActionListener( this );
         infoButton.setEnabled( true );
+        fillLable.setVisible( true );
         askWhetherToReallyConsumeLabelIsActive = false;
       }
     };
@@ -569,6 +575,8 @@ public class DrinkConsumptionButton extends JPanel
 
   void reset()
   {
+    infoButton.setVisible( true );
+    fillLable.setVisible( true );
     ActionListener[] abortListenerArray = abortButton.getActionListeners();
     for ( ActionListener actionListener : abortListenerArray )
     {

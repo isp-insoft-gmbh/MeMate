@@ -704,7 +704,7 @@ public class Database
   public String[][] getHistory( String currentUser )
   {
     ArrayList<String[]> history = new ArrayList<>();
-    String sql = "SELECT action,consumer,transaction_price,balance,date FROM historie_log";
+    String sql = "SELECT action,consumer,transaction_price,balance,date,undo FROM historie_log";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
@@ -719,7 +719,7 @@ public class Database
             String[] log = { rs.getString( "action" ), consumer,
                 NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString()
                     .replace( " ", "" ),
-                balance, rs.getString( "date" ) };
+                balance, rs.getString( "date" ), String.valueOf( rs.getBoolean( "undo" ) ) };
             history.add( log );
           }
         }
@@ -739,14 +739,17 @@ public class Database
   public String[][] getLast5HistoryEntries()
   {
     ArrayList<String[]> history = new ArrayList<>();
-    String sql = "SELECT action,consumer,date FROM historie_log ORDER BY date DESC LIMIT 5";
+    String sql = "SELECT action,consumer,date,undo FROM historie_log ORDER BY date DESC LIMIT 5";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
       while ( rs.next() )
       {
-        String[] log = { rs.getString( "action" ), rs.getString( "consumer" ), rs.getString( "date" ) };
-        history.add( log );
+        if ( !rs.getBoolean( "undo" ) )
+        {
+          String[] log = { rs.getString( "action" ), rs.getString( "consumer" ), rs.getString( "date" ) };
+          history.add( log );
+        }
       }
 
     }

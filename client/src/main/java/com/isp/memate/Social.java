@@ -52,7 +52,7 @@ public class Social extends JPanel
   /**
    * 
    */
-  public static void update()
+  public void update()
   {
     mainPanel.removeAll();
     scoreBoardPanel.removeAll();
