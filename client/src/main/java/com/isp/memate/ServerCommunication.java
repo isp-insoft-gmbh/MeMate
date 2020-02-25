@@ -26,7 +26,7 @@ import com.isp.memate.Shared.Operation;
 import com.isp.memate.util.ClientLog;
 
 /**
- * Die Klasse {@link ServerCommunication} kommunizert mit dem Server
+ * Die Klasse ServerCommunication kommunizert mit dem Server
  * und schickt verschiedenen Shared-Objekte an der Server.
  * Beispielsweise bei checkLogin schickt die Klasse ein Objekt, welches
  * den Befehl CHECK_LOGIN und ein Userobjekt, welches Nutzername und
@@ -35,10 +35,10 @@ import com.isp.memate.util.ClientLog;
  * @author nwe
  * @since 24.10.2019
  */
-public class ServerCommunication
+class ServerCommunication
 {
   private static final ServerCommunication    instance            = new ServerCommunication();
-  public final ReentrantLock                  lock                = new ReentrantLock( true );
+  final ReentrantLock                         lock                = new ReentrantLock( true );
   private final ArrayList<Byte>               byteImageList       = new ArrayList<>();
   private final List<String>                  drinkNames          = new ArrayList<>();
   private final Map<String, Float>            priceMap            = new HashMap<>();
@@ -64,7 +64,7 @@ public class ServerCommunication
   /**
    * @return the static instance of {@link ServerCommunication}
    */
-  public static ServerCommunication getInstance()
+  static ServerCommunication getInstance()
   {
     return instance;
   }
@@ -183,7 +183,7 @@ public class ServerCommunication
     timer3.schedule( task3, 5000, 300000 );
   }
 
-  public void startDrinkInfoTimer()
+  void startDrinkInfoTimer()
   {
     /**
      * Dieser Task sorgt dafür, dass die Getränke alle 30
@@ -205,7 +205,7 @@ public class ServerCommunication
   /**
    * @param history
    */
-  protected void updateHistory( String[][] history )
+  private void updateHistory( String[][] history )
   {
     List<String[]> list = Arrays.asList( history );
     Collections.reverse( list );
@@ -215,7 +215,7 @@ public class ServerCommunication
   /**
    * @param history
    */
-  protected void updateShortHistory( String[][] history )
+  private void updateShortHistory( String[][] history )
   {
     this.shortHistory = history;
   }
@@ -223,7 +223,7 @@ public class ServerCommunication
   /**
    * @param history
    */
-  protected void updateScoreboard( String[][] history )
+  private void updateScoreboard( String[][] history )
   {
     this.scoreboard = history;
   }
@@ -232,7 +232,7 @@ public class ServerCommunication
    * @param name Name des Getränks
    * @return Image des Getränks.
    */
-  public ImageIcon getIcon( String name )
+  ImageIcon getIcon( String name )
   {
     return imageMap.get( name );
   }
@@ -241,7 +241,7 @@ public class ServerCommunication
    * @param name Name des Getränks
    * @return Preis des Getränks.
    */
-  public Float getPrice( String name )
+  Float getPrice( String name )
   {
     return priceMap.get( name );
   }
@@ -250,7 +250,7 @@ public class ServerCommunication
    * @param name Name des Getränks
    * @return ID des Getränks.
    */
-  public Integer getID( String name )
+  Integer getID( String name )
   {
     return drinkIDMap.get( name );
   }
@@ -259,7 +259,7 @@ public class ServerCommunication
    * @param name Name des Getränks
    * @return Anzahl des Getränks.
    */
-  public Integer getAmount( String name )
+  Integer getAmount( String name )
   {
     return amountMap.get( name );
   }
@@ -268,7 +268,7 @@ public class ServerCommunication
    * @param name Name des Getränks
    * @return Inhaltsstoffe des Getränks
    */
-  public DrinkIngredients getIngredients( String name )
+  DrinkIngredients getIngredients( String name )
   {
     return IngredientsMap.get( name );
   }
@@ -277,7 +277,7 @@ public class ServerCommunication
    * @param name Name des Getränks
    * @return Ob es Inhaltsangaben über das Getränk gibt oder nicht.
    */
-  public Boolean hasIngredients( String name )
+  Boolean hasIngredients( String name )
   {
     return drinkIngredientsMap.get( name );
   }
@@ -293,54 +293,64 @@ public class ServerCommunication
   private void updateMaps( Drink[] drinkInfos )
   {
     lock.lock();
-    List<String> oldDrinkNames = new ArrayList<>( drinkNames );
-    Map<String, Float> oldPriceMap = new HashMap<>();
-    oldPriceMap.putAll( priceMap );
-    Map<String, Integer> oldAmountMap = new HashMap<>();
-    oldAmountMap.putAll( amountMap );
-    ArrayList<Byte> oldByteImageList = new ArrayList<>( byteImageList );
+    try
+    {
+      List<String> oldDrinkNames = new ArrayList<>( drinkNames );
+      Map<String, Float> oldPriceMap = new HashMap<>();
+      oldPriceMap.putAll( priceMap );
+      Map<String, Integer> oldAmountMap = new HashMap<>();
+      oldAmountMap.putAll( amountMap );
+      ArrayList<Byte> oldByteImageList = new ArrayList<>( byteImageList );
 
-    priceMap.clear();
-    amountMap.clear();
-    imageMap.clear();
-    drinkIDMap.clear();
-    drinkNames.clear();
-    drinkIngredientsMap.clear();
-    IngredientsMap.clear();
-    byteImageList.clear();
-    for ( Drink drink : drinkInfos )
-    {
-      String name = drink.name;
-      Float price = drink.price;
-      int amount = drink.amount;
-      byte[] pictureInBytes = drink.pictureInBytes;
-      Integer id = drink.id;
-      ImageIcon icon = new ImageIcon( pictureInBytes );
-      priceMap.put( name, price );
-      imageMap.put( name, icon );
-      amountMap.put( name, amount );
-      //FIXME Das muss besser werden
-      //Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend mit der vorherigen Liste verglichen wird. 
-      byteImageList.add( pictureInBytes[ 355 ] );
-      drinkIDMap.put( name, id );
-      drinkNames.add( name );
-      drinkIngredientsMap.put( name, drink.ingredients );
-      IngredientsMap.put( name, drink.drinkIngredients );
+      priceMap.clear();
+      amountMap.clear();
+      imageMap.clear();
+      drinkIDMap.clear();
+      drinkNames.clear();
+      drinkIngredientsMap.clear();
+      IngredientsMap.clear();
+      byteImageList.clear();
+      for ( Drink drink : drinkInfos )
+      {
+        String name = drink.name;
+        Float price = drink.price;
+        int amount = drink.amount;
+        byte[] pictureInBytes = drink.pictureInBytes;
+        Integer id = drink.id;
+        ImageIcon icon = new ImageIcon( pictureInBytes );
+        priceMap.put( name, price );
+        imageMap.put( name, icon );
+        amountMap.put( name, amount );
+        //FIXME Das muss besser werden
+        //Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend mit der vorherigen Liste verglichen wird. 
+        byteImageList.add( pictureInBytes[ 355 ] );
+        drinkIDMap.put( name, id );
+        drinkNames.add( name );
+        drinkIngredientsMap.put( name, drink.ingredients );
+        IngredientsMap.put( name, drink.drinkIngredients );
+      }
+      if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap ) || !byteImageList.equals( oldByteImageList )
+          || !amountMap.equals( oldAmountMap ) )
+      {
+        Mainframe.getInstance().updateDashboard();
+      }
+      Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
     }
-    if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap ) || !byteImageList.equals( oldByteImageList )
-        || !amountMap.equals( oldAmountMap ) )
+    catch ( Exception exception )
     {
-      Mainframe.getInstance().updateDashboard();
+      ClientLog.newLog( exception.getMessage() );
     }
-    Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
-    lock.unlock();
+    finally
+    {
+      lock.unlock();
+    }
   }
 
 
   /**
    * Sagt dem Server, dass er die Historie schicken soll.
    */
-  public void tellServerToSendHistoryData()
+  void tellServerToSendHistoryData()
   {
     try
     {
@@ -370,7 +380,7 @@ public class ServerCommunication
   /**
    * Sagt dem Server, dass er die aktuelle Versionsnummer schicken soll.
    */
-  public void tellServertoSendVersionNumber()
+  void tellServertoSendVersionNumber()
   {
     try
     {
@@ -385,7 +395,7 @@ public class ServerCommunication
   /**
    * Sagt dem Server, dass die letzte Aktion rückgängig gemacht werden soll.
    */
-  public void undoLastAction()
+  void undoLastAction()
   {
     try
     {
@@ -414,7 +424,7 @@ public class ServerCommunication
    * 
    * @param username Benutzername
    */
-  public void updateCurrentUser( String username )
+  void updateCurrentUser( String username )
   {
     this.currentUser = username;
   }
@@ -424,7 +434,7 @@ public class ServerCommunication
    * Schickt einen Befehl an den Server, damit dieser
    * die Getränksinformationen sendet.
    */
-  public void tellServerToSendDrinkInformations()
+  void tellServerToSendDrinkInformations()
   {
     try
     {
@@ -444,7 +454,7 @@ public class ServerCommunication
    * 
    * @param drinkIngredients Inhaltsstoffe
    */
-  public void registerIngredients( DrinkIngredients drinkIngredients )
+  void registerIngredients( DrinkIngredients drinkIngredients )
   {
     try
     {
@@ -466,7 +476,7 @@ public class ServerCommunication
    * @param login ein {@link LoginInformation} Objekt, welches den Nutzernamen und das gehashte Passwort
    *          enthält.
    */
-  public void checkLogin( LoginInformation login )
+  void checkLogin( LoginInformation login )
   {
     try
     {
@@ -486,7 +496,7 @@ public class ServerCommunication
    * 
    * @param username Benutzername
    */
-  public void getBalance( String username )
+  void getBalance( String username )
   {
     try
     {
@@ -508,7 +518,7 @@ public class ServerCommunication
    * 
    * @return Die Historydaten als 2D Array
    */
-  public String[][] getHistoryData( dateType dateType )
+  String[][] getHistoryData( dateType dateType )
   {
     if ( history == null )
     {
@@ -565,7 +575,7 @@ public class ServerCommunication
     return scoreboard;
   }
 
-  public enum dateType
+  enum dateType
   {
     SHORT,
     LONG,
@@ -579,7 +589,7 @@ public class ServerCommunication
    * @param username Benutzername
    * @param password gehashtes Passwort
    */
-  public void registerNewUser( String username, String password )
+  void registerNewUser( String username, String password )
   {
     try
     {
@@ -603,7 +613,7 @@ public class ServerCommunication
    *          mit dem neuen
    *          Namen, dem neuen Preis oder dem neuen Bild sein.
    */
-  public void updateDrinkInformations( Integer id, Operation operation, Object updatedInformation )
+  void updateDrinkInformations( Integer id, Operation operation, Object updatedInformation )
   {
     try
     {
@@ -637,7 +647,7 @@ public class ServerCommunication
    * 
    * @param drink ein Drink-Objekt, welches alle angegeben Informationen des Getränks enthält.
    */
-  public void registerNewDrink( Drink drink )
+  void registerNewDrink( Drink drink )
   {
     try
     {
@@ -659,7 +669,7 @@ public class ServerCommunication
    * @param id ID des Getränks
    * @param name Name des Getränks
    */
-  public void removeDrink( Integer id, String name )
+  void removeDrink( Integer id, String name )
   {
     try
     {
@@ -672,7 +682,6 @@ public class ServerCommunication
     tellServerToSendDrinkInformations();
   }
 
-  @SuppressWarnings( "javadoc" )
   public List<String> getDrinkNames()
   {
     if ( drinkNames != null )
@@ -691,7 +700,7 @@ public class ServerCommunication
    * @param username Nutzername
    * @param uuid SessionID
    */
-  public void connectSessionIDToUser( String username, String uuid )
+  void connectSessionIDToUser( String username, String uuid )
   {
     try
     {
@@ -711,7 +720,7 @@ public class ServerCommunication
    * 
    * @param sessionID SessionID
    */
-  public void checkLoginForSessionID( String sessionID )
+  void checkLoginForSessionID( String sessionID )
   {
     try
     {
@@ -730,7 +739,7 @@ public class ServerCommunication
    * 
    * @param valueToAdd Amount to add to balance
    */
-  public void addBalance( int valueToAdd )
+  void addBalance( int valueToAdd )
   {
     try
     {
@@ -750,7 +759,7 @@ public class ServerCommunication
    * 
    * @param drinkName Name des Getränks
    */
-  public void consumeDrink( String drinkName )
+  void consumeDrink( String drinkName )
   {
     try
     {
@@ -782,7 +791,7 @@ public class ServerCommunication
   /**
    * Sagt dem Server, dass er Den Kontostand des Spaarschweins schicken soll.
    */
-  public void tellServerToSendPiggybankBalance()
+  void tellServerToSendPiggybankBalance()
   {
     try
     {
@@ -795,8 +804,7 @@ public class ServerCommunication
     }
   }
 
-  @SuppressWarnings( "javadoc" )
-  public void setDrinkAmount( String name, int amount )
+  void setDrinkAmount( String name, int amount )
   {
     try
     {
@@ -811,7 +819,7 @@ public class ServerCommunication
   /**
    * Teilt dem Server mit, dass der Nutzer sich ausgeloggt hat.
    */
-  public void logout()
+  void logout()
   {
     try
     {
@@ -825,7 +833,6 @@ public class ServerCommunication
   }
 
 
-  @SuppressWarnings( "javadoc" )
   public String[] getAllUsers()
   {
     return userArray;
@@ -837,7 +844,7 @@ public class ServerCommunication
    * @param username Nutzername
    * @param password neues Passwort
    */
-  public void changePassword( String username, String password )
+  void changePassword( String username, String password )
   {
     try
     {
@@ -871,7 +878,7 @@ public class ServerCommunication
    * 
    * @param clientVersion Version des Clients
    */
-  public void checkVersion( String clientVersion )
+  void checkVersion( String clientVersion )
   {
     ClientLog.newLog( "CHECK VERSION" );
     ClientLog.newLog( "Server: " + version );

@@ -28,7 +28,7 @@ import com.isp.memate.util.MeMateUIManager;
  * @author nwe
  * @since 15.10.2019
  */
-public class History extends JPanel
+class History extends JPanel
 {
   private final String[]    columnNames  = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
   private final JScrollPane scrollPane   = new JScrollPane();
@@ -62,7 +62,7 @@ public class History extends JPanel
    * Sollte man selber oder ein anderer Nutzer etwas machen, so kann mit dieser
    * Methode die History von Außen geupdated werden.
    */
-  public void updateHistory()
+  void updateHistory()
   {
     tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( dateType.MIDDLE ), columnNames )
     {

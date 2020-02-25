@@ -41,7 +41,7 @@ import com.isp.memate.util.MeMateUIManager;
  * @author nwe
  * @since 15.10.2019
  */
-public class Mainframe extends JFrame
+class Mainframe extends JFrame
 {
   private static final Mainframe instance               = new Mainframe();
   private final Icon             dashboardIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_black.png" ) );
@@ -95,7 +95,7 @@ public class Mainframe extends JFrame
   /**
    * @return the static instance of {@link ServerCommunication}
    */
-  public static Mainframe getInstance()
+  static Mainframe getInstance()
   {
     return instance;
   }
@@ -408,7 +408,7 @@ public class Mainframe extends JFrame
    * 
    * @param newBalance der Kontostand
    */
-  public void updateBalanceLabel( Float newBalance )
+  void updateBalanceLabel( Float newBalance )
   {
     balanceLabel.setText( String.format( "Kontostand: %.2f €", newBalance ) );
     if ( newBalance.floatValue() >= 0 )
@@ -424,7 +424,7 @@ public class Mainframe extends JFrame
   /**
    * Toggles the Adminview
    */
-  public void toggleAdminView()
+  void toggleAdminView()
   {
     if ( ServerCommunication.getInstance().currentUser.equals( "admin" ) )
     {
@@ -449,7 +449,7 @@ public class Mainframe extends JFrame
     undoButton.setEnabled( state );
   }
 
-  public void updateDashboard()
+  void updateDashboard()
   {
     Component[] comp = contentPanel.getComponents();
     for ( Component component : comp )

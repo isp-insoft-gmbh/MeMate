@@ -30,7 +30,7 @@ import com.isp.memate.util.MeMateUIManager;
  * @author nwe
  * @since 15.10.2019
  */
-public class Drinkmanager extends JPanel
+class Drinkmanager extends JPanel
 {
   private String[]          data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
   private final JButton     addButton         = MeMateUIManager.createNormalButton( "button" );
@@ -162,7 +162,7 @@ public class Drinkmanager extends JPanel
   /**
    * Sollte es neue Getränke geben so kann hier von Außen die Liste aktualisiert werden.
    */
-  public void updateList()
+  void updateList()
   {
     data = new String[ServerCommunication.getInstance().getDrinkNames().size()];
     data = ServerCommunication.getInstance().getDrinkNames().toArray( data );

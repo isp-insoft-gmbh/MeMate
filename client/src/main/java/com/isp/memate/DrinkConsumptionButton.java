@@ -44,14 +44,14 @@ import com.isp.memate.util.MeMateUIManager;
 
 
 /**
- * Die Klasse {@link DrinkConsumptionButton} erzeugt eine Komponente, welcher auf einem {@link JPanel}
+ * Die Klasse DrinkConsumptionButton erzeugt eine Komponente, welcher auf einem {@link JPanel}
  * basiert, aber einen Button nachahmt. Man kann ihn fokusieren und auch das
  * Highlighting verhält sich ähnlich zu einem echten Button.
  * 
  * @author nwe
  * @since 18.10.2019
  */
-public class DrinkConsumptionButton extends JPanel
+class DrinkConsumptionButton extends JPanel
 {
   private static final Color HOVER_BACKGROUND_COLOR = new Color( 186, 232, 232 );
   private static final Color PRESSED_BACKGROUND     = UIManager.getColor( "AppColor" );
@@ -89,7 +89,7 @@ public class DrinkConsumptionButton extends JPanel
    * @param name Name des Getränks, welcher unten im "Button" angezeigt werden soll
    * @param icon Bild des Getränks, welches mittig im "Button" angezeigt werden soll
    */
-  public DrinkConsumptionButton( Mainframe mainFrame, String price, String name, Icon icon )
+  DrinkConsumptionButton( Mainframe mainFrame, String price, String name, Icon icon )
   {
     setLayout( new BorderLayout() );
     acceptButton.setText( "Ja" );
@@ -536,23 +536,33 @@ public class DrinkConsumptionButton extends JPanel
       @Override
       public void actionPerformed( ActionEvent e )
       {
-        ServerCommunication.getInstance().lock.lock();
-        ServerCommunication.getInstance().consumeDrink( drinkName );
-        ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
-        acceptButton.removeActionListener( this );
-        ActionListener[] array = abortButton.getActionListeners();
-        for ( ActionListener actionListener : array )
+        try
         {
-          abortButton.removeActionListener( actionListener );
+          ServerCommunication.getInstance().lock.lock();
+          ServerCommunication.getInstance().consumeDrink( drinkName );
+          ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
+          acceptButton.removeActionListener( this );
+          ActionListener[] array = abortButton.getActionListeners();
+          for ( ActionListener actionListener : array )
+          {
+            abortButton.removeActionListener( actionListener );
+          }
+          abortButton.addActionListener( abortButtonListener );
+          DrinkConsumptionButton.this.addMouseListener( mouseListener );
+          DrinkConsumptionButton.this.addKeyListener( keyListener );
+          Mainframe.getInstance().setUndoButtonEnabled( true );
+          infoButton.setEnabled( true );
+          fillLable.setVisible( true );
+          askWhetherToReallyConsumeLabelIsActive = false;
         }
-        abortButton.addActionListener( abortButtonListener );
-        DrinkConsumptionButton.this.addMouseListener( mouseListener );
-        DrinkConsumptionButton.this.addKeyListener( keyListener );
-        Mainframe.getInstance().setUndoButtonEnabled( true );
-        infoButton.setEnabled( true );
-        fillLable.setVisible( true );
-        askWhetherToReallyConsumeLabelIsActive = false;
-        ServerCommunication.getInstance().lock.unlock();
+        catch ( Exception exception )
+        {
+          ClientLog.newLog( exception.getMessage() );
+        }
+        finally
+        {
+          ServerCommunication.getInstance().lock.unlock();
+        }
       }
     };
     acceptButton.addActionListener( actionListener );

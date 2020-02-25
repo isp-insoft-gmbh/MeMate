@@ -14,7 +14,7 @@ import javax.swing.plaf.basic.BasicScrollBarUI;
  * @since 06.02.2020
  *
  */
-public class BrightScrollBarUI extends BasicScrollBarUI
+class BrightScrollBarUI extends BasicScrollBarUI
 {
   @Override
   protected JButton createDecreaseButton( final int orientation )

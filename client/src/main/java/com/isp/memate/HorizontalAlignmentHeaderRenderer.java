@@ -17,12 +17,11 @@ import javax.swing.table.TableCellRenderer;
  * @since 29.01.2020
  *
  */
-public class HorizontalAlignmentHeaderRenderer implements TableCellRenderer
+class HorizontalAlignmentHeaderRenderer implements TableCellRenderer
 {
   private int horizontalAlignment = SwingConstants.LEFT;
 
-  @SuppressWarnings( "javadoc" )
-  public HorizontalAlignmentHeaderRenderer( int horizontalAlignment )
+  HorizontalAlignmentHeaderRenderer( int horizontalAlignment )
   {
     this.horizontalAlignment = horizontalAlignment;
   }

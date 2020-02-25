@@ -45,7 +45,7 @@ import com.isp.memate.util.MeMateUIManager;
  * @since 09.12.2019
  *
  */
-public class Adminview extends JPanel
+class Adminview extends JPanel
 {
   private final JButton    exportButton          =
       MeMateUIManager.createNormalButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "export_white.png" ) ),
@@ -470,7 +470,7 @@ public class Adminview extends JPanel
   /**
    * Generiert das AdminPanel neu
    */
-  public void updateDrinkAmounts()
+  void updateDrinkAmounts()
   {
     removeAll();
     loadDefaultSettings();
@@ -486,22 +486,5 @@ public class Adminview extends JPanel
   private void updatePiggybankBalanceLabel( Float balance )
   {
     piggyBankLabel.setText( String.format( "Im Sparschwein befinden sich %.2f€", balance ) );
-  }
-
-  /**
-   * updated die Icons, je nach State des Darkmodes.
-   */
-  public void updateButtonIcons()
-  {
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      resetPasswordButton.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "password_white.png" ) ) );
-      exportButton.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "export_white.png" ) ) );
-    }
-    else
-    {
-      resetPasswordButton.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "password_black.png" ) ) );
-      exportButton.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "export_black.png" ) ) );
-    }
   }
 }

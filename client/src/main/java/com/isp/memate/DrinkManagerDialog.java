@@ -50,15 +50,15 @@ import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
- * Der {@linkplain DrinkManagerDialog} erzeugt einen neuen Frame,
- * wenn im {@linkplain Drinkmanager} ein Getränk hinzugefügt oder bearbeitet wird.
+ * Der DrinkManagerDialog erzeugt einen neuen Frame,
+ * wenn im Drinkmanager ein Getränk hinzugefügt oder bearbeitet wird.
  * In diesem Frame kann man den Name, Preis, und ein Bild des Getränks angeben oder editieren.
  * Des weiteren gibt es einen Dialog um Getränkeinformationen zu ergänzen.
  * 
  * @author nwe
  * @since 18.10.2019
  */
-public class DrinkManagerDialog
+class DrinkManagerDialog
 {
   private final SpinnerNumberModel spinnerModel      = new SpinnerNumberModel( 0, 0, 1000, 0.10 );
   private final JPanel             layout            = new JPanel( new GridBagLayout() );
@@ -77,7 +77,7 @@ public class DrinkManagerDialog
    * 
    * @param owner Parent für den aufzurufenden Dialog
    */
-  public DrinkManagerDialog( Window owner )
+  DrinkManagerDialog( Window owner )
   {
     final JLabel drinkName = new JLabel( "Name" );
     final JLabel drinkPrice = new JLabel( "Preis" );
@@ -264,7 +264,7 @@ public class DrinkManagerDialog
    * 
    * @return das neue Icon.
    */
-  protected Icon getEditIcon()
+  private Icon getEditIcon()
   {
     currentImage = (ImageIcon) pictureLabel.getIcon();
     BufferedImage image = new BufferedImage( currentImage.getIconWidth(), currentImage.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
@@ -297,7 +297,7 @@ public class DrinkManagerDialog
    * 
    * @param drink ausgewähltes Getränk
    */
-  public void showEditDialog( String drink )
+  void showEditDialog( String drink )
   {
     dialog.setTitle( "Getränk bearbeiten" );
     confirmButton.setText( "Speichern" );
@@ -371,7 +371,7 @@ public class DrinkManagerDialog
    * Es wird ein Name, Preis und Bild als Eingabe gefordert.
    * Sind die Eingaben korrekt, so werden diese an der Server weitergeleitet.
    */
-  public void showNewDialog()
+  void showNewDialog()
   {
     if ( MeMateUIManager.getDarkModeState() )
     {
@@ -441,7 +441,7 @@ public class DrinkManagerDialog
    * Zeigt einen Dialog an, um Informationen über das Getränk zu ergänzen.
    * Beispielsweise Zutatenliste, Fettgehalt oder Zuckergehalt.
    */
-  public void showIngredientsDialog( int DrinkID )
+  void showIngredientsDialog( int DrinkID )
   {
     layout.removeAll();
     dialog.setTitle( "Inhaltsstoffe hinzufügen" );

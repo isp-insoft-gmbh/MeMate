@@ -34,7 +34,7 @@ import com.isp.memate.util.MeMateUIManager;
  * @since 28.01.2020
  *
  */
-public class CreditHistory extends JPanel
+class CreditHistory extends JPanel
 {
 
   /**
@@ -48,7 +48,7 @@ public class CreditHistory extends JPanel
   /**
    * Erzeugt eine neue Chart und fügt diese hinzu.
    */
-  public void addChart()
+  void addChart()
   {
     removeAll();
     JFreeChart lineChart = ChartFactory.createLineChart( "Guthabenverlauf", "Datum", "Guthaben", createBalanceDataset(),

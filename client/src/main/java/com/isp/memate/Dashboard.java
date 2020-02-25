@@ -22,6 +22,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
 
@@ -30,7 +31,7 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 /**
- * Auf dem {@link Dashboard} soll der Nutzer die Auswahl an Getränken sehen
+ * Auf dem Dashboard soll der Nutzer die Auswahl an Getränken sehen
  * und sich nach Bedarf, welche kaufen können.
  * Tut er dies, so wird der Preis des Getränks von seinem Guthaben abgezogen.
  * Außerdem hat der Benutzer auf dem Dashboard die Möglichkeit sein Kontostand aufzuladen
@@ -39,7 +40,7 @@ import net.miginfocom.swing.MigLayout;
  * @author nwe
  * @since 15.10.2019
  */
-public class Dashboard extends JPanel
+class Dashboard extends JPanel
 {
   private final Mainframe                   mainFrame;
   private final ImageIcon                   infoIcon      = new ImageIcon( getClass().getClassLoader().getResource( "infoicon.png" ) );
@@ -54,12 +55,13 @@ public class Dashboard extends JPanel
    * 
    * @param mainFrame Parent-Mainframe für Statuszugriff/updates
    */
-  public Dashboard( Mainframe mainFrame )
+  Dashboard( Mainframe mainFrame )
   {
     this.mainFrame = mainFrame;
     scrollpane = new JScrollPane( createDrinkButtonPanel() );
     scrollpane.getVerticalScrollBar().setUnitIncrement( 16 );
     scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+    scrollpane.setHorizontalScrollBarPolicy( JScrollPane.HORIZONTAL_SCROLLBAR_NEVER );
 
     setLayout( new BorderLayout() );
     add( scrollpane, BorderLayout.CENTER );
@@ -150,7 +152,7 @@ public class Dashboard extends JPanel
    * 
    * @return Das Panel in welchem man die angebotenen Getränke anklicken kann.
    */
-  public JPanel createDrinkButtonPanel()
+  private JPanel createDrinkButtonPanel()
   {
     buttonList.clear();
     JPanel panel = MeMateUIManager.createJPanel();
@@ -190,13 +192,22 @@ public class Dashboard extends JPanel
     return panel;
   }
 
-  @SuppressWarnings( "javadoc" )
-  public void updateButtonpanel()
+  void updateButtonpanel()
   {
-    ServerCommunication.getInstance().lock.lock();
-    scrollpane.setViewportView( createDrinkButtonPanel() );
-    ServerCommunication.getInstance().lock.unlock();
-    MeMateUIManager.setUISettings();
+    try
+    {
+      ServerCommunication.getInstance().lock.lock();
+      scrollpane.setViewportView( createDrinkButtonPanel() );
+      MeMateUIManager.setUISettings();
+    }
+    catch ( Exception exception )
+    {
+      ClientLog.newLog( exception.getMessage() );
+    }
+    finally
+    {
+      ServerCommunication.getInstance().lock.unlock();
+    }
   }
 
   /**
@@ -205,7 +216,7 @@ public class Dashboard extends JPanel
    * @param name Name des Geträmnks
    * @param price Preis des Getränks
    */
-  public void showPriceChangedDialog( String name, Float price )
+  void showPriceChangedDialog( String name, Float price )
   {
 
     int result = JOptionPane.showConfirmDialog( mainFrame,
@@ -226,7 +237,7 @@ public class Dashboard extends JPanel
    * 
    * @param name Getränkenaame
    */
-  public void showNoMoreDrinksDialog( String name )
+  void showNoMoreDrinksDialog( String name )
   {
     JOptionPane.showMessageDialog( mainFrame, "<html><b>" + name + " </b>ist leider nicht mehr verfügbar</html>", "Getränk nicht verfügbar",
         JOptionPane.ERROR_MESSAGE, null );
@@ -237,7 +248,7 @@ public class Dashboard extends JPanel
    * Resetet alle drinkButtons, dies tritt nur auf wenn man bereits ein
    * Getränk angeklickt hat und nun ein weiteres anklicken möchte.
    */
-  public void resetAllDrinkButtons()
+  void resetAllDrinkButtons()
   {
     for ( DrinkConsumptionButton drinkConsumptionButton : buttonList )
     {

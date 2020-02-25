@@ -340,7 +340,7 @@ public class Login extends JFrame
    * @param input eingebenes Passwort
    * @return gehashtes Passwort
    */
-  public String getHash( String input )
+  String getHash( String input )
   {
     try
     {
@@ -465,7 +465,7 @@ public class Login extends JFrame
    * 
    * @param loginResult Antwort des Servers
    */
-  public void validateLoginResult( LoginResult loginResult )
+  void validateLoginResult( LoginResult loginResult )
   {
     if ( loginResult == LoginResult.LOGIN_SUCCESSFULL )
     {
@@ -536,7 +536,7 @@ public class Login extends JFrame
    * 
    * @param registrationResult Die Antwort des Servers auf die Registrierung.
    */
-  public void validateRegistartionResult( String registrationResult )
+  void validateRegistartionResult( String registrationResult )
   {
     if ( !registrationResult.equals( "Registrierung erfolgreich." ) )
     {

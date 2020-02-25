@@ -68,7 +68,6 @@ public class MeMateUIManager
   public static void installDefaults()
   {
     installNewKey( defaultKey, new DarkDayColor( new Color( 36, 43, 55 ), Color.WHITE ), new DarkDayColor( Color.WHITE, Color.BLACK ) );
-
   }
 
   public static void installNewKey( final String key, final DarkDayColor backgroundColors, final DarkDayColor foregroundColors )
@@ -77,6 +76,45 @@ public class MeMateUIManager
     backgroundMap.put( key, backgroundColors );
     foregroundMap.put( key, foregroundColors );
   }
+
+  public static void showDarkMode()
+  {
+    darkModeState = true;
+    UIManager.put( "OptionPane.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "OptionPane.messageForeground", Color.white );
+    UIManager.put( "Label.foreground", Color.white );
+    setUISettings();
+  }
+
+  public static void showDayMode()
+  {
+    darkModeState = false;
+    UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
+    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
+    UIManager.put( "OptionPane.messageForeground", Color.black );
+    UIManager.put( "Label.foreground", Color.black );
+    setUISettings();
+  }
+
+  public static void iniDayMode()
+  {
+    darkModeState = false;
+    UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
+    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
+    UIManager.put( "OptionPane.messageForeground", Color.black );
+    UIManager.put( "Label.foreground", Color.black );
+  }
+
+  public static void iniDarkMode()
+  {
+    darkModeState = true;
+    UIManager.put( "OptionPane.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "OptionPane.messageForeground", Color.white );
+    UIManager.put( "Label.foreground", Color.white );
+  }
+
 
   public static JPanel createJPanel()
   {
@@ -116,16 +154,6 @@ public class MeMateUIManager
     return checkbox;
   }
 
-  @SuppressWarnings( "javadoc" )
-  public static MeMateActionBarButton createButton( final String title, final String tooltip, final Color background,
-                                                    final Color foreground,
-                                                    final Runnable runnable, final String key )
-  {
-    MeMateActionBarButton button = new MeMateActionBarButton( title, tooltip, background, foreground, runnable );
-    buttonList.put( key, button );
-    return button;
-  }
-
   public static JButton createNormalButton( String key )
   {
     JButton button = new JButton();
@@ -138,12 +166,6 @@ public class MeMateUIManager
     return button;
   }
 
-  /**
-   * @param key
-   * @param imageIcon
-   * @param imageIcon2
-   * @return
-   */
   public static JButton createNormalButton( String key, ImageIcon imageIcon, ImageIcon imageIcon2 )
   {
     JButton button = createNormalButton( key );
@@ -151,54 +173,11 @@ public class MeMateUIManager
     return button;
   }
 
-  public static void showDayMode()
-  {
-    darkModeState = false;
-    UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
-    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
-    UIManager.put( "OptionPane.messageForeground", Color.black );
-    UIManager.put( "Label.foreground", Color.black );
-    setUISettings();
-  }
-
-  public static void showDarkMode()
-  {
-    darkModeState = true;
-    UIManager.put( "OptionPane.background", new Color( 36, 43, 55 ) );
-    UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
-    UIManager.put( "OptionPane.messageForeground", Color.white );
-    UIManager.put( "Label.foreground", Color.white );
-    setUISettings();
-  }
-
-  public static void iniDayMode()
-  {
-    darkModeState = false;
-    UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
-    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
-    UIManager.put( "OptionPane.messageForeground", Color.black );
-    UIManager.put( "Label.foreground", Color.black );
-  }
-
-  public static void iniDarkMode()
-  {
-    darkModeState = true;
-    UIManager.put( "OptionPane.background", new Color( 36, 43, 55 ) );
-    UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
-    UIManager.put( "OptionPane.messageForeground", Color.white );
-    UIManager.put( "Label.foreground", Color.white );
-  }
-
-  public static boolean getDarkModeState()
-  {
-    return darkModeState;
-  }
 
   public static void registerPanel( final String key, JPanel panel )
   {
     panelList.put( key, panel );
   }
-
 
   public static void registerIconLabel( JLabel infoIconLabel, ImageIcon infoIcon, ImageIcon infoIconWhite )
   {
@@ -221,19 +200,26 @@ public class MeMateUIManager
     scrollPaneList.put( key, scrollPane );
   }
 
-
-  @SuppressWarnings( "javadoc" )
   public static void registerSeparator( final JComponent separator, final String key )
   {
     separatorList.put( key, separator );
   }
 
-
-  @SuppressWarnings( "javadoc" )
   public static void registerlabel( final JLabel label )
   {
     labelList.put( defaultKey, label );
   }
+
+  public static void registerFreeChart( JFreeChart freeChart )
+  {
+    MeMateUIManager.freeChart = freeChart;
+  }
+
+  public static void registerLineChart( JFreeChart lineChart )
+  {
+    MeMateUIManager.lineChart = lineChart;
+  }
+
 
   public static DarkDayColor getBackground( String key )
   {
@@ -245,9 +231,12 @@ public class MeMateUIManager
     return foregroundMap.get( key );
   }
 
-  /**
-   *
-   */
+  public static boolean getDarkModeState()
+  {
+    return darkModeState;
+  }
+
+
   public static void setUISettings()
   {
     ClientLog.newLog( "UI-Update" );
@@ -536,9 +525,7 @@ public class MeMateUIManager
     private final ImageIcon darkIcon;
     private final ImageIcon dayIcon;
 
-    /**
-     *
-     */
+
     public DarkDayIcon( final ImageIcon darkIcon, final ImageIcon dayIcon )
     {
       this.darkIcon = darkIcon;
@@ -554,22 +541,5 @@ public class MeMateUIManager
     {
       return darkIcon;
     }
-  }
-
-  /**
-   * @param freeChart
-   * 
-   */
-  public static void registerFreeChart( JFreeChart freeChart )
-  {
-    MeMateUIManager.freeChart = freeChart;
-  }
-
-  /**
-   * @param lineChart
-   */
-  public static void registerLineChart( JFreeChart lineChart )
-  {
-    MeMateUIManager.lineChart = lineChart;
   }
 }

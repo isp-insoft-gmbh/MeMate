@@ -25,14 +25,14 @@ import javax.swing.border.Border;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
- * Der DrinkCellRenderer erweitert die ListCellRenderer-Klasse, damit im {@linkplain Drinkmanager} die
+ * Der DrinkCellRenderer erweitert die ListCellRenderer-Klasse, damit im Drinkmanager die
  * vorhandenen Getränke mit Vorschaubild und Preis dargestellt werden.
  * 
  * @author nwe
  * @since 17.10.2019
  *
  */
-public class DrinkCellRenderer implements ListCellRenderer<Object>
+class DrinkCellRenderer implements ListCellRenderer<Object>
 {
   private final Border DEFAULT_BORDER  = BorderFactory.createEmptyBorder( 2, 2, 2, 2 );
   private final Border FOCUS_BORDER    = BorderFactory.createCompoundBorder( BorderFactory.createEmptyBorder( 1, 1, 1, 1 ),

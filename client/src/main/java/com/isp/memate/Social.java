@@ -33,7 +33,7 @@ import com.isp.memate.util.MeMateUIManager;
  * @since 11.02.2020
  *
  */
-public class Social extends JPanel
+class Social extends JPanel
 {
   private static JPanel mainPanel             = MeMateUIManager.createJPanel();
   private static JPanel scoreBoardPanel       = MeMateUIManager.createJPanel();
@@ -53,7 +53,7 @@ public class Social extends JPanel
   /**
    * 
    */
-  public void update()
+  void update()
   {
     mainPanel.removeAll();
     scoreBoardPanel.removeAll();

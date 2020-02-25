@@ -28,7 +28,7 @@ import com.isp.memate.ServerCommunication.dateType;
  * @since 23.01.2020
  *
  */
-public class DataExport
+class DataExport
 {
   private final String path           = System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator;
   private final String userXMLPath    = path + "users.xml";

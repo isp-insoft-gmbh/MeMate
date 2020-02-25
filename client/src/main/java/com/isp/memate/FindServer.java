@@ -21,7 +21,7 @@ import com.isp.memate.util.ClientLog;
  * @since 10.12.2019
  *
  */
-public class FindServer
+class FindServer
 {
   private static DatagramSocket   socket        = null;
   private static InetAddress      serverAddress = null;
@@ -39,7 +39,7 @@ public class FindServer
   /**
    * @return Serveradresse
    */
-  public static InetAddress getServerAddress()
+  static InetAddress getServerAddress()
   {
     return serverAddress;
   }
@@ -47,7 +47,7 @@ public class FindServer
   /**
    * @return Serverport
    */
-  public static int getServerPort()
+  static int getServerPort()
   {
     return serverPort;
   }
@@ -88,7 +88,7 @@ public class FindServer
    * @param address Adresse an welche der Broadcast gesendet werden soll.
    * @throws IOException wenn etwas mit dem Socket fehlschlägt.
    */
-  public static void broadcast( String broadcastMessage, InetAddress address ) throws IOException
+  private static void broadcast( String broadcastMessage, InetAddress address ) throws IOException
   {
     //Sendet das Packet an den Server
     socket = new DatagramSocket();
@@ -129,7 +129,7 @@ public class FindServer
    * @return Liste der möglichen Adressen der Networkinterfaces.
    * @throws SocketException
    */
-  static List<InetAddress> listAllBroadcastAddresses() throws SocketException
+  private static List<InetAddress> listAllBroadcastAddresses() throws SocketException
   {
     List<InetAddress> broadcastList = new ArrayList<>();
     Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();

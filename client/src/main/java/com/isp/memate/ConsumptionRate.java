@@ -52,7 +52,7 @@ import com.isp.memate.util.MeMateUIManager;
  * @since 19.12.2019
  *
  */
-public class ConsumptionRate extends JPanel
+class ConsumptionRate extends JPanel
 {
   private final Map<String, Integer> amountMap      = new HashMap<>();
   private XYDataset                  dataset;
@@ -177,7 +177,7 @@ public class ConsumptionRate extends JPanel
    * Zuerst wird ein neuer Datensatz generiert und anhand davon das neue chartPanel.
    * Außerdem wird das Layout gesetzt, einige Settings geladen und Component- und ItemListener angemeldet.
    */
-  public void addGraph()
+  void addGraph()
   {
     removeAll();
     dataset = createDataset( "Alle" );
