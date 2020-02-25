@@ -10,13 +10,12 @@ import java.io.Serializable;
  * @since 02.12.2019
  *
  */
-public class DrinkPicture implements Serializable
+class DrinkPicture implements Serializable
 {
   byte[] pictureAsBytes;
   int    id;
 
-  @SuppressWarnings( "javadoc" )
-  public DrinkPicture( byte[] pictureAsBytes, int id )
+  DrinkPicture( byte[] pictureAsBytes, int id )
   {
     this.pictureAsBytes = pictureAsBytes;
     this.id = id;

@@ -10,16 +10,14 @@ import java.io.Serializable;
  * @since 27.11.2019
  *
  */
-public class User implements Serializable
+class User implements Serializable
 {
   String name;
   String password;
   Float  balance;
   int    id;
 
-
-  @SuppressWarnings( "javadoc" )
-  public User( String name, String password, Float balance, int id )
+  User( String name, String password, Float balance, int id )
   {
     this.name = name;
     this.password = password;

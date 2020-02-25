@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @since 06.01.2020
  *
  */
-public class DrinkIngredients implements Serializable
+class DrinkIngredients implements Serializable
 {
   int    drinkID;
   String ingredients;
@@ -23,10 +23,8 @@ public class DrinkIngredients implements Serializable
   double protein;
   double salt;
 
-
-  @SuppressWarnings( "javadoc" )
-  public DrinkIngredients( int drinkID, String ingredients, int energy_kJ, int energy_kcal, double fat, double fatty_acids, double carbs,
-                           double sugar, double protein, double salt )
+  DrinkIngredients( int drinkID, String ingredients, int energy_kJ, int energy_kcal, double fat, double fatty_acids, double carbs,
+                    double sugar, double protein, double salt )
   {
     this.drinkID = drinkID;
     this.ingredients = ingredients;

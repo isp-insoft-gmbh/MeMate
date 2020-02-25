@@ -10,16 +10,14 @@ import java.io.Serializable;
  * @since 02.12.2019
  *
  */
-public class SessionID implements Serializable
+class SessionID implements Serializable
 {
   String sessionID;
   String username;
 
-  @SuppressWarnings( "javadoc" )
-  public SessionID( String sessionID, String username )
+  SessionID( String sessionID, String username )
   {
     this.sessionID = sessionID;
     this.username = username;
   }
-
 }

@@ -10,11 +10,11 @@ import java.io.Serializable;
  * @since 27.11.2019
  *
  */
-public class Drink implements Serializable
+class Drink implements Serializable
 {
   String           name;
   Float            price;
-  String           picturePath;
+  private String   picturePath;
   byte[]           pictureInBytes;
   int              id;
   int              amount;
@@ -22,9 +22,8 @@ public class Drink implements Serializable
   DrinkIngredients drinkIngredients;
 
 
-  @SuppressWarnings( "javadoc" )
-  public Drink( String name, Float price, String picturePath, int id, byte[] pictureInBytes, int amount, boolean ingredients,
-                DrinkIngredients drinkIngredients )
+  Drink( String name, Float price, String picturePath, int id, byte[] pictureInBytes, int amount, boolean ingredients,
+         DrinkIngredients drinkIngredients )
   {
     this.name = name;
     this.price = price;

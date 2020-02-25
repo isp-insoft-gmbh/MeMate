@@ -10,17 +10,14 @@ import java.io.Serializable;
  * @since 17.12.2019
  *
  */
-public class DrinkAmount implements Serializable
+class DrinkAmount implements Serializable
 {
   String name;
   int    amount;
 
-
-  @SuppressWarnings( "javadoc" )
-  public DrinkAmount( String name, int amount )
+  DrinkAmount( String name, int amount )
   {
     this.name = name;
     this.amount = amount;
   }
-
 }

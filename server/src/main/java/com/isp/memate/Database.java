@@ -35,7 +35,7 @@ import com.isp.memate.Shared.Operation;
  * @author nwe
  * @since 24.10.2019
  */
-public class Database
+class Database
 {
   private Connection          conn = null;
   private final ReentrantLock lock = new ReentrantLock( true );
@@ -43,7 +43,7 @@ public class Database
   /**
    * @return path for all configuration / data; changes depending on OS
    */
-  public static Path getTargetFolder()
+  static Path getTargetFolder()
   {
     if ( System.getProperty( "os.name" ).toLowerCase().contains( "windows" ) )
     {
@@ -62,7 +62,7 @@ public class Database
    * 
    * @param dataBasePath Startparameter Pfad der Datenbank
    */
-  public Database( String dataBasePath )
+  Database( String dataBasePath )
   {
     try
     {
@@ -257,7 +257,7 @@ public class Database
    * @param id ID des Nutzers
    * @return Kontostand des Nutzers
    */
-  public Float getBalance( Integer id )
+  Float getBalance( Integer id )
   {
     Float balance = 0f;
     String sql = "SELECT guthaben FROM user WHERE ID= ?";
@@ -307,7 +307,7 @@ public class Database
    * @return Wenn eine Exception auftritt so wird, die Nachricht "Benutzername bereits vergeben" zurückgegeben,
    *         ansonsten "Registrierung erfolgreich"
    */
-  public String registerNewUser( String username, String password )
+  String registerNewUser( String username, String password )
   {
     lock.lock();
     String sql = "INSERT INTO user(guthaben,username,password) VALUES(?,?,?)";
@@ -337,7 +337,7 @@ public class Database
    * @param sessionID ID des Nutzers.
    * @param updatedBalance neuer Kontostand
    */
-  public void updateBalance( String sessionID, Float updatedBalance )
+  void updateBalance( String sessionID, Float updatedBalance )
   {
     lock.lock();
     String username = getUsernameForSessionID( sessionID );
@@ -367,7 +367,7 @@ public class Database
    * @param operation Opearion
    * @param updatedInformation die neue Information, kann Name, Preis oder Bild sein.
    */
-  public void updateDrinkInformation( Integer id, Operation operation, Object updatedInformation )
+  void updateDrinkInformation( Integer id, Operation operation, Object updatedInformation )
   {
     lock.lock();
     String sql = null;
@@ -417,7 +417,7 @@ public class Database
 
   /**
    * Liest alle Getränke aus der Datenbank und
-   * erstellt ein Array aus {@linkplain Drink}-Objekten.
+   * erstellt ein Array aus Drink-Objekten.
    * 
    * @return das Drink-Objekt-Array
    */
@@ -460,7 +460,7 @@ public class Database
    * @param price Preis des Getränks
    * @param picture Bild des Getränks
    */
-  public void registerNewDrink( String name, Float price, byte[] picture )
+  void registerNewDrink( String name, Float price, byte[] picture )
   {
     lock.lock();
     String sql = "INSERT INTO drink(name,preis,picture) VALUES(?,?,?)";
@@ -486,7 +486,7 @@ public class Database
    * 
    * @param id ID des Getränks
    */
-  public void removeDrink( Integer id )
+  void removeDrink( Integer id )
   {
     lock.lock();
     String sql = "DELETE FROM drink WHERE ID= ?";
@@ -516,7 +516,7 @@ public class Database
    * @param password gehashtes Passwort
    * @return ob der Login erfolgreich war oder nicht
    */
-  public LoginResult checkLogin( String username, String password )
+  LoginResult checkLogin( String username, String password )
   {
     String sql = "SELECT password FROM user WHERE username = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
@@ -545,7 +545,7 @@ public class Database
    * @param sessionID SessionID
    * @param userID NutzerID
    */
-  public void addSessionIDToUser( String sessionID, Integer userID )
+  void addSessionIDToUser( String sessionID, Integer userID )
   {
     lock.lock();
     String sql2 = "INSERT INTO session_ID(user,sessionID,last_login) VALUES (?,?,?)";
@@ -572,7 +572,7 @@ public class Database
    * @param sessionID SessionID
    * @return Username for the give SessionID
    */
-  public String getUsernameForSessionID( String sessionID )
+  String getUsernameForSessionID( String sessionID )
   {
     int userID = -1;
     String sql = "SELECT user FROM session_id WHERE sessionID = ?";
@@ -680,7 +680,7 @@ public class Database
    * @param consumedDrink Name des gakuften Getränks
    * @return den Preis für das gewählte Getränk
    */
-  public Float getDrinkPrice( String consumedDrink )
+  Float getDrinkPrice( String consumedDrink )
   {
     String sql = "SELECT preis FROM drink WHERE name = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
@@ -701,7 +701,7 @@ public class Database
    * @param currentUser derzeitiger Benutzer
    * @return Jede Kontoaufladung oder Getränkekauf.
    */
-  public String[][] getHistory( String currentUser )
+  String[][] getHistory( String currentUser )
   {
     ArrayList<String[]> history = new ArrayList<>();
     String sql = "SELECT action,consumer,transaction_price,balance,date,undo FROM historie_log";
@@ -800,7 +800,7 @@ public class Database
    * @param newBalance neuer Kontostand
    * @param date Datum
    */
-  public void addLog( String action, String username, Float transaction, Float newBalance, String date )
+  void addLog( String action, String username, Float transaction, Float newBalance, String date )
   {
     lock.lock();
     String sql = "INSERT INTO historie_log(action,consumer,transaction_price,balance,date) VALUES(?,?,?,?,?)";
@@ -828,7 +828,7 @@ public class Database
    * 
    * @param date Datum des Ereignisses
    */
-  public void disableLog( String date )
+  void disableLog( String date )
   {
     lock.lock();
     String sql = "UPDATE historie_log SET undo=? WHERE date=?";
@@ -894,7 +894,7 @@ public class Database
    * @param name Name des Getränks.
    * @return Anzahl des Getränks
    */
-  public int getDrinkAmount( String name )
+  int getDrinkAmount( String name )
   {
     String sql = "SELECT amount FROM drink WHERE name =?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
@@ -915,7 +915,7 @@ public class Database
    * 
    * @param name Name des Getränks
    */
-  public void decreaseAmountOfDrinks( String name )
+  void decreaseAmountOfDrinks( String name )
   {
     lock.lock();
     String sql = "UPDATE drink SET amount = amount -1 WHERE name = ?";
@@ -939,7 +939,7 @@ public class Database
    * 
    * @param name Name des Getränks
    */
-  public void increaseAmountOfDrinks( String name )
+  void increaseAmountOfDrinks( String name )
   {
     lock.lock();
     String sql = "UPDATE drink SET amount = amount +1 WHERE name = ?";
@@ -964,7 +964,7 @@ public class Database
    * @param name Name des Getränks
    * @param amount Anzahl des Getränks
    */
-  public void setAmountOfDrinks( String name, int amount )
+  void setAmountOfDrinks( String name, int amount )
   {
     lock.lock();
     String sql = "UPDATE drink SET amount = ? WHERE name = ?";
@@ -999,8 +999,8 @@ public class Database
    * @param protein Eiweiß
    * @param salt Salz
    */
-  public void addIngredients( int DrinkID, String ingredients, int energy_kJ, int energy_kcal, double fat, double fattyAcids,
-                              double carbs, double sugar, double protein, double salt )
+  void addIngredients( int DrinkID, String ingredients, int energy_kJ, int energy_kcal, double fat, double fattyAcids,
+                       double carbs, double sugar, double protein, double salt )
   {
     lock.lock();
     String sql =
@@ -1046,7 +1046,7 @@ public class Database
    * @param drinkID ID des Getränks
    * @return Inhaltsstoffe etc. des Getränks
    */
-  public DrinkIngredients getIngredients( int drinkID )
+  private DrinkIngredients getIngredients( int drinkID )
   {
     String sql = "SELECT * FROM ingredients WHERE drink = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
@@ -1115,7 +1115,7 @@ public class Database
    * @param name Nutzername
    * @param password Passwort
    */
-  public void changePassword( String name, String password )
+  void changePassword( String name, String password )
   {
     lock.lock();
     String sql = "UPDATE user SET password = ? WHERE username = ?";

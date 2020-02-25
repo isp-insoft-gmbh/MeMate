@@ -29,14 +29,6 @@ class FindServer
   private static final FindServer instance      = new FindServer();
 
   /**
-   * @return static instance of Dashboard
-   */
-  public static FindServer getInstance()
-  {
-    return instance;
-  }
-
-  /**
    * @return Serveradresse
    */
   static InetAddress getServerAddress()

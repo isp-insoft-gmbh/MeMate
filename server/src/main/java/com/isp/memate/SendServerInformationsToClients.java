@@ -20,7 +20,7 @@ import com.isp.memate.ServerLog.logType;
  * @since 10.12.2019
  *
  */
-public class SendServerInformationsToClients extends Thread
+class SendServerInformationsToClients extends Thread
 {
   private DatagramSocket socket;
   private byte[]         buf = new byte[256];

@@ -12,14 +12,14 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
- * Die {@link ServerLog} Klasse gibt zum einen alles formatiert und mit Farbe in der Console aus und speichert
+ * Die ServerLog Klasse gibt zum einen alles formatiert und mit Farbe in der Console aus und speichert
  * den Log in einer .txt Datei.
  * 
  * @author nwe
  * @since 02.01.2020
  *
  */
-public class ServerLog
+class ServerLog
 {
   private static final String            ANSI_RESET  = "\u001B[0m";
   private static final String            ANSI_RED    = "\u001B[31m";
@@ -33,7 +33,7 @@ public class ServerLog
    * @param logType Typ des Logs
    * @param message Nachricht
    */
-  public static void newLog( logType logType, String message )
+  static void newLog( logType logType, String message )
   {
     LocalDateTime now = LocalDateTime.now();
     String date = now.format( formatter );

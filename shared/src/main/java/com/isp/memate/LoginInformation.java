@@ -10,14 +10,12 @@ import java.io.Serializable;
  * @since 29.11.2019
  *
  */
-public class LoginInformation implements Serializable
+class LoginInformation implements Serializable
 {
   String username;
   String password;
 
-
-  @SuppressWarnings( "javadoc" )
-  public LoginInformation( String username, String password )
+  LoginInformation( String username, String password )
   {
     this.username = username;
     this.password = password;

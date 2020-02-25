@@ -10,14 +10,13 @@ import java.io.Serializable;
  * @since 02.12.2019
  *
  */
-public class DrinkPrice implements Serializable
+class DrinkPrice implements Serializable
 {
   Float  price;
   int    id;
   String name;
 
-  @SuppressWarnings( "javadoc" )
-  public DrinkPrice( Float price, int id, String name )
+  DrinkPrice( Float price, int id, String name )
   {
     this.price = price;
     this.id = id;

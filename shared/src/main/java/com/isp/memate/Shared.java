@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @author nwe
  * @since 28.11.2019
  */
-public class Shared implements Serializable
+class Shared implements Serializable
 {
   User             user             = null;
   LoginInformation loginInformation = null;
@@ -41,7 +41,7 @@ public class Shared implements Serializable
    * @param operation der auszuführende Befehl
    * @param object Kann Getränkename, Login-Informationen oder alles andere sein.
    */
-  public Shared( Operation operation, Object object )
+  Shared( Operation operation, Object object )
   {
     this.operation = operation;
     switch ( operation )

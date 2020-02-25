@@ -24,7 +24,7 @@ import com.isp.memate.Shared.Operation;
  * @since 24.10.2019
  *
  */
-public class SocketThread extends Thread
+class SocketThread extends Thread
 {
   private final String         version = "0.9.8";
   private ObjectOutputStream   objectOutputStream;
@@ -33,19 +33,19 @@ public class SocketThread extends Thread
   private String               currentUser;
   private Map<String, Integer> userIDMap;
   private Database             database;
-  protected Socket             socket;
+  private Socket               socket;
   //UNDO
-  boolean        lastActionDrink   = false;
-  boolean        lastActionDeposit = false;
-  private String lastDrinkName;
-  private String lastDate;
-  private float  lastTransaction;
+  private boolean lastActionDrink   = false;
+  private boolean lastActionDeposit = false;
+  private String  lastDrinkName;
+  private String  lastDate;
+  private float   lastTransaction;
 
   /**
    * @param clientSocket userSocket
    * @param dataBase Database
    */
-  public SocketThread( Socket clientSocket, Database dataBase )
+  SocketThread( Socket clientSocket, Database dataBase )
   {
     this.socket = clientSocket;
     this.database = dataBase;
