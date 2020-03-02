@@ -26,6 +26,7 @@ class FindServer
   private static DatagramSocket   socket        = null;
   private static InetAddress      serverAddress = null;
   private static int              serverPort    = -1;
+  @SuppressWarnings( "unused" )
   private static final FindServer instance      = new FindServer();
 
   /**

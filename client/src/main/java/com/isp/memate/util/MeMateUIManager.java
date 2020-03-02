@@ -65,11 +65,21 @@ public class MeMateUIManager
 
   private static boolean darkModeState = false;
 
+  /**
+   * Install Default Key with default colors.
+   */
   public static void installDefaults()
   {
     installNewKey( defaultKey, new DarkDayColor( new Color( 36, 43, 55 ), Color.WHITE ), new DarkDayColor( Color.WHITE, Color.BLACK ) );
   }
 
+  /**
+   * Install a new custom Key with custom colors.
+   * 
+   * @param key keyname
+   * @param backgroundColors BG-Colors
+   * @param foregroundColors FG-Colors
+   */
   public static void installNewKey( final String key, final DarkDayColor backgroundColors, final DarkDayColor foregroundColors )
   {
     keySet.add( key );
@@ -77,6 +87,9 @@ public class MeMateUIManager
     foregroundMap.put( key, foregroundColors );
   }
 
+  /**
+   * Lädt den Darkmode
+   */
   public static void showDarkMode()
   {
     darkModeState = true;
@@ -87,6 +100,9 @@ public class MeMateUIManager
     setUISettings();
   }
 
+  /**
+   * Lädt den Daymode
+   */
   public static void showDayMode()
   {
     darkModeState = false;
@@ -97,6 +113,9 @@ public class MeMateUIManager
     setUISettings();
   }
 
+  /**
+   * Wird beim Auslesen der Userconfig geladen oder nicht
+   */
   public static void iniDayMode()
   {
     darkModeState = false;
@@ -106,6 +125,9 @@ public class MeMateUIManager
     UIManager.put( "Label.foreground", Color.black );
   }
 
+  /**
+   * Wird beim Auslesen der Userconfig geladen oder nicht
+   */
   public static void iniDarkMode()
   {
     darkModeState = true;
@@ -116,11 +138,22 @@ public class MeMateUIManager
   }
 
 
+  /**
+   * Erstellt ein {@link JPanel} mit defaultKey
+   * 
+   * @return {@link JPanel}
+   */
   public static JPanel createJPanel()
   {
     return createJPanel( defaultKey );
   }
 
+  /**
+   * Erstellt ein {@link JPanel}, welches der panelList hinzugefügt wird.
+   * 
+   * @param key key
+   * @return {@link JPanel}
+   */
   public static JPanel createJPanel( final String key )
   {
     final JPanel panel = new JPanel();
@@ -128,11 +161,22 @@ public class MeMateUIManager
     return panel;
   }
 
+  /**
+   * Erstellt ein {@link JLabel} mit defaultKey
+   * 
+   * @return {@link JLabel}
+   */
   public static JLabel createJLabel()
   {
     return createJLabel( defaultKey );
   }
 
+  /**
+   * Erstellt ein {@link JLabel}, welches der labelList hinzugefügt wird.
+   * 
+   * @param key key
+   * @return {@link JLabel}
+   */
   public static JLabel createJLabel( final String key )
   {
     final JLabel label = new JLabel();
@@ -140,6 +184,11 @@ public class MeMateUIManager
     return label;
   }
 
+  /**
+   * Erstellt ein {@link JTextPane}, welches der textPaneList hinzugefügt wird.
+   * 
+   * @return {@link JTextPane}
+   */
   public static JTextPane createTextPane()
   {
     final JTextPane textpane = new JTextPane();
@@ -147,6 +196,11 @@ public class MeMateUIManager
     return textpane;
   }
 
+  /**
+   * Erstellt eine {@link JCheckBox}, welche der checkBoxList hinzugefügt wird.
+   * 
+   * @return {@link JTextPane}
+   */
   public static JCheckBox createCheckbox()
   {
     final JCheckBox checkbox = new JCheckBox();
@@ -154,6 +208,12 @@ public class MeMateUIManager
     return checkbox;
   }
 
+  /**
+   * Erstellt einen {@link JButton}, welcher der normalButtonList hinzugefügt wird.
+   * 
+   * @param key key
+   * @return {@link JButton}
+   */
   public static JButton createNormalButton( String key )
   {
     JButton button = new JButton();
@@ -166,6 +226,14 @@ public class MeMateUIManager
     return button;
   }
 
+  /**
+   * Erstellt einen {@link JButton} mit Icon, welcher der iconList hinzugefügt wird.
+   * 
+   * @param key key
+   * @param imageIcon Daymode Icon
+   * @param imageIcon2 Darkmode Icon
+   * @return {@link JButton}
+   */
   public static JButton createNormalButton( String key, ImageIcon imageIcon, ImageIcon imageIcon2 )
   {
     JButton button = createNormalButton( key );
@@ -174,69 +242,96 @@ public class MeMateUIManager
   }
 
 
+  @SuppressWarnings( "javadoc" )
   public static void registerPanel( final String key, JPanel panel )
   {
     panelList.put( key, panel );
   }
 
+  @SuppressWarnings( "javadoc" )
   public static void registerIconLabel( JLabel infoIconLabel, ImageIcon infoIcon, ImageIcon infoIconWhite )
   {
     labelList.put( defaultKey, infoIconLabel );
     panelIconList.put( infoIconLabel, new DarkDayIcon( infoIconWhite, infoIcon ) );
   }
 
+  @SuppressWarnings( "javadoc" )
   public static void registerTable( final String key, JTable table )
   {
     tableList.put( key, table );
   }
 
+  @SuppressWarnings( "javadoc" )
   public static void registerList( final String key, JList<?> list )
   {
     listList.put( key, list );
   }
 
+  @SuppressWarnings( "javadoc" )
   public static void registerScrollPane( final String key, JScrollPane scrollPane )
   {
     scrollPaneList.put( key, scrollPane );
   }
 
+  @SuppressWarnings( "javadoc" )
   public static void registerSeparator( final JComponent separator, final String key )
   {
     separatorList.put( key, separator );
   }
 
+  @SuppressWarnings( "javadoc" )
   public static void registerlabel( final JLabel label )
   {
     labelList.put( defaultKey, label );
   }
 
+  @SuppressWarnings( "javadoc" )
   public static void registerFreeChart( JFreeChart freeChart )
   {
     MeMateUIManager.freeChart = freeChart;
   }
 
+  @SuppressWarnings( "javadoc" )
   public static void registerLineChart( JFreeChart lineChart )
   {
     MeMateUIManager.lineChart = lineChart;
   }
 
 
+  /**
+   * Gibt die Hintergrundfarben des gegebenen Keys an.
+   * 
+   * @param key Key
+   * @return Hintergrundfarben
+   */
   public static DarkDayColor getBackground( String key )
   {
     return backgroundMap.get( key );
   }
 
+  /**
+   * Gibt die Vordergrundfarben des gegebenen Keys an.
+   * 
+   * @param key Key
+   * @return Vordergrundfarben
+   */
   public static DarkDayColor getForeground( String key )
   {
     return foregroundMap.get( key );
   }
 
+  /**
+   * @return den Status ob der Darkmode an oder aus ist.
+   */
   public static boolean getDarkModeState()
   {
     return darkModeState;
   }
 
 
+  /**
+   * Wendet die derzeitigen UI-Settings an allen registrierten Komponenten an.
+   */
   public static void setUISettings()
   {
     ClientLog.newLog( "UI-Update" );
@@ -495,13 +590,24 @@ public class MeMateUIManager
   }
 
 
+  /**
+   * Enthält immer eine Farbe für den Darkmode und eine für den Daymode.
+   * 
+   * @author nwe
+   * @since 02.03.2020
+   *
+   */
   public static class DarkDayColor
   {
     private final Color darkColor;
     private final Color dayColor;
 
+
     /**
-     *
+     * Setzen der Farben
+     * 
+     * @param darkColor Darkmode Farbe
+     * @param dayColor Daymode Farbe
      */
     public DarkDayColor( final Color darkColor, final Color dayColor )
     {
@@ -509,11 +615,17 @@ public class MeMateUIManager
       this.dayColor = dayColor;
     }
 
+    /**
+     * @return Daymode Farbe
+     */
     public Color getDayColor()
     {
       return dayColor;
     }
 
+    /**
+     * @return Darkmode Farbe
+     */
     public Color getDarkColor()
     {
       return darkColor;
