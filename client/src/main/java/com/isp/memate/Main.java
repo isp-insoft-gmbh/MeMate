@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -24,7 +25,7 @@ import com.isp.memate.util.MeMateUIManager.DarkDayColor;
  */
 class Main
 {
-  final static String version = "0.9.8.1";
+  final static String version = "0.9.8.2";
 
   /**
    * @param args unused
@@ -37,6 +38,7 @@ class Main
       UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0, 0 ) );
       UIManager.put( "AppColor", new Color( 29, 164, 165 ) );
       UIManager.put( "DefaultBrightColor", Color.white );
+      ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
     }
     catch ( ClassNotFoundException | InstantiationException | IllegalAccessException
         | UnsupportedLookAndFeelException exception )

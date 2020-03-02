@@ -8,10 +8,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -29,7 +27,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -124,148 +121,38 @@ class DrinkConsumptionButton extends JPanel
       fillLablenConstraints.anchor = GridBagConstraints.LINE_START;
       nameLabelAndDrinkInfoButtonPanel.add( fillLable, fillLablenConstraints );
 
-      infoButton.addActionListener( new ActionListener()
+
+      DrinkIngredients ingredients = ServerCommunication.getInstance().getIngredients( name );
+      String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
+      int maxLength = 40;
+      int currentLength = 0;
+      StringBuilder listBuilder = new StringBuilder();
+      listBuilder.append( "Zutaten:<br>" );
+      for ( int i = 0; i < ingredientsArray.length; i++ )
       {
-        @Override
-        public void actionPerformed( ActionEvent e )
+        currentLength += ingredientsArray[ i ].length() + 2;
+        if ( currentLength > maxLength )
         {
-          if ( iconLabel.isVisible() )
-          {
-            iconLabel.setVisible( false );
-            DrinkIngredients ingredients = ServerCommunication.getInstance().getIngredients( name );
-            String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
-            int maxLength = 50;
-            int currentLength = 0;
-            StringBuilder listBuilder = new StringBuilder();
-            listBuilder.append( "<html>Zutaten:<br>" );
-            for ( int i = 0; i < ingredientsArray.length; i++ )
-            {
-              currentLength += ingredientsArray[ i ].length() + 2;
-              if ( currentLength > maxLength )
-              {
-                listBuilder.append( "<br>" );
-                currentLength = ingredientsArray[ i ].length() + 2;
-              }
-              listBuilder.append( ingredientsArray[ i ] )
-                  .append( ", " );
-            }
-            if ( listBuilder.toString().length() >= 190 )
-            {
-              textLabel.setText( listBuilder.toString().substring( 0, 190 ) + "...<br><br>Durchschnittlicher Gehalt je 100ml<br>" );
-            }
-            else
-            {
-              textLabel.setText(
-                  listBuilder.toString().substring( 0, listBuilder.length() - 2 ) + "<br><br>Durchschnittlicher Gehalt je 100ml<br>" );
-            }
-            textLabel.setHorizontalAlignment( JLabel.LEFT );
-            GridBagConstraints textLabelConstraints = new GridBagConstraints();
-            textLabelConstraints.gridx = 0;
-            textLabelConstraints.gridy = 0;
-            textLabelConstraints.gridwidth = 3;
-            textLabelConstraints.gridheight = 2;
-            textLabelConstraints.anchor = GridBagConstraints.LINE_START;
-            textLabelConstraints.insets = new Insets( 0, 2, 0, 2 );
-            infoPanel.add( textLabel, textLabelConstraints );
-            addPanel( "Energie", 3, infoPanel, ingredients );
-            addPanel( "Fett", 4, infoPanel, ingredients );
-            addPanel( "davon gesättigte Fettsäuren", 5, infoPanel, ingredients );
-            addPanel( "Kohlenhydrate", 6, infoPanel, ingredients );
-            addPanel( "Zucker", 7, infoPanel, ingredients );
-            addPanel( "Eiweiß", 8, infoPanel, ingredients );
-            addPanel( "Salz", 9, infoPanel, ingredients );
-            add( infoPanel, BorderLayout.CENTER );
-            MeMateUIManager.setUISettings();
-          }
-          else
-          {
-            remove( infoPanel );
-            infoPanel.removeAll();
-            iconLabel.setVisible( true );
-          }
-          repaint();
-          revalidate();
-          requestFocus();
+          listBuilder.append( "<br>" );
+          currentLength = ingredientsArray[ i ].length() + 2;
         }
-
-        private JPanel addPanel( String ingredient, int y, JPanel mainPanel, DrinkIngredients ingredients )
-        {
-          JPanel panel = MeMateUIManager.createJPanel( "drinkButtons" );
-          panel.setLayout( new GridBagLayout() );
-
-          JLabel label = MeMateUIManager.createJLabel();
-          label.setText( ingredient + " " );
-          GridBagConstraints labelConstraints = new GridBagConstraints();
-          labelConstraints.gridx = 0;
-          labelConstraints.gridy = 0;
-          labelConstraints.weightx = 0;
-          labelConstraints.anchor = GridBagConstraints.LAST_LINE_START;
-          panel.add( label, labelConstraints );
-
-          JComponent separator = new JComponent()
-          {
-            @Override
-            public void paintComponent( final Graphics g )
-            {
-              for ( int x = 0; x < getWidth(); x += 4 )
-              {
-                g.drawLine( x, 0, x + 1, 0 );
-              }
-            }
-          };
-          MeMateUIManager.registerSeparator( separator, "default" );
-          GridBagConstraints seperatorConstraints = new GridBagConstraints();
-          seperatorConstraints.gridx = 1;
-          seperatorConstraints.gridy = 0;
-          seperatorConstraints.weightx = 1;
-          seperatorConstraints.insets = new Insets( 0, 0, 3, 0 );
-          seperatorConstraints.anchor = GridBagConstraints.SOUTH;
-          seperatorConstraints.fill = GridBagConstraints.HORIZONTAL;
-          panel.add( separator, seperatorConstraints );
-
-          JLabel amountLabel = MeMateUIManager.createJLabel();
-          switch ( ingredient )
-          {
-            case "Salz":
-              amountLabel.setText( String.format( " %.2fg", ingredients.salt ) );
-              break;
-            case "Eiweiß":
-              amountLabel.setText( String.format( " %.1fg", ingredients.protein ) );
-              break;
-            case "Energie":
-              amountLabel.setText( " " + ingredients.energy_kJ + " kJ (" + ingredients.energy_kcal + " kcal)" );
-              break;
-            case "Fett":
-              amountLabel.setText( String.format( " %.1fg", ingredients.fat ) );
-              break;
-            case "davon gesättigte Fettsäuren":
-              amountLabel.setText( String.format( " %.1fg", ingredients.fatty_acids ) );
-              break;
-            case "Kohlenhydrate":
-              amountLabel.setText( String.format( " %.1fg", ingredients.carbs ) );
-              break;
-            case "Zucker":
-              amountLabel.setText( String.format( " %.1fg", ingredients.sugar ) );
-            default :
-              break;
-          }
-          GridBagConstraints amountLabelConstraints = new GridBagConstraints();
-          amountLabelConstraints.gridx = 2;
-          amountLabelConstraints.gridy = 0;
-          amountLabelConstraints.weightx = 0;
-          amountLabelConstraints.anchor = GridBagConstraints.LAST_LINE_END;
-          panel.add( amountLabel, amountLabelConstraints );
-
-          panel.setPreferredSize( new Dimension( getWidth() - 10, 15 ) );
-          GridBagConstraints panelConstraints = new GridBagConstraints();
-          panelConstraints.gridx = 0;
-          panelConstraints.gridy = y;
-          panelConstraints.gridwidth = 3;
-          panelConstraints.insets = new Insets( 0, 2, 0, 2 );
-          mainPanel.add( panel, panelConstraints );
-          return panel;
-        }
-      } );
+        listBuilder.append( ingredientsArray[ i ] )
+            .append( ", " );
+      }
+      infoButton
+          .setToolTipText(
+              "<html><font face=monospace>" + listBuilder.toString().substring( 0, listBuilder.toString().length() - 2 )
+                  + "<br><br><br>Durchschnittlicher Gehalt je 100ml<br>"
+                  + getIngredient( "Energie", ingredients ) + "<br>"
+                  + getIngredient( "Fett", ingredients ) + "<br>"
+                  + getIngredient( "davon gesättigte Fettsäuren", ingredients ) + "<br>"
+                  + getIngredient( "Kohlenhydrate", ingredients ) + "<br>"
+                  + getIngredient( "Zucker", ingredients ) + "<br>"
+                  + getIngredient( "Eiweiß", ingredients ) + "<br>"
+                  + getIngredient( "Salz", ingredients ) + "<br>"
+                  + "</font></html>" );
+      infoButton.setFocusable( false );
+      infoButton.setEnabled( false );
     }
 
     price = price.replace( "€", "" );
@@ -489,6 +376,57 @@ class DrinkConsumptionButton extends JPanel
     MeMateUIManager.registerPanel( "drinkButtons", this );
   }
 
+
+  /**
+   * @param string
+   * @param ingredients
+   * @return
+   */
+  private String getIngredient( String ingredient, DrinkIngredients ingredients )
+  {
+    int maxLength = 40;
+    int ingredientLength = ingredient.length() + 1;
+    int amountOfPoints = 0;
+    StringBuilder builder = new StringBuilder();
+    String amount = "";
+
+    switch ( ingredient )
+    {
+      case "Salz":
+        amount = String.format( " %.2fg", ingredients.salt );
+        break;
+      case "Eiweiß":
+        amount = String.format( " %.1fg", ingredients.protein );
+        break;
+      case "Energie":
+        amount = " " + ingredients.energy_kJ + " kJ (" + ingredients.energy_kcal + " kcal)";
+        break;
+      case "Fett":
+        amount = String.format( " %.1fg", ingredients.fat );
+        break;
+      case "davon gesättigte Fettsäuren":
+        amount = String.format( " %.1fg", ingredients.fatty_acids );
+        break;
+      case "Kohlenhydrate":
+        amount = String.format( " %.1fg", ingredients.carbs );
+        break;
+      case "Zucker":
+        amount = String.format( " %.1fg", ingredients.sugar );
+      default :
+        break;
+    }
+    ingredientLength += amount.toString().length();
+    amountOfPoints = maxLength - ingredientLength;
+    builder.append( ingredient + " " );
+    for ( int i = 0; i < amountOfPoints; i++ )
+    {
+      builder.append( "." );
+    }
+    builder.append( amount );
+    return builder.toString();
+  }
+
+
   /**
    * Sobald man auf ein Getränk klickt, so öffnet sich ein Dialog, welcher fragt, ob man das
    * Getränk wirklich konsumieren möchte. Bestätigt man dies, so wird {@linkplain ServerCommunication}
@@ -514,7 +452,6 @@ class DrinkConsumptionButton extends JPanel
         component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
       }
     }
-    infoButton.setEnabled( false );
     DrinkConsumptionButton.this.removeMouseListener( mouseListener );
     DrinkConsumptionButton.this.removeKeyListener( keyListener );
     iconLabel.setVisible( false );
@@ -551,7 +488,6 @@ class DrinkConsumptionButton extends JPanel
           DrinkConsumptionButton.this.addMouseListener( mouseListener );
           DrinkConsumptionButton.this.addKeyListener( keyListener );
           Mainframe.getInstance().setUndoButtonEnabled( true );
-          infoButton.setEnabled( true );
           fillLable.setVisible( true );
           askWhetherToReallyConsumeLabelIsActive = false;
         }
@@ -575,7 +511,6 @@ class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addMouseListener( mouseListener );
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         abortButton.removeActionListener( this );
-        infoButton.setEnabled( true );
         fillLable.setVisible( true );
         askWhetherToReallyConsumeLabelIsActive = false;
       }
@@ -602,7 +537,6 @@ class DrinkConsumptionButton extends JPanel
 
     DrinkConsumptionButton.this.addMouseListener( mouseListener );
     DrinkConsumptionButton.this.addKeyListener( keyListener );
-    infoButton.setEnabled( true );
     remove( overlay );
     remove( askWhetherToReallyConsumeLabel );
     iconLabel.setVisible( true );

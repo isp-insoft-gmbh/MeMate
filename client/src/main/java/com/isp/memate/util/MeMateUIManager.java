@@ -97,6 +97,8 @@ public class MeMateUIManager
     UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
     UIManager.put( "OptionPane.messageForeground", Color.white );
     UIManager.put( "Label.foreground", Color.white );
+    UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
+    UIManager.put( "ToolTip.foreground", Color.white );
     setUISettings();
   }
 
@@ -110,6 +112,8 @@ public class MeMateUIManager
     UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
     UIManager.put( "OptionPane.messageForeground", Color.black );
     UIManager.put( "Label.foreground", Color.black );
+    UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
+    UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
     setUISettings();
   }
 
@@ -123,6 +127,8 @@ public class MeMateUIManager
     UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
     UIManager.put( "OptionPane.messageForeground", Color.black );
     UIManager.put( "Label.foreground", Color.black );
+    UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
+    UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
   }
 
   /**
@@ -135,6 +141,8 @@ public class MeMateUIManager
     UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
     UIManager.put( "OptionPane.messageForeground", Color.white );
     UIManager.put( "Label.foreground", Color.white );
+    UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
+    UIManager.put( "ToolTip.foreground", Color.white );
   }
 
 
