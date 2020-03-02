@@ -35,7 +35,6 @@ class SocketThread extends Thread
   private Database             database;
   private Socket               socket;
   //UNDO
-  private boolean lastActionDrink   = false;
   private boolean lastActionDeposit = false;
   private String  lastDrinkName;
   private String  lastDate;
@@ -203,7 +202,6 @@ class SocketThread extends Thread
   {
     ServerLog.newLog( logType.INFO, currentUser + " hat sich ausgeloggt." );
     lastActionDeposit = false;
-    lastActionDrink = false;
     currentUser = null;
     currentSessionID = null;
   }
@@ -230,7 +228,6 @@ class SocketThread extends Thread
 
       //For Undo
       lastActionDeposit = false;
-      lastActionDrink = false;
       lastTransaction = 0;
     }
     else
@@ -245,7 +242,6 @@ class SocketThread extends Thread
       getBalance();
 
       //For Undo
-      lastActionDrink = false;
       lastActionDeposit = false;
       lastTransaction = 0;
       lastDate = "null";
@@ -385,7 +381,6 @@ class SocketThread extends Thread
     sendHistoryData();
 
     //For Undo
-    lastActionDrink = true;
     lastActionDeposit = false;
     lastTransaction = drinkPrice;
     lastDrinkName = consumedDrink.name;
@@ -412,7 +407,6 @@ class SocketThread extends Thread
 
     //For Undo
     lastActionDeposit = true;
-    lastActionDrink = false;
     lastTransaction = balanceToAdd;
     lastDate = date;
   }

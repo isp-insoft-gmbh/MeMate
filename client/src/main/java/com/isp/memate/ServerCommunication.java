@@ -59,7 +59,6 @@ class ServerCommunication
   private Socket                              socket;
   private ObjectInputStream                   inStream;
   private ObjectOutputStream                  outStream;
-  String                                      sessionID;
 
   /**
    * @return the static instance of {@link ServerCommunication}

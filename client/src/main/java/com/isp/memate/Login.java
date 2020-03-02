@@ -510,7 +510,6 @@ public class Login extends JFrame
   {
     UUID uuid = UUID.randomUUID();
     ServerCommunication.getInstance().connectSessionIDToUser( uuid.toString() );
-    ServerCommunication.getInstance().sessionID = uuid.toString();
     if ( stayLoggedInCheckBox.isSelected() )
     {
       try

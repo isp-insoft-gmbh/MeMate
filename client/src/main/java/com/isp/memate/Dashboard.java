@@ -194,9 +194,9 @@ class Dashboard extends JPanel
 
   void updateButtonpanel()
   {
+    ServerCommunication.getInstance().lock.lock();
     try
     {
-      ServerCommunication.getInstance().lock.lock();
       scrollpane.setViewportView( createDrinkButtonPanel() );
       MeMateUIManager.setUISettings();
     }

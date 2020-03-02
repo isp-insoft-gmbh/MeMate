@@ -520,13 +520,13 @@ public class MeMateUIManager
     }
   }
 
-  public static class DarkDayIcon
+  private static class DarkDayIcon
   {
     private final ImageIcon darkIcon;
     private final ImageIcon dayIcon;
 
 
-    public DarkDayIcon( final ImageIcon darkIcon, final ImageIcon dayIcon )
+    private DarkDayIcon( final ImageIcon darkIcon, final ImageIcon dayIcon )
     {
       this.darkIcon = darkIcon;
       this.dayIcon = dayIcon;

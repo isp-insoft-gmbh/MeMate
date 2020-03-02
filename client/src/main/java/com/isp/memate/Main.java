@@ -84,7 +84,6 @@ class Main
     }
     else
     {
-      ServerCommunication.getInstance().sessionID = sessionID;
       ServerCommunication.getInstance().checkLoginForSessionID( sessionID );
       ServerCommunication.getInstance().tellServertoSendVersionNumber();
       Mainframe mainframe = Mainframe.getInstance();

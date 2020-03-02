@@ -312,7 +312,6 @@ class Mainframe extends JFrame
       @Override
       public void run()
       {
-        ServerCommunication.getInstance().sessionID = null;
         ServerCommunication.getInstance().currentUser = null;
         ServerCommunication.getInstance().logout();
         setUndoButtonEnabled( false );

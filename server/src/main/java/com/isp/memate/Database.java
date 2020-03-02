@@ -339,9 +339,9 @@ class Database
    */
   void updateBalance( String sessionID, Float updatedBalance )
   {
-    lock.lock();
     String username = getUsernameForSessionID( sessionID );
     String sql = "UPDATE user SET guthaben=? WHERE username=?";
+    lock.lock();
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setFloat( 1, updatedBalance );
@@ -369,7 +369,6 @@ class Database
    */
   void updateDrinkInformation( Integer id, Operation operation, Object updatedInformation )
   {
-    lock.lock();
     String sql = null;
     switch ( operation )
     {
@@ -385,6 +384,7 @@ class Database
       default :
         break;
     }
+    lock.lock();
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setInt( 2, id );
@@ -1002,9 +1002,9 @@ class Database
   void addIngredients( int DrinkID, String ingredients, int energy_kJ, int energy_kcal, double fat, double fattyAcids,
                        double carbs, double sugar, double protein, double salt )
   {
-    lock.lock();
     String sql =
         "INSERT INTO ingredients(drink,ingredients,energy_kJ,energy_kcal,fat,fatty_acids,carbs,sugar,protein,salt) VALUES(?,?,?,?,?,?,?,?,?,?)";
+    lock.lock();
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setInt( 1, DrinkID );

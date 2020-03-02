@@ -536,9 +536,9 @@ class DrinkConsumptionButton extends JPanel
       @Override
       public void actionPerformed( ActionEvent e )
       {
+        ServerCommunication.getInstance().lock.lock();
         try
         {
-          ServerCommunication.getInstance().lock.lock();
           ServerCommunication.getInstance().consumeDrink( drinkName );
           ServerCommunication.getInstance().getBalance();
           acceptButton.removeActionListener( this );

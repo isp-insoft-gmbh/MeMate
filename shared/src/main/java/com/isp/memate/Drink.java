@@ -14,7 +14,6 @@ class Drink implements Serializable
 {
   String           name;
   Float            price;
-  private String   picturePath;
   byte[]           pictureInBytes;
   int              id;
   int              amount;
@@ -27,7 +26,6 @@ class Drink implements Serializable
   {
     this.name = name;
     this.price = price;
-    this.picturePath = picturePath;
     this.pictureInBytes = pictureInBytes;
     this.id = id;
     this.amount = amount;
