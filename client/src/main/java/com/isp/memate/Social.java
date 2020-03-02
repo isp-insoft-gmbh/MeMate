@@ -270,25 +270,25 @@ class Social extends JPanel
       switch ( day )
       {
         case MONDAY:
-          xDaysAgo = today.minusDays( 0 );
-          break;
-        case TUESDAY:
           xDaysAgo = today.minusDays( 1 );
           break;
-        case WEDNESDAY:
+        case TUESDAY:
           xDaysAgo = today.minusDays( 2 );
           break;
-        case THURSDAY:
+        case WEDNESDAY:
           xDaysAgo = today.minusDays( 3 );
           break;
-        case FRIDAY:
+        case THURSDAY:
           xDaysAgo = today.minusDays( 4 );
           break;
-        case SATURDAY:
+        case FRIDAY:
           xDaysAgo = today.minusDays( 5 );
           break;
-        case SUNDAY:
+        case SATURDAY:
           xDaysAgo = today.minusDays( 6 );
+          break;
+        case SUNDAY:
+          xDaysAgo = today.minusDays( 7 );
           break;
       }
       for ( String[] data : history )
