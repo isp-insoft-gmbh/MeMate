@@ -52,51 +52,45 @@ public class MeMateActionBarButton
   private final List<JLabel> titleLabels  = new ArrayList<>();
   private String             iconOrientation;
 
-  /**
-   *
-   */
+
+  @SuppressWarnings( "javadoc" )
   public MeMateActionBarButton( final Icon icon, final Color background, final Runnable runnable )
   {
     this( icon, icon, background, runnable );
   }
 
-  /**
-   *
-   */
+
+  @SuppressWarnings( "javadoc" )
   public MeMateActionBarButton( final String title, final String tooltip, final Color background, final Color foreground,
                                 final Runnable runnable )
   {
     this( title, tooltip, null, null, background, foreground, null, runnable, null );
   }
 
-  /**
-  *
-  */
+
+  @SuppressWarnings( "javadoc" )
   public MeMateActionBarButton( final Icon icon, final Icon pressedIcon, final Color background, final String iconOrientation )
   {
     this( null, null, icon, pressedIcon, background, null, null, null, iconOrientation );
   }
 
-  /**
-   *
-   */
+
+  @SuppressWarnings( "javadoc" )
   public MeMateActionBarButton( final Icon icon, final Icon pressedIcon, final Color background, final Runnable runnable )
   {
     this( null, null, icon, pressedIcon, background, null, null, runnable, BorderLayout.WEST );
   }
 
-  /**
-  *
-  */
+
+  @SuppressWarnings( "javadoc" )
   public MeMateActionBarButton( final String title, final String tooltip, final Icon icon, final Icon pressedIcon, final Color background,
                                 final Color foreground, final Color marker, final Runnable runnable )
   {
     this( title, tooltip, icon, pressedIcon, background, foreground, marker, runnable, BorderLayout.WEST );
   }
 
-  /**
-  *
-  */
+
+  @SuppressWarnings( "javadoc" )
   public MeMateActionBarButton( final String title, final String tooltip, final Icon icon, final Icon pressedIcon, final Color background,
                                 final Color foreground, final Color marker, final Runnable runnable, final String iconOrientation )
   {
@@ -114,9 +108,6 @@ public class MeMateActionBarButton
   }
 
 
-  /**
-   *
-   */
   private void initButton()
   {
     barPanel = createButtonPanel();
@@ -246,6 +237,9 @@ public class MeMateActionBarButton
   }
 
 
+  /**
+   * @return ob der Button enabled ist oder nicht.
+   */
   public boolean isEnabled()
   {
     return enabled;
@@ -262,6 +256,11 @@ public class MeMateActionBarButton
     setComponentsEnabled( menuPanel, enabled );
   }
 
+  /**
+   * Setzt den Title des Buttons
+   * 
+   * @param title Title
+   */
   public void setTitle( String title )
   {
     this.title = title;
@@ -341,7 +340,7 @@ public class MeMateActionBarButton
 
   /**
    * Setzt das Flag, das der Button selektiert ist. Beim Selektieren wird der Marker in einer anderen Farbe
-   * angezeigt {@link #setMarkerColor(Color)}.
+   * angezeigt.
    */
   public void selected()
   {
@@ -359,7 +358,7 @@ public class MeMateActionBarButton
   }
 
   /**
-   * Liefert den Button im sichtbaren Bereich der {@link ActionBar Aktionsleiste}.
+   * Liefert den Button im sichtbaren Bereich der {@link MeMateActionBar Aktionsleiste}.
    *
    * @return Button im sichtbaren Bereich.
    */
@@ -369,7 +368,7 @@ public class MeMateActionBarButton
   }
 
   /**
-   * Liefert den Button aus dem Kontextmenü der {@link ActionBar Aktionsleiste}.
+   * Liefert den Button aus dem Kontextmenü der {@link MeMateActionBar Aktionsleiste}.
    *
    * @return Button im Kontextmenü.
    */
@@ -378,11 +377,19 @@ public class MeMateActionBarButton
     return menuPanel;
   }
 
+  /**
+   * @return das Icon des Buttons.
+   */
   public Icon getIcon()
   {
     return icon;
   }
 
+  /**
+   * Setzt das Icon für den Button.
+   * 
+   * @param icon Icon
+   */
   public void setIcon( final Icon icon )
   {
     this.icon = icon;
@@ -390,26 +397,45 @@ public class MeMateActionBarButton
     iconLabels.forEach( lable -> lable.setIcon( icon ) );
   }
 
+  /**
+   * @return das Icon, welches beim Drücken auf den Button angezeigt wird.
+   */
   public Icon getPressedIcon()
   {
     return pressedIcon;
   }
 
+  /**
+   * Setzt das pressedIcon des Buttons.
+   * 
+   * @param pressedIcon pressedIcon
+   */
   public void setPressedIcon( final Icon pressedIcon )
   {
     this.pressedIcon = pressedIcon;
   }
 
+  /**
+   * @return Title des Buttons.
+   */
   public String getTitle()
   {
     return title;
   }
 
+  /**
+   * @return Tooltip des Buttons.
+   */
   public String getTooltip()
   {
     return tooltip;
   }
 
+  /**
+   * Setzt den Tooltip für den Button.
+   * 
+   * @param tooltip Tooltip-text
+   */
   public void setTooltip( final String tooltip )
   {
     this.tooltip = tooltip;
@@ -418,11 +444,19 @@ public class MeMateActionBarButton
     menuPanel.setToolTipText( tooltip );
   }
 
+  /**
+   * @return Hintergrundfarbe des Buttons.
+   */
   public Color getBackground()
   {
     return background;
   }
 
+  /**
+   * Setzt die Hintergrundfarbe des Buttons.
+   * 
+   * @param background Hintergrundfarbe.
+   */
   public void setBackground( final Color background )
   {
     this.background = background;
@@ -436,11 +470,19 @@ public class MeMateActionBarButton
     }
   }
 
+  /**
+   * @return Vordergrundfarbe des Buttons
+   */
   public Color getForeground()
   {
     return foreground;
   }
 
+  /**
+   * Setzt die Vordergrundfarbe des Buttons.
+   * 
+   * @param foreground Vordergrundfarbe.
+   */
   public void setForeground( final Color foreground )
   {
     this.foreground = foreground;
@@ -448,11 +490,19 @@ public class MeMateActionBarButton
     titleLabels.forEach( title -> title.setForeground( foreground ) );
   }
 
+  /**
+   * @return die MarkerColor des Buttons.
+   */
   public Color getMarker()
   {
     return marker;
   }
 
+  /**
+   * Setzt die MarkerColor des Buttons.
+   * 
+   * @param marker Farbe des Markers.
+   */
   public void setMarker( Color marker )
   {
     this.marker = marker;
@@ -463,11 +513,27 @@ public class MeMateActionBarButton
   }
 
 
+  /**
+   * @return Runnable des Buttons.
+   */
   public Runnable getRunnable()
   {
     return runnable;
   }
 
+  /**
+   * Setzt das Runnable des Buttons.
+   * 
+   * @param runnable Runnable.
+   */
+  public void setRunnable( final Runnable runnable )
+  {
+    this.runnable = runnable;
+  }
+
+  /**
+   * Ändert die Schriftfarbe, abhängig von dem Dark- oder Daymode.
+   */
   public void toggleFontColor()
   {
     if ( darkModeOn )
@@ -483,18 +549,24 @@ public class MeMateActionBarButton
     }
   }
 
+  /**
+   * Ändert die Farben des Buttonsm sollte sich der Dark/Daymode ändern.
+   * 
+   * @param background Hintergrundfarbe
+   * @param foreground Vordergrundfarbe
+   */
   public void toggleDarkMode( Color background, Color foreground )
   {
     changeButtonStyle( null, background, foreground );
   }
 
+  /**
+   * Setzt den Darkmodestate.
+   * 
+   * @param state State
+   */
   public void setDarkModeState( boolean state )
   {
     darkModeOn = state;
-  }
-
-  public void setRunnable( final Runnable runnable )
-  {
-    this.runnable = runnable;
   }
 }

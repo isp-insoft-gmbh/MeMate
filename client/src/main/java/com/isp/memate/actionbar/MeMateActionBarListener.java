@@ -24,7 +24,7 @@ public class MeMateActionBarListener extends MouseAdapter
   private Runnable              entered;
 
   /**
-   * @param button {@link ActionBarButton}
+   * @param button {@link MeMateActionBarButton}
    * @param exited Aktion bei {@link MouseListener#mouseExited(MouseEvent)}.
    * @param entered Aktion bei {@link MouseListener#mouseEntered(MouseEvent)}.
    */

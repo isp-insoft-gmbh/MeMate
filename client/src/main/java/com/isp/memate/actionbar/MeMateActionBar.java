@@ -83,12 +83,11 @@ public class MeMateActionBar extends JPanel
 
   /**
    * Erzeugt anhand des übergebenen {@link BarType BarTypes} eine neuen ButtonBar.
-   *
-   * @param type Darstellungsmodi der ButtonBar.
+   * 
+   * @param backgroundColor Hintergrundfarbe
+   * @param foregoundColor Vordergrundfarbe
    */
-  public MeMateActionBar(
-                          final Color backgroundColor,
-                          final Color foregoundColor )
+  public MeMateActionBar( final Color backgroundColor, final Color foregoundColor )
   {
     super( new BorderLayout() );
     this.backgroundColor = backgroundColor;
@@ -239,12 +238,19 @@ public class MeMateActionBar extends JPanel
     setBackground( backgroundColor );
   }
 
+
+  /**
+   * Fügt den Button zum Ausklappen der Actionbar hinzu
+   */
   public void installToggleButtonTitleVisibleState()
   {
     createToggleButtonTitleVisibleState();
     add( createToggleButtonTitleVisibleState().getBarButton(), BorderLayout.NORTH );
   }
 
+  /**
+   * @return burgerButton
+   */
   public MeMateActionBarButton createToggleButtonTitleVisibleState()
   {
     burgerButton =
@@ -297,6 +303,17 @@ public class MeMateActionBar extends JPanel
     return addActionButton( icon, pressedIcon, title, tooltip, null, runnable );
   }
 
+  /**
+   * Fügt der Actionbar einen neuen Button hinzu.
+   * 
+   * @param icon Icon
+   * @param pressedIcon pressed Icon
+   * @param title Title
+   * @param tooltip ToolTip
+   * @param markerColor MarkerColor
+   * @param runnable Action, welche der Button ausführen soll.
+   * @return button
+   */
   public MeMateActionBarButton addActionButton( final Icon icon, final Icon pressedIcon, final String title, final String tooltip,
                                                 final Color markerColor, final Runnable runnable )
   {
@@ -331,18 +348,6 @@ public class MeMateActionBar extends JPanel
 
     button.setTitleVisible( labelsVisible );
 
-    return button;
-  }
-
-  public MeMateActionBarButton getExternalButton( final String title, final String tooltip, final Color background, final Color foreground,
-                                                  final Runnable runnable )
-  {
-    final MeMateActionBarButton button =
-        new MeMateActionBarButton( title, tooltip, background, foreground, runnable );
-    button.addMouseListener( new MeMateActionBarListener( button,
-        () -> button.setBackground( backgroundColor ),
-        () -> button.setBackground( backgroundColor.darker() ) ) );
-    //allButtons.add( button );
     return button;
   }
 
