@@ -24,7 +24,7 @@ import com.isp.memate.util.MeMateUIManager.DarkDayColor;
  */
 class Main
 {
-  final static String version = "0.9.8";
+  final static String version = "0.9.8.1";
 
   /**
    * @param args unused

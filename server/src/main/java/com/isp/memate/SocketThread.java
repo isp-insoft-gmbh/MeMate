@@ -26,7 +26,7 @@ import com.isp.memate.Shared.Operation;
  */
 class SocketThread extends Thread
 {
-  private final String         version = "0.9.8";
+  private final String         version = "0.9.8.1";
   private ObjectOutputStream   objectOutputStream;
   private ObjectInputStream    objectInputStream;
   private String               currentSessionID;

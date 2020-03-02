@@ -97,20 +97,22 @@ class FindServer
     try
     {
       socket.receive( serverPacket );
+      serverAddress = serverPacket.getAddress();
+      serverPort = serverPacket.getPort();
+      String serverMessage = new String( serverPacket.getData(), 0, serverPacket.getLength() );
+
+      System.out.println( "Es wurde ein Server gefunden." );
+      System.out.println( "Adresse: " + serverAddress + "\nPort: " + serverPort + "\nNachricht: " + serverMessage );
     }
     catch ( IOException exception )
     {
       ClientLog.newLog( "Das Serverpacket konnte nicht richtig empfangen werden." );
       ClientLog.newLog( exception.getMessage() );
     }
-    serverAddress = serverPacket.getAddress();
-    serverPort = serverPacket.getPort();
-    String serverMessage = new String( serverPacket.getData(), 0, serverPacket.getLength() );
-
-    System.out.println( "Es wurde ein Server gefunden." );
-    System.out.println( "Adresse: " + serverAddress + "\nPort: " + serverPort + "\nNachricht: " + serverMessage );
-
-    socket.close();
+    finally
+    {
+      socket.close();
+    }
   }
 
   /**

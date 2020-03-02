@@ -85,10 +85,13 @@ class ServerCommunication
       outStream = new ObjectOutputStream( socket.getOutputStream() );
       inStream = new ObjectInputStream( socket.getInputStream() );
     }
-    catch ( IOException __ )
+    catch ( Exception __ )
     {
       ClientLog.newLog( "Der Server konnte nicht gefunden werden " + __.getMessage() );
-      showErrorDialog( "Der Server konnte nicht gefunden werden. Bitte stelle sicher, dass der Server an ist", "Server nicht gefunden" );
+      JOptionPane.showMessageDialog( Login.getInstance(),
+          "Es konnte kein Server gefunden werden. Bitte stelle sicher, dass der Server an ist", "Server nicht gefunden",
+          JOptionPane.ERROR_MESSAGE, null );
+      System.exit( 1 );
     }
     /**
      * Dieser Task überprüft alle 100 Milliseconds, ob der Server etwas gesendet hat.
@@ -725,7 +728,6 @@ class ServerCommunication
     try
     {
       outStream.writeObject( new Shared( Operation.GET_USERNAME_FOR_SESSION_ID, sessionID ) );
-
     }
     catch ( IOException exception )
     {
