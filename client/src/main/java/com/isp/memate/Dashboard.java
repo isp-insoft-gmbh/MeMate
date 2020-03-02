@@ -101,7 +101,7 @@ class Dashboard extends JPanel
         {
           ServerCommunication sc = ServerCommunication.getInstance();
           sc.addBalance( (int) value );
-          ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
+          ServerCommunication.getInstance().getBalance();
           Mainframe.getInstance().setUndoButtonEnabled( true );
         }
       }
@@ -227,7 +227,7 @@ class Dashboard extends JPanel
     if ( result == JOptionPane.YES_OPTION )
     {
       ServerCommunication.getInstance().consumeDrink( name );
-      ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
+      ServerCommunication.getInstance().getBalance();
     }
   }
 

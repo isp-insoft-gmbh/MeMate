@@ -540,7 +540,7 @@ class DrinkConsumptionButton extends JPanel
         {
           ServerCommunication.getInstance().lock.lock();
           ServerCommunication.getInstance().consumeDrink( drinkName );
-          ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
+          ServerCommunication.getInstance().getBalance();
           acceptButton.removeActionListener( this );
           ActionListener[] array = abortButton.getActionListeners();
           for ( ActionListener actionListener : array )

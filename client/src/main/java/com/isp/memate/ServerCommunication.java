@@ -140,7 +140,7 @@ class ServerCommunication
               }
               Mainframe.getInstance().setHelloLabel( username );
               tellServerToSendDrinkInformations();
-              getBalance( ServerCommunication.getInstance().currentUser );
+              getBalance();
               break;
             case PRICE_CHANGED:
               Mainframe.getInstance().getDashboard().showPriceChangedDialog( shared.drinkPrice.name, shared.drinkPrice.price );
@@ -495,15 +495,14 @@ class ServerCommunication
 
   /**
    * Es wird ein Shared-Objekt mit dem Befehl GET_BALANCE
-   * und dem Nutzernamen an den Server geschickt.
+   * an den Server geschickt.
    * 
-   * @param username Benutzername
    */
-  void getBalance( String username )
+  void getBalance()
   {
     try
     {
-      outStream.writeObject( new Shared( Operation.GET_BALANCE, username ) );
+      outStream.writeObject( new Shared( Operation.GET_BALANCE, null ) );
     }
     catch ( IOException exception )
     {
@@ -703,11 +702,11 @@ class ServerCommunication
    * @param username Nutzername
    * @param uuid SessionID
    */
-  void connectSessionIDToUser( String username, String uuid )
+  void connectSessionIDToUser( String uuid )
   {
     try
     {
-      outStream.writeObject( new Shared( Operation.CONNECT_SESSION_ID, new SessionID( uuid, username ) ) );
+      outStream.writeObject( new Shared( Operation.CONNECT_SESSION_ID, uuid ) );
     }
     catch ( IOException exception )
     {

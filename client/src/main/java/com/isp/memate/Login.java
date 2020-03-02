@@ -478,7 +478,7 @@ public class Login extends JFrame
       mainframe.setHelloLabel( currentUsername );
       mainframe.setVisible( true );
       ServerCommunication.getInstance().tellServerToSendDrinkInformations();
-      ServerCommunication.getInstance().getBalance( ServerCommunication.getInstance().currentUser );
+      ServerCommunication.getInstance().getBalance();
       ServerCommunication.getInstance().tellServerToSendHistoryData();
       mainframe.toggleAdminView();
       mainframe.requestFocus();
@@ -509,7 +509,7 @@ public class Login extends JFrame
   private void generateSessionID( String username )
   {
     UUID uuid = UUID.randomUUID();
-    ServerCommunication.getInstance().connectSessionIDToUser( username, uuid.toString() );
+    ServerCommunication.getInstance().connectSessionIDToUser( uuid.toString() );
     ServerCommunication.getInstance().sessionID = uuid.toString();
     if ( stayLoggedInCheckBox.isSelected() )
     {

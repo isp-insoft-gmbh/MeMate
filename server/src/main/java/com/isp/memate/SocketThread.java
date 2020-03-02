@@ -85,7 +85,7 @@ class SocketThread extends Thread
               break;
 
             case GET_BALANCE:
-              getBalance( shared.username );
+              getBalance();
               break;
 
             case GET_DRINKINFO:
@@ -222,7 +222,7 @@ class SocketThread extends Thread
       database.disableLog( lastDate );
       ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
       sendHistoryData();
-      getBalance( currentUser );
+      getBalance();
 
       //For Admin-Balance
       Float adminBalance = database.getPiggyBankBalance() - lastTransaction;
@@ -242,7 +242,7 @@ class SocketThread extends Thread
       database.disableLog( lastDate );
       database.increaseAmountOfDrinks( lastDrinkName );
       sendHistoryData();
-      getBalance( currentUser );
+      getBalance();
 
       //For Undo
       lastActionDrink = false;
@@ -443,11 +443,11 @@ class SocketThread extends Thread
    * 
    * @param sessionID
    */
-  private void connectSessionID( SessionID sessionID )
+  private void connectSessionID( String sessionID )
   {
-    database.addSessionIDToUser( sessionID.sessionID, userIDMap.get( sessionID.username ) );
-    currentSessionID = sessionID.sessionID;
-    ServerLog.newLog( logType.INFO, "Die SessionID " + sessionID.sessionID + " wurde mit " + sessionID.username + " verbunden." );
+    database.addSessionIDToUser( sessionID, userIDMap.get( currentUser ) );
+    currentSessionID = sessionID;
+    ServerLog.newLog( logType.INFO, "Die SessionID " + sessionID + " wurde mit " + currentUser + " verbunden." );
   }
 
   /**
@@ -537,14 +537,13 @@ class SocketThread extends Thread
    * mit dieser ID wird der Kontostand von der Datenbank
    * erfragt und zurück gegben.
    * 
-   * @param username Benutzername
    * 
    */
-  private void getBalance( String username )
+  private void getBalance()
   {
-    Integer userID = userIDMap.get( username );
+    Integer userID = userIDMap.get( currentUser );
     Float balance = database.getBalance( userID );
-    ServerLog.newLog( logType.INFO, "Der Kontostand von " + username + " beträgt " + balance + "€" );
+    ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " beträgt " + balance + "€" );
     try
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_BALANCE_RESULT, balance ) );

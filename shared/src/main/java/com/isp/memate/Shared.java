@@ -19,7 +19,6 @@ class Shared implements Serializable
   DrinkPrice       drinkPrice       = null;
   DrinkPicture     drinkPicture     = null;
   DrinkAmount      drinkAmount      = null;
-  SessionID        sessionID        = null;
   DrinkIngredients drinkIngredients = null;
   Drink[]          drinkInfos       = null;
   String[][]       history;
@@ -33,6 +32,7 @@ class Shared implements Serializable
   String           username;
   String           userSessionID;
   String           version;
+  String           sessionID;
   int              balanceToAdd;
   Operation        operation;
   LoginResult      loginResult;
@@ -89,7 +89,7 @@ class Shared implements Serializable
         drinkPicture = (DrinkPicture) object;
         break;
       case CONNECT_SESSION_ID:
-        sessionID = (SessionID) object;
+        sessionID = (String) object;
         break;
       case GET_USERNAME_FOR_SESSION_ID:
         userSessionID = (String) object;
