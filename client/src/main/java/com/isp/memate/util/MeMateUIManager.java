@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
@@ -54,6 +55,7 @@ public class MeMateUIManager
   private static final Multimap<String, JTextPane>             textPaneList     = ArrayListMultimap.create();
   private static final Multimap<String, JCheckBox>             checkBoxList     = ArrayListMultimap.create();
   private static final Multimap<String, JList<?>>              listList         = ArrayListMultimap.create();
+  private static final Multimap<String, JSpinner>              spinnerList      = ArrayListMultimap.create();
   private static final Map<JButton, DarkDayIcon>               iconList         = new HashMap<>();
   private static final Map<JLabel, DarkDayIcon>                panelIconList    = new HashMap<>();
   private static final Map<String, DarkDayColor>               backgroundMap    = new HashMap<>();
@@ -305,6 +307,17 @@ public class MeMateUIManager
     MeMateUIManager.lineChart = lineChart;
   }
 
+  @SuppressWarnings( "javadoc" )
+  public static void registerButton( JButton button )
+  {
+    normalButtonList.put( "button", button );
+  }
+
+  @SuppressWarnings( "javadoc" )
+  public static void registerSpinner( JSpinner spinner )
+  {
+    spinnerList.put( "spinner", spinner );
+  }
 
   /**
    * Gibt die Hintergrundfarben des gegebenen Keys an.
@@ -479,6 +492,21 @@ public class MeMateUIManager
         else
         {
           separator.setForeground( foregroundMap.get( key ).getDayColor() );
+        }
+      }
+      for ( final JSpinner spinner : spinnerList.get( key ) )
+      {
+        if ( darkModeState )
+        {
+          spinner.setUI( new DarkSpinnerUI() );
+          spinner.setBackground( backgroundMap.get( key ).getDarkColor() );
+          spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor().brighter(), 1 ) );
+        }
+        else
+        {
+          spinner.setUI( new DaySpinnerUI() );
+          spinner.setBackground( backgroundMap.get( key ).getDayColor() );
+          spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
         }
       }
       for ( final MeMateActionBarButton button : buttonList.get( key ) )

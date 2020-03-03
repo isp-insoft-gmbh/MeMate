@@ -148,5 +148,8 @@ class Main
     MeMateUIManager.installNewKey( "adminButton",
         new DarkDayColor( new Color( 52, 73, 94 ), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
+    MeMateUIManager.installNewKey( "spinner",
+        new DarkDayColor( new Color( 52, 73, 94 ), new Color( 236, 240, 241 ) ),
+        new DarkDayColor( Color.WHITE, Color.BLACK ) );
   }
 }

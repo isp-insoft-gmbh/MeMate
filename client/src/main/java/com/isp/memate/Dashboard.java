@@ -81,6 +81,7 @@ class Dashboard extends JPanel
     final JPanel panel = MeMateUIManager.createJPanel();
     final SpinnerNumberModel spinnerModel = new SpinnerNumberModel( 1, 1, 1000, 1 );
     final JSpinner valueSpinner = new JSpinner( spinnerModel );
+    MeMateUIManager.registerSpinner( valueSpinner );
     //    String pattern = "0€";
     //    JSpinner.NumberEditor editor = new JSpinner.NumberEditor( valueSpinner, pattern );
     //    valueSpinner.setEditor( editor );
