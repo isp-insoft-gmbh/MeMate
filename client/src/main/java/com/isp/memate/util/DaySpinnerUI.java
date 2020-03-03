@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
@@ -49,6 +50,7 @@ public class DaySpinnerUI extends BasicSpinnerUI
     JComponent editor = spinner.getEditor();
     textField.setBackground( Color.white );
     textField.setForeground( Color.black );
+    textField.setBorder( new EmptyBorder( 0, 0, 0, 5 ) );
     editor.setInheritsPopupMenu( true );
     return editor;
   }

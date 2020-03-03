@@ -369,6 +369,7 @@ class Adminview extends JPanel
       SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 50, 1 );
       JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
       amountSpinner.setValue( ServerCommunication.getInstance().getAmount( drink ) );
+      MeMateUIManager.registerSpinner( amountSpinner );
       GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
       amountSpinnerConstraints.gridx = 0;
       amountSpinnerConstraints.gridy = 2;

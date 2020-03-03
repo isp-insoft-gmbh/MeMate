@@ -10,7 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
@@ -25,7 +25,7 @@ public class DarkSpinnerUI extends BasicSpinnerUI
   protected Component createPreviousButton()
   {
     JButton button =
-        new BasicArrowButton( SwingConstants.SOUTH, new Color( 51, 61, 78 ), new Color( 51, 61, 78 ), UIManager.getColor( "AppColor" ),
+        new BasicArrowButton( SwingConstants.SOUTH, new Color( 51, 61, 78 ), new Color( 51, 61, 78 ), new Color( 91, 109, 139 ),
             new Color( 51, 61, 78 ) );
     Component c = button;
     c.setName( "Spinner.previousButton" );
@@ -37,7 +37,7 @@ public class DarkSpinnerUI extends BasicSpinnerUI
   protected Component createNextButton()
   {
     JButton button =
-        new BasicArrowButton( SwingConstants.NORTH, new Color( 51, 61, 78 ), new Color( 51, 61, 78 ), UIManager.getColor( "AppColor" ),
+        new BasicArrowButton( SwingConstants.NORTH, new Color( 51, 61, 78 ), new Color( 51, 61, 78 ), new Color( 91, 109, 139 ),
             new Color( 51, 61, 78 ) );
     Component c = button;
     c.setName( "Spinner.nextButton" );
@@ -52,6 +52,7 @@ public class DarkSpinnerUI extends BasicSpinnerUI
     JComponent editor = spinner.getEditor();
     textField.setBackground( new Color( 72, 87, 111 ) );
     textField.setForeground( Color.white );
+    textField.setBorder( new EmptyBorder( 0, 0, 0, 5 ) );
     editor.setInheritsPopupMenu( true );
     return editor;
   }
