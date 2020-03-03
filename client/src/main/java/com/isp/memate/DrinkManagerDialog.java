@@ -21,9 +21,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -47,6 +49,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.isp.memate.Shared.Operation;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.DarkSpinnerUI;
+import com.isp.memate.util.DaySpinnerUI;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -299,6 +303,26 @@ class DrinkManagerDialog
    */
   void showEditDialog( String drink )
   {
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      drinkPriceSpinner.setUI( new DarkSpinnerUI() );
+      drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
+      drinkPriceSpinner
+          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
+      drinkNameField.setBackground( new Color( 72, 87, 111 ) );
+      drinkNameField.setForeground( Color.white );
+      drinkNameField
+          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
+    }
+    else
+    {
+      drinkPriceSpinner.setUI( new DaySpinnerUI() );
+      drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDayColor() );
+      drinkPriceSpinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
+      drinkNameField.setBackground( Color.white );
+      drinkNameField.setForeground( Color.black );
+      drinkNameField.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
+    }
     dialog.setTitle( "Getränk bearbeiten" );
     confirmButton.setText( "Speichern" );
     String oldName = drink;
@@ -377,11 +401,25 @@ class DrinkManagerDialog
     {
       pictureLabel.setIcon( new ImageIcon( new ImageIcon( getClass().getClassLoader().getResource( "placeholder2.png" ) ).getImage()
           .getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
+      drinkPriceSpinner.setUI( new DarkSpinnerUI() );
+      drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
+      drinkPriceSpinner
+          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
+      drinkNameField.setBackground( new Color( 72, 87, 111 ) );
+      drinkNameField.setForeground( Color.white );
+      drinkNameField
+          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
     }
     else
     {
       pictureLabel.setIcon( new ImageIcon( new ImageIcon( getClass().getClassLoader().getResource( "placeholder.png" ) ).getImage()
           .getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
+      drinkPriceSpinner.setUI( new DaySpinnerUI() );
+      drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDayColor() );
+      drinkPriceSpinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
+      drinkNameField.setBackground( Color.white );
+      drinkNameField.setForeground( Color.black );
+      drinkNameField.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
     }
     dialog.setTitle( "Getränk hinzufügen" );
     confirmButton.setText( "Hinzufügen" );
@@ -469,6 +507,7 @@ class DrinkManagerDialog
     GridBagConstraints energykJSpinnerConstraints = new GridBagConstraints();
     energykJSpinnerConstraints.gridx = 1;
     energykJSpinnerConstraints.gridy = 1;
+    energykJSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
     energykJSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( energykJSpinner, energykJSpinnerConstraints );
 
@@ -482,6 +521,7 @@ class DrinkManagerDialog
     GridBagConstraints energykCALSpinnerConstraints = new GridBagConstraints();
     energykCALSpinnerConstraints.gridx = 1;
     energykCALSpinnerConstraints.gridy = 2;
+    energykCALSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
     energykCALSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( energykCALSpinner, energykCALSpinnerConstraints );
 
@@ -495,6 +535,7 @@ class DrinkManagerDialog
     GridBagConstraints fatSpinnerConstraints = new GridBagConstraints();
     fatSpinnerConstraints.gridx = 1;
     fatSpinnerConstraints.gridy = 3;
+    fatSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
     fatSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( fatSpinner, fatSpinnerConstraints );
 
@@ -508,6 +549,7 @@ class DrinkManagerDialog
     GridBagConstraints fattyAcidsSpinnerConstraints = new GridBagConstraints();
     fattyAcidsSpinnerConstraints.gridx = 1;
     fattyAcidsSpinnerConstraints.gridy = 4;
+    fattyAcidsSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
     fattyAcidsSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( fattyAcidsSpinner, fattyAcidsSpinnerConstraints );
 
@@ -521,6 +563,7 @@ class DrinkManagerDialog
     GridBagConstraints carbsSpinnerConstraints = new GridBagConstraints();
     carbsSpinnerConstraints.gridx = 1;
     carbsSpinnerConstraints.gridy = 5;
+    carbsSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
     carbsSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( carbsSpinner, carbsSpinnerConstraints );
 
@@ -534,6 +577,7 @@ class DrinkManagerDialog
     GridBagConstraints sugarSpinnerConstraints = new GridBagConstraints();
     sugarSpinnerConstraints.gridx = 1;
     sugarSpinnerConstraints.gridy = 6;
+    sugarSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
     sugarSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( sugarSpinner, sugarSpinnerConstraints );
 
@@ -547,6 +591,7 @@ class DrinkManagerDialog
     GridBagConstraints proteinSpinnerConstraints = new GridBagConstraints();
     proteinSpinnerConstraints.gridx = 1;
     proteinSpinnerConstraints.gridy = 7;
+    proteinSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
     proteinSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( proteinSpinner, proteinSpinnerConstraints );
 
@@ -560,6 +605,7 @@ class DrinkManagerDialog
     GridBagConstraints saltSpinnerConstraints = new GridBagConstraints();
     saltSpinnerConstraints.gridx = 1;
     saltSpinnerConstraints.gridy = 8;
+    saltSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
     saltSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( saltSpinner, saltSpinnerConstraints );
 
@@ -572,12 +618,14 @@ class DrinkManagerDialog
     buttonBarConstraints.gridx = 1;
     buttonBarConstraints.gridy = 9;
     buttonBarConstraints.gridwidth = 2;
-    buttonBarConstraints.insets = new Insets( 5, 0, 0, 0 );
+    buttonBarConstraints.insets = new Insets( 10, 0, 0, 0 );
     buttonBarConstraints.anchor = GridBagConstraints.LINE_END;
     layout.add( buttonBar, buttonBarConstraints );
 
-    toggleDarkMode( ingredientsLabel, energyKJLabel, energyKCALLabel, fatLabel, fattyAcidsLabel, carbsLabel, sugarLabel, proteinLabel,
-        saltLabel, buttonBar );
+    toggleDarkMode( ingredientsLabel, ingredientsField, energyKJLabel, energyKCALLabel, fatLabel, fattyAcidsLabel, carbsLabel, sugarLabel,
+        proteinLabel,
+        saltLabel, buttonBar, energykJSpinner, energykCALSpinner, fatSpinner, fattyAcidsSpinner, carbsSpinner, sugarSpinner, proteinSpinner,
+        saltSpinner );
 
     ActionListener[] listeners = confirmButton.getActionListeners();
     for ( ActionListener actionListener : listeners )
@@ -622,6 +670,7 @@ class DrinkManagerDialog
 
   /**
    * @param ingredientsLabel
+   * @param ingredientsField
    * @param energyKJLabel
    * @param energyKCALLabel
    * @param fatLabel
@@ -631,11 +680,31 @@ class DrinkManagerDialog
    * @param proteinLabel
    * @param saltLabel
    * @param buttonBar
+   * @param saltSpinner
+   * @param proteinSpinner
+   * @param sugarSpinner
+   * @param carbsSpinner
+   * @param fattyAcidsSpinner
+   * @param fatSpinner
+   * @param energykCALSpinner
+   * @param energykJSpinner
    */
-  private void toggleDarkMode( JLabel ingredientsLabel, JLabel energyKJLabel, JLabel energyKCALLabel, JLabel fatLabel,
+  private void toggleDarkMode( JLabel ingredientsLabel, JTextField ingredientsField, JLabel energyKJLabel, JLabel energyKCALLabel,
+                               JLabel fatLabel,
                                JLabel fattyAcidsLabel, JLabel carbsLabel, JLabel sugarLabel, JLabel proteinLabel, JLabel saltLabel,
-                               JPanel buttonBar )
+                               JPanel buttonBar, JSpinner energykJSpinner, JSpinner energykCALSpinner, JSpinner fatSpinner,
+                               JSpinner fattyAcidsSpinner, JSpinner carbsSpinner, JSpinner sugarSpinner, JSpinner proteinSpinner,
+                               JSpinner saltSpinner )
   {
+    ArrayList<JSpinner> spinnerList = new ArrayList<>();
+    spinnerList.add( energykJSpinner );
+    spinnerList.add( energykCALSpinner );
+    spinnerList.add( fatSpinner );
+    spinnerList.add( fattyAcidsSpinner );
+    spinnerList.add( carbsSpinner );
+    spinnerList.add( sugarSpinner );
+    spinnerList.add( proteinSpinner );
+    spinnerList.add( saltSpinner );
     if ( MeMateUIManager.getDarkModeState() )
     {
       buttonBar.setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
@@ -648,7 +717,16 @@ class DrinkManagerDialog
       saltLabel.setForeground( Color.white );
       carbsLabel.setForeground( Color.white );
       sugarLabel.setForeground( Color.white );
-
+      ingredientsField.setBackground( new Color( 72, 87, 111 ) );
+      ingredientsField.setForeground( Color.white );
+      ingredientsField
+          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
+      for ( JSpinner spinner : spinnerList )
+      {
+        spinner.setUI( new DarkSpinnerUI() );
+        spinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
+        spinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
+      }
     }
     else
     {
@@ -662,6 +740,15 @@ class DrinkManagerDialog
       saltLabel.setForeground( Color.black );
       carbsLabel.setForeground( Color.black );
       sugarLabel.setForeground( Color.black );
+      ingredientsField.setBackground( Color.white );
+      ingredientsField.setForeground( Color.black );
+      ingredientsField.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
+      for ( JSpinner spinner : spinnerList )
+      {
+        spinner.setUI( new DaySpinnerUI() );
+        spinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDayColor() );
+        spinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
+      }
     }
   }
 }

@@ -126,6 +126,13 @@ class DrinkConsumptionButton extends JPanel
         DrinkIngredients ingredients = ServerCommunication.getInstance().getIngredients( name );
         String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
         int maxLength = 40;
+        for ( String string : ingredientsArray )
+        {
+          if ( string.length() > maxLength )
+          {
+            maxLength = string.length() + 2;
+          }
+        }
         int currentLength = 0;
         StringBuilder listBuilder = new StringBuilder();
         listBuilder.append( "<html>Zutaten:<br>" );
