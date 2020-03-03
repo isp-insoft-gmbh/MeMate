@@ -513,55 +513,6 @@ class DrinkConsumptionButton extends JPanel
 
 
   /**
-   * @param string
-   * @param ingredients
-   * @return
-   */
-  private String getIngredient( String ingredient, DrinkIngredients ingredients, int maxLength )
-  {
-    int ingredientLength = ingredient.length() + 1;
-    int amountOfPoints = 0;
-    StringBuilder builder = new StringBuilder();
-    String amount = "";
-
-    switch ( ingredient )
-    {
-      case "Salz":
-        amount = String.format( " %.2fg", ingredients.salt );
-        break;
-      case "Eiweiß":
-        amount = String.format( " %.1fg", ingredients.protein );
-        break;
-      case "Energie":
-        amount = " " + ingredients.energy_kJ + " kJ (" + ingredients.energy_kcal + " kcal)";
-        break;
-      case "Fett":
-        amount = String.format( " %.1fg", ingredients.fat );
-        break;
-      case "davon gesättigte Fettsäuren":
-        amount = String.format( " %.1fg", ingredients.fatty_acids );
-        break;
-      case "Kohlenhydrate":
-        amount = String.format( " %.1fg", ingredients.carbs );
-        break;
-      case "Zucker":
-        amount = String.format( " %.1fg", ingredients.sugar );
-      default :
-        break;
-    }
-    ingredientLength += amount.toString().length();
-    amountOfPoints = maxLength - ingredientLength;
-    builder.append( ingredient + " " );
-    for ( int i = 0; i < amountOfPoints; i++ )
-    {
-      builder.append( "." );
-    }
-    builder.append( amount );
-    return builder.toString();
-  }
-
-
-  /**
    * Sobald man auf ein Getränk klickt, so öffnet sich ein Dialog, welcher fragt, ob man das
    * Getränk wirklich konsumieren möchte. Bestätigt man dies, so wird {@linkplain ServerCommunication}
    * mitgeteilt, welches Getränk man gekauft hat.

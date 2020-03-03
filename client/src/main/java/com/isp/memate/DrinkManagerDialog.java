@@ -208,10 +208,29 @@ class DrinkManagerDialog
         }
         drinkPicturePath = selectedFile.getPath();
         File image = new File( drinkPicturePath );
-        ImageIcon drinkImage =
-            new ImageIcon( new ImageIcon( image.getPath() ).getImage().getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) );
-        pictureLabel.setIcon( drinkImage );
-        currentImage = drinkImage;
+        ImageIcon drinkIcon = new ImageIcon( new ImageIcon( image.getPath() ).getImage() );
+
+        Image drinkImage = drinkIcon.getImage();
+        Image scaledImage;
+
+        if ( drinkIcon.getIconHeight() > 140 || drinkIcon.getIconWidth() > 150 )
+        {
+          double scale = 140.0 / drinkIcon.getIconHeight();
+          int height = 140;
+          int width = (int) (drinkIcon.getIconWidth() * scale);
+          if ( width > 150 )
+          {
+            width = 150;
+          }
+          scaledImage = drinkImage.getScaledInstance( width, height, Image.SCALE_SMOOTH );
+          pictureLabel.setIcon( new ImageIcon( scaledImage ) );
+        }
+        else
+        {
+          scaledImage = drinkIcon.getImage().getScaledInstance( 42, 132, Image.SCALE_SMOOTH );
+          pictureLabel.setIcon( new ImageIcon( scaledImage ) );
+        }
+        currentImage = new ImageIcon( scaledImage );
       }
     } );
 
@@ -329,8 +348,31 @@ class DrinkManagerDialog
     Float oldPrice = ServerCommunication.getInstance().getPrice( drink );
     drinkNameField.setText( oldName );
     drinkPriceSpinner.setValue( oldPrice );
-    pictureLabel.setIcon( new ImageIcon(
-        ServerCommunication.getInstance().getIcon( drink ).getImage().getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
+
+
+    ImageIcon drinkIcon = ServerCommunication.getInstance().getIcon( drink );
+    Image drinkImage = drinkIcon.getImage();
+    Image scaledImage;
+
+    if ( drinkIcon.getIconHeight() > 140 || drinkIcon.getIconWidth() > 150 )
+    {
+      double scale = 140.0 / drinkIcon.getIconHeight();
+      int height = 140;
+      int width = (int) (drinkIcon.getIconWidth() * scale);
+      if ( width > 150 )
+      {
+        width = 150;
+      }
+      scaledImage = drinkImage.getScaledInstance( width, height, Image.SCALE_SMOOTH );
+      pictureLabel.setIcon( new ImageIcon( scaledImage ) );
+    }
+    else
+    {
+      pictureLabel.setIcon( new ImageIcon(
+          ServerCommunication.getInstance().getIcon( drink ).getImage().getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
+    }
+
+
     confirmButton.addActionListener( new ActionListener()
     {
       @Override

@@ -290,12 +290,6 @@ public class MeMateUIManager
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerlabel( final JLabel label )
-  {
-    labelList.put( defaultKey, label );
-  }
-
-  @SuppressWarnings( "javadoc" )
   public static void registerFreeChart( JFreeChart freeChart )
   {
     MeMateUIManager.freeChart = freeChart;
