@@ -25,7 +25,7 @@ import com.isp.memate.util.MeMateUIManager.DarkDayColor;
  */
 class Main
 {
-  final static String version = "0.9.8.2";
+  final static String version = "0.9.8.3";
 
   /**
    * @param args unused
@@ -150,6 +150,9 @@ class Main
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
     MeMateUIManager.installNewKey( "spinner",
         new DarkDayColor( new Color( 52, 73, 94 ), new Color( 236, 240, 241 ) ),
+        new DarkDayColor( Color.WHITE, Color.BLACK ) );
+    MeMateUIManager.installNewKey( "comboBox",
+        new DarkDayColor( new Color( 91, 109, 139 ), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
   }
 }

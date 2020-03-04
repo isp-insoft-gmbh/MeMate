@@ -261,10 +261,12 @@ class ConsumptionRate extends JPanel
     selectDrinkComboBox = new JComboBox<>();
     selectDrinkComboBox.addItem( "Alle" );
     selectDrinkComboBox.setSelectedItem( "Alle" );
+    MeMateUIManager.registerComboBox( selectDrinkComboBox );
     for ( String string : consumedDrinks )
     {
       selectDrinkComboBox.addItem( string );
     }
+    MeMateUIManager.setUISettings();
   }
 
 

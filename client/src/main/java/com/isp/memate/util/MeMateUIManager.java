@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -23,6 +24,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.table.JTableHeader;
 
 import org.jfree.chart.JFreeChart;
@@ -56,6 +59,7 @@ public class MeMateUIManager
   private static final Multimap<String, JCheckBox>             checkBoxList     = ArrayListMultimap.create();
   private static final Multimap<String, JList<?>>              listList         = ArrayListMultimap.create();
   private static final Multimap<String, JSpinner>              spinnerList      = ArrayListMultimap.create();
+  private static final Multimap<String, JComboBox<String>>     comboBoxList     = ArrayListMultimap.create();
   private static final Map<JButton, DarkDayIcon>               iconList         = new HashMap<>();
   private static final Map<JLabel, DarkDayIcon>                panelIconList    = new HashMap<>();
   private static final Map<String, DarkDayColor>               backgroundMap    = new HashMap<>();
@@ -101,6 +105,10 @@ public class MeMateUIManager
     UIManager.put( "Label.foreground", Color.white );
     UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
     UIManager.put( "ToolTip.foreground", Color.white );
+    UIManager.put( "ComboBox.buttonBackground", new Color( 51, 61, 78 ) );
+    UIManager.put( "ComboBox.buttonShadow", new Color( 51, 61, 78 ) );
+    UIManager.put( "ComboBox.buttonDarkShadow", new Color( 91, 109, 139 ) );
+    UIManager.put( "ComboBox.buttonHighlight", new Color( 51, 61, 78 ) );
     setUISettings();
   }
 
@@ -116,6 +124,10 @@ public class MeMateUIManager
     UIManager.put( "Label.foreground", Color.black );
     UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
     UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
+    UIManager.put( "ComboBox.buttonBackground", new Color( 215, 215, 215 ) );
+    UIManager.put( "ComboBox.buttonShadow", new Color( 215, 215, 215 ) );
+    UIManager.put( "ComboBox.buttonDarkShadow", Color.black );
+    UIManager.put( "ComboBox.buttonHighlight", new Color( 215, 215, 215 ) );
     setUISettings();
   }
 
@@ -131,6 +143,10 @@ public class MeMateUIManager
     UIManager.put( "Label.foreground", Color.black );
     UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
     UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
+    UIManager.put( "ComboBox.buttonBackground", new Color( 215, 215, 215 ) );
+    UIManager.put( "ComboBox.buttonShadow", new Color( 215, 215, 215 ) );
+    UIManager.put( "ComboBox.buttonDarkShadow", Color.black );
+    UIManager.put( "ComboBox.buttonHighlight", new Color( 215, 215, 215 ) );
   }
 
   /**
@@ -145,6 +161,10 @@ public class MeMateUIManager
     UIManager.put( "Label.foreground", Color.white );
     UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
     UIManager.put( "ToolTip.foreground", Color.white );
+    UIManager.put( "ComboBox.buttonBackground", new Color( 51, 61, 78 ) );
+    UIManager.put( "ComboBox.buttonShadow", new Color( 51, 61, 78 ) );
+    UIManager.put( "ComboBox.buttonDarkShadow", new Color( 91, 109, 139 ) );
+    UIManager.put( "ComboBox.buttonHighlight", new Color( 51, 61, 78 ) );
   }
 
 
@@ -311,6 +331,12 @@ public class MeMateUIManager
   public static void registerSpinner( JSpinner spinner )
   {
     spinnerList.put( "spinner", spinner );
+  }
+
+  @SuppressWarnings( "javadoc" )
+  public static void registerComboBox( JComboBox<String> comboBox )
+  {
+    comboBoxList.put( "comboBox", comboBox );
   }
 
   /**
@@ -501,6 +527,25 @@ public class MeMateUIManager
           spinner.setUI( new DaySpinnerUI() );
           spinner.setBackground( backgroundMap.get( key ).getDayColor() );
           spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
+        }
+      }
+      for ( final JComboBox<String> comboBox : comboBoxList.get( key ) )
+      {
+        comboBox.setUI( new BasicComboBoxUI() );
+        if ( darkModeState )
+        {
+          comboBox.setBackground( backgroundMap.get( key ).getDarkColor() );
+          comboBox.setForeground( foregroundMap.get( key ).getDarkColor() );
+          comboBox.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+
+        }
+        else
+        {
+          comboBox.setBackground( backgroundMap.get( key ).getDayColor() );
+          comboBox.setForeground( foregroundMap.get( key ).getDayColor() );
+          comboBox.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker() ) );
+
+
         }
       }
       for ( final MeMateActionBarButton button : buttonList.get( key ) )
