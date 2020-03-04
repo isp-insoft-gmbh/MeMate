@@ -542,6 +542,7 @@ class DrinkManagerDialog
     GridBagConstraints energyKJLabelConstraints = new GridBagConstraints();
     energyKJLabelConstraints.gridx = 0;
     energyKJLabelConstraints.gridy = 1;
+    energyKJLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
     JLabel energyKJLabel = new JLabel( "Energie kJ" );
     layout.add( energyKJLabel, energyKJLabelConstraints );
     SpinnerModel energykJModel = new SpinnerNumberModel( 0, 0, 500, 1 );
@@ -556,6 +557,7 @@ class DrinkManagerDialog
     GridBagConstraints energyKCALLabelConstraints = new GridBagConstraints();
     energyKCALLabelConstraints.gridx = 0;
     energyKCALLabelConstraints.gridy = 2;
+    energyKCALLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
     JLabel energyKCALLabel = new JLabel( "Energie kcal" );
     layout.add( energyKCALLabel, energyKCALLabelConstraints );
     SpinnerModel energykCALModel = new SpinnerNumberModel( 0, 0, 500, 1 );
@@ -570,6 +572,7 @@ class DrinkManagerDialog
     GridBagConstraints fatLabelConstraints = new GridBagConstraints();
     fatLabelConstraints.gridx = 0;
     fatLabelConstraints.gridy = 3;
+    fatLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
     JLabel fatLabel = new JLabel( "Fett" );
     layout.add( fatLabel, fatLabelConstraints );
     SpinnerModel fatModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
@@ -584,6 +587,7 @@ class DrinkManagerDialog
     GridBagConstraints fattyAcidsLabelConstraints = new GridBagConstraints();
     fattyAcidsLabelConstraints.gridx = 0;
     fattyAcidsLabelConstraints.gridy = 4;
+    fattyAcidsLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
     JLabel fattyAcidsLabel = new JLabel( "gesättigte Fettsäuren" );
     layout.add( fattyAcidsLabel, fattyAcidsLabelConstraints );
     SpinnerModel fattyAcidsModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
@@ -598,6 +602,7 @@ class DrinkManagerDialog
     GridBagConstraints carbsLabelConstraints = new GridBagConstraints();
     carbsLabelConstraints.gridx = 0;
     carbsLabelConstraints.gridy = 5;
+    carbsLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
     JLabel carbsLabel = new JLabel( "Kohlenhydrate" );
     layout.add( carbsLabel, carbsLabelConstraints );
     SpinnerModel carbsModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
@@ -612,6 +617,7 @@ class DrinkManagerDialog
     GridBagConstraints sugarLabelConstraints = new GridBagConstraints();
     sugarLabelConstraints.gridx = 0;
     sugarLabelConstraints.gridy = 6;
+    sugarLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
     JLabel sugarLabel = new JLabel( "davon Zucker" );
     layout.add( sugarLabel, sugarLabelConstraints );
     SpinnerModel sugarModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
@@ -626,6 +632,7 @@ class DrinkManagerDialog
     GridBagConstraints proteinLabelConstraints = new GridBagConstraints();
     proteinLabelConstraints.gridx = 0;
     proteinLabelConstraints.gridy = 7;
+    proteinLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
     JLabel proteinLabel = new JLabel( "Eiweiß" );
     layout.add( proteinLabel, proteinLabelConstraints );
     SpinnerModel proteinModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
@@ -640,6 +647,7 @@ class DrinkManagerDialog
     GridBagConstraints saltLabelConstraints = new GridBagConstraints();
     saltLabelConstraints.gridx = 0;
     saltLabelConstraints.gridy = 8;
+    saltLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
     JLabel saltLabel = new JLabel( "Salz" );
     layout.add( saltLabel, saltLabelConstraints );
     SpinnerModel saltModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );

@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
@@ -91,6 +92,8 @@ class Mainframe extends JFrame
   private MeMateActionBarButton darkModeButton;
   private MeMateActionBarButton undoButton;
   private final MeMateActionBar bar;
+  public static Image           frameImage   =
+      Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue2.png" ) );
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -465,4 +468,6 @@ class Mainframe extends JFrame
       }
     }
   }
+
+
 }
