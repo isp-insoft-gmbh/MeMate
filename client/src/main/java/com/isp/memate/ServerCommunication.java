@@ -3,14 +3,25 @@
  */
 package com.isp.memate;
 
+import java.awt.AWTException;
 import java.awt.Cursor;
+import java.awt.Image;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.TrayIcon.MessageType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,28 +48,33 @@ import com.isp.memate.util.ClientLog;
  */
 class ServerCommunication
 {
-  private static final ServerCommunication    instance            = new ServerCommunication();
-  final ReentrantLock                         lock                = new ReentrantLock( true );
-  private final ArrayList<Byte>               byteImageList       = new ArrayList<>();
-  private final List<String>                  drinkNames          = new ArrayList<>();
-  private final Map<String, Float>            priceMap            = new HashMap<>();
-  private final Map<String, ImageIcon>        imageMap            = new HashMap<>();
-  private final Map<String, Integer>          amountMap           = new HashMap<>();
-  private final Map<String, Integer>          drinkIDMap          = new HashMap<>();
-  private final Map<String, Boolean>          drinkIngredientsMap = new HashMap<>();
-  private final Map<String, DrinkIngredients> IngredientsMap      = new HashMap<>();
-  private static String                       version             = "x";
-  private String[]                            userArray           = null;
-  private User[]                              fullUserArray       = null;
-  private Drink[]                             drinkArray          = null;
-  String                                      currentUser         = null;
+  private static final ServerCommunication    instance                  = new ServerCommunication();
+  final ReentrantLock                         lock                      = new ReentrantLock( true );
+  private final ArrayList<Byte>               byteImageList             = new ArrayList<>();
+  private final List<String>                  drinkNames                = new ArrayList<>();
+  private final Map<String, Float>            priceMap                  = new HashMap<>();
+  private final Map<String, ImageIcon>        imageMap                  = new HashMap<>();
+  private final Map<String, Integer>          amountMap                 = new HashMap<>();
+  private final Map<String, Integer>          drinkIDMap                = new HashMap<>();
+  private final Map<String, Boolean>          drinkIngredientsMap       = new HashMap<>();
+  private final Map<String, DrinkIngredients> IngredientsMap            = new HashMap<>();
+  private static String                       version                   = "x";
+  private String[]                            userArray                 = null;
+  private User[]                              fullUserArray             = null;
+  private Drink[]                             drinkArray                = null;
+  String                                      currentUser               = null;
+  private String[][]                          shortHistory              = null;
   private String[][]                          history;
-  private String[][]                          shortHistory;
   private String[][]                          scoreboard;
   private Float                               piggyBankBalance;
   private Socket                              socket;
   private ObjectInputStream                   inStream;
   private ObjectOutputStream                  outStream;
+  private ArrayList<String>                   alreadyShownNotifications = new ArrayList<>();
+
+
+  //Windows Notifications
+  boolean showNotifications = false;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -178,12 +194,46 @@ class ServerCommunication
         tellServerToSendHistoryData();
       }
     };
+    TimerTask task4 = new TimerTask()
+    {
+
+      @Override
+      public void run()
+      {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "HH:mm" );
+        LocalDateTime now = LocalDateTime.now();
+        String date = dtf.format( now );
+        if ( date.equals( "12:19" ) )
+        {
+          if ( SystemTray.isSupported() )
+          {
+            SystemTray tray = SystemTray.getSystemTray();
+            Image image = Mainframe.frameImage;
+            TrayIcon trayIcon = new TrayIcon( image );
+            trayIcon.setImageAutoSize( true );
+            trayIcon.setToolTip( "MeMate" );
+            try
+            {
+              tray.add( trayIcon );
+            }
+            catch ( AWTException exception )
+            {
+              // TODO(nwe|03.03.2020): Fehlerbehandlung muss noch implementiert werden!
+            }
+            trayIcon.displayMessage( "MeMate", "Standup Meeting", MessageType.NONE );
+          }
+        }
+      }
+    };
     tellServertoSendUserArray();
     Timer timer = new Timer();
     timer.schedule( task, 0, 100 );
     Timer timer3 = new Timer();
     timer3.schedule( task3, 5000, 300000 );
+    Timer timer4 = new Timer();
+    timer4.schedule( task4, 0, 60000 );
   }
+
 
   void startDrinkInfoTimer()
   {
@@ -215,11 +265,71 @@ class ServerCommunication
   }
 
   /**
+   * 
+   */
+  private void checkForChanges()
+  {
+    String[][] history = getShortHistory();
+    if ( history != null && showNotifications )
+    {
+      ZonedDateTime today = ZonedDateTime.now();
+      ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );
+      for ( String[] data : history )
+      {
+        String action = data[ 0 ];
+        String consumer = data[ 1 ];
+        String date = data[ 2 ];
+        String drinkname = action.substring( 0, action.length() - 10 );
+        if ( action.contains( "getrunken" ) )
+        {
+          try
+          {
+            Date eventDate = new SimpleDateFormat( "yyyy-MM-dd HH:mm" ).parse( date );
+            if ( !eventDate.toInstant().isBefore( twentyMinutesAgo.toInstant() ) )
+            {
+              if ( !alreadyShownNotifications.contains( date ) )
+              {
+                if ( shortHistory != null )
+                {
+                  alreadyShownNotifications.add( date );
+                  if ( SystemTray.isSupported() )
+                  {
+                    SystemTray tray = SystemTray.getSystemTray();
+                    Image image = Mainframe.frameImage;
+                    TrayIcon trayIcon = new TrayIcon( image );
+                    trayIcon.setImageAutoSize( true );
+                    trayIcon.setToolTip( "MeMate" );
+                    try
+                    {
+                      tray.add( trayIcon );
+                    }
+                    catch ( AWTException exception )
+                    {
+                      // TODO(nwe|03.03.2020): Fehlerbehandlung muss noch implementiert werden!
+                    }
+                    trayIcon.displayMessage( "MeMate", consumer + " trinkt gerade " + drinkname, MessageType.NONE );
+                  }
+
+                }
+              }
+            }
+          }
+          catch ( ParseException exception )
+          {
+            ClientLog.newLog( "Das Datum ist out of range." + exception );
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * @param history
    */
   private void updateShortHistory( String[][] history )
   {
     this.shortHistory = history;
+    checkForChanges();
   }
 
   /**
@@ -849,6 +959,22 @@ class ServerCommunication
     try
     {
       outStream.writeObject( new Shared( Operation.CHANGE_PASSWORD, new User( username, password, 0f, 1 ) ) );
+    }
+    catch ( IOException exception )
+    {
+      showErrorDialog( "Passwort ändern fehlgeschlagen.", "Passwort" );
+      ClientLog.newLog( exception.getMessage() );
+    }
+  }
+
+  /**
+   * @param newPass neues Passwort
+   */
+  void changePassword( String newPass )
+  {
+    try
+    {
+      outStream.writeObject( new Shared( Operation.CHANGE_PASSWORD_USER, newPass ) );
     }
     catch ( IOException exception )
     {

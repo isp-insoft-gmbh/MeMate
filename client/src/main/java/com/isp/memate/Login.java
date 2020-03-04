@@ -483,6 +483,180 @@ public class Login extends JFrame
       mainframe.toggleAdminView();
       mainframe.requestFocus();
     }
+    else if ( loginResult == LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD )
+    {
+      JFrame changePasswordFrame = new JFrame( "Passwort ändern" );
+      JPanel changePasswordPanel = new JPanel( new GridBagLayout() );
+      JLabel passwordlabel = new JLabel( "Passwort:" );
+      JLabel password2label = new JLabel( "Passwort wiederholen:" );
+      JLabel passwordCompareLabel = new JLabel();
+      JPasswordField passwordField = new JPasswordField();
+      JPasswordField password2Field = new JPasswordField();
+      JButton savePasswordButton = new JButton( "Speichern" );
+      JButton pass_abortButton = new JButton( "Abbrechen" );
+
+      changePasswordFrame.getRootPane().setDefaultButton( savePasswordButton );
+
+      int prefHeight = passwordField.getPreferredSize().height;
+      passwordField.setPreferredSize( new Dimension( 200, prefHeight ) );
+      password2Field.setPreferredSize( new Dimension( 200, prefHeight ) );
+      passwordCompareLabel.setPreferredSize( new Dimension( 200, prefHeight ) );
+
+      GridBagConstraints reg_passwordlabelConstraints = new GridBagConstraints();
+      reg_passwordlabelConstraints.gridx = 0;
+      reg_passwordlabelConstraints.gridy = 0;
+      reg_passwordlabelConstraints.insets = new Insets( 10, 0, 10, 0 );
+      reg_passwordlabelConstraints.anchor = GridBagConstraints.LINE_START;
+      changePasswordPanel.add( passwordlabel, reg_passwordlabelConstraints );
+      GridBagConstraints reg_passwordFieldConstraints = new GridBagConstraints();
+      reg_passwordFieldConstraints.gridx = 1;
+      reg_passwordFieldConstraints.gridy = 0;
+      reg_passwordFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
+      changePasswordPanel.add( passwordField, reg_passwordFieldConstraints );
+      GridBagConstraints reg_password2labelConstraints = new GridBagConstraints();
+      reg_password2labelConstraints.gridx = 0;
+      reg_password2labelConstraints.gridy = 1;
+      reg_password2labelConstraints.insets = new Insets( 0, 0, 10, 0 );
+      reg_password2labelConstraints.anchor = GridBagConstraints.LINE_START;
+      changePasswordPanel.add( password2label, reg_password2labelConstraints );
+      GridBagConstraints reg_password2FieldConstraints = new GridBagConstraints();
+      reg_password2FieldConstraints.gridx = 1;
+      reg_password2FieldConstraints.gridy = 1;
+      reg_password2FieldConstraints.insets = new Insets( 0, 5, 5, 0 );
+      changePasswordPanel.add( password2Field, reg_password2FieldConstraints );
+      GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
+      passwordCompareLabelConstraints.gridx = 1;
+      passwordCompareLabelConstraints.gridy = 2;
+      passwordCompareLabelConstraints.anchor = GridBagConstraints.LINE_START;
+      passwordCompareLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
+      changePasswordPanel.add( passwordCompareLabel, passwordCompareLabelConstraints );
+      JPanel buttonPanel = new JPanel( new FlowLayout() );
+      buttonPanel.add( savePasswordButton );
+      buttonPanel.add( pass_abortButton );
+      GridBagConstraints reg_buttonpanelConstraints = new GridBagConstraints();
+      reg_buttonpanelConstraints.gridx = 0;
+      reg_buttonpanelConstraints.gridy = 3;
+      reg_buttonpanelConstraints.gridwidth = 2;
+      changePasswordPanel.add( buttonPanel, reg_buttonpanelConstraints );
+
+      Color green = new Color( 33, 122, 34 );
+      DocumentListener documentListener = new DocumentListener()
+      {
+
+        @Override
+        public void removeUpdate( DocumentEvent e )
+        {
+          compare();
+        }
+
+        @Override
+        public void insertUpdate( DocumentEvent e )
+        {
+          compare();
+        }
+
+        @Override
+        public void changedUpdate( DocumentEvent e )
+        {
+        }
+
+        private void compare()
+        {
+          if ( passwordField.getPassword() == null
+              || passwordField.getPassword().length == 0
+              || password2Field.getPassword() == null
+              || password2Field.getPassword().length == 0 )
+          {
+            passwordCompareLabel.setText( "" );
+            passwordCompareLabel.setForeground( Color.black );
+          }
+          else
+          {
+            if ( String.valueOf( passwordField.getPassword() ).equals( String.valueOf( password2Field.getPassword() ) ) )
+            {
+              passwordCompareLabel.setText( "Die Passwörter stimmen überein." );
+              passwordCompareLabel.setForeground( green );
+            }
+            else
+            {
+              passwordCompareLabel.setText( "Die Passwörter stimmen nicht überein." );
+              passwordCompareLabel.setForeground( Color.red );
+            }
+          }
+        }
+      };
+      pass_abortButton.addActionListener( new ActionListener()
+      {
+
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          changePasswordFrame.dispose();
+          getRootPane().setDefaultButton( loginButton );
+          validateLoginResult( LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD );
+        }
+      } );
+      savePasswordButton.addActionListener( new ActionListener()
+      {
+
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          boolean isPasswordOrUserNameIncorrect = passwordField.getPassword() == null || passwordField.getPassword().length == 0
+              || password2Field.getPassword() == null || password2Field.getPassword().length == 0;
+
+          if ( isPasswordOrUserNameIncorrect )
+          {
+            JOptionPane.showMessageDialog( changePasswordFrame, "Passwort ist nicht zulässig.", "Passwort ändern",
+                JOptionPane.WARNING_MESSAGE );
+          }
+          else if ( !String.valueOf( passwordField.getPassword() ).equals( String.valueOf( password2Field.getPassword() ) ) )
+          {
+            JOptionPane.showMessageDialog( changePasswordFrame, "Die Passwörter stimmen nicht überein.", "Passwort ändern",
+                JOptionPane.WARNING_MESSAGE );
+          }
+          else
+          {
+            char[] password = passwordField.getPassword();
+            int reply =
+                JOptionPane.showConfirmDialog( changePasswordFrame, "Wollen Sie wirklich das neue Passwort spechern?", "Passwort ändern",
+                    JOptionPane.INFORMATION_MESSAGE );
+            if ( reply == JOptionPane.YES_OPTION )
+            {
+              ServerCommunication.getInstance().changePassword( getHash( String.valueOf( password ) ) );
+              ServerCommunication.getInstance().startDrinkInfoTimer();
+              ServerCommunication.getInstance().updateCurrentUser( currentUsername );
+              generateSessionID( currentUsername );
+              changePasswordFrame.dispose();
+              dispose();
+              Mainframe mainframe = Mainframe.getInstance();
+              mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
+              mainframe.setHelloLabel( currentUsername );
+              mainframe.setVisible( true );
+              ServerCommunication.getInstance().tellServerToSendDrinkInformations();
+              ServerCommunication.getInstance().getBalance();
+              ServerCommunication.getInstance().tellServerToSendHistoryData();
+              mainframe.toggleAdminView();
+              mainframe.requestFocus();
+            }
+          }
+        }
+      } );
+
+      password2Field.getDocument().addDocumentListener( documentListener );
+      passwordField.getDocument().addDocumentListener( documentListener );
+
+      getRootPane().setDefaultButton( savePasswordButton );
+      changePasswordFrame.add( changePasswordPanel );
+      changePasswordFrame.pack();
+      changePasswordFrame.setResizable( false );
+      changePasswordFrame.setSize( changePasswordFrame.getWidth() + 30, changePasswordFrame.getHeight() + 20 );
+      changePasswordFrame.setLocationRelativeTo( Login.this );
+      changePasswordFrame
+          .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
+      changePasswordFrame.setVisible( true );
+
+    }
     else
     {
       String message;

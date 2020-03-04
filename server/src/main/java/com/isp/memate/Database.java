@@ -149,7 +149,8 @@ class Database
         + "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
         + "guthaben double NOT NULL,"
         + "username string UNIQUE NOT NULL,"
-        + "password string NOT NULL"
+        + "password string NOT NULL,"
+        + "requestNewPassword boolean DEFAULT (false)"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -509,7 +510,7 @@ class Database
 
 
   /**
-   * Überprüft die angegebenen Login-Informationen, sollten diese korrekt sein, sow ird Login erfolgreich zurück
+   * Überprüft die angegebenen Login-Informationen, sollten diese korrekt sein, so wird Login erfolgreich zurück
    * gegeben.
    * 
    * @param username Nutzername
@@ -518,14 +519,21 @@ class Database
    */
   LoginResult checkLogin( String username, String password )
   {
-    String sql = "SELECT password FROM user WHERE username = ?";
+    String sql = "SELECT password,requestNewPassword FROM user WHERE username = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setString( 1, username );
       ResultSet rs = pstmt.executeQuery();
       if ( rs.getString( "password" ).equals( password ) )
       {
-        return LoginResult.LOGIN_SUCCESSFULL;
+        if ( rs.getBoolean( "requestNewPassword" ) )
+        {
+          return LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD;
+        }
+        else
+        {
+          return LoginResult.LOGIN_SUCCESSFULL;
+        }
       }
       else
       {
@@ -1115,14 +1123,22 @@ class Database
    * @param name Nutzername
    * @param password Passwort
    */
-  void changePassword( String name, String password )
+  void changePassword( String name, String password, boolean requestNewPass )
   {
     lock.lock();
-    String sql = "UPDATE user SET password = ? WHERE username = ?";
+    String sql = "UPDATE user SET password = ?,requestNewPassword=? WHERE username = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setString( 1, password );
-      pstmt.setString( 2, name );
+      if ( requestNewPass )
+      {
+        pstmt.setBoolean( 2, true );
+      }
+      else
+      {
+        pstmt.setBoolean( 2, false );
+      }
+      pstmt.setString( 3, name );
       pstmt.executeUpdate();
     }
     catch ( SQLException e )

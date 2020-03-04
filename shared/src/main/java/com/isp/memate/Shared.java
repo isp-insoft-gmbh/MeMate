@@ -33,6 +33,7 @@ class Shared implements Serializable
   String           userSessionID;
   String           version;
   String           sessionID;
+  String           pass;
   int              balanceToAdd;
   Operation        operation;
   LoginResult      loginResult;
@@ -139,6 +140,9 @@ class Shared implements Serializable
       case CHANGE_PASSWORD:
         user = (User) object;
         break;
+      case CHANGE_PASSWORD_USER:
+        pass = (String) object;
+        break;
       case GET_VERSION:
         version = (String) object;
         break;
@@ -181,13 +185,15 @@ class Shared implements Serializable
     SET_DRINK_AMOUNT,
     UNDO,
     CHANGE_PASSWORD,
-    LOGOUT;
+    LOGOUT,
+    CHANGE_PASSWORD_USER;
   }
 
   enum LoginResult
   {
     LOGIN_SUCCESSFULL,
     USER_NOT_FOUND,
-    WRONG_PASSWORD;
+    WRONG_PASSWORD,
+    LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD;
   }
 }

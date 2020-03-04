@@ -166,7 +166,11 @@ class SocketThread extends Thread
               break;
 
             case CHANGE_PASSWORD:
-              database.changePassword( shared.user.name, shared.user.password );
+              database.changePassword( shared.user.name, shared.user.password, true );
+              break;
+
+            case CHANGE_PASSWORD_USER:
+              database.changePassword( currentUser, shared.pass, false );
               break;
 
             default :
@@ -578,6 +582,13 @@ class SocketThread extends Thread
 
       case WRONG_PASSWORD:
         ServerLog.newLog( logType.ERROR, "Falsches Passwort" );
+        objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
+        break;
+
+      case LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD:
+        currentUser = username;
+        ServerLog.newLog( logType.INFO,
+            username + " hat sich erfolgreich eingeloggt, wird aber aufgefordert ein neues Passwort zu erstellen." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
         break;
     }
