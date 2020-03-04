@@ -25,7 +25,6 @@ import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.table.JTableHeader;
 
 import org.jfree.chart.JFreeChart;
@@ -531,9 +530,9 @@ public class MeMateUIManager
       }
       for ( final JComboBox<String> comboBox : comboBoxList.get( key ) )
       {
-        comboBox.setUI( new BasicComboBoxUI() );
         if ( darkModeState )
         {
+          comboBox.setUI( new DarkComboBoxUI() );
           comboBox.setBackground( backgroundMap.get( key ).getDarkColor() );
           comboBox.setForeground( foregroundMap.get( key ).getDarkColor() );
           comboBox.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
@@ -541,6 +540,7 @@ public class MeMateUIManager
         }
         else
         {
+          comboBox.setUI( new DayComboBoxUI() );
           comboBox.setBackground( backgroundMap.get( key ).getDayColor() );
           comboBox.setForeground( foregroundMap.get( key ).getDayColor() );
           comboBox.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker() ) );
