@@ -19,6 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -57,6 +58,7 @@ public class MeMateUIManager
   private static final Multimap<String, JCheckBox>             checkBoxList     = ArrayListMultimap.create();
   private static final Multimap<String, JList<?>>              listList         = ArrayListMultimap.create();
   private static final Multimap<String, JSpinner>              spinnerList      = ArrayListMultimap.create();
+  private static final Multimap<String, JRadioButton>          radioButtonList  = ArrayListMultimap.create();
   private static final Multimap<String, JComboBox<String>>     comboBoxList     = ArrayListMultimap.create();
   private static final Map<JButton, DarkDayIcon>               iconList         = new HashMap<>();
   private static final Map<JLabel, DarkDayIcon>                panelIconList    = new HashMap<>();
@@ -75,6 +77,25 @@ public class MeMateUIManager
   public static void installDefaults()
   {
     installNewKey( defaultKey, new DarkDayColor( UIManager.getColor( "App.Background" ), Color.WHITE ),
+        new DarkDayColor( Color.WHITE, Color.BLACK ) );
+    MeMateUIManager.installNewKey( "button",
+        new DarkDayColor( UIManager.getColor( "App.Background" ).brighter(), new Color( 215, 215, 215 ) ),
+        new DarkDayColor( Color.white, Color.black ) );
+    MeMateUIManager.installNewKey( "drinkButtons",
+        new DarkDayColor( UIManager.getColor( "App.Background" ).brighter(), new Color( 236, 240, 241 ) ),
+        new DarkDayColor( Color.white, Color.black ) );
+    MeMateUIManager.installNewKey( "table", new DarkDayColor( UIManager.getColor( "App.Background" ), Color.white ),
+        new DarkDayColor( Color.white, Color.black ) );
+    MeMateUIManager.installNewKey( "scroll", new DarkDayColor( UIManager.getColor( "App.Background" ), Color.white ),
+        new DarkDayColor( Color.white, Color.black ) );
+    MeMateUIManager.installNewKey( "adminButton",
+        new DarkDayColor( UIManager.getColor( "App.Secondary.Background" ), new Color( 236, 240, 241 ) ),
+        new DarkDayColor( Color.WHITE, Color.BLACK ) );
+    MeMateUIManager.installNewKey( "spinner",
+        new DarkDayColor( UIManager.getColor( "App.Background" ).brighter().brighter(), new Color( 236, 240, 241 ) ),
+        new DarkDayColor( Color.WHITE, Color.BLACK ) );
+    MeMateUIManager.installNewKey( "comboBox",
+        new DarkDayColor( UIManager.getColor( "App.Secondary.Background" ).brighter(), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
   }
 
@@ -235,6 +256,20 @@ public class MeMateUIManager
     final JCheckBox checkbox = new JCheckBox();
     checkBoxList.put( "default", checkbox );
     return checkbox;
+  }
+
+  /**
+   * Erstellt einen {@link JRadioButton}, welche der radioButtonList hinzugefügt wird.
+   * 
+   * @param text buttontext
+   * 
+   * @return {@link JRadioButton}
+   */
+  public static JRadioButton createRadioButton( String text )
+  {
+    final JRadioButton radioButton = new JRadioButton( text );
+    radioButtonList.put( "button", radioButton );
+    return radioButton;
   }
 
   /**
@@ -419,6 +454,19 @@ public class MeMateUIManager
           }
         }
       }
+      for ( final JRadioButton radioButton : radioButtonList.get( key ) )
+      {
+        if ( darkModeState )
+        {
+          radioButton.setBackground( backgroundMap.get( key ).getDarkColor() );
+          radioButton.setForeground( Color.white );
+        }
+        else
+        {
+          radioButton.setBackground( backgroundMap.get( key ).getDayColor() );
+          radioButton.setForeground( Color.black );
+        }
+      }
       for ( final JButton button : normalButtonList.get( key ) )
       {
         if ( darkModeState )
@@ -477,6 +525,7 @@ public class MeMateUIManager
           header.setBackground( backgroundMap.get( key ).getDarkColor().brighter().brighter() );
           header.setForeground( foregroundMap.get( key ).getDarkColor() );
           table.setForeground( foregroundMap.get( key ).getDarkColor() );
+          table.setSelectionBackground( UIManager.getColor( "AppColor" ) );
         }
         else
         {
@@ -485,6 +534,7 @@ public class MeMateUIManager
           header.setBackground( backgroundMap.get( key ).getDayColor().darker() );
           header.setForeground( foregroundMap.get( key ).getDayColor() );
           table.setForeground( foregroundMap.get( key ).getDayColor() );
+          table.setSelectionBackground( UIManager.getColor( "AppColor" ) );
         }
       }
       for ( JScrollPane scrollPane : scrollPaneList.get( key ) )

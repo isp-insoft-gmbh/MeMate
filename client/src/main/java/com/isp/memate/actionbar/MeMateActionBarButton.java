@@ -18,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import com.isp.memate.util.MeMateUIManager;
 
@@ -347,7 +348,7 @@ public class MeMateActionBarButton
   public void selected()
   {
     isMarked = true;
-    markerPanels.forEach( markerPanel -> markerPanel.setBackground( marker ) );
+    markerPanels.forEach( markerPanel -> markerPanel.setBackground( UIManager.getColor( "AppColor" ) ) );
   }
 
   /**

@@ -55,7 +55,6 @@ import com.isp.memate.util.MeMateUIManager;
 class DrinkConsumptionButton extends JPanel
 {
   private static final Color HOVER_BACKGROUND_COLOR = new Color( 186, 232, 232 );
-  private static final Color PRESSED_BACKGROUND     = UIManager.getColor( "AppColor" );
   private final Border       DEFAULT_LINE_BORDER    = BorderFactory.createLineBorder( new Color( 173, 173, 173, 0 ) );
   private final Border       DEFAULT_BORDER         =
       BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
@@ -417,13 +416,13 @@ class DrinkConsumptionButton extends JPanel
       public void mousePressed( MouseEvent __ )
       {
         requestFocus();
-        setBackground( PRESSED_BACKGROUND );
-        nameLabelAndDrinkInfoButtonPanel.setBackground( PRESSED_BACKGROUND );
-        infoPanel.setBackground( PRESSED_BACKGROUND );
+        setBackground( UIManager.getColor( "AppColor" ) );
+        nameLabelAndDrinkInfoButtonPanel.setBackground( UIManager.getColor( "AppColor" ) );
+        infoPanel.setBackground( UIManager.getColor( "AppColor" ) );
         Component[] components = infoPanel.getComponents();
         for ( Component component : components )
         {
-          component.setBackground( PRESSED_BACKGROUND );
+          component.setBackground( UIManager.getColor( "AppColor" ) );
         }
       }
 

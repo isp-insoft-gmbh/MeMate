@@ -85,8 +85,8 @@ class Mainframe extends JFrame
   private Social                social       = new Social();
   private Dashboard             dashboard    = new Dashboard( instance );
   private final JLabel          balanceLabel = new JLabel();
-  private final JPanel          headerPanel  = new JPanel();
-  private JPanel                burgerButton;
+  public final JPanel           headerPanel  = new JPanel();
+  public JPanel                 burgerButton;
   private MeMateActionBarButton drinkManagerButton;
   private MeMateActionBarButton dashboardButton;
   private MeMateActionBarButton historyButton;
@@ -96,8 +96,9 @@ class Mainframe extends JFrame
   private MeMateActionBarButton adminViewButton;
   private MeMateActionBarButton logoutButton;
   private MeMateActionBarButton darkModeButton;
+  public MeMateActionBarButton  settingsButton;
   private MeMateActionBarButton undoButton;
-  private MeMateActionBar       bar;
+  public MeMateActionBar        bar;
   public static Image           frameImage   =
       Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue2.png" ) );
 
@@ -137,6 +138,7 @@ class Mainframe extends JFrame
     setSize( 1185, 770 );
     setLocationRelativeTo( null );
     add( contentPanel, BorderLayout.CENTER );
+    add( headerPanel, BorderLayout.NORTH );
     MeMateUIManager.setUISettings();
   }
 
@@ -163,6 +165,7 @@ class Mainframe extends JFrame
     toggleAdminButtons();
     addUndoButton();
     addDarkModeButton();
+    addSettingsButton();
     addLogoutButton();
 
 
@@ -196,7 +199,26 @@ class Mainframe extends JFrame
       ClientLog.newLog( exception.getMessage() );
     }
     add( bar, BorderLayout.WEST );
-    add( headerPanel, BorderLayout.NORTH );
+  }
+
+  /**
+   * 
+   */
+  private void addSettingsButton()
+  {
+    settingsButton = bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Settings",
+        "Öffnet die Einstellungen", color, new Runnable()
+        {
+          public void run()
+          {
+            contentPanel.removeAll();
+            MeMateUIManager.setUISettings();
+            contentPanel.add( new Settings() );
+            contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
+            contentPanel.repaint();
+            contentPanel.revalidate();
+          }
+        } );
   }
 
   /**
