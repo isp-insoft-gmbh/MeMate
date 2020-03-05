@@ -475,12 +475,12 @@ public class Login extends JFrame
       dispose();
       Mainframe mainframe = Mainframe.getInstance();
       mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
+      mainframe.addActionBar();
       mainframe.setHelloLabel( currentUsername );
       mainframe.setVisible( true );
       ServerCommunication.getInstance().tellServerToSendDrinkInformations();
       ServerCommunication.getInstance().getBalance();
       ServerCommunication.getInstance().tellServerToSendHistoryData();
-      mainframe.toggleAdminView();
       mainframe.requestFocus();
     }
     else if ( loginResult == LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD )
@@ -636,7 +636,6 @@ public class Login extends JFrame
               ServerCommunication.getInstance().tellServerToSendDrinkInformations();
               ServerCommunication.getInstance().getBalance();
               ServerCommunication.getInstance().tellServerToSendHistoryData();
-              mainframe.toggleAdminView();
               mainframe.requestFocus();
             }
           }

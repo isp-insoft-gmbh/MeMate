@@ -30,6 +30,8 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.isp.memate.util.MeMateUIManager;
+
 
 /**
  * @author dtr
@@ -266,6 +268,8 @@ public class MeMateActionBar extends JPanel
         () ->
         {//Maus-Hover
           burgerButton.setBackground( backgroundColor.darker() );
+
+
         } ) );
 
     checkUserConfig();
@@ -350,6 +354,19 @@ public class MeMateActionBar extends JPanel
     button.setTitleVisible( labelsVisible );
 
     return button;
+  }
+
+  public void removeActionButton( MeMateActionBarButton button )
+  {
+    if ( allButtons.contains( button ) )
+    {
+      allButtons.remove( button );
+      contentPanel.remove( button.getBarButton() );
+      invisibleButtonPopupMenu.remove( button.getBarButton() );
+      button.setTitleVisible( false );
+      button.setEnabled( false );
+      button.setVisible( false );
+    }
   }
 
   /**
@@ -510,13 +527,10 @@ public class MeMateActionBar extends JPanel
   public void toggleDarkmode()
   {
 
-    if ( darkModeOn )
+    if ( MeMateUIManager.getDarkModeState() )
     {
       setBackground( new Color( 225, 225, 225 ) );
       burgerButton.setBackground( new Color( 225, 225, 225 ) );
-      Icon temp = viewBlack;
-      viewBlack = viewWhite;
-      viewWhite = temp;
       allButtons.forEach( btn ->
       {
         Icon icon = btn.getIcon();
@@ -525,11 +539,12 @@ public class MeMateActionBar extends JPanel
         btn.setPressedIcon( icon );
         btn.toggleFontColor();
       } );
-      Icon icon = burgerButton.getIcon();
-      Icon pressedIcon = burgerButton.getPressedIcon();
-      burgerButton.setIcon( pressedIcon );
-      burgerButton.setPressedIcon( icon );
-      burgerButton.toggleFontColor();
+
+      Icon tempIcon = burgerButton.getIcon();
+      Icon tempPressedIcon = burgerButton.getPressedIcon();
+      burgerButton.setIcon( tempPressedIcon );
+      burgerButton.setPressedIcon( tempIcon );
+
 
       darkModeOn = false;
     }
@@ -537,9 +552,6 @@ public class MeMateActionBar extends JPanel
     {
       setBackground( darkModeBackground );
       burgerButton.setBackground( darkModeBackground );
-      Icon temp = viewBlack;
-      viewBlack = viewWhite;
-      viewWhite = temp;
       allButtons.forEach( btn ->
       {
         Icon icon = btn.getPressedIcon();
@@ -548,14 +560,12 @@ public class MeMateActionBar extends JPanel
         btn.setPressedIcon( pressedIcon );
         btn.toggleFontColor();
       } );
-      Icon icon = burgerButton.getPressedIcon();
-      Icon pressedIcon = burgerButton.getIcon();
-      burgerButton.setIcon( icon );
-      burgerButton.setPressedIcon( pressedIcon );
-      burgerButton.toggleFontColor();
+      Icon tempIcon = burgerButton.getIcon();
+      Icon tempPressedIcon = burgerButton.getPressedIcon();
+      burgerButton.setIcon( tempPressedIcon );
+      burgerButton.setPressedIcon( tempIcon );
       darkModeOn = true;
     }
-
   }
 
   /**

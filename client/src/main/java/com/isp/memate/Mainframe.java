@@ -86,12 +86,18 @@ class Mainframe extends JFrame
   private Dashboard             dashboard    = new Dashboard( instance );
   private final JLabel          balanceLabel = new JLabel();
   private final JPanel          headerPanel  = new JPanel();
+  private JPanel                burgerButton;
   private MeMateActionBarButton drinkManagerButton;
+  private MeMateActionBarButton dashboardButton;
+  private MeMateActionBarButton historyButton;
+  private MeMateActionBarButton drinkConsumptionButton;
+  private MeMateActionBarButton creditHistoryButton;
+  private MeMateActionBarButton socialButton;
   private MeMateActionBarButton adminViewButton;
   private MeMateActionBarButton logoutButton;
   private MeMateActionBarButton darkModeButton;
   private MeMateActionBarButton undoButton;
-  private final MeMateActionBar bar;
+  private MeMateActionBar       bar;
   public static Image           frameImage   =
       Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue2.png" ) );
 
@@ -120,11 +126,9 @@ class Mainframe extends JFrame
   public Mainframe()
   {
     contentPanel.setLayout( new BorderLayout() );
-    bar = new MeMateActionBar( new Color( 225, 225, 225 ), Color.black );
     contentPanel.add( dashboard );
 
     deriveFontsAndSetLayout();
-    addActionBar();
     setIconImage(
         Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
     setTitle( "MeMate" );
@@ -132,17 +136,75 @@ class Mainframe extends JFrame
     setMinimumSize( new Dimension( 380, 550 ) );
     setSize( 1185, 770 );
     setLocationRelativeTo( null );
+    add( contentPanel, BorderLayout.CENTER );
     MeMateUIManager.setUISettings();
   }
 
   /**
    * Fügt die Actionbar hinzu.
    */
-  private void addActionBar()
+  public void addActionBar()
   {
-    headerPanel.add( bar.createToggleButtonTitleVisibleState().getBarButton(), BorderLayout.WEST );
+    try
+    {
+      remove( bar );
+      headerPanel.remove( burgerButton );
+    }
+    catch ( Exception exception )
+    {
+      // Muss nicht weiter behandelt werden, da diese Exception nur beim ersten Aufbauen der Actionbar auftritt.
+    }
+    bar = new MeMateActionBar( new Color( 225, 225, 225 ), Color.black );
+    burgerButton = bar.createToggleButtonTitleVisibleState().getBarButton();
+    headerPanel.add( burgerButton, BorderLayout.WEST );
 
-    bar.addActionButton( dashboardIconBlack, dashboardIconWhite, "Dashboard", "Dashboard öffnen", color, new Runnable()
+
+    addDefaultButtons();
+    toggleAdminButtons();
+    addUndoButton();
+    addDarkModeButton();
+    addLogoutButton();
+
+
+    bar.selectButton( "Dashboard" );
+    try
+    {
+      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+      InputStream input = new FileInputStream( file );
+      Properties userProperties = new Properties();
+      userProperties.load( input );
+
+      if ( userProperties.getProperty( "Darkmode" ) != null && userProperties.getProperty( "Darkmode" ).equals( "on" ) )
+      {
+        darkModeButton.setIcon( dayModeIconBlack );
+        darkModeButton.setPressedIcon( dayModeIconWhite );
+        darkModeButton.setTooltip( "Wechselt in den Daymode" );
+        darkModeButton.setTitle( "Daymode" );
+        bar.toggleDarkmode();
+        bar.setBackground( UIManager.getColor( "App.Actionbar" ) );
+        burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
+        MeMateUIManager.showDarkMode();
+      }
+      else
+      {
+        MeMateUIManager.showDayMode();
+      }
+    }
+    catch ( IOException exception )
+    {
+      ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
+      ClientLog.newLog( exception.getMessage() );
+    }
+    add( bar, BorderLayout.WEST );
+    add( headerPanel, BorderLayout.NORTH );
+  }
+
+  /**
+   * 
+   */
+  private void addDefaultButtons()
+  {
+    dashboardButton = bar.addActionButton( dashboardIconBlack, dashboardIconWhite, "Dashboard", "Dashboard öffnen", color, new Runnable()
     {
       public void run()
       {
@@ -154,7 +216,7 @@ class Mainframe extends JFrame
         contentPanel.revalidate();
       }
     } );
-    bar.addActionButton( historyIconBlack, historyIconWhite, "Historie", "Historie öffnen", color, new Runnable()
+    historyButton = bar.addActionButton( historyIconBlack, historyIconWhite, "Historie", "Historie öffnen", color, new Runnable()
     {
       public void run()
       {
@@ -167,7 +229,7 @@ class Mainframe extends JFrame
         contentPanel.revalidate();
       }
     } );
-    bar.addActionButton( consumptionIconBlack, consumptionIconWhite, "Verbrauchsrate",
+    drinkConsumptionButton = bar.addActionButton( consumptionIconBlack, consumptionIconWhite, "Verbrauchsrate",
         "Hier können sie ihren durchschnittlichen Konsum sehen", color, new Runnable()
         {
           public void run()
@@ -181,7 +243,7 @@ class Mainframe extends JFrame
             contentPanel.revalidate();
           }
         } );
-    bar.addActionButton( creditHistoryIconBlack, creditHistoryIconWhite, "Guthabenverlauf",
+    creditHistoryButton = bar.addActionButton( creditHistoryIconBlack, creditHistoryIconWhite, "Guthabenverlauf",
         "Hier können sie den Verlauf ihres Guthabens betrachten", color, new Runnable()
         {
           public void run()
@@ -195,7 +257,7 @@ class Mainframe extends JFrame
             contentPanel.revalidate();
           }
         } );
-    bar.addActionButton( socialBlackIcon, socialWhiteIcon, "Scoreboard", "Scoreboard", color, new Runnable()
+    socialButton = bar.addActionButton( socialBlackIcon, socialWhiteIcon, "Scoreboard", "Scoreboard", color, new Runnable()
     {
 
       @Override
@@ -207,55 +269,51 @@ class Mainframe extends JFrame
         contentPanel.add( social );
         contentPanel.repaint();
         contentPanel.revalidate();
-
       }
     } );
+  }
 
-    drinkManagerButton = bar.addActionButton( drinkManagerIconBlack, drinkManagerIconWhite, "Getränkemanager",
-        "Getränkemanager öffnen", color, new Runnable()
-        {
-          public void run()
-          {
-            contentPanel.removeAll();
-            drinkManager.updateList();
-            MeMateUIManager.setUISettings();
-            contentPanel.add( drinkManager );
-            contentPanel.setBorder( new EmptyBorder( 0, 0, 5, 5 ) );
-            contentPanel.repaint();
-            contentPanel.revalidate();
-          }
-        } );
-    drinkManagerButton.setEnabled( false );
-    adminViewButton = bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Adminview",
-        "Adminansicht öffnen", color, new Runnable()
-        {
-          public void run()
-          {
-            contentPanel.removeAll();
-            adminView.updateDrinkAmounts();
-            MeMateUIManager.setUISettings();
-            contentPanel.add( adminView );
-            contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
-            contentPanel.repaint();
-            contentPanel.revalidate();
-          }
-        } );
-    adminViewButton.setEnabled( false );
-
-
-    bar.addVariableGlue();
-    undoButton = bar.addActionButton( undoBlackIcon, undoWhiteIcon, "Rückgänig", "Letzte Aktion rückgängig machen", new Runnable()
+  /**
+   * 
+   */
+  private void addLogoutButton()
+  {
+    logoutButton = bar.addActionButton( logoutIconBlack, logoutIconWhite, "Logout", "Ausloggen", new Runnable()
     {
-
       @Override
       public void run()
       {
-        ServerCommunication.getInstance().undoLastAction();
-        undoButton.setBackground( bar.getBackground() );
-        updateDashboard();
+        ServerCommunication.getInstance().currentUser = null;
+        ServerCommunication.getInstance().logout();
+        setUndoButtonEnabled( false );
+        try
+        {
+          File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+          InputStream input = new FileInputStream( file );
+          Properties userProperties = new Properties();
+          userProperties.load( input );
+          userProperties.setProperty( "SessionID", "null" );
+          OutputStream output = new FileOutputStream( file );
+          userProperties.store( output, "" );
+        }
+        catch ( IOException exception )
+        {
+          ClientLog.newLog( "Die SessionID konnte nicht resetet werden." );
+          ClientLog.newLog( exception.getMessage() );
+        }
+        dispose();
+        Login login = Login.getInstance();
+        login.setVisible( true );
+        logoutButton.setBackground( bar.getBackground() );
       }
     } );
-    undoButton.setEnabled( false );
+  }
+
+  /**
+   * 
+   */
+  private void addDarkModeButton()
+  {
     darkModeButton = bar.addActionButton( darkModeIconBlack, darkModeIconWhite, "Darkmode", "Wechselt in den Darkmode", new Runnable()
     {
       @Override
@@ -310,64 +368,85 @@ class Mainframe extends JFrame
         }
       }
     } );
-    logoutButton = bar.addActionButton( logoutIconBlack, logoutIconWhite, "Logout", "Ausloggen", new Runnable()
+  }
+
+  /**
+   * 
+   */
+  private void addUndoButton()
+  {
+    bar.addVariableGlue();
+    undoButton = bar.addActionButton( undoBlackIcon, undoWhiteIcon, "Rückgänig", "Letzte Aktion rückgängig machen", new Runnable()
     {
+
       @Override
       public void run()
       {
-        ServerCommunication.getInstance().currentUser = null;
-        ServerCommunication.getInstance().logout();
-        setUndoButtonEnabled( false );
-        try
-        {
-          File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-          InputStream input = new FileInputStream( file );
-          Properties userProperties = new Properties();
-          userProperties.load( input );
-          userProperties.setProperty( "SessionID", "null" );
-          OutputStream output = new FileOutputStream( file );
-          userProperties.store( output, "" );
-        }
-        catch ( IOException exception )
-        {
-          ClientLog.newLog( "Die SessionID konnte nicht resetet werden." );
-          ClientLog.newLog( exception.getMessage() );
-        }
-        dispose();
-        Login login = Login.getInstance();
-        login.setVisible( true );
-        logoutButton.setBackground( bar.getBackground() );
+        ServerCommunication.getInstance().undoLastAction();
+        undoButton.setBackground( bar.getBackground() );
+        updateDashboard();
       }
     } );
-    add( bar, BorderLayout.WEST );
-    add( headerPanel, BorderLayout.NORTH );
-    add( contentPanel, BorderLayout.CENTER );
-    bar.selectButton( "Dashboard" );
-    try
-    {
-      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      InputStream input = new FileInputStream( file );
-      Properties userProperties = new Properties();
-      userProperties.load( input );
+    undoButton.setEnabled( false );
+  }
 
-      if ( userProperties.getProperty( "Darkmode" ) != null && userProperties.getProperty( "Darkmode" ).equals( "on" ) )
-      {
-        darkModeButton.setIcon( dayModeIconBlack );
-        darkModeButton.setPressedIcon( dayModeIconWhite );
-        darkModeButton.setTooltip( "Wechselt in den Daymode" );
-        darkModeButton.setTitle( "Daymode" );
-        bar.toggleDarkmode();
-        MeMateUIManager.showDarkMode();
-      }
-      else
-      {
-        MeMateUIManager.showDayMode();
-      }
-    }
-    catch ( IOException exception )
+  /**
+   * 
+   */
+  private void toggleAdminButtons()
+  {
+    if ( ServerCommunication.getInstance().currentUser.equals( "admin" ) )
     {
-      ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
-      ClientLog.newLog( exception.getMessage() );
+      drinkManagerButton = bar.addActionButton( drinkManagerIconBlack, drinkManagerIconWhite, "Getränkemanager",
+          "Getränkemanager öffnen", color, new Runnable()
+          {
+            public void run()
+            {
+              contentPanel.removeAll();
+              drinkManager.updateList();
+              MeMateUIManager.setUISettings();
+              contentPanel.add( drinkManager );
+              contentPanel.setBorder( new EmptyBorder( 0, 0, 5, 5 ) );
+              contentPanel.repaint();
+              contentPanel.revalidate();
+            }
+          } );
+      adminViewButton = bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Adminview",
+          "Adminansicht öffnen", color, new Runnable()
+          {
+            public void run()
+            {
+              contentPanel.removeAll();
+              adminView.updateDrinkAmounts();
+              MeMateUIManager.setUISettings();
+              contentPanel.add( adminView );
+              contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
+              contentPanel.repaint();
+              contentPanel.revalidate();
+            }
+          } );
+    }
+  }
+
+  public void updateActionbar()
+  {
+    bar.removeActionButton( drinkManagerButton );
+    bar.removeActionButton( adminViewButton );
+    bar.removeActionButton( undoButton );
+    bar.removeActionButton( darkModeButton );
+    bar.removeActionButton( logoutButton );
+    toggleAdminButtons();
+    addUndoButton();
+    addDarkModeButton();
+    addLogoutButton();
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      darkModeButton.setIcon( darkModeIconWhite );
+      darkModeButton.setPressedIcon( darkModeIconBlack );
+      logoutButton.setIcon( logoutIconWhite );
+      logoutButton.setIcon( logoutIconBlack );
+      undoButton.setIcon( undoWhiteIcon );
+      undoButton.setIcon( undoBlackIcon );
     }
   }
 
@@ -421,24 +500,6 @@ class Mainframe extends JFrame
     {
       balanceLabel.setForeground( Color.RED );
     }
-  }
-
-  /**
-   * Toggles the Adminview
-   */
-  void toggleAdminView()
-  {
-    if ( ServerCommunication.getInstance().currentUser.equals( "admin" ) )
-    {
-      drinkManagerButton.setEnabled( true );
-      adminViewButton.setEnabled( true );
-    }
-    else
-    {
-      drinkManagerButton.setEnabled( false );
-      adminViewButton.setEnabled( false );
-    }
-
   }
 
   /**

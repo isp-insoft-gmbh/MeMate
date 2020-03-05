@@ -19,6 +19,8 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.isp.memate.util.MeMateUIManager;
+
 
 /**
  * @author dtr
@@ -286,7 +288,7 @@ public class MeMateActionBarButton
    */
   public void showPressedStyle()
   {
-    if ( darkModeOn )
+    if ( MeMateUIManager.getDarkModeState() )
     {
       changeButtonStyle( pressedIcon, background.brighter().brighter().brighter(), Color.black );
     }
@@ -301,7 +303,7 @@ public class MeMateActionBarButton
    */
   public void hidePressedStyle()
   {
-    if ( darkModeOn )
+    if ( MeMateUIManager.getDarkModeState() )
     {
       changeButtonStyle( icon, background, Color.white );
     }

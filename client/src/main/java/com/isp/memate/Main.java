@@ -156,10 +156,10 @@ class Main
       {
         mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         mainframe.setVisible( true );
+        mainframe.addActionBar();
         ServerCommunication.getInstance().startDrinkInfoTimer();
         ServerCommunication.getInstance().tellServerToSendHistoryData();
         ServerCommunication.getInstance().checkVersion( version );
-        mainframe.toggleAdminView();
         mainframe.requestFocus();
         MeMateUIManager.setUISettings();
       }
