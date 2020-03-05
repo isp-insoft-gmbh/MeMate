@@ -24,7 +24,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.JTableHeader;
 
 import org.jfree.chart.JFreeChart;
@@ -75,7 +74,8 @@ public class MeMateUIManager
    */
   public static void installDefaults()
   {
-    installNewKey( defaultKey, new DarkDayColor( new Color( 36, 43, 55 ), Color.WHITE ), new DarkDayColor( Color.WHITE, Color.BLACK ) );
+    installNewKey( defaultKey, new DarkDayColor( UIManager.getColor( "App.Background" ), Color.WHITE ),
+        new DarkDayColor( Color.WHITE, Color.BLACK ) );
   }
 
   /**
@@ -98,8 +98,8 @@ public class MeMateUIManager
   public static void showDarkMode()
   {
     darkModeState = true;
-    UIManager.put( "OptionPane.background", new Color( 36, 43, 55 ) );
-    UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "OptionPane.background", UIManager.getColor( "App.Background" ) );
+    UIManager.put( "Panel.background", UIManager.getColor( "App.Background" ) );
     UIManager.put( "OptionPane.messageForeground", Color.white );
     UIManager.put( "Label.foreground", Color.white );
     UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
@@ -154,8 +154,8 @@ public class MeMateUIManager
   public static void iniDarkMode()
   {
     darkModeState = true;
-    UIManager.put( "OptionPane.background", new Color( 36, 43, 55 ) );
-    UIManager.put( "Panel.background", new Color( 36, 43, 55 ) );
+    UIManager.put( "OptionPane.background", UIManager.getColor( "App.Background" ) );
+    UIManager.put( "Panel.background", UIManager.getColor( "App.Background" ) );
     UIManager.put( "OptionPane.messageForeground", Color.white );
     UIManager.put( "Label.foreground", Color.white );
     UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
@@ -426,7 +426,7 @@ public class MeMateUIManager
           button.setBackground( backgroundMap.get( key ).getDarkColor() );
           button.setForeground( foregroundMap.get( key ).getDarkColor() );
           button.setBorder(
-              BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( new Color( 50, 70, 70 ) ),
+              BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor().brighter() ),
                   BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
           if ( iconList.get( button ) != null )
           {
@@ -519,7 +519,7 @@ public class MeMateUIManager
         {
           spinner.setUI( new DarkSpinnerUI() );
           spinner.setBackground( backgroundMap.get( key ).getDarkColor() );
-          spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor().brighter(), 1 ) );
+          spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor(), 1 ) );
         }
         else
         {
@@ -535,7 +535,7 @@ public class MeMateUIManager
           comboBox.setUI( new DarkComboBoxUI() );
           comboBox.setBackground( backgroundMap.get( key ).getDarkColor() );
           comboBox.setForeground( foregroundMap.get( key ).getDarkColor() );
-          comboBox.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+          comboBox.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor(), 1 ) );
 
         }
         else
@@ -543,7 +543,7 @@ public class MeMateUIManager
           comboBox.setUI( new DayComboBoxUI() );
           comboBox.setBackground( backgroundMap.get( key ).getDayColor() );
           comboBox.setForeground( foregroundMap.get( key ).getDayColor() );
-          comboBox.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker() ) );
+          comboBox.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
 
 
         }
@@ -602,7 +602,7 @@ public class MeMateUIManager
       {
         freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
         freeChart.getTitle().setPaint( Color.white );
-        freeChart.getXYPlot().setBackgroundPaint( new Color( 36, 43, 55 ).brighter() );
+        freeChart.getXYPlot().setBackgroundPaint( UIManager.getColor( "App.Background" ).brighter() );
         freeChart.getXYPlot().setDomainGridlinesVisible( false );
         freeChart.getXYPlot().setRangeGridlinesVisible( false );
         freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.white );
@@ -628,7 +628,7 @@ public class MeMateUIManager
       if ( darkModeState )
       {
         lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-        lineChart.getCategoryPlot().setBackgroundPaint( new Color( 36, 43, 55 ).brighter() );
+        lineChart.getCategoryPlot().setBackgroundPaint( UIManager.getColor( "App.Background" ).brighter() );
         lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
         lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
         lineChart.getTitle().setPaint( Color.white );

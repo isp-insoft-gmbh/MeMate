@@ -37,6 +37,7 @@ class Main
       UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
       UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0, 0 ) );
       UIManager.put( "AppColor", new Color( 29, 164, 165 ) );
+      UIManager.put( "App.Background", new Color( 36, 43, 55 ) );  //Green 38, 77, 0
       UIManager.put( "DefaultBrightColor", Color.white );
       ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
     }
@@ -137,19 +138,20 @@ class Main
   {
     MeMateUIManager.installDefaults();
     MeMateUIManager.installNewKey( "button",
-        new DarkDayColor( new Color( 36, 43, 55 ).brighter(), new Color( 215, 215, 215 ) ),
+        new DarkDayColor( UIManager.getColor( "App.Background" ).brighter(), new Color( 215, 215, 215 ) ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "drinkButtons", new DarkDayColor( new Color( 36, 43, 55 ).brighter(), new Color( 236, 240, 241 ) ),
+    MeMateUIManager.installNewKey( "drinkButtons",
+        new DarkDayColor( UIManager.getColor( "App.Background" ).brighter(), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "table", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
+    MeMateUIManager.installNewKey( "table", new DarkDayColor( UIManager.getColor( "App.Background" ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
-    MeMateUIManager.installNewKey( "scroll", new DarkDayColor( new Color( 36, 43, 55 ), Color.white ),
+    MeMateUIManager.installNewKey( "scroll", new DarkDayColor( UIManager.getColor( "App.Background" ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
     MeMateUIManager.installNewKey( "adminButton",
         new DarkDayColor( new Color( 52, 73, 94 ), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
     MeMateUIManager.installNewKey( "spinner",
-        new DarkDayColor( new Color( 52, 73, 94 ), new Color( 236, 240, 241 ) ),
+        new DarkDayColor( UIManager.getColor( "App.Background" ).brighter().brighter(), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
     MeMateUIManager.installNewKey( "comboBox",
         new DarkDayColor( new Color( 91, 109, 139 ), new Color( 236, 240, 241 ) ),

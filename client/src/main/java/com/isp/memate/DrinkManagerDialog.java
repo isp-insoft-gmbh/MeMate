@@ -328,7 +328,7 @@ class DrinkManagerDialog
       drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkPriceSpinner
           .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
-      drinkNameField.setBackground( new Color( 72, 87, 111 ) );
+      drinkNameField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkNameField.setForeground( Color.white );
       drinkNameField
           .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
@@ -447,7 +447,7 @@ class DrinkManagerDialog
       drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkPriceSpinner
           .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
-      drinkNameField.setBackground( new Color( 72, 87, 111 ) );
+      drinkNameField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkNameField.setForeground( Color.white );
       drinkNameField
           .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
@@ -767,7 +767,7 @@ class DrinkManagerDialog
       saltLabel.setForeground( Color.white );
       carbsLabel.setForeground( Color.white );
       sugarLabel.setForeground( Color.white );
-      ingredientsField.setBackground( new Color( 72, 87, 111 ) );
+      ingredientsField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       ingredientsField.setForeground( Color.white );
       ingredientsField
           .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );

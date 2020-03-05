@@ -3,10 +3,10 @@
  */
 package com.isp.memate.util;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
+import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
 /**
@@ -43,11 +43,11 @@ class DarkScrollBarUI extends BasicScrollBarUI
   protected void configureScrollBarColors()
   {
     super.configureScrollBarColors();
-    thumbColor = new Color( 36, 43, 55 ).brighter();
-    thumbHighlightColor = new Color( 36, 43, 55 ).brighter();
+    thumbColor = UIManager.getColor( "App.Background" ).brighter();
+    thumbHighlightColor = UIManager.getColor( "App.Background" ).brighter();
 
-    thumbLightShadowColor = new Color( 36, 43, 55 ).brighter();
-    thumbDarkShadowColor = new Color( 36, 43, 55 ).brighter();
-    trackColor = new Color( 36, 43, 55 );
+    thumbLightShadowColor = UIManager.getColor( "App.Background" ).brighter();
+    thumbDarkShadowColor = UIManager.getColor( "App.Background" ).brighter();
+    trackColor = UIManager.getColor( "App.Background" );
   }
 }

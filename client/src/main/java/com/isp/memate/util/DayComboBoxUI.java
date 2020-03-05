@@ -3,9 +3,12 @@
  */
 package com.isp.memate.util;
 
+import java.awt.Color;
+
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.plaf.basic.ComboPopup;
@@ -33,11 +36,13 @@ public class DayComboBoxUI extends BasicComboBoxUI
         return sp;
       }
 
+      @SuppressWarnings( "rawtypes" )
       @Override
       public JList getList()
       {
-        list.setBackground( MeMateUIManager.getBackground( "comboBox" ).getDayColor() );
+        list.setBackground( Color.white );
         list.setForeground( MeMateUIManager.getForeground( "comboBox" ).getDayColor() );
+        list.setSelectionBackground( UIManager.getColor( "AppColor" ) );
         return list;
       }
     };
