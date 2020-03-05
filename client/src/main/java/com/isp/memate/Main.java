@@ -34,10 +34,64 @@ class Main
   {
     try
     {
+      /*
+       * Color Shemes:
+       * 
+       * *DEFAULT Blue
+       *    - AppColor: 29, 164, 165
+       *    - App.background: 36, 43, 55
+       *    - App.Secondary.Background: 52, 73, 94
+       *    - App.Actionbar: 42, 51, 64
+       *     
+       * *Darker Default
+       *    - AppColor: 0, 173, 181
+       *    - App.Background: 34, 40, 49
+       *    - App.Secondary.background: 57, 62, 70
+       *    - App.Actionbar: 42, 51, 64
+       *    
+       * *Red/Gray
+       *    - AppColor: 226, 62, 87
+       *    - App.Background: 48, 56, 65
+       *    - App.Secondary.background: 58, 71, 80
+       *    - App.Actionbar: 57, 67, 77
+       *    
+       * *Blue/Black
+       *    - AppColor: 85, 172, 238
+       *    - App.Background: 41, 47, 51
+       *    - App.Secondary.background: 102, 117, 127
+       *    - App.Actionbar: 49, 56, 60
+       *    
+       * *Orange/Black
+       *    - AppColor: 227, 162, 26
+       *    - App.Background: 41, 47, 51
+       *    - App.Secondary.background: 102, 117, 127
+       *    - App.Actionbar: 49, 56, 60
+       *    
+       * *Coral/Black
+       *    - AppColor: 255, 111, 97
+       *    - App.Background: 41, 47, 51
+       *    - App.Secondary.background: 102, 117, 127
+       *    - App.Actionbar: 49, 56, 60
+       *    
+       * *Green
+       *    - AppColor: 153, 180, 51
+       *    - App.Background: 11, 40, 25
+       *    - App.Secondary.Background: 30, 113, 69
+       *    - App.Actionbar: 13, 48, 30
+       *
+       * *Green/Gray
+       *    - AppColor: 153, 180, 51
+       *    - App.Background: 48, 56, 65
+       *    - App.Secondary.Background: 58, 71, 80
+       *    - App.Actionbar: 57, 67, 77
+       */
+
       UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
       UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0, 0 ) );
       UIManager.put( "AppColor", new Color( 29, 164, 165 ) );
-      UIManager.put( "App.Background", new Color( 36, 43, 55 ) );  //Green 38, 77, 0
+      UIManager.put( "App.Background", new Color( 36, 43, 55 ) );
+      UIManager.put( "App.Secondary.Background", new Color( 52, 73, 94 ) );
+      UIManager.put( "App.Actionbar", new Color( 42, 51, 64 ) );
       UIManager.put( "DefaultBrightColor", Color.white );
       ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
     }
@@ -148,13 +202,13 @@ class Main
     MeMateUIManager.installNewKey( "scroll", new DarkDayColor( UIManager.getColor( "App.Background" ), Color.white ),
         new DarkDayColor( Color.white, Color.black ) );
     MeMateUIManager.installNewKey( "adminButton",
-        new DarkDayColor( new Color( 52, 73, 94 ), new Color( 236, 240, 241 ) ),
+        new DarkDayColor( UIManager.getColor( "App.Secondary.Background" ), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
     MeMateUIManager.installNewKey( "spinner",
         new DarkDayColor( UIManager.getColor( "App.Background" ).brighter().brighter(), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
     MeMateUIManager.installNewKey( "comboBox",
-        new DarkDayColor( new Color( 91, 109, 139 ), new Color( 236, 240, 241 ) ),
+        new DarkDayColor( UIManager.getColor( "App.Secondary.Background" ).brighter(), new Color( 236, 240, 241 ) ),
         new DarkDayColor( Color.WHITE, Color.BLACK ) );
   }
 }

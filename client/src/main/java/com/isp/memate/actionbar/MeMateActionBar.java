@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 
 /**
@@ -76,7 +77,7 @@ public class MeMateActionBar extends JPanel
 
   private Color backgroundColor;
   private Color foregoundColor;
-  private Color darkModeBackground = new Color( 42, 51, 64 );
+  private Color darkModeBackground = UIManager.getColor( "App.Actionbar" );
 
   private MeMateActionBarButton burgerButton;
 
