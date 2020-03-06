@@ -268,7 +268,7 @@ public class MeMateUIManager
   public static JRadioButton createRadioButton( String text )
   {
     final JRadioButton radioButton = new JRadioButton( text );
-    radioButtonList.put( "button", radioButton );
+    radioButtonList.put( "default", radioButton );
     return radioButton;
   }
 

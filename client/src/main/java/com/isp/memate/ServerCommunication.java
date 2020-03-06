@@ -9,7 +9,10 @@ import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -25,6 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
@@ -72,9 +76,6 @@ class ServerCommunication
   private ObjectOutputStream                  outStream;
   private ArrayList<String>                   alreadyShownNotifications = new ArrayList<>();
 
-
-  //Windows Notifications
-  boolean showNotifications = false;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -203,24 +204,28 @@ class ServerCommunication
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "HH:mm" );
         LocalDateTime now = LocalDateTime.now();
         String date = dtf.format( now );
+        System.out.println( String.valueOf( showNotifications( "MeetingNotification" ) ) );
         if ( date.equals( "12:19" ) )
         {
-          if ( SystemTray.isSupported() )
+          if ( showNotifications( "MeetingNotification" ) )
           {
-            SystemTray tray = SystemTray.getSystemTray();
-            Image image = Mainframe.frameImage;
-            TrayIcon trayIcon = new TrayIcon( image );
-            trayIcon.setImageAutoSize( true );
-            trayIcon.setToolTip( "MeMate" );
-            try
+            if ( SystemTray.isSupported() )
             {
-              tray.add( trayIcon );
+              SystemTray tray = SystemTray.getSystemTray();
+              Image image = Mainframe.frameImage;
+              TrayIcon trayIcon = new TrayIcon( image );
+              trayIcon.setImageAutoSize( true );
+              trayIcon.setToolTip( "MeMate" );
+              try
+              {
+                tray.add( trayIcon );
+              }
+              catch ( AWTException exception )
+              {
+                // TODO(nwe|03.03.2020): Fehlerbehandlung muss noch implementiert werden!
+              }
+              trayIcon.displayMessage( "MeMate", "Standup Meeting", MessageType.NONE );
             }
-            catch ( AWTException exception )
-            {
-              // TODO(nwe|03.03.2020): Fehlerbehandlung muss noch implementiert werden!
-            }
-            trayIcon.displayMessage( "MeMate", "Standup Meeting", MessageType.NONE );
           }
         }
       }
@@ -234,6 +239,31 @@ class ServerCommunication
     timer4.schedule( task4, 0, 60000 );
   }
 
+
+  /**
+   * @return
+   */
+  protected boolean showNotifications( String propertry )
+  {
+    String state = null;
+    try ( InputStream input =
+        new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
+    {
+      Properties userProperties = new Properties();
+      userProperties.load( input );
+      state = userProperties.getProperty( propertry );
+    }
+    catch ( Exception exception )
+    {
+      ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
+      ClientLog.newLog( exception.getMessage() );
+    }
+    if ( state == null || state.equals( "false" ) )
+    {
+      return false;
+    }
+    return true;
+  }
 
   void startDrinkInfoTimer()
   {
@@ -270,7 +300,7 @@ class ServerCommunication
   private void checkForChanges()
   {
     String[][] history = getShortHistory();
-    if ( history != null && showNotifications )
+    if ( history != null && showNotifications( "ConsumptionNotification" ) )
     {
       ZonedDateTime today = ZonedDateTime.now();
       ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );

@@ -30,8 +30,6 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import com.isp.memate.util.MeMateUIManager;
-
 
 /**
  * @author dtr
@@ -522,49 +520,49 @@ public class MeMateActionBar extends JPanel
   /**
    * 
    */
-  public void toggleDarkmode()
+  public void showDarkmode()
   {
-
-    if ( MeMateUIManager.getDarkModeState() )
+    setBackground( UIManager.getColor( "App.Actionbar" ) );
+    burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
+    allButtons.forEach( btn ->
     {
-      setBackground( new Color( 225, 225, 225 ) );
-      burgerButton.setBackground( new Color( 225, 225, 225 ) );
-      allButtons.forEach( btn ->
-      {
-        Icon icon = btn.getIcon();
-        Icon pressedIcon = btn.getPressedIcon();
-        btn.setIcon( pressedIcon );
-        btn.setPressedIcon( icon );
-        btn.toggleFontColor();
-      } );
+      Icon icon = btn.getPressedIcon();
+      Icon pressedIcon = btn.getIcon();
+      btn.setIcon( icon );
+      btn.setPressedIcon( pressedIcon );
+      btn.toggleFontColor();
+    } );
 
-      Icon tempIcon = burgerButton.getIcon();
-      Icon tempPressedIcon = burgerButton.getPressedIcon();
-      burgerButton.setIcon( tempPressedIcon );
-      burgerButton.setPressedIcon( tempIcon );
-
-
-      darkModeOn = false;
-    }
-    else
-    {
-      setBackground( UIManager.getColor( "App.Actionbar" ) );
-      burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
-      allButtons.forEach( btn ->
-      {
-        Icon icon = btn.getPressedIcon();
-        Icon pressedIcon = btn.getIcon();
-        btn.setIcon( icon );
-        btn.setPressedIcon( pressedIcon );
-        btn.toggleFontColor();
-      } );
-      Icon tempIcon = burgerButton.getIcon();
-      Icon tempPressedIcon = burgerButton.getPressedIcon();
-      burgerButton.setIcon( tempPressedIcon );
-      burgerButton.setPressedIcon( tempIcon );
-      darkModeOn = true;
-    }
+    Icon tempIcon = burgerButton.getIcon();
+    Icon tempPressedIcon = burgerButton.getPressedIcon();
+    burgerButton.setIcon( tempPressedIcon );
+    burgerButton.setPressedIcon( tempIcon );
+    darkModeOn = true;
   }
+
+  /**
+   * 
+   */
+  public void showDaymode()
+  {
+    setBackground( new Color( 225, 225, 225 ) );
+    burgerButton.setBackground( new Color( 225, 225, 225 ) );
+    allButtons.forEach( btn ->
+    {
+      Icon icon = btn.getIcon();
+      Icon pressedIcon = btn.getPressedIcon();
+      btn.setIcon( pressedIcon );
+      btn.setPressedIcon( icon );
+      btn.toggleFontColor();
+    } );
+
+    Icon tempIcon = burgerButton.getIcon();
+    Icon tempPressedIcon = burgerButton.getPressedIcon();
+    burgerButton.setIcon( tempPressedIcon );
+    burgerButton.setPressedIcon( tempIcon );
+    darkModeOn = false;
+  }
+
 
   /**
    * @return ob der Darkmode an oder aus ist

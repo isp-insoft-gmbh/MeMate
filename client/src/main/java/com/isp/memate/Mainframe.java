@@ -95,7 +95,6 @@ class Mainframe extends JFrame
   private MeMateActionBarButton socialButton;
   private MeMateActionBarButton adminViewButton;
   private MeMateActionBarButton logoutButton;
-  private MeMateActionBarButton darkModeButton;
   public MeMateActionBarButton  settingsButton;
   private MeMateActionBarButton undoButton;
   public MeMateActionBar        bar;
@@ -164,7 +163,6 @@ class Mainframe extends JFrame
     addDefaultButtons();
     toggleAdminButtons();
     addUndoButton();
-    addDarkModeButton();
     addSettingsButton();
     addLogoutButton();
 
@@ -179,11 +177,7 @@ class Mainframe extends JFrame
 
       if ( userProperties.getProperty( "Darkmode" ) != null && userProperties.getProperty( "Darkmode" ).equals( "on" ) )
       {
-        darkModeButton.setIcon( dayModeIconBlack );
-        darkModeButton.setPressedIcon( dayModeIconWhite );
-        darkModeButton.setTooltip( "Wechselt in den Daymode" );
-        darkModeButton.setTitle( "Daymode" );
-        bar.toggleDarkmode();
+        bar.showDarkmode();
         bar.setBackground( UIManager.getColor( "App.Actionbar" ) );
         burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
         MeMateUIManager.showDarkMode();
@@ -336,60 +330,7 @@ class Mainframe extends JFrame
    */
   private void addDarkModeButton()
   {
-    darkModeButton = bar.addActionButton( darkModeIconBlack, darkModeIconWhite, "Darkmode", "Wechselt in den Darkmode", new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        bar.toggleDarkmode();
-        if ( bar.darkModeOn() )
-        {
-          MeMateUIManager.showDarkMode();
-          darkModeButton.setIcon( dayModeIconWhite );
-          darkModeButton.setPressedIcon( dayModeIconBlack );
-          darkModeButton.setTooltip( "Wechselt in den Daymode" );
-          darkModeButton.setTitle( "Daymode" );
-          try
-          {
-            File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-            InputStream input = new FileInputStream( file );
-            Properties userProperties = new Properties();
-            userProperties.load( input );
-            userProperties.setProperty( "Darkmode", "on" );
-            OutputStream output = new FileOutputStream( file );
-            userProperties.store( output, "" );
-          }
-          catch ( IOException exception )
-          {
-            ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
-            ClientLog.newLog( exception.getMessage() );
-          }
-        }
-        else
-        {
-          MeMateUIManager.showDayMode();
-          darkModeButton.setIcon( darkModeIconBlack );
-          darkModeButton.setPressedIcon( darkModeIconWhite );
-          darkModeButton.setTooltip( "Wechselt in den Darkmode" );
-          darkModeButton.setTitle( "Darkmode" );
-          try
-          {
-            File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-            InputStream input = new FileInputStream( file );
-            Properties userProperties = new Properties();
-            userProperties.load( input );
-            userProperties.setProperty( "Darkmode", "off" );
-            OutputStream output = new FileOutputStream( file );
-            userProperties.store( output, "" );
-          }
-          catch ( IOException exception )
-          {
-            ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
-            ClientLog.newLog( exception.getMessage() );
-          }
-        }
-      }
-    } );
+
   }
 
   /**
@@ -455,7 +396,6 @@ class Mainframe extends JFrame
     bar.removeActionButton( drinkManagerButton );
     bar.removeActionButton( adminViewButton );
     bar.removeActionButton( undoButton );
-    bar.removeActionButton( darkModeButton );
     bar.removeActionButton( logoutButton );
     toggleAdminButtons();
     addUndoButton();
@@ -463,8 +403,6 @@ class Mainframe extends JFrame
     addLogoutButton();
     if ( MeMateUIManager.getDarkModeState() )
     {
-      darkModeButton.setIcon( darkModeIconWhite );
-      darkModeButton.setPressedIcon( darkModeIconBlack );
       logoutButton.setIcon( logoutIconWhite );
       logoutButton.setIcon( logoutIconBlack );
       undoButton.setIcon( undoWhiteIcon );
