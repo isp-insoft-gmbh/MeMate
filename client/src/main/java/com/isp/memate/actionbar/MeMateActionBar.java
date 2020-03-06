@@ -77,10 +77,8 @@ public class MeMateActionBar extends JPanel
   private final Icon arrowBlack = new ImageIcon( "C:/Users/nwe/Desktop/IconsMeMate/Burger/arrow_down_black.png" );
   private final Icon arrowWhite = new ImageIcon( "C:/Users/nwe/Desktop/IconsMeMate/Burger/arrow_down_white.png" );
 
-  private Color backgroundColor;
-  private Color foregoundColor;
-  private Color darkModeBackground = UIManager.getColor( "App.Actionbar" );
-
+  private Color                 backgroundColor;
+  private Color                 foregoundColor;
   private MeMateActionBarButton burgerButton;
 
 
@@ -550,8 +548,8 @@ public class MeMateActionBar extends JPanel
     }
     else
     {
-      setBackground( darkModeBackground );
-      burgerButton.setBackground( darkModeBackground );
+      setBackground( UIManager.getColor( "App.Actionbar" ) );
+      burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
       allButtons.forEach( btn ->
       {
         Icon icon = btn.getPressedIcon();
