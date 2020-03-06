@@ -100,7 +100,7 @@ class Mainframe extends JFrame
   private MeMateActionBarButton undoButton;
   public MeMateActionBar        bar;
   public static Image           frameImage   =
-      Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue2.png" ) );
+      Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue.png" ) );
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -131,7 +131,7 @@ class Mainframe extends JFrame
 
     deriveFontsAndSetLayout();
     setIconImage(
-        Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
+        Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     setMinimumSize( new Dimension( 380, 550 ) );

@@ -96,7 +96,7 @@ public class Login extends JFrame
     passwordLabel.setText( "Passwort" );
     usernameLabel.setText( "Benutzername" );
     stayLoggedInLabel.setText( "Eingeloggt bleiben" );
-    setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
+    setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
     setTitle( "MeMate" );
     deriveFonts();
     setBordersAndPreferredSize();
@@ -276,7 +276,7 @@ public class Login extends JFrame
         registrationFrame.setSize( registrationFrame.getWidth() + 30, registrationFrame.getHeight() + 20 );
         registrationFrame.setLocationRelativeTo( Login.this );
         registrationFrame
-            .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
+            .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
         registrationFrame.setVisible( true );
 
         reg_abortButton.addActionListener( new ActionListener()
@@ -652,7 +652,7 @@ public class Login extends JFrame
       changePasswordFrame.setSize( changePasswordFrame.getWidth() + 30, changePasswordFrame.getHeight() + 20 );
       changePasswordFrame.setLocationRelativeTo( Login.this );
       changePasswordFrame
-          .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
+          .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
       changePasswordFrame.setVisible( true );
 
     }

@@ -165,7 +165,7 @@ class Adminview extends JPanel
       {
         passwordFrame.setTitle( "Passwort zurücksetzen" );
         passwordFrame
-            .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue2.png" ) ) );
+            .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
         String[] user = ServerCommunication.getInstance().getAllUsers();
         JPanel passwordPanel = new JPanel( new GridBagLayout() );
         JButton saveButton = new JButton( "Speichern" );
