@@ -24,7 +24,7 @@ import com.isp.memate.util.MeMateUIManager;
  */
 class Main
 {
-  final static String version = "0.9.8.3";
+  final static String version = "0.9.9.1";
 
   /**
    * @param args unused
@@ -33,58 +33,6 @@ class Main
   {
     try
     {
-      /*
-       * Color Shemes:
-       * 
-       * *DEFAULT Blue
-       *    - AppColor: 29, 164, 165
-       *    - App.background: 36, 43, 55
-       *    - App.Secondary.Background: 52, 73, 94
-       *    - App.Actionbar: 42, 51, 64
-       *     
-       * *Darker Default
-       *    - AppColor: 0, 173, 181
-       *    - App.Background: 34, 40, 49
-       *    - App.Secondary.background: 57, 62, 70
-       *    - App.Actionbar: 42, 51, 64
-       *    
-       * *Red/Gray
-       *    - AppColor: 226, 62, 87
-       *    - App.Background: 48, 56, 65
-       *    - App.Secondary.background: 58, 71, 80
-       *    - App.Actionbar: 57, 67, 77
-       *    
-       * *Blue/Black
-       *    - AppColor: 85, 172, 238
-       *    - App.Background: 41, 47, 51
-       *    - App.Secondary.background: 102, 117, 127
-       *    - App.Actionbar: 49, 56, 60
-       *    
-       * *Orange/Black
-       *    - AppColor: 227, 162, 26
-       *    - App.Background: 41, 47, 51
-       *    - App.Secondary.background: 102, 117, 127
-       *    - App.Actionbar: 49, 56, 60
-       *    
-       * *Coral/Black
-       *    - AppColor: 255, 111, 97
-       *    - App.Background: 41, 47, 51
-       *    - App.Secondary.background: 102, 117, 127
-       *    - App.Actionbar: 49, 56, 60
-       *    
-       * *Green
-       *    - AppColor: 153, 180, 51
-       *    - App.Background: 11, 40, 25
-       *    - App.Secondary.Background: 30, 113, 69
-       *    - App.Actionbar: 13, 48, 30
-       *
-       * *Green/Gray
-       *    - AppColor: 153, 180, 51
-       *    - App.Background: 48, 56, 65
-       *    - App.Secondary.Background: 58, 71, 80
-       *    - App.Actionbar: 57, 67, 77
-       */
-
       UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
       UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0, 0 ) );
       UIManager.put( "DefaultBrightColor", Color.white );
@@ -141,7 +89,7 @@ class Main
       Mainframe mainframe = Mainframe.getInstance();
       if ( ServerCommunication.getInstance().currentUser == null )
       {
-        System.out.println( "Es wurde kein Nutzer für die angegeben Session gefunden." );
+        ClientLog.newLog( "Es wurde kein Nutzer für die angegeben Session gefunden." );
         Login login = Login.getInstance();
         MeMateUIManager.setUISettings();
         login.setVisible( true );
@@ -162,7 +110,7 @@ class Main
   }
 
   /**
-   * 
+   * Die Userconfig wird gelesen und das richtige Colortheme geladen.
    */
   private static void installColors()
   {
@@ -212,7 +160,6 @@ class Main
     }
   }
 
-
   private static void putColorsInUIManager( Color appColor, Color background, Color background2, Color actionbar )
   {
     UIManager.put( "AppColor", appColor );
@@ -222,6 +169,8 @@ class Main
   }
 
   /**
+   * Erstellt den MaMate Ordner unter AppData und die Userconfig File.
+   * 
    * @param meMateFolder
    * @param userPropFile
    */

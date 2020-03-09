@@ -29,17 +29,11 @@ class FindServer
   @SuppressWarnings( "unused" )
   private static final FindServer instance      = new FindServer();
 
-  /**
-   * @return Serveradresse
-   */
   static InetAddress getServerAddress()
   {
     return serverAddress;
   }
 
-  /**
-   * @return Serverport
-   */
   static int getServerPort()
   {
     return serverPort;
@@ -47,7 +41,6 @@ class FindServer
 
   /**
    * Ruft erst listAllBroadcastAddresses auf und startet dann für alle Einträge einen Broadcast.
-   * 
    */
   public FindServer()
   {
@@ -55,12 +48,12 @@ class FindServer
     try
     {
       broadcastList = listAllBroadcastAddresses();
-      System.out.println( "Es wurden " + broadcastList.size() + " mögliche Netzwerkschnittstellen gefunden." );
+      ClientLog.newLog( "Es wurden " + broadcastList.size() + " mögliche Netzwerkschnittstellen gefunden." );
       for ( InetAddress inetAddress : broadcastList )
       {
         if ( serverAddress == null )
         {
-          System.out.println( "Starte Broadcast für " + inetAddress );
+          ClientLog.newLog( "Starte Broadcast für " + inetAddress );
           broadcast( "MateClient", inetAddress );
         }
       }
@@ -102,8 +95,8 @@ class FindServer
       serverPort = serverPacket.getPort();
       String serverMessage = new String( serverPacket.getData(), 0, serverPacket.getLength() );
 
-      System.out.println( "Es wurde ein Server gefunden." );
-      System.out.println( "Adresse: " + serverAddress + "\nPort: " + serverPort + "\nNachricht: " + serverMessage );
+      ClientLog.newLog( "Es wurde ein Server gefunden." );
+      ClientLog.newLog( "Adresse: " + serverAddress + "\nPort: " + serverPort + "\nNachricht: " + serverMessage );
     }
     catch ( IOException exception )
     {

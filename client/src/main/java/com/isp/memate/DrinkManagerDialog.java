@@ -251,11 +251,6 @@ class DrinkManagerDialog
     toggleDarkMode( drinkName, drinkPrice, buttonBar );
   }
 
-  /**
-   * @param drinkName
-   * @param drinkPrice
-   * @param buttonBar
-   */
   private void toggleDarkMode( final JLabel drinkName, final JLabel drinkPrice, JPanel buttonBar )
   {
     if ( MeMateUIManager.getDarkModeState() )
@@ -719,25 +714,7 @@ class DrinkManagerDialog
   }
 
   /**
-   * @param ingredientsLabel
-   * @param ingredientsField
-   * @param energyKJLabel
-   * @param energyKCALLabel
-   * @param fatLabel
-   * @param fattyAcidsLabel
-   * @param carbsLabel
-   * @param sugarLabel
-   * @param proteinLabel
-   * @param saltLabel
-   * @param buttonBar
-   * @param saltSpinner
-   * @param proteinSpinner
-   * @param sugarSpinner
-   * @param carbsSpinner
-   * @param fattyAcidsSpinner
-   * @param fatSpinner
-   * @param energykCALSpinner
-   * @param energykJSpinner
+   * Ändert den Darkmodestate aller mitgegebenen Komponenten.
    */
   private void toggleDarkMode( JLabel ingredientsLabel, JTextField ingredientsField, JLabel energyKJLabel, JLabel energyKCALLabel,
                                JLabel fatLabel,

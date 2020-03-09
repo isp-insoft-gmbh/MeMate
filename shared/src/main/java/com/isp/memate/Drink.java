@@ -8,7 +8,6 @@ import java.io.Serializable;
 /**
  * @author nwe
  * @since 27.11.2019
- *
  */
 class Drink implements Serializable
 {

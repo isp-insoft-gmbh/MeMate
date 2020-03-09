@@ -18,6 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.ClientLog;
 
 /**
  * Die Klasse wird nur aufgerufen sobald der Admin den Export Button im AdminPanel drückt.
@@ -84,7 +85,7 @@ class DataExport
       DOMSource domSource = new DOMSource( document );
       StreamResult streamResult = new StreamResult( new File( historyXMLPath ) );
       transformer.transform( domSource, streamResult );
-      System.out.println( "Done creating History-XML File" );
+      ClientLog.newLog( "Done creating History-XML File" );
     }
     catch ( ParserConfigurationException pce )
     {
@@ -164,7 +165,7 @@ class DataExport
       DOMSource domSource = new DOMSource( document );
       StreamResult streamResult = new StreamResult( new File( drinksXMLPath ) );
       transformer.transform( domSource, streamResult );
-      System.out.println( "Done creating Drink-XML File" );
+      ClientLog.newLog( "Done creating Drink-XML File" );
     }
     catch ( ParserConfigurationException pce )
     {
@@ -212,7 +213,7 @@ class DataExport
       DOMSource domSource = new DOMSource( document );
       StreamResult streamResult = new StreamResult( new File( userXMLPath ) );
       transformer.transform( domSource, streamResult );
-      System.out.println( "Done creating user-XML File" );
+      ClientLog.newLog( "Done creating user-XML File" );
     }
     catch ( ParserConfigurationException pce )
     {

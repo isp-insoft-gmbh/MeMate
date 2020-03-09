@@ -14,6 +14,9 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 /**
+ * Erstellt einen Togglebutton, welcher activated sein kann oder nicht. Der Zustand bestimmt im Settingspanel
+ * ob die Benachrichtigungen an sein sollen.
+ * 
  * @author nwe
  * @since 06.03.2020
  *
@@ -21,13 +24,16 @@ import javax.swing.UIManager;
 
 public class ToggleSwitch extends JPanel
 {
+  @SuppressWarnings( "javadoc" )
   public boolean        activated    = false;
-  private Color         switchColor  = new Color( 200, 200, 200 ), buttonColor = new Color( 255, 255, 255 ),
-      borderColor = new Color( 50, 50, 50 );
+  private Color         borderColor  = new Color( 50, 50, 50 );
   private BufferedImage puffer;
   private int           borderRadius = 10;
   private Graphics2D    g;
 
+  /**
+   * erstellt einen ToggleSwitchButton, setzt den Cusor und repainted den Button.
+   */
   public ToggleSwitch()
   {
     super();
@@ -51,11 +57,11 @@ public class ToggleSwitch extends JPanel
     }
     g.setColor( MeMateUIManager.getDarkModeState() ? UIManager.getColor( "App.Background" ) : Color.white );
     g.fillRoundRect( 0, 0, getWidth(), getHeight(), 0, 0 );
-    g.setColor( activated ? UIManager.getColor( "AppColor" ) : switchColor );
+    g.setColor( activated ? UIManager.getColor( "AppColor" ) : new Color( 200, 200, 200 ) );
     g.fillRoundRect( 0, 0, this.getWidth() - 1, getHeight() - 1, 5, borderRadius );
     g.setColor( borderColor );
     g.drawRoundRect( 0, 0, getWidth() - 1, getHeight() - 1, 5, borderRadius );
-    g.setColor( buttonColor );
+    g.setColor( new Color( 255, 255, 255 ) );
     if ( activated )
     {
       g.fillRoundRect( getWidth() / 2, 1, (getWidth() - 1) / 2 - 2, (getHeight() - 1) - 2, borderRadius, borderRadius );
@@ -72,6 +78,11 @@ public class ToggleSwitch extends JPanel
     gr.drawImage( puffer, 0, 0, null );
   }
 
+  /**
+   * Hier kann von Außen der Zustand des Buttons geändert werden, zum Beispiel beim Laden der userconfig.
+   * 
+   * @param activated Status
+   */
   public void setActivated( boolean activated )
   {
     this.activated = activated;

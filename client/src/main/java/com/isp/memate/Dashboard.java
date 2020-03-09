@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -94,7 +95,6 @@ class Dashboard extends JPanel
       public void actionPerformed( ActionEvent e )
       {
         Object value = valueSpinner.getValue();
-        System.out.println( String.valueOf( valueSpinner.getValue() ) );
         int result =
             JOptionPane.showConfirmDialog( Dashboard.this, "<html>Wollen Sie wirklich <b>" + value + "€</b> einzahlen?",
                 "Guthaben hinzufügen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE );
@@ -134,7 +134,7 @@ class Dashboard extends JPanel
     panel.add( infoIconLabel, new CC().spanY() );
     panel.add( infoTextLabel1, new CC().minWidth( "0" ).pushX().wrap() );
     panel.add( valueSpinner, new CC() );
-    panel.add( aufladenButton, new CC() ); // Wenn der Button ein MeMateActionBarButton ist, dann getbarbutton ergänzen
+    panel.add( aufladenButton, new CC() );
     panel.add( infoTextLabel2, new CC().skip( 1 ).minWidth( "0" ).pushX() );
 
     SwingUtil.setPreferredWidth( 50, valueSpinner );
@@ -195,7 +195,8 @@ class Dashboard extends JPanel
 
   void updateButtonpanel()
   {
-    ServerCommunication.getInstance().lock.lock();
+    ReentrantLock lock = ServerCommunication.getInstance().lock;
+    lock.lock();
     try
     {
       scrollpane.setViewportView( createDrinkButtonPanel() );
@@ -207,7 +208,7 @@ class Dashboard extends JPanel
     }
     finally
     {
-      ServerCommunication.getInstance().lock.unlock();
+      lock.unlock();
     }
   }
 

@@ -325,14 +325,12 @@ class Adminview extends JPanel
     piggyBankPanel.add( setAdminBalanceButton, setAdminBalanceButtonConstraints );
   }
 
-
   private void setToolTipAndText()
   {
     setAdminBalanceButton.setText( "Guthaben setzen" );
     resetPasswordButton.setToolTipText( "Passwörter zurücksetzen." );
     exportButton.setToolTipText( "Daten exportieren" );
   }
-
 
   private void removeAllAndLayout()
   {

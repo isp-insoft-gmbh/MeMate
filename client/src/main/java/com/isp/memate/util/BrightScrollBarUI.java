@@ -10,7 +10,7 @@ import javax.swing.JButton;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
 /**
- * @author dtr
+ * @author nwe
  * @since 06.02.2020
  *
  */

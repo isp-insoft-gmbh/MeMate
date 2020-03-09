@@ -33,19 +33,19 @@ import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.ToggleSwitch;
 
 /**
+ * Auf dem Settings Panel kann sein gewünschtes Color Scheme auswählen, den Darkmodestate verändern und
+ * Benachrichtigungen für Standup-Meeting oder andere Benachrichtigungen aktivieren und deaktivieren.
+ * 
  * @author nwe
  * @since 05.03.2020
  *
  */
 class Settings extends JPanel
 {
-  JComboBox<String> colorThemeComboBox = new JComboBox<>();
-  JRadioButton      daymodeButton      = MeMateUIManager.createRadioButton( "Hell" );
-  JRadioButton      darkmodeButton     = MeMateUIManager.createRadioButton( "Dunkel" );
+  private final JComboBox<String> colorThemeComboBox = new JComboBox<>();
+  private final JRadioButton      daymodeButton      = MeMateUIManager.createRadioButton( "Hell" );
+  private final JRadioButton      darkmodeButton     = MeMateUIManager.createRadioButton( "Dunkel" );
 
-  /**
-   * 
-   */
   public Settings()
   {
     setLayout( new GridBagLayout() );
@@ -57,9 +57,6 @@ class Settings extends JPanel
     MeMateUIManager.setUISettings();
   }
 
-  /**
-   * 
-   */
   private void addConsumptionNotification()
   {
     JLabel consumptionNotificationLabel = MeMateUIManager.createJLabel();
@@ -71,7 +68,6 @@ class Settings extends JPanel
     consumptionNotificationLabelConstraints.gridwidth = 10;
     consumptionNotificationLabelConstraints.anchor = GridBagConstraints.LINE_START;
     consumptionNotificationLabelConstraints.insets = new Insets( 30, 20, 0, 0 );
-
 
     add( consumptionNotificationLabel, consumptionNotificationLabelConstraints );
     ToggleSwitch consumptionSwitch = new ToggleSwitch();
@@ -127,10 +123,6 @@ class Settings extends JPanel
     }
   }
 
-  /**
-   * @param string
-   * @return
-   */
   private boolean loadPrefAndSetState( String propertry )
   {
     String state = null;
@@ -153,9 +145,7 @@ class Settings extends JPanel
     return true;
   }
 
-  /**
-   * 
-   */
+
   private void addMeetingNotification()
   {
     JLabel meetingNotificationLabel = MeMateUIManager.createJLabel();
@@ -213,9 +203,6 @@ class Settings extends JPanel
     }
   }
 
-  /**
-   * 
-   */
   private void addDarkmodeSettings()
   {
     JLabel pickDarkmodeLabel = MeMateUIManager.createJLabel();
@@ -307,9 +294,6 @@ class Settings extends JPanel
     add( darkmodeButton, darkModeButtonConstraints );
   }
 
-  /**
-   * 
-   */
   private void getPrefsAndSelectButton()
   {
     String state = "null";
@@ -339,9 +323,6 @@ class Settings extends JPanel
     }
   }
 
-  /**
-   * 
-   */
   private void addColorThemePicker()
   {
     MeMateUIManager.registerComboBox( colorThemeComboBox );
@@ -413,9 +394,6 @@ class Settings extends JPanel
   }
 
 
-  /**
-   * 
-   */
   private void getPrefsAndSelectItem()
   {
     String color = "null";

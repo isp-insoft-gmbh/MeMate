@@ -287,7 +287,7 @@ public class MeMateActionBarButton
   /**
    * Ändert die Darstellung des Buttons, wenn der Button gedrückt wird.
    */
-  public void showPressedStyle()
+  void showPressedStyle()
   {
     if ( MeMateUIManager.getDarkModeState() )
     {
@@ -302,7 +302,7 @@ public class MeMateActionBarButton
   /**
    * Ändert die Darstellung des Buttons, wenn der Button los gelassen wird.
    */
-  public void hidePressedStyle()
+  void hidePressedStyle()
   {
     if ( MeMateUIManager.getDarkModeState() )
     {
@@ -354,7 +354,7 @@ public class MeMateActionBarButton
   /**
    * Deselktiert den Button und der Marker bekommt die gleiche Farbe des Panels und ist somit nicht sichtbar.
    */
-  public void unselected()
+  void unselected()
   {
     isMarked = false;
     markerPanels.forEach( markerPanel -> markerPanel.setBackground( background ) );
@@ -537,7 +537,7 @@ public class MeMateActionBarButton
   /**
    * Ändert die Schriftfarbe, abhängig von dem Dark- oder Daymode.
    */
-  public void toggleFontColor()
+  void toggleFontColor()
   {
     if ( darkModeOn )
     {

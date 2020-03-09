@@ -29,6 +29,9 @@ import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
+ * Im Social Panel kann man ein wöchentliches Scoreboard, ein Overall Scoreboard und wer grade
+ * etwas trinkt sehen.
+ * 
  * @author nwe
  * @since 11.02.2020
  *
@@ -40,9 +43,7 @@ class Social extends JPanel
   private static JPanel weeklyScoreBoardPanel = MeMateUIManager.createJPanel();
   private static JPanel activityPanel         = MeMateUIManager.createJPanel();
 
-  /**
-   * 
-   */
+
   public Social()
   {
     setLayout( new BorderLayout() );
@@ -50,9 +51,6 @@ class Social extends JPanel
     add( mainPanel, BorderLayout.CENTER );
   }
 
-  /**
-   * 
-   */
   void update()
   {
     mainPanel.removeAll();
@@ -80,7 +78,8 @@ class Social extends JPanel
 
 
   /**
-   * 
+   * Schaut sich die letzen 5 Einträge der History an und wenn dabei Einträge von einem Getränkekauf sind
+   * so wird dafür ein kleiner Panel generiert.
    */
   private static void loadActivityPanelSettings()
   {
@@ -180,10 +179,6 @@ class Social extends JPanel
     loadScoreBoard( scoreList, scoreBoardPanel, "overall" );
   }
 
-  /**
-   * @param scoreList
-   * @param scoreBoardPanel2
-   */
   private static void loadScoreBoard( List<Score> scoreList, JPanel panel, String title )
   {
     panel.setLayout( new GridBagLayout() );

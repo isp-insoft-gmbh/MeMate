@@ -41,7 +41,7 @@ import com.isp.memate.Shared.Operation;
 import com.isp.memate.util.ClientLog;
 
 /**
- * Die Klasse ServerCommunication kommunizert mit dem Server
+ * Die Klasse ServerCommunication kommuniziert mit dem Server
  * und schickt verschiedenen Shared-Objekte an der Server.
  * Beispielsweise bei checkLogin schickt die Klasse ein Objekt, welches
  * den Befehl CHECK_LOGIN und ein Userobjekt, welches Nutzername und
@@ -204,7 +204,6 @@ class ServerCommunication
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "HH:mm" );
         LocalDateTime now = LocalDateTime.now();
         String date = dtf.format( now );
-        System.out.println( String.valueOf( showNotifications( "MeetingNotification" ) ) );
         if ( date.equals( "12:19" ) )
         {
           if ( showNotifications( "MeetingNotification" ) )
@@ -222,7 +221,7 @@ class ServerCommunication
               }
               catch ( AWTException exception )
               {
-                // TODO(nwe|03.03.2020): Fehlerbehandlung muss noch implementiert werden!
+                ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
               }
               trayIcon.displayMessage( "MeMate", "Standup Meeting", MessageType.NONE );
             }
@@ -239,11 +238,10 @@ class ServerCommunication
     timer4.schedule( task4, 0, 60000 );
   }
 
-
-  /**
-   * @return
+  /*
+   * Gibt zurück ob die gegebene Property enabled ist oder nicht.
    */
-  protected boolean showNotifications( String propertry )
+  private boolean showNotifications( String property )
   {
     String state = null;
     try ( InputStream input =
@@ -251,7 +249,7 @@ class ServerCommunication
     {
       Properties userProperties = new Properties();
       userProperties.load( input );
-      state = userProperties.getProperty( propertry );
+      state = userProperties.getProperty( property );
     }
     catch ( Exception exception )
     {
@@ -283,10 +281,6 @@ class ServerCommunication
     timer2.schedule( task2, 10000, 30000 );
   }
 
-
-  /**
-   * @param history
-   */
   private void updateHistory( String[][] history )
   {
     List<String[]> list = Arrays.asList( history );
@@ -295,7 +289,8 @@ class ServerCommunication
   }
 
   /**
-   * 
+   * Sollte es Änderungen der History geben, so wird geprüft, ob jemand etwas getrunken hat.
+   * Wenn dies der Fall ist, popt eine Benachrichtigung auf, sollte der User diese Einstellung aktiviert haben.
    */
   private void checkForChanges()
   {
@@ -335,7 +330,7 @@ class ServerCommunication
                     }
                     catch ( AWTException exception )
                     {
-                      // TODO(nwe|03.03.2020): Fehlerbehandlung muss noch implementiert werden!
+                      ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
                     }
                     trayIcon.displayMessage( "MeMate", consumer + " trinkt gerade " + drinkname, MessageType.NONE );
                   }
@@ -353,72 +348,42 @@ class ServerCommunication
     }
   }
 
-  /**
-   * @param history
-   */
   private void updateShortHistory( String[][] history )
   {
     this.shortHistory = history;
     checkForChanges();
   }
 
-  /**
-   * @param history
-   */
   private void updateScoreboard( String[][] history )
   {
     this.scoreboard = history;
   }
 
-  /**
-   * @param name Name des Getränks
-   * @return Image des Getränks.
-   */
   ImageIcon getIcon( String name )
   {
     return imageMap.get( name );
   }
 
-  /**
-   * @param name Name des Getränks
-   * @return Preis des Getränks.
-   */
   Float getPrice( String name )
   {
     return priceMap.get( name );
   }
 
-  /**
-   * @param name Name des Getränks
-   * @return ID des Getränks.
-   */
   Integer getID( String name )
   {
     return drinkIDMap.get( name );
   }
 
-  /**
-   * @param name Name des Getränks
-   * @return Anzahl des Getränks.
-   */
   Integer getAmount( String name )
   {
     return amountMap.get( name );
   }
 
-  /**
-   * @param name Name des Getränks
-   * @return Inhaltsstoffe des Getränks
-   */
   DrinkIngredients getIngredients( String name )
   {
     return IngredientsMap.get( name );
   }
 
-  /**
-   * @param name Name des Getränks
-   * @return Ob es Inhaltsangaben über das Getränk gibt oder nicht.
-   */
   Boolean hasIngredients( String name )
   {
     return drinkIngredientsMap.get( name );
@@ -490,7 +455,7 @@ class ServerCommunication
 
 
   /**
-   * Sagt dem Server, dass er die Historie schicken soll.
+   * Teilt dem Server mit, dass er die Historie schicken soll.
    */
   void tellServerToSendHistoryData()
   {
@@ -505,7 +470,7 @@ class ServerCommunication
   }
 
   /**
-   * Sagt dem Server, dass er ein Array mit allen Nutzern schicken soll.
+   * Teilt dem Server mit, dass er ein Array mit allen Nutzern schicken soll.
    */
   private void tellServertoSendUserArray()
   {
@@ -520,7 +485,7 @@ class ServerCommunication
   }
 
   /**
-   * Sagt dem Server, dass er die aktuelle Versionsnummer schicken soll.
+   * Teilt dem Server mit, dass er die aktuelle Versionsnummer schicken soll.
    */
   void tellServertoSendVersionNumber()
   {
@@ -535,7 +500,7 @@ class ServerCommunication
   }
 
   /**
-   * Sagt dem Server, dass die letzte Aktion rückgängig gemacht werden soll.
+   * Teilt dem Server mit, dass die letzte Aktion rückgängig gemacht werden soll.
    */
   void undoLastAction()
   {
@@ -550,10 +515,6 @@ class ServerCommunication
     }
   }
 
-  /**
-   * @param message Error-Nachricht
-   * @param title Titel des Errordialogs
-   */
   private void showErrorDialog( String message, String title )
   {
     ClientLog.newLog( message );
@@ -592,7 +553,7 @@ class ServerCommunication
   }
 
   /**
-   * Fügt einem Getränk optional die Inhaltsstoffe hinzu
+   * Fügt einem Getränk optional die Inhaltsstoffe hinzu.
    * 
    * @param drinkIngredients Inhaltsstoffe
    */
@@ -635,7 +596,6 @@ class ServerCommunication
   /**
    * Es wird ein Shared-Objekt mit dem Befehl GET_BALANCE
    * an den Server geschickt.
-   * 
    */
   void getBalance()
   {
@@ -929,7 +889,7 @@ class ServerCommunication
 
 
   /**
-   * Sagt dem Server, dass er Den Kontostand des Spaarschweins schicken soll.
+   * Teilt dem Server mit, dass er den Kontostand des Spaarschweins schicken soll.
    */
   void tellServerToSendPiggybankBalance()
   {
@@ -997,9 +957,6 @@ class ServerCommunication
     }
   }
 
-  /**
-   * @param newPass neues Passwort
-   */
   void changePassword( String newPass )
   {
     try
@@ -1049,17 +1006,11 @@ class ServerCommunication
     }
   }
 
-  /**
-   * @return the piggyBankBalance
-   */
   public Float getPiggyBankBalance()
   {
     return piggyBankBalance;
   }
 
-  /**
-   * @param piggyBankBalance the piggyBankBalance to set
-   */
   public void setPiggyBankBalance( Float piggyBankBalance )
   {
     this.piggyBankBalance = piggyBankBalance;

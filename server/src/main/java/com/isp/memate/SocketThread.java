@@ -26,7 +26,7 @@ import com.isp.memate.Shared.Operation;
  */
 class SocketThread extends Thread
 {
-  private final String         version = "0.9.8.3";
+  private final String         version = "0.9.9.1";
   private ObjectOutputStream   objectOutputStream;
   private ObjectInputStream    objectInputStream;
   private String               currentSessionID;
@@ -189,9 +189,6 @@ class SocketThread extends Thread
     }
   }
 
-  /**
-   * @param drinkIngredients
-   */
   private void registerIngredients( DrinkIngredients drinkIngredients )
   {
     database.addIngredients( drinkIngredients.drinkID, drinkIngredients.ingredients, drinkIngredients.energy_kJ,
@@ -211,7 +208,7 @@ class SocketThread extends Thread
   }
 
   /**
-   * Die letzte AKtion wird rückgänig gemacht.
+   * Die letzte AKtion wird rückgängig gemacht.
    */
   private void undoLastAction()
   {
@@ -253,7 +250,7 @@ class SocketThread extends Thread
   }
 
   /**
-   * Sendet das Guthaben des Spaarschweins
+   * Sendet das Guthaben des Spaarschweins.
    */
   private void sendPiggybankBalance()
   {

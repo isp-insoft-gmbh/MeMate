@@ -106,7 +106,7 @@ public class MeMateUIManager
    * @param backgroundColors BG-Colors
    * @param foregroundColors FG-Colors
    */
-  public static void installNewKey( final String key, final DarkDayColor backgroundColors, final DarkDayColor foregroundColors )
+  private static void installNewKey( final String key, final DarkDayColor backgroundColors, final DarkDayColor foregroundColors )
   {
     keySet.add( key );
     backgroundMap.put( key, backgroundColors );
@@ -734,7 +734,7 @@ public class MeMateUIManager
      * @param darkColor Darkmode Farbe
      * @param dayColor Daymode Farbe
      */
-    public DarkDayColor( final Color darkColor, final Color dayColor )
+    private DarkDayColor( final Color darkColor, final Color dayColor )
     {
       this.darkColor = darkColor;
       this.dayColor = dayColor;

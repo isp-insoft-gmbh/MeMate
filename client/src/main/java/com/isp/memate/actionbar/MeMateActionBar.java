@@ -30,6 +30,8 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.isp.memate.util.ClientLog;
+
 
 /**
  * @author dtr
@@ -53,7 +55,7 @@ public class MeMateActionBar extends JPanel
   }
 
   private final JPanel     contentPanel;
-  private JPanel           viewButton;
+  private JPanel           viewButton = null;
   private final JPanel     contextMenuButton;
   private final JPopupMenu invisibleButtonPopupMenu;
 
@@ -62,8 +64,6 @@ public class MeMateActionBar extends JPanel
 
 
   private boolean labelsVisible = false;
-
-  private boolean darkModeOn = false;
 
   private Optional<Component> lastSeparator = Optional.empty();
 
@@ -292,8 +292,7 @@ public class MeMateActionBar extends JPanel
     }
     catch ( IOException exception )
     {
-      System.out.println( "Der Ausklappstatus konnte nicht gespeichert werden." );
-      exception.printStackTrace();
+      ClientLog.newLog( "Der Ausklappstatus konnte nicht gespeichert werden." + exception );
     }
   }
 
@@ -352,23 +351,10 @@ public class MeMateActionBar extends JPanel
     return button;
   }
 
-  public void removeActionButton( MeMateActionBarButton button )
-  {
-    if ( allButtons.contains( button ) )
-    {
-      allButtons.remove( button );
-      contentPanel.remove( button.getBarButton() );
-      invisibleButtonPopupMenu.remove( button.getBarButton() );
-      button.setTitleVisible( false );
-      button.setEnabled( false );
-      button.setVisible( false );
-    }
-  }
-
   /**
    * Ändert die Sichtbarkeit der Labels der hinzugefügten Buttons.
    */
-  public void changeLabelVisibleState()
+  private void changeLabelVisibleState()
   {
     setLabelsVisible( !labelsVisible );
     try
@@ -383,8 +369,7 @@ public class MeMateActionBar extends JPanel
     }
     catch ( IOException exception )
     {
-      System.out.println( "Der Ausklappstatus konnte nicht gespeichert werden." );
-      exception.printStackTrace();
+      ClientLog.newLog( "Der Ausklappstatus konnte nicht gespeichert werden." + exception );
     }
   }
 
@@ -537,7 +522,6 @@ public class MeMateActionBar extends JPanel
     Icon tempPressedIcon = burgerButton.getPressedIcon();
     burgerButton.setIcon( tempPressedIcon );
     burgerButton.setPressedIcon( tempIcon );
-    darkModeOn = true;
   }
 
   /**
@@ -560,15 +544,5 @@ public class MeMateActionBar extends JPanel
     Icon tempPressedIcon = burgerButton.getPressedIcon();
     burgerButton.setIcon( tempPressedIcon );
     burgerButton.setPressedIcon( tempIcon );
-    darkModeOn = false;
-  }
-
-
-  /**
-   * @return ob der Darkmode an oder aus ist
-   */
-  public boolean darkModeOn()
-  {
-    return darkModeOn;
   }
 }

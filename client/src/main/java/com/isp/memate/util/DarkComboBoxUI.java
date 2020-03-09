@@ -16,7 +16,7 @@ import javax.swing.plaf.basic.ComboPopup;
  * @since 04.03.2020
  *
  */
-public class DarkComboBoxUI extends BasicComboBoxUI
+class DarkComboBoxUI extends BasicComboBoxUI
 {
   @Override
   protected ComboPopup createPopup()

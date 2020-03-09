@@ -23,6 +23,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.NumberFormat;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -557,7 +558,8 @@ class DrinkConsumptionButton extends JPanel
       @Override
       public void actionPerformed( ActionEvent e )
       {
-        ServerCommunication.getInstance().lock.lock();
+        ReentrantLock lock = ServerCommunication.getInstance().lock;
+        lock.lock();
         try
         {
           ServerCommunication.getInstance().consumeDrink( drinkName );
@@ -581,7 +583,7 @@ class DrinkConsumptionButton extends JPanel
         }
         finally
         {
-          ServerCommunication.getInstance().lock.unlock();
+          lock.unlock();
         }
       }
     };

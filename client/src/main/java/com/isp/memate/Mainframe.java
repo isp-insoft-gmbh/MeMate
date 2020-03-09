@@ -45,18 +45,15 @@ import com.isp.memate.util.MeMateUIManager;
 class Mainframe extends JFrame
 {
   private static final Mainframe instance               = new Mainframe();
+  private Dashboard              dashboard              = new Dashboard( instance );
   private final Icon             dashboardIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_black.png" ) );
   private final Icon             dashboardIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_white.png" ) );
   private final Icon             adminViewIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_black.png" ) );
   private final Icon             adminViewIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_white.png" ) );
   private final Icon             logoutIconBlack        = new ImageIcon( getClass().getClassLoader().getResource( "logout_black_24.png" ) );
   private final Icon             logoutIconWhite        = new ImageIcon( getClass().getClassLoader().getResource( "logout_white_24.png" ) );
-  private final Icon             darkModeIconBlack      = new ImageIcon( getClass().getClassLoader().getResource( "darkmode_black.png" ) );
-  private final Icon             darkModeIconWhite      = new ImageIcon( getClass().getClassLoader().getResource( "darkmode_white.png" ) );
   private final Icon             historyIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "history_black.png" ) );
   private final Icon             historyIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "history_white.png" ) );
-  private final Icon             dayModeIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_black.png" ) );
-  private final Icon             dayModeIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "daymode_white.png" ) );
   private final Icon             socialBlackIcon        = new ImageIcon( getClass().getClassLoader().getResource( "social_black.png" ) );
   private final Icon             socialWhiteIcon        = new ImageIcon( getClass().getClassLoader().getResource( "social_white.png" ) );
   private final Icon             undoBlackIcon          = new ImageIcon( getClass().getClassLoader().getResource( "back_black.png" ) );
@@ -79,26 +76,17 @@ class Mainframe extends JFrame
   private ConsumptionRate        consumptionRate        = new ConsumptionRate();
   private CreditHistory          creditHistory          = new CreditHistory();
   private Drinkmanager           drinkManager           = new Drinkmanager();
-
-  private Adminview             adminView    = new Adminview();
-  private History               history      = new History();
-  private Social                social       = new Social();
-  private Dashboard             dashboard    = new Dashboard( instance );
-  private final JLabel          balanceLabel = new JLabel();
-  public final JPanel           headerPanel  = new JPanel();
-  public JPanel                 burgerButton;
-  private MeMateActionBarButton drinkManagerButton;
-  private MeMateActionBarButton dashboardButton;
-  private MeMateActionBarButton historyButton;
-  private MeMateActionBarButton drinkConsumptionButton;
-  private MeMateActionBarButton creditHistoryButton;
-  private MeMateActionBarButton socialButton;
-  private MeMateActionBarButton adminViewButton;
-  private MeMateActionBarButton logoutButton;
-  public MeMateActionBarButton  settingsButton;
-  private MeMateActionBarButton undoButton;
-  public MeMateActionBar        bar;
-  public static Image           frameImage   =
+  private Adminview              adminView              = new Adminview();
+  private History                history                = new History();
+  private Social                 social                 = new Social();
+  private final JLabel           balanceLabel           = new JLabel();
+  public final JPanel            headerPanel            = new JPanel();
+  public JPanel                  burgerButton;
+  private MeMateActionBarButton  logoutButton;
+  public MeMateActionBarButton   settingsButton;
+  private MeMateActionBarButton  undoButton;
+  public MeMateActionBar         bar;
+  public static Image            frameImage             =
       Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue.png" ) );
 
   /**
@@ -166,7 +154,6 @@ class Mainframe extends JFrame
     addSettingsButton();
     addLogoutButton();
 
-
     bar.selectButton( "Dashboard" );
     try
     {
@@ -195,9 +182,6 @@ class Mainframe extends JFrame
     add( bar, BorderLayout.WEST );
   }
 
-  /**
-   * 
-   */
   private void addSettingsButton()
   {
     settingsButton = bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Settings",
@@ -215,12 +199,9 @@ class Mainframe extends JFrame
         } );
   }
 
-  /**
-   * 
-   */
   private void addDefaultButtons()
   {
-    dashboardButton = bar.addActionButton( dashboardIconBlack, dashboardIconWhite, "Dashboard", "Dashboard öffnen", color, new Runnable()
+    bar.addActionButton( dashboardIconBlack, dashboardIconWhite, "Dashboard", "Dashboard öffnen", color, new Runnable()
     {
       public void run()
       {
@@ -232,7 +213,7 @@ class Mainframe extends JFrame
         contentPanel.revalidate();
       }
     } );
-    historyButton = bar.addActionButton( historyIconBlack, historyIconWhite, "Historie", "Historie öffnen", color, new Runnable()
+    bar.addActionButton( historyIconBlack, historyIconWhite, "Historie", "Historie öffnen", color, new Runnable()
     {
       public void run()
       {
@@ -245,7 +226,7 @@ class Mainframe extends JFrame
         contentPanel.revalidate();
       }
     } );
-    drinkConsumptionButton = bar.addActionButton( consumptionIconBlack, consumptionIconWhite, "Verbrauchsrate",
+    bar.addActionButton( consumptionIconBlack, consumptionIconWhite, "Verbrauchsrate",
         "Hier können sie ihren durchschnittlichen Konsum sehen", color, new Runnable()
         {
           public void run()
@@ -259,7 +240,7 @@ class Mainframe extends JFrame
             contentPanel.revalidate();
           }
         } );
-    creditHistoryButton = bar.addActionButton( creditHistoryIconBlack, creditHistoryIconWhite, "Guthabenverlauf",
+    bar.addActionButton( creditHistoryIconBlack, creditHistoryIconWhite, "Guthabenverlauf",
         "Hier können sie den Verlauf ihres Guthabens betrachten", color, new Runnable()
         {
           public void run()
@@ -273,9 +254,8 @@ class Mainframe extends JFrame
             contentPanel.revalidate();
           }
         } );
-    socialButton = bar.addActionButton( socialBlackIcon, socialWhiteIcon, "Scoreboard", "Scoreboard", color, new Runnable()
+    bar.addActionButton( socialBlackIcon, socialWhiteIcon, "Scoreboard", "Scoreboard", color, new Runnable()
     {
-
       @Override
       public void run()
       {
@@ -289,9 +269,6 @@ class Mainframe extends JFrame
     } );
   }
 
-  /**
-   * 
-   */
   private void addLogoutButton()
   {
     logoutButton = bar.addActionButton( logoutIconBlack, logoutIconWhite, "Logout", "Ausloggen", new Runnable()
@@ -325,23 +302,12 @@ class Mainframe extends JFrame
     } );
   }
 
-  /**
-   * 
-   */
-  private void addDarkModeButton()
-  {
 
-  }
-
-  /**
-   * 
-   */
   private void addUndoButton()
   {
     bar.addVariableGlue();
     undoButton = bar.addActionButton( undoBlackIcon, undoWhiteIcon, "Rückgänig", "Letzte Aktion rückgängig machen", new Runnable()
     {
-
       @Override
       public void run()
       {
@@ -353,14 +319,11 @@ class Mainframe extends JFrame
     undoButton.setEnabled( false );
   }
 
-  /**
-   * 
-   */
   private void toggleAdminButtons()
   {
     if ( ServerCommunication.getInstance().currentUser.equals( "admin" ) )
     {
-      drinkManagerButton = bar.addActionButton( drinkManagerIconBlack, drinkManagerIconWhite, "Getränkemanager",
+      bar.addActionButton( drinkManagerIconBlack, drinkManagerIconWhite, "Getränkemanager",
           "Getränkemanager öffnen", color, new Runnable()
           {
             public void run()
@@ -374,7 +337,7 @@ class Mainframe extends JFrame
               contentPanel.revalidate();
             }
           } );
-      adminViewButton = bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Adminview",
+      bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Adminview",
           "Adminansicht öffnen", color, new Runnable()
           {
             public void run()
@@ -391,25 +354,6 @@ class Mainframe extends JFrame
     }
   }
 
-  public void updateActionbar()
-  {
-    bar.removeActionButton( drinkManagerButton );
-    bar.removeActionButton( adminViewButton );
-    bar.removeActionButton( undoButton );
-    bar.removeActionButton( logoutButton );
-    toggleAdminButtons();
-    addUndoButton();
-    addDarkModeButton();
-    addLogoutButton();
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      logoutButton.setIcon( logoutIconWhite );
-      logoutButton.setIcon( logoutIconBlack );
-      undoButton.setIcon( undoWhiteIcon );
-      undoButton.setIcon( undoBlackIcon );
-    }
-  }
-
   /**
    * Setzt den Text Im Begrüßungslabel.
    * 
@@ -421,7 +365,7 @@ class Mainframe extends JFrame
   }
 
   /**
-   * Setzt Border und ändert ein paar Schriftgrößen
+   * Setzt Border und ändert ein paar Schriftgrößen.
    */
   private void deriveFontsAndSetLayout()
   {
@@ -463,7 +407,7 @@ class Mainframe extends JFrame
   }
 
   /**
-   * Bestimmt ob der undoButton aktiviert sein soll oder nicht
+   * Bestimmt ob der undoButton aktiviert sein soll oder nicht.
    * 
    * @param state true or false
    */
