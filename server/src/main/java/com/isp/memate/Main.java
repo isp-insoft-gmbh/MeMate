@@ -16,9 +16,7 @@ import com.isp.memate.ServerLog.logType;
  * 
  * @author nwe
  * @since 23.10.2019
- * 
  */
-
 
 public class Main
 {

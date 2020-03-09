@@ -654,7 +654,6 @@ public class Login extends JFrame
       changePasswordFrame
           .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
       changePasswordFrame.setVisible( true );
-
     }
     else
     {

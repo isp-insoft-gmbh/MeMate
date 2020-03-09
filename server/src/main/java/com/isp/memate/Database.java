@@ -333,7 +333,7 @@ class Database
   }
 
   /**
-   * Überschreibt den guthaben-wert des gegebenen Nutzers in dem user-table.
+   * Überschreibt den Guthaben-wert des gegebenen Nutzers in dem user-table.
    * 
    * @param sessionID ID des Nutzers.
    * @param updatedBalance neuer Kontostand
@@ -362,10 +362,10 @@ class Database
 
   /**
    * Überschreibt eine bestimmte Information des Getränks,
-   * abhängig von der Operaion.
+   * abhängig von der Operation.
    * 
-   * @param id ID des Getränks
-   * @param operation Opearion
+   * @param id ID des Getränks.
+   * @param operation Operation.
    * @param updatedInformation die neue Information, kann Name, Preis oder Bild sein.
    */
   void updateDrinkInformation( Integer id, Operation operation, Object updatedInformation )
