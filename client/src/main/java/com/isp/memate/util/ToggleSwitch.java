@@ -49,6 +49,8 @@ public class ToggleSwitch extends JPanel
           RenderingHints.VALUE_ANTIALIAS_ON );
       g.setRenderingHints( rh );
     }
+    g.setColor( MeMateUIManager.getDarkModeState() ? UIManager.getColor( "App.Background" ) : Color.white );
+    g.fillRoundRect( 0, 0, getWidth(), getHeight(), 0, 0 );
     g.setColor( activated ? UIManager.getColor( "AppColor" ) : switchColor );
     g.fillRoundRect( 0, 0, this.getWidth() - 1, getHeight() - 1, 5, borderRadius );
     g.setColor( borderColor );

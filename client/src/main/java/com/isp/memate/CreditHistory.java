@@ -12,6 +12,7 @@ import java.awt.event.ComponentListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.swing.JPanel;
@@ -136,6 +137,7 @@ class CreditHistory extends JPanel
           if ( action.contains( "Guthaben" ) || action.contains( "getrunken" ) )
           {
             Date date = null;
+            String dateAsString = data[ 4 ];
             try
             {
               date = oldFormat.parse( data[ 4 ] );
@@ -144,10 +146,23 @@ class CreditHistory extends JPanel
             {
               ClientLog.newLog( "Das Datum konnt nicht formatiert werden." + exception );
             }
-            if ( data[ 5 ].equals( "false" ) )
+            ZonedDateTime today = ZonedDateTime.now();
+            ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
+            try
             {
-              dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
-                  dateFormat.format( date ) );
+              Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
+              if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+              {
+                if ( data[ 5 ].equals( "false" ) )
+                {
+                  dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
+                      dateFormat.format( date ) );
+                }
+              }
+            }
+            catch ( ParseException exception )
+            {
+              ClientLog.newLog( "Das Datum ist out of range." + exception );
             }
           }
         }
