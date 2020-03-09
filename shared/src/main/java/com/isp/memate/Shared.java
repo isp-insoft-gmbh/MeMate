@@ -25,8 +25,10 @@ class Shared implements Serializable
   String[][]       shortHistory;
   String[][]       scoreboard;
   String[]         users;
+  String[]         displaynames;
   User[]           fullUserArray;
   Float            userBalance;
+  String           displayname;
   String           consumedDrink;
   String           registrationResult;
   String           username;
@@ -134,6 +136,12 @@ class Shared implements Serializable
       case GET_USERS_RESULT:
         users = (String[]) object;
         break;
+      case GET_USERS_DISPLAYNAMES:
+        displaynames = (String[]) object;
+        break;
+      case GET_DISPLAYNAME:
+        displayname = (String) object;
+        break;
       case GET_FULLUSERS_RESULT:
         fullUserArray = (User[]) object;
         break;
@@ -142,6 +150,9 @@ class Shared implements Serializable
         break;
       case CHANGE_PASSWORD_USER:
         pass = (String) object;
+        break;
+      case CHANGE_DISPLAYNAME:
+        displayname = (String) object;
         break;
       case GET_VERSION:
         version = (String) object;
@@ -186,7 +197,10 @@ class Shared implements Serializable
     UNDO,
     CHANGE_PASSWORD,
     LOGOUT,
-    CHANGE_PASSWORD_USER;
+    CHANGE_PASSWORD_USER,
+    GET_USERS_DISPLAYNAMES,
+    GET_DISPLAYNAME,
+    CHANGE_DISPLAYNAME;
   }
 
   enum LoginResult

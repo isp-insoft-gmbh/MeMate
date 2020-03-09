@@ -150,7 +150,8 @@ class Database
         + "guthaben double NOT NULL,"
         + "username string UNIQUE NOT NULL,"
         + "password string NOT NULL,"
-        + "requestNewPassword boolean DEFAULT (false)"
+        + "requestNewPassword boolean DEFAULT (false),"
+        + "DisplayName string UNIQUE NOT NULL"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -275,6 +276,29 @@ class Database
     return balance;
   }
 
+  /**
+   * Der DisplayName wird zurückgegeben.
+   * 
+   * @param Nutzername
+   * @return Displayname
+   */
+  String getDisplayName( String username )
+  {
+    String displayname = username;
+    String sql = "SELECT DisplayName FROM user WHERE username= ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ); )
+    {
+      pstmt.setString( 1, username );
+      ResultSet rs = pstmt.executeQuery();
+      displayname = rs.getString( "DisplayName" );
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    return displayname;
+  }
+
 
   /**
    * Füllt eine Map mit allen Usern und zugehörigen IDs.
@@ -311,12 +335,13 @@ class Database
   String registerNewUser( String username, String password )
   {
     lock.lock();
-    String sql = "INSERT INTO user(guthaben,username,password) VALUES(?,?,?)";
+    String sql = "INSERT INTO user(guthaben,username,password,DisplayName) VALUES(?,?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setFloat( 1, 0f );
       pstmt.setString( 2, username );
       pstmt.setString( 3, password );
+      pstmt.setString( 4, username );
       pstmt.executeUpdate();
     }
     catch ( SQLException e )
@@ -727,7 +752,7 @@ class Database
             String[] log = { rs.getString( "action" ), consumer,
                 NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString()
                     .replace( " ", "" ),
-                balance, rs.getString( "date" ), String.valueOf( rs.getBoolean( "undo" ) ) };
+                balance, rs.getString( "date" ), String.valueOf( rs.getBoolean( "undo" ) ), getDisplayName( consumer ) };
             history.add( log );
           }
         }
@@ -755,7 +780,7 @@ class Database
       {
         if ( !rs.getBoolean( "undo" ) )
         {
-          String[] log = { rs.getString( "action" ), rs.getString( "consumer" ), rs.getString( "date" ) };
+          String[] log = { rs.getString( "action" ), getDisplayName( rs.getString( "consumer" ) ), rs.getString( "date" ) };
           history.add( log );
         }
       }
@@ -785,7 +810,7 @@ class Database
         {
           if ( !rs.getBoolean( "undo" ) )
           {
-            String[] log = { rs.getString( "action" ), rs.getString( "consumer" ), rs.getString( "date" ) };
+            String[] log = { rs.getString( "action" ), getDisplayName( rs.getString( "consumer" ) ), rs.getString( "date" ) };
             history.add( log );
           }
         }
@@ -1097,6 +1122,29 @@ class Database
   }
 
   /**
+   * @return alle DisplayNames
+   */
+  public String[] getDisplayNames()
+  {
+    ArrayList<String> names = new ArrayList<>();
+    String sql = "SELECT DisplayName FROM user";
+    try ( Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery( sql ) )
+    {
+      while ( rs.next() )
+      {
+        names.add( rs.getString( "DisplayName" ) );
+      }
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    String[] userAsArray = names.toArray( new String[names.size()] );
+    return userAsArray;
+  }
+
+  /**
    * @return alle user
    */
   public User[] getFullUser()
@@ -1139,6 +1187,26 @@ class Database
         pstmt.setBoolean( 2, false );
       }
       pstmt.setString( 3, name );
+      pstmt.executeUpdate();
+    }
+    catch ( SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  void changeDisplayName( Integer userID, String newDisplayName )
+  {
+    lock.lock();
+    String sql = "UPDATE user SET DisplayName = ? WHERE ID = ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
+    {
+      pstmt.setString( 1, newDisplayName );
+      pstmt.setInt( 2, userID );
       pstmt.executeUpdate();
     }
     catch ( SQLException e )

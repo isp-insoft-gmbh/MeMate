@@ -155,12 +155,13 @@ class Social extends JPanel
 
   private static void loadScoreBoardSettings()
   {
-    final String[] userNames = ServerCommunication.getInstance().getAllUsers();
+    final String[] userNames = ServerCommunication.getInstance().getAllDisplayNames();
     final Map<String, Integer> scoreMap = new HashMap<>();
     for ( String username : userNames )
     {
       scoreMap.put( username, 0 );
     }
+    ServerCommunication.getInstance().lock.lock();
     String[][] history = ServerCommunication.getInstance().getScoreboard();
     if ( history != null )
     {
@@ -176,6 +177,7 @@ class Social extends JPanel
     }
     Collections.sort( scoreList, Comparator.comparing( Score::getScore ) );
     Collections.reverse( scoreList );
+    ServerCommunication.getInstance().lock.unlock();
     loadScoreBoard( scoreList, scoreBoardPanel, "overall" );
   }
 
@@ -250,12 +252,13 @@ class Social extends JPanel
 
   private static void loadWeeklyScoreBoardSettings()
   {
-    final String[] userNames = ServerCommunication.getInstance().getAllUsers();
+    final String[] userNames = ServerCommunication.getInstance().getAllDisplayNames();
     final Map<String, Integer> scoreMap = new HashMap<>();
     for ( String username : userNames )
     {
       scoreMap.put( username, 0 );
     }
+    ServerCommunication.getInstance().lock.lock();
     String[][] history = ServerCommunication.getInstance().getScoreboard();
     if ( history != null )
     {
@@ -310,6 +313,7 @@ class Social extends JPanel
     }
     Collections.sort( scoreList, Comparator.comparing( Score::getScore ) );
     Collections.reverse( scoreList );
+    ServerCommunication.getInstance().lock.unlock();
     loadScoreBoard( scoreList, weeklyScoreBoardPanel, "weekly" );
   }
 }

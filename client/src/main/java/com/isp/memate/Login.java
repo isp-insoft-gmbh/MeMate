@@ -476,7 +476,6 @@ public class Login extends JFrame
       Mainframe mainframe = Mainframe.getInstance();
       mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
       mainframe.addActionBar();
-      mainframe.setHelloLabel( currentUsername );
       mainframe.setVisible( true );
       ServerCommunication.getInstance().tellServerToSendDrinkInformations();
       ServerCommunication.getInstance().getBalance();
@@ -631,7 +630,6 @@ public class Login extends JFrame
               dispose();
               Mainframe mainframe = Mainframe.getInstance();
               mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
-              mainframe.setHelloLabel( currentUsername );
               mainframe.setVisible( true );
               ServerCommunication.getInstance().tellServerToSendDrinkInformations();
               ServerCommunication.getInstance().getBalance();

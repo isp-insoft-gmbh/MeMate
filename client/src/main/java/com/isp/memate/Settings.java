@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -65,6 +66,7 @@ class Settings extends JPanel
     addMeetingNotification();
     addConsumptionNotification();
     addChangePasswordHyperlink();
+    addChangeDisplayNameHyperlink();
     addFiller();
     MeMateUIManager.setUISettings();
   }
@@ -75,7 +77,7 @@ class Settings extends JPanel
     GridBagConstraints fillerConstraints = new GridBagConstraints();
     JLabel l = new JLabel();
     fillerConstraints.gridx = 0;
-    fillerConstraints.gridy = 11;
+    fillerConstraints.gridy = 12;
     fillerConstraints.weighty = 1;
     fillerConstraints.gridwidth = 10;
     fillerConstraints.anchor = GridBagConstraints.LINE_START;
@@ -112,6 +114,40 @@ class Settings extends JPanel
     GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
     hyperlinkConstraints.gridx = 0;
     hyperlinkConstraints.gridy = 10;
+    hyperlinkConstraints.anchor = GridBagConstraints.LINE_START;
+    hyperlinkConstraints.insets = new Insets( 30, 20, 0, 0 );
+    add( hyperlink, hyperlinkConstraints );
+  }
+
+  private void addChangeDisplayNameHyperlink()
+  {
+    JLabel hyperlink = MeMateUIManager.createJLabel();
+    hyperlink.setText( "Anzeigenamen ändern" );
+    hyperlink.setFont( hyperlink.getFont().deriveFont( 18f ) );
+    hyperlink.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+    hyperlink.addMouseListener( new MouseAdapter()
+    {
+      @Override
+      public void mouseClicked( MouseEvent e )
+      {
+        showDisplayNameChangeDialog();
+      }
+
+      @Override
+      public void mouseEntered( MouseEvent e )
+      {
+        hyperlink.setText( "<html><u>Anzeigenamen ändern</u></html>" );
+      }
+
+      @Override
+      public void mouseExited( MouseEvent e )
+      {
+        hyperlink.setText( "Anzeigenamen ändern" );
+      }
+    } );
+    GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
+    hyperlinkConstraints.gridx = 0;
+    hyperlinkConstraints.gridy = 11;
     hyperlinkConstraints.anchor = GridBagConstraints.LINE_START;
     hyperlinkConstraints.insets = new Insets( 30, 20, 0, 0 );
     add( hyperlink, hyperlinkConstraints );
@@ -274,6 +310,97 @@ class Settings extends JPanel
     changePasswordFrame
         .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
     changePasswordFrame.setVisible( true );
+  }
+
+  private void showDisplayNameChangeDialog()
+  {
+    JDialog changeDisplayNameFrame = new JDialog( Mainframe.getInstance(), "Anzeigenamen ändern", true );
+    JPanel changeDisplayNamePanel = new JPanel( new GridBagLayout() );
+    JLabel displayNamelabel = new JLabel( "Anzeigename:" );
+    JTextField displayNameField = new JTextField();
+    JButton saveDisplayNameButton = new JButton( "Speichern" );
+    JButton abortDisplayNameButton = new JButton( "Abbrechen" );
+
+    changeDisplayNameFrame.getRootPane().setDefaultButton( saveDisplayNameButton );
+
+    int prefHeight = displayNameField.getPreferredSize().height;
+    displayNameField.setPreferredSize( new Dimension( 100, prefHeight ) );
+
+    GridBagConstraints displayNamelabelConstraints = new GridBagConstraints();
+    displayNamelabelConstraints.gridx = 0;
+    displayNamelabelConstraints.gridy = 0;
+    displayNamelabelConstraints.insets = new Insets( 10, 0, 10, 0 );
+    displayNamelabelConstraints.anchor = GridBagConstraints.LINE_START;
+    changeDisplayNamePanel.add( displayNamelabel, displayNamelabelConstraints );
+    GridBagConstraints displayNameFieldConstraints = new GridBagConstraints();
+    displayNameFieldConstraints.gridx = 1;
+    displayNameFieldConstraints.gridy = 0;
+    displayNameFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
+    changeDisplayNamePanel.add( displayNameField, displayNameFieldConstraints );
+    JPanel buttonPanel = new JPanel( new FlowLayout() );
+    buttonPanel.add( saveDisplayNameButton );
+    buttonPanel.add( abortDisplayNameButton );
+    GridBagConstraints displayname_buttonpanelConstraints = new GridBagConstraints();
+    displayname_buttonpanelConstraints.gridx = 0;
+    displayname_buttonpanelConstraints.gridy = 1;
+    displayname_buttonpanelConstraints.gridwidth = 2;
+    changeDisplayNamePanel.add( buttonPanel, displayname_buttonpanelConstraints );
+
+
+    abortDisplayNameButton.addActionListener( new ActionListener()
+    {
+
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        changeDisplayNameFrame.dispose();
+      }
+    } );
+    saveDisplayNameButton.addActionListener( new ActionListener()
+    {
+
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        boolean isDisplayNameIncorrect = displayNameField.getText() == null || displayNameField.getText().length() == 0;
+
+        if ( isDisplayNameIncorrect )
+        {
+          JOptionPane.showMessageDialog( changeDisplayNameFrame, "Der Anzeigename darf nicht leer sein", "Anzeigenamen ändern",
+              JOptionPane.WARNING_MESSAGE );
+        }
+        else if ( displayNameField.getText().length() > 10 )
+        {
+          JOptionPane.showMessageDialog( changeDisplayNameFrame, "Der Anzeigename darf nicht länger als 10 Zeichen sein",
+              "Anzeigenamen ändern",
+              JOptionPane.WARNING_MESSAGE );
+        }
+        else
+        {
+          String displayName = displayNameField.getText();
+          int reply =
+              JOptionPane.showConfirmDialog( changeDisplayNameFrame, "Wollen Sie wirklich den neuen Anzeigenamen spechern?",
+                  "Anzeigenamen ändern",
+                  JOptionPane.INFORMATION_MESSAGE );
+          if ( reply == JOptionPane.YES_OPTION )
+          {
+            ServerCommunication.getInstance().changeDisplayName( displayName );
+            changeDisplayNameFrame.dispose();
+          }
+        }
+      }
+    } );
+
+
+    getRootPane().setDefaultButton( saveDisplayNameButton );
+    changeDisplayNameFrame.getContentPane().add( changeDisplayNamePanel );
+    changeDisplayNameFrame.pack();
+    changeDisplayNameFrame.setResizable( false );
+    changeDisplayNameFrame.setSize( changeDisplayNameFrame.getWidth() + 30, changeDisplayNameFrame.getHeight() + 20 );
+    changeDisplayNameFrame.setLocationRelativeTo( Settings.this );
+    changeDisplayNameFrame
+        .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+    changeDisplayNameFrame.setVisible( true );
   }
 
 

@@ -24,7 +24,7 @@ import com.isp.memate.util.MeMateUIManager;
  */
 class Main
 {
-  final static String version = "0.9.9.1";
+  final static String version = "0.9.9.2";
 
   /**
    * @param args unused

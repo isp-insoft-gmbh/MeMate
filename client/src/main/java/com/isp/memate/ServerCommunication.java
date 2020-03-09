@@ -64,9 +64,11 @@ class ServerCommunication
   private final Map<String, DrinkIngredients> IngredientsMap            = new HashMap<>();
   private static String                       version                   = "x";
   private String[]                            userArray                 = null;
+  private String[]                            displayNamesArray         = null;
   private User[]                              fullUserArray             = null;
   private Drink[]                             drinkArray                = null;
   String                                      currentUser               = null;
+  String                                      displayname               = null;
   private String[][]                          shortHistory              = null;
   private String[][]                          history;
   private String[][]                          scoreboard;
@@ -154,7 +156,7 @@ class ServerCommunication
               {
                 break;
               }
-              Mainframe.getInstance().setHelloLabel( username );
+              Mainframe.getInstance().setHelloLabel( displayname );
               tellServerToSendDrinkInformations();
               getBalance();
               break;
@@ -169,6 +171,14 @@ class ServerCommunication
               break;
             case GET_USERS_RESULT:
               userArray = shared.users;
+              break;
+            case GET_DISPLAYNAME:
+              displayname = shared.displayname;
+              Mainframe.getInstance().setHelloLabel( displayname );
+              break;
+            case GET_USERS_DISPLAYNAMES:
+              displayNamesArray = shared.displaynames;
+              break;
             case GET_FULLUSERS_RESULT:
               fullUserArray = shared.fullUserArray;
               break;
@@ -354,9 +364,11 @@ class ServerCommunication
     checkForChanges();
   }
 
-  private void updateScoreboard( String[][] history )
+  private void updateScoreboard( String[][] scoreboard )
   {
-    this.scoreboard = history;
+    lock.lock();
+    this.scoreboard = scoreboard;
+    lock.unlock();
   }
 
   ImageIcon getIcon( String name )
@@ -642,6 +654,7 @@ class ServerCommunication
       for ( int i = 0; i < historyArray.length; i++ )
       {
         historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 16 ).replace( "T", " " );
+        historyArray[ i ][ 1 ] = historyArray[ i ][ 6 ];
       }
     }
     return historyArray;
@@ -938,6 +951,11 @@ class ServerCommunication
     return userArray;
   }
 
+  public String[] getAllDisplayNames()
+  {
+    return displayNamesArray;
+  }
+
   /**
    * Teilt dem Server eine Passwortänderung mit.
    * 
@@ -966,6 +984,19 @@ class ServerCommunication
     catch ( IOException exception )
     {
       showErrorDialog( "Passwort ändern fehlgeschlagen.", "Passwort" );
+      ClientLog.newLog( exception.getMessage() );
+    }
+  }
+
+  public void changeDisplayName( String newDisplayName )
+  {
+    try
+    {
+      outStream.writeObject( new Shared( Operation.CHANGE_DISPLAYNAME, newDisplayName ) );
+    }
+    catch ( IOException exception )
+    {
+      showErrorDialog( "Anzeigenamen ändern fehlgeschlagen.", "Anzeigenamen" );
       ClientLog.newLog( exception.getMessage() );
     }
   }

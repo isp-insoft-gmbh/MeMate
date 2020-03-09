@@ -26,7 +26,7 @@ import com.isp.memate.Shared.Operation;
  */
 class SocketThread extends Thread
 {
-  private final String         version = "0.9.9.1";
+  private final String         version = "0.9.9.2";
   private ObjectOutputStream   objectOutputStream;
   private ObjectInputStream    objectInputStream;
   private String               currentSessionID;
@@ -169,6 +169,12 @@ class SocketThread extends Thread
               database.changePassword( shared.user.name, shared.user.password, true );
               break;
 
+            case CHANGE_DISPLAYNAME:
+              database.changeDisplayName( userIDMap.get( currentUser ), shared.displayname );
+              objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( currentUser ) ) );
+              sendHistoryData();
+              break;
+
             case CHANGE_PASSWORD_USER:
               database.changePassword( currentUser, shared.pass, false );
               break;
@@ -286,6 +292,14 @@ class SocketThread extends Thread
   {
     try
     {
+      objectOutputStream.writeObject( new Shared( Operation.GET_USERS_DISPLAYNAMES, database.getDisplayNames() ) );
+    }
+    catch ( IOException exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
+    }
+    try
+    {
       objectOutputStream.writeObject( new Shared( Operation.GET_HISTORY, database.getHistory( currentUser ) ) );
     }
     catch ( IOException exception )
@@ -318,6 +332,14 @@ class SocketThread extends Thread
     try
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_USERS_RESULT, database.getUser() ) );
+    }
+    catch ( IOException exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
+    }
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.GET_USERS_DISPLAYNAMES, database.getDisplayNames() ) );
     }
     catch ( IOException exception )
     {
@@ -425,6 +447,7 @@ class SocketThread extends Thread
     try
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_USERNAME_FOR_SESSION_ID_RESULT, username ) );
+      objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( username ) ) );
       ServerLog.newLog( logType.INFO, "Der Nutzer " + username + " gehört zu der SessionID " + sessionID );
     }
     catch ( IOException exception )
@@ -570,6 +593,7 @@ class SocketThread extends Thread
         currentUser = username;
         ServerLog.newLog( logType.INFO, username + " hat sich erfolgreich eingeloggt." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
+        objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( username ) ) );
         break;
 
       case USER_NOT_FOUND:
@@ -587,6 +611,7 @@ class SocketThread extends Thread
         ServerLog.newLog( logType.INFO,
             username + " hat sich erfolgreich eingeloggt, wird aber aufgefordert ein neues Passwort zu erstellen." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
+        objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( username ) ) );
         break;
     }
   }
