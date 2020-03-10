@@ -18,15 +18,43 @@ There are 4 core features:
 * Dashboard
   * You can buy all the Drinks that are currently available from here.
   * Adding balance to your account.
-  * Get some Informations about deposition.
+  * Get some informations about deposition and the ingredients of the beverages.
 
 * History
   * Displays every event that occurs in interaction with the application, 
 	whether someone consumed a drink or added balance to their account.
+  * Normal users can only see their own entries.
 
-* Drinkmanager
+* Drinkmanager (Admin only)
   * Allows management of the drink sortiment. (Pricing, names and pictures)
   * Already existing drinks can also be edited or removed.
+  
+Side Features:
+
+* Consumption rate
+  * Contains a graph showing the consumption of bottles per day during the last month.
+  * Calculates the average for bottles per day.
+  * Filter for drinks.
+  
+* Credit history
+  * Shows the credit history for the past month.
+
+* Weekly and overall scoreboard
+
+* Adminpanel
+  * Change the number of avaible drinks.
+  * Calculates for each drink when it probably will be empty.
+  * Reset userpasswords.
+  * Shows how much money is in the cash box and can be changed if necessary.
+  * Export user-, history- and drinkdate to xml-files.
+  
+* Settings
+  * Choose prefered color scheme.
+  * Toggle Darkmode.
+  * Toggle Notifications.
+  * Change password.
+  * Change display name.
+
 
 ## How to build
 
