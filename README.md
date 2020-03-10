@@ -33,8 +33,8 @@ Side Features:
 
 * Consumption rate
   * Contains a graph showing the consumption of bottles per day during the last month.
-  * calculates the average for bottles per day.
-  * filter for drinks.
+  * Calculates the average for bottles per day.
+  * Filter for drinks.
   
 * Credit history
   * Shows the credit history for the past month.
@@ -42,18 +42,18 @@ Side Features:
 * Weekly and overall scoreboard
 
 * Adminpanel
-  * change the number of avaible drinks.
-  * calculates for each drink when it probably will be empty.
-  * reset userpasswords.
-  * shows how much money is in the cash box and can be changed if necessary.
+  * Change the number of avaible drinks.
+  * Calculates for each drink when it probably will be empty.
+  * Reset userpasswords.
+  * Shows how much money is in the cash box and can be changed if necessary.
   * Export user-, history- and drinkdate to xml-files.
   
 * Settings
-  * choose prefered color scheme.
-  * toggle Darkmode.
-  * toggle Notifications.
-  * change password.
-  * change display name.
+  * Choose prefered color scheme.
+  * Toggle Darkmode.
+  * Toggle Notifications.
+  * Change password.
+  * Change display name.
 
 
 ## How to build
