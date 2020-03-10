@@ -82,6 +82,7 @@ class Mainframe extends JFrame
   private final JLabel           balanceLabel           = new JLabel();
   public final JPanel            headerPanel            = new JPanel();
   public JPanel                  burgerButton;
+  private MeMateActionBarButton  dashboardButton;
   private MeMateActionBarButton  logoutButton;
   public MeMateActionBarButton   settingsButton;
   private MeMateActionBarButton  undoButton;
@@ -155,6 +156,7 @@ class Mainframe extends JFrame
     addLogoutButton();
 
     bar.selectButton( "Dashboard" );
+    dashboardButton.getRunnable().run();
     try
     {
       File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
@@ -201,7 +203,7 @@ class Mainframe extends JFrame
 
   private void addDefaultButtons()
   {
-    bar.addActionButton( dashboardIconBlack, dashboardIconWhite, "Dashboard", "Dashboard öffnen", color, new Runnable()
+    dashboardButton = bar.addActionButton( dashboardIconBlack, dashboardIconWhite, "Dashboard", "Dashboard öffnen", color, new Runnable()
     {
       public void run()
       {

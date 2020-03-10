@@ -62,7 +62,7 @@ class ServerCommunication
   private final Map<String, Integer>          drinkIDMap                = new HashMap<>();
   private final Map<String, Boolean>          drinkIngredientsMap       = new HashMap<>();
   private final Map<String, DrinkIngredients> IngredientsMap            = new HashMap<>();
-  private static String                       version                   = "x";
+  private static String                       version                   = "couldn't get serverversion";
   private String[]                            userArray                 = null;
   private String[]                            displayNamesArray         = null;
   private User[]                              fullUserArray             = null;

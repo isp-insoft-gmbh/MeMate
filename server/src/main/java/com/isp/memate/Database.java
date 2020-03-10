@@ -151,7 +151,7 @@ class Database
         + "username string UNIQUE NOT NULL,"
         + "password string NOT NULL,"
         + "requestNewPassword boolean DEFAULT (false),"
-        + "DisplayName string UNIQUE NOT NULL"
+        + "DisplayName string UNIQUE"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
