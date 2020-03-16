@@ -14,6 +14,10 @@
 		<module>shared</module>
 	</modules>
 
+	<properties>
+		<main.basedir>${project.basedir}</main.basedir>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -30,46 +34,6 @@
 							<files>
 								<file>version.properties</file>
 							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<id>copy-version.properties_toClient</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/client/src/main/resources</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<include>version.properties</include>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-version.properties_toServer</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/server/src/main/resources</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<include>version.properties</include>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
 						</configuration>
 					</execution>
 				</executions>

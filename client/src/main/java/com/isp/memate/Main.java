@@ -18,7 +18,7 @@ import com.isp.memate.util.MeMateUIManager;
 /**
  * Die Mainklasse setzt das Look and Feel und öffnet den LoginFrame, wenn es keine SessionID gibt oder sie
  * abgelaufen ist.
- * 
+ *
  * @author nwe
  * @since 15.10.2019
  */
@@ -28,41 +28,40 @@ class Main
 
   /**
    * @param args unused
+   *
+   * @throws UnsupportedLookAndFeelException bei fehlerhafter Look&Feel Initialisierung
+   * @throws IllegalAccessException bei fehlerhafter Look&Feel Initialisierung
+   * @throws InstantiationException bei fehlerhafter Look&Feel Initialisierung
+   * @throws ClassNotFoundException bei fehlerhafter Look&Feel Initialisierung
    */
-  public static void main( String[] args )
+  public static void main( final String[] args )
+      throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
   {
-    try
-    {
-      UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-      UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0, 0 ) );
-      UIManager.put( "DefaultBrightColor", Color.white );
-      ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
-    }
-    catch ( ClassNotFoundException | InstantiationException | IllegalAccessException
-        | UnsupportedLookAndFeelException exception )
-    {
-      ClientLog.newLog( exception.getMessage() );
-    }
+    UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+    UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0 ) );
+    UIManager.put( "DefaultBrightColor", Color.white );
+    ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
+
     setVersion();
     installColors();
     installColorKeys();
 
     String sessionID = null;
     String darkmode = null;
-    File meMateFolder = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" );
-    File userPropFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-    File clientLogFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "ClientLog.log" );
+    final File meMateFolder = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" );
+    final File userPropFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+    final File clientLogFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "ClientLog.log" );
 
     createPropFile( meMateFolder, userPropFile, clientLogFile );
     try ( InputStream input =
         new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
     {
-      Properties userProperties = new Properties();
+      final Properties userProperties = new Properties();
       userProperties.load( input );
       sessionID = userProperties.getProperty( "SessionID" );
       darkmode = userProperties.getProperty( "Darkmode" );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
       ClientLog.newLog( exception.getMessage() );
@@ -78,7 +77,7 @@ class Main
     if ( sessionID == null || sessionID.equals( "null" ) )
     {
       ServerCommunication.getInstance().tellServertoSendVersionNumber();
-      Login login = Login.getInstance();
+      final Login login = Login.getInstance();
       MeMateUIManager.setUISettings();
       login.setVisible( true );
       ServerCommunication.getInstance().checkVersion( version );
@@ -87,11 +86,11 @@ class Main
     {
       ServerCommunication.getInstance().checkLoginForSessionID( sessionID );
       ServerCommunication.getInstance().tellServertoSendVersionNumber();
-      Mainframe mainframe = Mainframe.getInstance();
+      final Mainframe mainframe = Mainframe.getInstance();
       if ( ServerCommunication.getInstance().currentUser == null )
       {
         ClientLog.newLog( "Es wurde kein Nutzer für die angegeben Session gefunden." );
-        Login login = Login.getInstance();
+        final Login login = Login.getInstance();
         MeMateUIManager.setUISettings();
         login.setVisible( true );
         ServerCommunication.getInstance().checkVersion( version );
@@ -114,11 +113,11 @@ class Main
   {
     try ( InputStream input = Main.class.getClassLoader().getResourceAsStream( "version.properties" ) )
     {
-      Properties versionProperties = new Properties();
+      final Properties versionProperties = new Properties();
       versionProperties.load( input );
       version = versionProperties.getProperty( "build_version" );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die version.properties konnten nicht geladen werden" );
       ClientLog.newLog( exception.getMessage() );
@@ -135,11 +134,11 @@ class Main
     try ( InputStream input =
         new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
     {
-      Properties userProperties = new Properties();
+      final Properties userProperties = new Properties();
       userProperties.load( input );
       color = userProperties.getProperty( "colorScheme" );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
       ClientLog.newLog( exception.getMessage() );
@@ -177,7 +176,7 @@ class Main
     }
   }
 
-  private static void putColorsInUIManager( Color appColor, Color background, Color background2, Color actionbar )
+  private static void putColorsInUIManager( final Color appColor, final Color background, final Color background2, final Color actionbar )
   {
     UIManager.put( "AppColor", appColor );
     UIManager.put( "App.Background", background );
@@ -187,11 +186,11 @@ class Main
 
   /**
    * Erstellt den MaMate Ordner unter AppData und die Userconfig File.
-   * 
+   *
    * @param meMateFolder
    * @param userPropFile
    */
-  private static void createPropFile( File meMateFolder, File userPropFile, File log )
+  private static void createPropFile( final File meMateFolder, final File userPropFile, final File log )
   {
     try
     {
@@ -199,7 +198,7 @@ class Main
       userPropFile.createNewFile();
       log.createNewFile();
     }
-    catch ( IOException exception1 )
+    catch ( final IOException exception1 )
     {
       ClientLog.newLog( "Die userconfig-Properties konnten nicht erstellt werden." );
       ClientLog.newLog( exception1.getMessage() );
