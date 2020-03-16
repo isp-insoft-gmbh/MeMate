@@ -5,11 +5,13 @@ package com.isp.memate;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Properties;
 
 import com.isp.memate.ServerLog.logType;
 import com.isp.memate.Shared.LoginResult;
@@ -26,7 +28,7 @@ import com.isp.memate.Shared.Operation;
  */
 class SocketThread extends Thread
 {
-  private final String         version = "0.9.9.2";
+  private String               version = "unkown";
   private ObjectOutputStream   objectOutputStream;
   private ObjectInputStream    objectInputStream;
   private String               currentSessionID;
@@ -46,9 +48,26 @@ class SocketThread extends Thread
    */
   SocketThread( Socket clientSocket, Database dataBase )
   {
+    setVersion();
     this.socket = clientSocket;
     this.database = dataBase;
     userIDMap = database.getUserIDMap();
+  }
+
+  private void setVersion()
+  {
+    try ( InputStream input = SocketThread.class.getClassLoader().getResourceAsStream( "version.properties" ) )
+    {
+      Properties versionProperties = new Properties();
+      versionProperties.load( input );
+      version = versionProperties.getProperty( "build_version" );
+    }
+    catch ( Exception exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Die version.properties konnten nicht geladen werden" );
+      ServerLog.newLog( logType.ERROR, exception.getMessage() );
+    }
+    System.out.println( version );
   }
 
   /**

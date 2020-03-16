@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.isp.memate</groupId>
-	<version>1.0</version>
+	<version>0.9.9.2</version>
 	<artifactId>client</artifactId>
 	<name>MeMate Client</name>
 	<packaging>jar</packaging>
@@ -39,6 +39,24 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${basedir}/src/main/resources/version.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>com.akathist.maven.plugins.launch4j</groupId>
 				<artifactId>launch4j-maven-plugin</artifactId>
 				<version>1.7.25</version>
@@ -52,7 +70,7 @@
 						<configuration>
 							<headerType>gui</headerType>
 							<jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
-							<outfile>${project.build.directory}/MeMateClient${project.version}.exe</outfile>
+							<outfile>${project.build.directory}/memate.exe</outfile>
 							<classPath>
 								<mainClass>com.isp.memate.Main</mainClass>
 								<preCp>anything</preCp>
@@ -61,20 +79,20 @@
 							<jre>
 								<minVersion>1.8.0_0</minVersion>
 								<maxVersion>1.8.0_999</maxVersion>
-								<path>jre</path>
+								<path>${jre_FolderName_Win64}</path>
 								<jdkPreference>preferJre</jdkPreference>
 							</jre>
 							<versionInfo>
-								<fileVersion>${project.version}.0.0</fileVersion>
-								<txtFileVersion>${project.version}</txtFileVersion>
+								<fileVersion>${build_version}</fileVersion>
+								<txtFileVersion>${build_version}</txtFileVersion>
 								<fileDescription>MeMate Client</fileDescription>
 								<copyright>ISP Insoft 2020</copyright>
-								<productVersion>${project.version}.0.0</productVersion>
-								<txtProductVersion>${project.version}</txtProductVersion>
+								<productVersion>${build_version}</productVersion>
+								<txtProductVersion>${build_version}</txtProductVersion>
 								<productName>MeMate</productName>
 								<companyName>Isp Insoft GmbH</companyName>
 								<internalName>MeMate</internalName>
-								<originalFilename>MeMateClient${project.version}.exe</originalFilename>
+								<originalFilename>MeMateClient.exe</originalFilename>
 								<language>GERMAN</language>
 							</versionInfo>
 						</configuration>
@@ -82,23 +100,21 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.1.0</version>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.5.0</version>
 				<executions>
 					<execution>
-						<id>copy-resources</id>
-						<!-- here the phase you need -->
+						<id>install-jbpm</id>
 						<phase>package</phase>
 						<goals>
-							<goal>copy-resources</goal>
+							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/jre</outputDirectory>
-							<resources>
-								<resource>
-									<directory>jre</directory>
-								</resource>
-							</resources>
+							<url>${jre_URL_Win64}</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<sha256>${jre_SHA256_Signature_Win64}</sha256>
 						</configuration>
 					</execution>
 				</executions>
@@ -128,6 +144,11 @@
 			<groupId>com.google.collections</groupId>
 			<artifactId>google-collections</artifactId>
 			<version>1.0-rc2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-model</artifactId>
+			<version>3.3.9</version>
 		</dependency>
 
 	</dependencies>

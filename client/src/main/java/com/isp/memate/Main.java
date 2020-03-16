@@ -24,7 +24,7 @@ import com.isp.memate.util.MeMateUIManager;
  */
 class Main
 {
-  final static String version = "0.9.9.2";
+  static String version = "unknown";
 
   /**
    * @param args unused
@@ -43,6 +43,7 @@ class Main
     {
       ClientLog.newLog( exception.getMessage() );
     }
+    setVersion();
     installColors();
     installColorKeys();
 
@@ -107,6 +108,22 @@ class Main
         MeMateUIManager.setUISettings();
       }
     }
+  }
+
+  private static void setVersion()
+  {
+    try ( InputStream input = Main.class.getClassLoader().getResourceAsStream( "version.properties" ) )
+    {
+      Properties versionProperties = new Properties();
+      versionProperties.load( input );
+      version = versionProperties.getProperty( "build_version" );
+    }
+    catch ( Exception exception )
+    {
+      ClientLog.newLog( "Die version.properties konnten nicht geladen werden" );
+      ClientLog.newLog( exception.getMessage() );
+    }
+    System.out.println( version );
   }
 
   /**

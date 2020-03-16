@@ -54,6 +54,7 @@ class ServerCommunication
 {
   private static final ServerCommunication    instance                  = new ServerCommunication();
   final ReentrantLock                         lock                      = new ReentrantLock( true );
+  private ArrayList<String>                   alreadyShownNotifications = new ArrayList<>();
   private final ArrayList<Byte>               byteImageList             = new ArrayList<>();
   private final List<String>                  drinkNames                = new ArrayList<>();
   private final Map<String, Float>            priceMap                  = new HashMap<>();
@@ -67,16 +68,15 @@ class ServerCommunication
   private String[]                            displayNamesArray         = null;
   private User[]                              fullUserArray             = null;
   private Drink[]                             drinkArray                = null;
-  String                                      currentUser               = null;
-  String                                      displayname               = null;
+  private String                              displayname               = null;
   private String[][]                          shortHistory              = null;
+  String                                      currentUser               = null;
   private String[][]                          history;
   private String[][]                          scoreboard;
   private Float                               piggyBankBalance;
   private Socket                              socket;
   private ObjectInputStream                   inStream;
   private ObjectOutputStream                  outStream;
-  private ArrayList<String>                   alreadyShownNotifications = new ArrayList<>();
 
 
   /**
