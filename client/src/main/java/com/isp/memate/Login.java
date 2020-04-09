@@ -3,6 +3,10 @@
  */
 package com.isp.memate;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,7 +14,22 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
+import java.util.UUID;
 
+import javax.swing.FocusManager;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -18,14 +37,21 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
+import com.isp.memate.Shared.LoginResult;
+import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
 
 /**
- * 
  * Im LoginFrame kann der Benutzer sich registrieren oder wenn er bereits ein Konto besitzt, sich
  * einloggen. Außerdem besteht die Möglichkeit angemeldet zu bleiben.
  * 
@@ -34,27 +60,43 @@ import com.isp.memate.util.SwingUtil;
  */
 public class Login extends JFrame
 {
-  private final JPanel         loginPanel           = new JPanel( new GridBagLayout() );
-  private final JLabel         headerLabel          = new JLabel( "Willkommen bei MeMate" );
-  private final JLabel         usernameLabel        = new JLabel( "Benutzername" );
-  private final JLabel         passwordLabel        = new JLabel( "Passwort" );
-  private final JLabel         orLabel              = new JLabel( "oder" );
-  private final JLabel         stayLoggedInLabel    = new JLabel( "Eingeloggt bleiben" );
-  private final JTextField     usernameTextField    = new JTextField();
-  private final JPasswordField passwordField        = new JPasswordField();
-  private final JButton        loginButton          = new JButton( "Anmelden" );
-  private final JButton        registerButton       = new JButton( "Registrieren" );
-  private final JCheckBox      stayLoggedInCheckBox = new JCheckBox();
+  private static final Login   instance                = new Login();
+  private final Font           LABEL_FONT              = UIManager.getFont( "Label.font" ).deriveFont( 15f );
+  private final JButton        loginButton             = MeMateUIManager.createNormalButton( "button" );
+  private final JLabel         headerLabel             =
+      new JLabel( new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
+  private final JCheckBox      stayLoggedInCheckBox    = MeMateUIManager.createCheckbox();
+  private final JTextPane      registerHyperLink       = MeMateUIManager.createTextPane();
+  private final JTextPane      forgotPasswordHyperLink = MeMateUIManager.createTextPane();
+  private final JPanel         loginPanel              = MeMateUIManager.createJPanel();
+  private final JLabel         usernameLabel           = MeMateUIManager.createJLabel();
+  private final JLabel         passwordLabel           = MeMateUIManager.createJLabel();
+  private final JLabel         stayLoggedInLabel       = MeMateUIManager.createJLabel();
+  private final JPasswordField passwordField           = new JPasswordField();
+  private final JTextField     usernameTextField       = new JTextField();
+  private static String        currentUsername;
 
-  private final Font LABEL_FONT = UIManager.getFont( "Label.font" ).deriveFont( 15f );
+  /**
+   * @return static instance of Login
+   */
+  public static Login getInstance()
+  {
+    return instance;
+  }
 
   /**
    * Passt Schriftgrößen, Borders und Größen an. Außerdem werden die
-   * Komponenten gelayoutet und ActionListener werden hinzugefügt
+   * Komponenten gelayoutet und ActionListener für Login
+   * und Registrieren werden hinzugefügt.
    */
   public Login()
   {
-    setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "memateicon.png" ) ) );
+    loginPanel.setLayout( new GridBagLayout() );
+    loginButton.setText( "Anmelden" );
+    passwordLabel.setText( "Passwort" );
+    usernameLabel.setText( "Benutzername" );
+    stayLoggedInLabel.setText( "Eingeloggt bleiben" );
+    setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
     setTitle( "MeMate" );
     deriveFonts();
     setBordersAndPreferredSize();
@@ -67,48 +109,254 @@ public class Login extends JFrame
     setLocationRelativeTo( null );
   }
 
+  /**
+   * Enthält die Logik, für das Einloggen und Registrieren von Nutzern.
+   */
   private void addActionListener()
   {
-    loginButton.addActionListener( new ActionListener()
+    loginButton.addActionListener( __ ->
     {
-      public void actionPerformed( ActionEvent e )
+      if ( usernameTextField.getText().isEmpty() )
       {
-        dispose();
-        Mainframe mainframe = new Mainframe();
-        mainframe.setVisible( true );
-        // TODO implement Login
+        JOptionPane.showMessageDialog( loginPanel, "Benutzername darf nicht leer sein.", "Login fehlgeschlagen",
+            JOptionPane.WARNING_MESSAGE, null );
+        return;
+      }
+      else if ( passwordField.getPassword().length == 0 )
+      {
+        JOptionPane.showMessageDialog( loginPanel, "Passwort darf nicht leer sein.", "Login fehlgeschlagen",
+            JOptionPane.WARNING_MESSAGE, null );
+        return;
+      }
+      else
+      {
+        currentUsername = usernameTextField.getText();
+        LoginInformation login =
+            new LoginInformation( usernameTextField.getText(), getHash( String.valueOf( passwordField.getPassword() ) ) );
+        ServerCommunication.getInstance().checkLogin( login );
       }
     } );
-    registerButton.addActionListener( new ActionListener()
+    getRootPane().setDefaultButton( loginButton );
+
+    forgotPasswordHyperLink.addMouseListener( new MouseAdapter()
     {
-      public void actionPerformed( ActionEvent __ )
+      @Override
+      public void mouseClicked( MouseEvent e )
       {
-        if ( isPasswordOrUserNameIncorrect() )
+        JOptionPane.showMessageDialog( Login.this, "Bitte kontaktieren Sie ihren Admin.", "Passwort vergessen", JOptionPane.WARNING_MESSAGE,
+            null );
+      }
+    } );
+
+    registerHyperLink.addMouseListener( new MouseAdapter()
+    {
+      @Override
+      public void mouseClicked( MouseEvent e )
+      {
+        JFrame registrationFrame = new JFrame( "Konto erstellen" );
+        JPanel registrationPanel = new JPanel( new GridBagLayout() );
+        JLabel reg_usernamelabel = new JLabel( "Benutzername:" );
+        JLabel reg_passwordlabel = new JLabel( "Passwort:" );
+        JLabel reg_password2label = new JLabel( "Passwort wiederholen:" );
+        JLabel passwordCompareLabel = new JLabel();
+        JTextField reg_usernameTextField = new JTextField();
+        JPasswordField reg_passwordField = new JPasswordField();
+        JPasswordField reg_password2Field = new JPasswordField();
+        JButton reg_registrationButton = new JButton( "Registrieren" );
+        JButton reg_abortButton = new JButton( "Abbrechen" );
+
+        registrationFrame.getRootPane().setDefaultButton( reg_registrationButton );
+
+        int prefHeight = reg_usernameTextField.getPreferredSize().height;
+        reg_usernameTextField.setPreferredSize( new Dimension( 200, prefHeight ) );
+        reg_passwordField.setPreferredSize( new Dimension( 200, prefHeight ) );
+        reg_password2Field.setPreferredSize( new Dimension( 200, prefHeight ) );
+        passwordCompareLabel.setPreferredSize( new Dimension( 200, prefHeight ) );
+
+        GridBagConstraints reg_usernameLabelConstraints = new GridBagConstraints();
+        reg_usernameLabelConstraints.gridx = 0;
+        reg_usernameLabelConstraints.gridy = 0;
+        reg_usernameLabelConstraints.anchor = GridBagConstraints.LINE_START;
+        registrationPanel.add( reg_usernamelabel, reg_usernameLabelConstraints );
+        GridBagConstraints reg_usernameTextFieldConstraints = new GridBagConstraints();
+        reg_usernameTextFieldConstraints.gridx = 1;
+        reg_usernameTextFieldConstraints.gridy = 0;
+        reg_usernameTextFieldConstraints.insets = new Insets( 0, 5, 0, 0 );
+        registrationPanel.add( reg_usernameTextField, reg_usernameTextFieldConstraints );
+        GridBagConstraints reg_passwordlabelConstraints = new GridBagConstraints();
+        reg_passwordlabelConstraints.gridx = 0;
+        reg_passwordlabelConstraints.gridy = 1;
+        reg_passwordlabelConstraints.insets = new Insets( 10, 0, 10, 0 );
+        reg_passwordlabelConstraints.anchor = GridBagConstraints.LINE_START;
+        registrationPanel.add( reg_passwordlabel, reg_passwordlabelConstraints );
+        GridBagConstraints reg_passwordFieldConstraints = new GridBagConstraints();
+        reg_passwordFieldConstraints.gridx = 1;
+        reg_passwordFieldConstraints.gridy = 1;
+        reg_passwordFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
+        registrationPanel.add( reg_passwordField, reg_passwordFieldConstraints );
+        GridBagConstraints reg_password2labelConstraints = new GridBagConstraints();
+        reg_password2labelConstraints.gridx = 0;
+        reg_password2labelConstraints.gridy = 2;
+        reg_password2labelConstraints.insets = new Insets( 0, 0, 10, 0 );
+        reg_password2labelConstraints.anchor = GridBagConstraints.LINE_START;
+        registrationPanel.add( reg_password2label, reg_password2labelConstraints );
+        GridBagConstraints reg_password2FieldConstraints = new GridBagConstraints();
+        reg_password2FieldConstraints.gridx = 1;
+        reg_password2FieldConstraints.gridy = 2;
+        reg_password2FieldConstraints.insets = new Insets( 0, 5, 5, 0 );
+        registrationPanel.add( reg_password2Field, reg_password2FieldConstraints );
+        GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
+        passwordCompareLabelConstraints.gridx = 1;
+        passwordCompareLabelConstraints.gridy = 3;
+        passwordCompareLabelConstraints.anchor = GridBagConstraints.LINE_START;
+        passwordCompareLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
+        registrationPanel.add( passwordCompareLabel, passwordCompareLabelConstraints );
+        JPanel buttonPanel = new JPanel( new FlowLayout() );
+        buttonPanel.add( reg_registrationButton );
+        buttonPanel.add( reg_abortButton );
+        GridBagConstraints reg_buttonpanelConstraints = new GridBagConstraints();
+        reg_buttonpanelConstraints.gridx = 0;
+        reg_buttonpanelConstraints.gridy = 4;
+        reg_buttonpanelConstraints.gridwidth = 2;
+        registrationPanel.add( buttonPanel, reg_buttonpanelConstraints );
+
+        Color green = new Color( 33, 122, 34 );
+        DocumentListener documentListener = new DocumentListener()
         {
-          JOptionPane.showMessageDialog( Login.this, "Passwort oder Benutzername sind nicht zulässig", "Registrieren",
-              JOptionPane.WARNING_MESSAGE );
-        }
-        else
-        {
-          //String username = usernameTextField.getText();
-          //char[] password = passwordField.getPassword();
-          int reply =
-              JOptionPane.showConfirmDialog( Login.this, "Wollen Sie wirklich einen neuen Benutzer anlegen?", "Registrieren",
-                  JOptionPane.INFORMATION_MESSAGE );
-          if ( reply == JOptionPane.YES_OPTION )
+
+          @Override
+          public void removeUpdate( DocumentEvent e )
           {
-            //TODO implement new User 
+            compare();
           }
-        }
+
+          @Override
+          public void insertUpdate( DocumentEvent e )
+          {
+            compare();
+          }
+
+          @Override
+          public void changedUpdate( DocumentEvent e )
+          {
+          }
+
+          private void compare()
+          {
+            if ( reg_passwordField.getPassword() == null
+                || reg_passwordField.getPassword().length == 0
+                || reg_password2Field.getPassword() == null
+                || reg_password2Field.getPassword().length == 0 )
+            {
+              passwordCompareLabel.setText( "" );
+              passwordCompareLabel.setForeground( Color.black );
+            }
+            else
+            {
+              if ( String.valueOf( reg_passwordField.getPassword() ).equals( String.valueOf( reg_password2Field.getPassword() ) ) )
+              {
+                passwordCompareLabel.setText( "Die Passwörter stimmen überein." );
+                passwordCompareLabel.setForeground( green );
+              }
+              else
+              {
+                passwordCompareLabel.setText( "Die Passwörter stimmen nicht überein." );
+                passwordCompareLabel.setForeground( Color.red );
+              }
+            }
+          }
+        };
+        reg_password2Field.getDocument().addDocumentListener( documentListener );
+        reg_passwordField.getDocument().addDocumentListener( documentListener );
+
+        getRootPane().setDefaultButton( reg_registrationButton );
+        registrationFrame.add( registrationPanel );
+        registrationFrame.pack();
+        registrationFrame.setResizable( false );
+        registrationFrame.setSize( registrationFrame.getWidth() + 30, registrationFrame.getHeight() + 20 );
+        registrationFrame.setLocationRelativeTo( Login.this );
+        registrationFrame
+            .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+        registrationFrame.setVisible( true );
+
+        reg_abortButton.addActionListener( new ActionListener()
+        {
+          @Override
+          public void actionPerformed( ActionEvent e )
+          {
+            registrationFrame.dispose();
+            getRootPane().setDefaultButton( loginButton );
+          }
+        } );
+
+        reg_registrationButton.addActionListener( new ActionListener()
+        {
+          @Override
+          public void actionPerformed( ActionEvent e )
+          {
+            boolean isPasswordOrUserNameIncorrect = reg_passwordField.getPassword() == null || reg_passwordField.getPassword().length == 0
+                || reg_password2Field.getPassword() == null || reg_password2Field.getPassword().length == 0
+                || reg_usernameTextField.getText() == null || reg_usernameTextField.getText().isEmpty()
+                || reg_usernameTextField.getText().trim().length() == 0;
+
+            if ( isPasswordOrUserNameIncorrect )
+            {
+              JOptionPane.showMessageDialog( registrationFrame, "Passwort oder Benutzername sind nicht zulässig.", "Registrieren",
+                  JOptionPane.WARNING_MESSAGE );
+            }
+            else if ( !String.valueOf( reg_passwordField.getPassword() ).equals( String.valueOf( reg_password2Field.getPassword() ) ) )
+            {
+              JOptionPane.showMessageDialog( registrationFrame, "Die Passwörter stimmen nicht überein.", "Registrieren",
+                  JOptionPane.WARNING_MESSAGE );
+            }
+            else
+            {
+              String username = reg_usernameTextField.getText();
+              char[] password = reg_passwordField.getPassword();
+              int reply =
+                  JOptionPane.showConfirmDialog( registrationFrame, "Wollen Sie wirklich einen neuen Benutzer anlegen?", "Registrieren",
+                      JOptionPane.INFORMATION_MESSAGE );
+              if ( reply == JOptionPane.YES_OPTION )
+              {
+                ServerCommunication.getInstance().registerNewUser( username, getHash( String.valueOf( password ) ) );
+                registrationFrame.dispose();
+                getRootPane().setDefaultButton( loginButton );
+                currentUsername = username;
+                LoginInformation login =
+                    new LoginInformation( reg_usernameTextField.getText(), getHash( String.valueOf( reg_passwordField.getPassword() ) ) );
+                ServerCommunication.getInstance().checkLogin( login );
+              }
+            }
+          }
+        } );
       }
     } );
   }
 
 
-  private boolean isPasswordOrUserNameIncorrect()
+  /**
+   * Das eingebene Passwort wird gehasht.
+   * 
+   * @param input eingebenes Passwort
+   * @return gehashtes Passwort
+   */
+  String getHash( String input )
   {
-    return passwordField.getPassword() == null || passwordField.getPassword().length == 0
-        || usernameTextField.getText() == null || usernameTextField.getText().isEmpty();
+    try
+    {
+      MessageDigest passwordHasher = MessageDigest.getInstance( "SHA-256" );
+      byte[] hashedPasswordArray = passwordHasher.digest( input.getBytes( StandardCharsets.UTF_8 ) );
+      StringBuilder asString = new StringBuilder( hashedPasswordArray.length * 2 );
+      for ( byte b : hashedPasswordArray )
+      {
+        asString.append( Integer.toHexString( b & 0xff ) );
+      }
+      return asString.toString().toUpperCase();
+    }
+    catch ( NoSuchAlgorithmException exception )
+    {
+      throw new RuntimeException( exception );
+    }
   }
 
   private void layoutComponents()
@@ -160,24 +408,31 @@ public class Login extends JFrame
     loginButtonConstraints.gridy = 4;
     loginButtonConstraints.gridwidth = 6;
     loginButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
-    loginButtonConstraints.insets = new Insets( 5, 0, 3, 0 );
+    loginButtonConstraints.insets = new Insets( 5, 0, 10, 0 );
     loginPanel.add( loginButton, loginButtonConstraints );
 
-    GridBagConstraints orLabelConstraints = new GridBagConstraints();
-    orLabelConstraints.gridx = 0;
-    orLabelConstraints.gridy = 5;
-    orLabelConstraints.gridwidth = 6;
-    loginPanel.add( orLabel, orLabelConstraints );
+    GridBagConstraints registrierenHyperlinkConstraints = new GridBagConstraints();
+    registrierenHyperlinkConstraints.gridx = 5;
+    registrierenHyperlinkConstraints.gridy = 6;
+    registrierenHyperlinkConstraints.fill = GridBagConstraints.HORIZONTAL;
+    registrierenHyperlinkConstraints.insets = new Insets( 0, 85, 0, 0 );
+    loginPanel.add( registerHyperLink, registrierenHyperlinkConstraints );
 
-    GridBagConstraints registrierenButtonConstraints = new GridBagConstraints();
-    registrierenButtonConstraints.gridx = 0;
-    registrierenButtonConstraints.gridy = 6;
-    registrierenButtonConstraints.gridwidth = 6;
-    registrierenButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
-    registrierenButtonConstraints.insets = new Insets( 3, 0, 5, 0 );
-    loginPanel.add( registerButton, registrierenButtonConstraints );
+    GridBagConstraints forgotPasswordHyperlinkConstraints = new GridBagConstraints();
+    forgotPasswordHyperlinkConstraints.gridx = 5;
+    forgotPasswordHyperlinkConstraints.gridy = 3;
+    forgotPasswordHyperlinkConstraints.anchor = GridBagConstraints.LINE_END;
+    loginPanel.add( forgotPasswordHyperLink, forgotPasswordHyperlinkConstraints );
+
+    GridBagConstraints seperatorConstraints = new GridBagConstraints();
+    seperatorConstraints.gridx = 0;
+    seperatorConstraints.gridy = 5;
+    seperatorConstraints.gridwidth = 6;
+    seperatorConstraints.fill = GridBagConstraints.HORIZONTAL;
+    loginPanel.add( new JSeparator( SwingConstants.HORIZONTAL ), seperatorConstraints );
 
     add( loginPanel );
+    MeMateUIManager.registerPanel( "default", loginPanel );
   }
 
   private void setBordersAndPreferredSize()
@@ -190,10 +445,296 @@ public class Login extends JFrame
 
   private void deriveFonts()
   {
-    Font headerLabelFont = headerLabel.getFont();
-    headerLabel.setFont( new Font( "Comic Sans MS", headerLabelFont.getStyle(), (int) (headerLabelFont.getSize() * 3f) ) );
+    String fontName = LABEL_FONT.getFontName();
     usernameLabel.setFont( LABEL_FONT );
     passwordLabel.setFont( LABEL_FONT );
     stayLoggedInLabel.setFont( LABEL_FONT );
+    registerHyperLink.setEditable( false );
+    registerHyperLink.setContentType( "text/html" );
+    registerHyperLink.setText( "<html><font color=blue><font face='" + fontName + "'><a href>Konto erstellen</a></font></font></html>" );
+    registerHyperLink.setBackground( loginPanel.getBackground() );
+    forgotPasswordHyperLink.setEditable( false );
+    forgotPasswordHyperLink.setContentType( "text/html" );
+    forgotPasswordHyperLink
+        .setText( "<html><font color=blue><font face='" + fontName + "'><a href>Passwort vergessen ?</a></font></font></html>" );
+    forgotPasswordHyperLink.setBackground( loginPanel.getBackground() );
+  }
+
+  /**
+   * Der Antwort des Servers auf die Loginabfrage wird validiert.
+   * 
+   * @param loginResult Antwort des Servers
+   */
+  void validateLoginResult( LoginResult loginResult )
+  {
+    if ( loginResult == LoginResult.LOGIN_SUCCESSFULL )
+    {
+      ServerCommunication.getInstance().startDrinkInfoTimer();
+      ServerCommunication.getInstance().updateCurrentUser( currentUsername );
+      generateSessionID( currentUsername );
+      dispose();
+      Mainframe mainframe = Mainframe.getInstance();
+      mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
+      mainframe.addActionBar();
+      mainframe.setVisible( true );
+      ServerCommunication.getInstance().tellServerToSendDrinkInformations();
+      ServerCommunication.getInstance().getBalance();
+      ServerCommunication.getInstance().tellServerToSendHistoryData();
+      mainframe.requestFocus();
+    }
+    else if ( loginResult == LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD )
+    {
+      JFrame changePasswordFrame = new JFrame( "Passwort ändern" );
+      JPanel changePasswordPanel = new JPanel( new GridBagLayout() );
+      JLabel passwordlabel = new JLabel( "Passwort:" );
+      JLabel password2label = new JLabel( "Passwort wiederholen:" );
+      JLabel passwordCompareLabel = new JLabel();
+      JPasswordField passwordField = new JPasswordField();
+      JPasswordField password2Field = new JPasswordField();
+      JButton savePasswordButton = new JButton( "Speichern" );
+      JButton pass_abortButton = new JButton( "Abbrechen" );
+
+      changePasswordFrame.getRootPane().setDefaultButton( savePasswordButton );
+
+      int prefHeight = passwordField.getPreferredSize().height;
+      passwordField.setPreferredSize( new Dimension( 200, prefHeight ) );
+      password2Field.setPreferredSize( new Dimension( 200, prefHeight ) );
+      passwordCompareLabel.setPreferredSize( new Dimension( 200, prefHeight ) );
+
+      GridBagConstraints reg_passwordlabelConstraints = new GridBagConstraints();
+      reg_passwordlabelConstraints.gridx = 0;
+      reg_passwordlabelConstraints.gridy = 0;
+      reg_passwordlabelConstraints.insets = new Insets( 10, 0, 10, 0 );
+      reg_passwordlabelConstraints.anchor = GridBagConstraints.LINE_START;
+      changePasswordPanel.add( passwordlabel, reg_passwordlabelConstraints );
+      GridBagConstraints reg_passwordFieldConstraints = new GridBagConstraints();
+      reg_passwordFieldConstraints.gridx = 1;
+      reg_passwordFieldConstraints.gridy = 0;
+      reg_passwordFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
+      changePasswordPanel.add( passwordField, reg_passwordFieldConstraints );
+      GridBagConstraints reg_password2labelConstraints = new GridBagConstraints();
+      reg_password2labelConstraints.gridx = 0;
+      reg_password2labelConstraints.gridy = 1;
+      reg_password2labelConstraints.insets = new Insets( 0, 0, 10, 0 );
+      reg_password2labelConstraints.anchor = GridBagConstraints.LINE_START;
+      changePasswordPanel.add( password2label, reg_password2labelConstraints );
+      GridBagConstraints reg_password2FieldConstraints = new GridBagConstraints();
+      reg_password2FieldConstraints.gridx = 1;
+      reg_password2FieldConstraints.gridy = 1;
+      reg_password2FieldConstraints.insets = new Insets( 0, 5, 5, 0 );
+      changePasswordPanel.add( password2Field, reg_password2FieldConstraints );
+      GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
+      passwordCompareLabelConstraints.gridx = 1;
+      passwordCompareLabelConstraints.gridy = 2;
+      passwordCompareLabelConstraints.anchor = GridBagConstraints.LINE_START;
+      passwordCompareLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
+      changePasswordPanel.add( passwordCompareLabel, passwordCompareLabelConstraints );
+      JPanel buttonPanel = new JPanel( new FlowLayout() );
+      buttonPanel.add( savePasswordButton );
+      buttonPanel.add( pass_abortButton );
+      GridBagConstraints reg_buttonpanelConstraints = new GridBagConstraints();
+      reg_buttonpanelConstraints.gridx = 0;
+      reg_buttonpanelConstraints.gridy = 3;
+      reg_buttonpanelConstraints.gridwidth = 2;
+      changePasswordPanel.add( buttonPanel, reg_buttonpanelConstraints );
+
+      Color green = new Color( 33, 122, 34 );
+      DocumentListener documentListener = new DocumentListener()
+      {
+
+        @Override
+        public void removeUpdate( DocumentEvent e )
+        {
+          compare();
+        }
+
+        @Override
+        public void insertUpdate( DocumentEvent e )
+        {
+          compare();
+        }
+
+        @Override
+        public void changedUpdate( DocumentEvent e )
+        {
+        }
+
+        private void compare()
+        {
+          if ( passwordField.getPassword() == null
+              || passwordField.getPassword().length == 0
+              || password2Field.getPassword() == null
+              || password2Field.getPassword().length == 0 )
+          {
+            passwordCompareLabel.setText( "" );
+            passwordCompareLabel.setForeground( Color.black );
+          }
+          else
+          {
+            if ( String.valueOf( passwordField.getPassword() ).equals( String.valueOf( password2Field.getPassword() ) ) )
+            {
+              passwordCompareLabel.setText( "Die Passwörter stimmen überein." );
+              passwordCompareLabel.setForeground( green );
+            }
+            else
+            {
+              passwordCompareLabel.setText( "Die Passwörter stimmen nicht überein." );
+              passwordCompareLabel.setForeground( Color.red );
+            }
+          }
+        }
+      };
+      pass_abortButton.addActionListener( new ActionListener()
+      {
+
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          changePasswordFrame.dispose();
+          getRootPane().setDefaultButton( loginButton );
+          validateLoginResult( LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD );
+        }
+      } );
+      savePasswordButton.addActionListener( new ActionListener()
+      {
+
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          boolean isPasswordOrUserNameIncorrect = passwordField.getPassword() == null || passwordField.getPassword().length == 0
+              || password2Field.getPassword() == null || password2Field.getPassword().length == 0;
+
+          if ( isPasswordOrUserNameIncorrect )
+          {
+            JOptionPane.showMessageDialog( changePasswordFrame, "Passwort ist nicht zulässig.", "Passwort ändern",
+                JOptionPane.WARNING_MESSAGE );
+          }
+          else if ( !String.valueOf( passwordField.getPassword() ).equals( String.valueOf( password2Field.getPassword() ) ) )
+          {
+            JOptionPane.showMessageDialog( changePasswordFrame, "Die Passwörter stimmen nicht überein.", "Passwort ändern",
+                JOptionPane.WARNING_MESSAGE );
+          }
+          else
+          {
+            char[] password = passwordField.getPassword();
+            int reply =
+                JOptionPane.showConfirmDialog( changePasswordFrame, "Wollen Sie wirklich das neue Passwort spechern?", "Passwort ändern",
+                    JOptionPane.INFORMATION_MESSAGE );
+            if ( reply == JOptionPane.YES_OPTION )
+            {
+              ServerCommunication.getInstance().changePassword( getHash( String.valueOf( password ) ) );
+              ServerCommunication.getInstance().startDrinkInfoTimer();
+              ServerCommunication.getInstance().updateCurrentUser( currentUsername );
+              generateSessionID( currentUsername );
+              changePasswordFrame.dispose();
+              dispose();
+              Mainframe mainframe = Mainframe.getInstance();
+              mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
+              mainframe.setVisible( true );
+              ServerCommunication.getInstance().tellServerToSendDrinkInformations();
+              ServerCommunication.getInstance().getBalance();
+              ServerCommunication.getInstance().tellServerToSendHistoryData();
+              mainframe.requestFocus();
+            }
+          }
+        }
+      } );
+
+      password2Field.getDocument().addDocumentListener( documentListener );
+      passwordField.getDocument().addDocumentListener( documentListener );
+
+      getRootPane().setDefaultButton( savePasswordButton );
+      changePasswordFrame.add( changePasswordPanel );
+      changePasswordFrame.pack();
+      changePasswordFrame.setResizable( false );
+      changePasswordFrame.setSize( changePasswordFrame.getWidth() + 30, changePasswordFrame.getHeight() + 20 );
+      changePasswordFrame.setLocationRelativeTo( Login.this );
+      changePasswordFrame
+          .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+      changePasswordFrame.setVisible( true );
+    }
+    else
+    {
+      String message;
+      if ( loginResult == LoginResult.USER_NOT_FOUND )
+      {
+        message = "Benutzer konnte nicht gefunden werden.";
+      }
+      else
+      {
+        message = "Falsches Passwort eingegeben.";
+      }
+      JOptionPane.showMessageDialog( loginButton, message, "Login fehlgeschlagen", JOptionPane.ERROR_MESSAGE, null );
+    }
+  }
+
+  /**
+   * Erzeugt eine UUID für die derzeitge Session. Diese SessionID wird zusammen mit dem
+   * Benutzername an den Server geschickt, damit diese verbunden werden können.
+   * Wenn man eingeloggt bleiben möchte, so wird die SessionID in den userconfig
+   * Properties gespeichert und wird beim nächsten Start aufgerufen.
+   * 
+   * @param username Nutzername
+   */
+  private void generateSessionID( String username )
+  {
+    UUID uuid = UUID.randomUUID();
+    ServerCommunication.getInstance().connectSessionIDToUser( uuid.toString() );
+    if ( stayLoggedInCheckBox.isSelected() )
+    {
+      try
+      {
+        File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+        InputStream input = new FileInputStream( file );
+        Properties userProperties = new Properties();
+        userProperties.load( input );
+        userProperties.setProperty( "SessionID", uuid.toString() );
+        OutputStream output = new FileOutputStream( file );
+        userProperties.store( output, "" );
+      }
+      catch ( IOException exception )
+      {
+        ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
+        ClientLog.newLog( exception.getMessage() );
+      }
+    }
+  }
+
+  /**
+   * Wenn bei der Registrierung ein Fehler aufgetreten ist, so wird dieser dem Nutzer angezeigt.
+   * 
+   * @param registrationResult Die Antwort des Servers auf die Registrierung.
+   */
+  void validateRegistartionResult( String registrationResult )
+  {
+    if ( !registrationResult.equals( "Registrierung erfolgreich." ) )
+    {
+      JOptionPane.showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(), registrationResult,
+          "Registrierung fehlgeschlagen", JOptionPane.ERROR_MESSAGE, null );
+    }
+  }
+
+  /**
+   * zeigt den Darkmode Header
+   */
+  public void showDarkHeader()
+  {
+    String fontName = LABEL_FONT.getFontName();
+    headerLabel.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "welcome_white.png" ) ) );
+    registerHyperLink.setText( "<html><font color=white><font face='" + fontName + "'><a href>Konto erstellen</a></font></font></html>" );
+    forgotPasswordHyperLink
+        .setText( "<html><font color=white><font face='" + fontName + "'><a href>Passwort vergessen ?</a></font></font></html>" );
+  }
+
+  /**
+   * zeigt den Daymode Header
+   */
+  public void showDayHeader()
+  {
+    String fontName = LABEL_FONT.getFontName();
+    headerLabel.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
+    registerHyperLink.setText( "<html><font color=blue><font face='" + fontName + "'><a href>Konto erstellen</a></font></font></html>" );
+    forgotPasswordHyperLink
+        .setText( "<html><font color=blue><font face='" + fontName + "'><a href>Passwort vergessen ?</a></font></font></html>" );
   }
 }

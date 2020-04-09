@@ -15,34 +15,44 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.isp.memate.util.MeMateUIManager;
+
 /**
- * Im Getränkemanager kann man einstellen, welche Getränke derzeit verfügbar sind und somit im
- * {@link Dashboard} angezeigt werden. Man kann neue Getränke hinzufügen, Getränke entfernen und Getränke
- * beearbeiten, sollte sich zum Beispiel der Preis ändern.
+ * Im Getränkemanager kann der Admin einstellen, welche Getränke es gibt.
+ * Man kann neue Getränke hinzufügen, Getränke entfernen
+ * und Getränke beearbeiten, sollte sich zum Beispiel der Preis ändern.
+ * Außerdem kann man Getränkeinformationen hinzufügen wie z.B Zutatenliste.
  * 
  * @author nwe
  * @since 15.10.2019
  */
-public class Drinkmanager extends JPanel
+class Drinkmanager extends JPanel
 {
-  private final String[]      data         = { "MioMio Mate", "MioMio Cola", "Coca Cola", "MioMio Pomegranate" };
-  private final JList<String> drinkList    = new JList<>( data );
-  private final JScrollPane   scrollpane   = new JScrollPane();
-  final JButton               addButton    = new JButton( "Hinzufügen" );
-  final JButton               editButton   = new JButton( "Bearbeiten" );
-  final JButton               removeButton = new JButton( "Entfernen" );
+  private String[]          data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
+  private final JButton     addButton         = MeMateUIManager.createNormalButton( "button" );
+  private final JButton     editButton        = MeMateUIManager.createNormalButton( "button" );
+  private final JButton     removeButton      = MeMateUIManager.createNormalButton( "button" );
+  private final JButton     ingredientsButton = MeMateUIManager.createNormalButton( "button" );
+  private JList<String>     drinkList         = new JList<>( data );
+  private final JScrollPane scrollpane        = new JScrollPane();
+  private int               currentSelection;
+
 
   /**
-   * Passt das Layout an und legt den CellRenderer fest. Dadurch werden
-   * sowohl Bilder als auch die Namen/Preise in der Liste angezeigt.
+   * Passt das Layout an und legt den CellRenderer fest.
+   * Dadurch werden sowohl Bilder als auch die Namen/Preise in der Liste angezeigt.
    */
   public Drinkmanager()
   {
+    addButton.setText( "Hinzufügen" );
+    editButton.setText( "Bearbeiten" );
+    removeButton.setText( "Entfernen" );
+    ingredientsButton.setText( "Inhaltsstoffe" );
+    data = ServerCommunication.getInstance().getDrinkNames().toArray( data );
     setLayout( new BorderLayout() );
     add( scrollpane, BorderLayout.CENTER );
     add( createButtonPanel(), BorderLayout.SOUTH );
@@ -51,24 +61,41 @@ public class Drinkmanager extends JPanel
     drinkList.setFixedCellHeight( 150 );
     drinkList.setFont( drinkList.getFont().deriveFont( 20f ) );
     scrollpane.setViewportView( drinkList );
+    MeMateUIManager.registerScrollPane( "scroll", scrollpane );
 
-    //TODO Make sure we only select data if data is present. In the future, this might fail.
-    drinkList.setSelectedIndex( 0 );
+    if ( data.length == 0 )
+    {
+      editButton.setEnabled( false );
+      removeButton.setEnabled( false );
+    }
+    else
+    {
+      drinkList.setSelectedIndex( 0 );
+      editButton.setEnabled( true );
+      removeButton.setEnabled( true );
+    }
+    drinkList.addListSelectionListener( new ListSelectionListener()
+    {
+      @Override
+      public void valueChanged( ListSelectionEvent e )
+      {
+        currentSelection = drinkList.getSelectedIndex();
+      }
+    } );
+    MeMateUIManager.registerPanel( "default", this );
   }
 
   /**
-   * @return JPanel mit den Buttons zum Hinzufügen, Bearbeiten und Entfernen von Getränken
+   * Erzeugt ein JPanel mit den Buttons zum Hinzufügen, Bearbeiten und Entfernen von Getränken.
+   *
+   * @return JPanel mit den genannten Buttons.
    */
   private JPanel createButtonPanel()
   {
-    editButton.setEnabled( false );
-    removeButton.setEnabled( false );
-
-    final JPanel panel = new JPanel();
+    final JPanel panel = MeMateUIManager.createJPanel();
     final GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
     panel.setBorder( new EmptyBorder( 5, 5, 5, 5 ) );
-    panel.setBackground( UIManager.getColor( "TabbedPane.highlight" ) );
     panel.setLayout( new GridBagLayout() );
     gridBagConstraints.anchor = GridBagConstraints.LINE_START;
     gridBagConstraints.gridx = 0;
@@ -76,40 +103,37 @@ public class Drinkmanager extends JPanel
     panel.add( addButton, gridBagConstraints );
     gridBagConstraints.gridx = 1;
     gridBagConstraints.weightx = 0;
-    panel.add( editButton, gridBagConstraints );
+    panel.add( ingredientsButton, gridBagConstraints );
     gridBagConstraints.gridx = 2;
+    gridBagConstraints.weightx = 0;
+    panel.add( editButton, gridBagConstraints );
+    gridBagConstraints.gridx = 3;
     gridBagConstraints.anchor = GridBagConstraints.LINE_END;
     panel.add( removeButton, gridBagConstraints );
-
-    drinkList.addListSelectionListener( new ListSelectionListener()
-    {
-      @Override
-      public void valueChanged( ListSelectionEvent e )
-      {
-        if ( e.getLastIndex() == -1 )
-        {
-          editButton.setEnabled( false );
-          removeButton.setEnabled( false );
-        }
-        else
-        {
-          editButton.setEnabled( true );
-          removeButton.setEnabled( true );
-        }
-      }
-    } );
 
     removeButton.addActionListener( new ActionListener()
     {
       @Override
       public void actionPerformed( ActionEvent e )
       {
-        int result = JOptionPane.showConfirmDialog( scrollpane, "Wollen Sie wirklich " + drinkList.getSelectedValue() + " löschen?",
-            "Getränk entfernen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE );
+        int result = JOptionPane.showConfirmDialog( scrollpane,
+            "Wollen Sie wirklich " + drinkList.getSelectedValue() + " löschen?", "Getränk entfernen",
+            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE );
         if ( result == JOptionPane.YES_OPTION )
         {
-          //TODO remove selected Drink
+          ServerCommunication.getInstance().removeDrink( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ),
+              drinkList.getSelectedValue() );
         }
+        updateList();
+      }
+    } );
+    ingredientsButton.addActionListener( new ActionListener()
+    {
+      @Override
+      public void actionPerformed( ActionEvent e )
+      {
+        DrinkManagerDialog ingredientsDialog = new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
+        ingredientsDialog.showIngredientsDialog( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ) );
       }
     } );
     addButton.addActionListener( new ActionListener()
@@ -133,5 +157,41 @@ public class Drinkmanager extends JPanel
       }
     } );
     return panel;
+  }
+
+  /**
+   * Sollte es neue Getränke geben so kann hier von Außen die Liste aktualisiert werden.
+   */
+  void updateList()
+  {
+    data = new String[ServerCommunication.getInstance().getDrinkNames().size()];
+    data = ServerCommunication.getInstance().getDrinkNames().toArray( data );
+    drinkList = new JList<>( data );
+    drinkList.setCellRenderer( new DrinkCellRenderer() );
+    drinkList.setFixedCellHeight( 150 );
+    drinkList.setFont( drinkList.getFont().deriveFont( 20f ) );
+    MeMateUIManager.registerList( "default", drinkList );
+    scrollpane.setViewportView( drinkList );
+    scrollpane.repaint();
+
+    if ( data.length == 0 )
+    {
+      editButton.setEnabled( false );
+      removeButton.setEnabled( false );
+    }
+    else
+    {
+      drinkList.setSelectedIndex( currentSelection );
+      editButton.setEnabled( true );
+      removeButton.setEnabled( true );
+    }
+    drinkList.addListSelectionListener( new ListSelectionListener()
+    {
+      @Override
+      public void valueChanged( ListSelectionEvent e )
+      {
+        currentSelection = drinkList.getSelectedIndex();
+      }
+    } );
   }
 }

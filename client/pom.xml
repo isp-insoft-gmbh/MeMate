@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.isp.memate</groupId>
-	<version>1.0</version>
+	<version>0.9.9.2</version>
 	<artifactId>client</artifactId>
 	<name>MeMate Client</name>
 	<packaging>jar</packaging>
@@ -16,6 +16,50 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.commonjava.maven.plugins</groupId>
+				<artifactId>directory-maven-plugin</artifactId>
+				<version>0.1</version>
+				<executions>
+					<execution>
+						<id>directories</id>
+						<goals>
+							<goal>directory-of</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<property>memate.basedir</property>
+							<project>
+								<groupId>com.isp.memate</groupId>
+								<artifactId>memate</artifactId>
+							</project>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-version.properties_toClient</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${memate.basedir}/client/src/main/resources</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${memate.basedir}</directory>
+									<include>version.properties</include>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -38,6 +82,87 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${basedir}/src/main/resources/version.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<version>1.7.25</version>
+				<executions>
+					<execution>
+						<id>l4j-clui</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<headerType>gui</headerType>
+							<jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
+							<outfile>${project.build.directory}/memate.exe</outfile>
+							<classPath>
+								<mainClass>com.isp.memate.Main</mainClass>
+								<preCp>anything</preCp>
+							</classPath>
+							<icon>MeMate.ico</icon>
+							<jre>
+								<minVersion>1.8.0_0</minVersion>
+								<maxVersion>1.8.0_999</maxVersion>
+								<path>${jre_FolderName_Win64}</path>
+								<jdkPreference>preferJre</jdkPreference>
+							</jre>
+							<versionInfo>
+								<fileVersion>${build_version}</fileVersion>
+								<txtFileVersion>${build_version}</txtFileVersion>
+								<fileDescription>MeMate Client</fileDescription>
+								<copyright>ISP Insoft 2020</copyright>
+								<productVersion>${build_version}</productVersion>
+								<txtProductVersion>${build_version}</txtProductVersion>
+								<productName>MeMate</productName>
+								<companyName>Isp Insoft GmbH</companyName>
+								<internalName>MeMate</internalName>
+								<originalFilename>MeMateClient.exe</originalFilename>
+								<language>GERMAN</language>
+							</versionInfo>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.5.0</version>
+				<executions>
+					<execution>
+						<id>install-jbpm</id>
+						<phase>package</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>${jre_URL_Win64}</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<sha256>${jre_SHA256_Signature_Win64}</sha256>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -53,5 +178,23 @@
 			<artifactId>miglayout-swing</artifactId>
 			<version>5.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.5.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.collections/google-collections -->
+		<dependency>
+			<groupId>com.google.collections</groupId>
+			<artifactId>google-collections</artifactId>
+			<version>1.0-rc2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-model</artifactId>
+			<version>3.3.9</version>
+		</dependency>
+
 	</dependencies>
+
 </project>

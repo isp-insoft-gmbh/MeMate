@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
  * 
  * @author Rob Camick
  */
-public class WrapLayout extends FlowLayout
+class WrapLayout extends FlowLayout
 {
 
   /**
@@ -40,7 +40,7 @@ public class WrapLayout extends FlowLayout
    * 
    * @param align the alignment value
    */
-  public WrapLayout( int align )
+  WrapLayout( int align )
   {
     super( align );
   }
