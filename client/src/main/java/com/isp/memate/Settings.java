@@ -11,10 +11,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -46,7 +43,7 @@ import com.isp.memate.util.ToggleSwitch;
 /**
  * Auf dem Settings Panel kann sein gewünschtes Color Scheme auswählen, den Darkmodestate verändern und
  * Benachrichtigungen für Standup-Meeting oder andere Benachrichtigungen aktivieren und deaktivieren.
- * 
+ *
  * @author nwe
  * @since 05.03.2020
  *
@@ -74,8 +71,8 @@ class Settings extends JPanel
 
   private void addFiller()
   {
-    GridBagConstraints fillerConstraints = new GridBagConstraints();
-    JLabel l = new JLabel();
+    final GridBagConstraints fillerConstraints = new GridBagConstraints();
+    final JLabel l = new JLabel();
     fillerConstraints.gridx = 0;
     fillerConstraints.gridy = 12;
     fillerConstraints.weighty = 1;
@@ -87,31 +84,31 @@ class Settings extends JPanel
 
   private void addChangePasswordHyperlink()
   {
-    JLabel hyperlink = MeMateUIManager.createJLabel();
+    final JLabel hyperlink = MeMateUIManager.createJLabel();
     hyperlink.setText( "Passwort ändern" );
     hyperlink.setFont( hyperlink.getFont().deriveFont( 18f ) );
     hyperlink.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
     hyperlink.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseClicked( MouseEvent e )
+      public void mouseClicked( final MouseEvent e )
       {
         showPasswordChangeDialog();
       }
 
       @Override
-      public void mouseEntered( MouseEvent e )
+      public void mouseEntered( final MouseEvent e )
       {
         hyperlink.setText( "<html><u>Passwort ändern</u></html>" );
       }
 
       @Override
-      public void mouseExited( MouseEvent e )
+      public void mouseExited( final MouseEvent e )
       {
         hyperlink.setText( "Passwort ändern" );
       }
     } );
-    GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
+    final GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
     hyperlinkConstraints.gridx = 0;
     hyperlinkConstraints.gridy = 10;
     hyperlinkConstraints.anchor = GridBagConstraints.LINE_START;
@@ -121,31 +118,31 @@ class Settings extends JPanel
 
   private void addChangeDisplayNameHyperlink()
   {
-    JLabel hyperlink = MeMateUIManager.createJLabel();
+    final JLabel hyperlink = MeMateUIManager.createJLabel();
     hyperlink.setText( "Anzeigenamen ändern" );
     hyperlink.setFont( hyperlink.getFont().deriveFont( 18f ) );
     hyperlink.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
     hyperlink.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseClicked( MouseEvent e )
+      public void mouseClicked( final MouseEvent e )
       {
         showDisplayNameChangeDialog();
       }
 
       @Override
-      public void mouseEntered( MouseEvent e )
+      public void mouseEntered( final MouseEvent e )
       {
         hyperlink.setText( "<html><u>Anzeigenamen ändern</u></html>" );
       }
 
       @Override
-      public void mouseExited( MouseEvent e )
+      public void mouseExited( final MouseEvent e )
       {
         hyperlink.setText( "Anzeigenamen ändern" );
       }
     } );
-    GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
+    final GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
     hyperlinkConstraints.gridx = 0;
     hyperlinkConstraints.gridy = 11;
     hyperlinkConstraints.anchor = GridBagConstraints.LINE_START;
@@ -155,78 +152,78 @@ class Settings extends JPanel
 
   private void showPasswordChangeDialog()
   {
-    JDialog changePasswordFrame = new JDialog( Mainframe.getInstance(), "Passwort ändern", true );
-    JPanel changePasswordPanel = new JPanel( new GridBagLayout() );
-    JLabel passwordlabel = new JLabel( "Passwort:" );
-    JLabel password2label = new JLabel( "Passwort wiederholen:" );
-    JLabel passwordCompareLabel = new JLabel();
-    JPasswordField passwordField = new JPasswordField();
-    JPasswordField password2Field = new JPasswordField();
-    JButton savePasswordButton = new JButton( "Speichern" );
-    JButton pass_abortButton = new JButton( "Abbrechen" );
+    final JDialog changePasswordFrame = new JDialog( Mainframe.getInstance(), "Passwort ändern", true );
+    final JPanel changePasswordPanel = new JPanel( new GridBagLayout() );
+    final JLabel passwordlabel = new JLabel( "Passwort:" );
+    final JLabel password2label = new JLabel( "Passwort wiederholen:" );
+    final JLabel passwordCompareLabel = new JLabel();
+    final JPasswordField passwordField = new JPasswordField();
+    final JPasswordField password2Field = new JPasswordField();
+    final JButton savePasswordButton = new JButton( "Speichern" );
+    final JButton pass_abortButton = new JButton( "Abbrechen" );
 
     changePasswordFrame.getRootPane().setDefaultButton( savePasswordButton );
 
-    int prefHeight = passwordField.getPreferredSize().height;
+    final int prefHeight = passwordField.getPreferredSize().height;
     passwordField.setPreferredSize( new Dimension( 200, prefHeight ) );
     password2Field.setPreferredSize( new Dimension( 200, prefHeight ) );
     passwordCompareLabel.setPreferredSize( new Dimension( 200, prefHeight ) );
 
-    GridBagConstraints reg_passwordlabelConstraints = new GridBagConstraints();
+    final GridBagConstraints reg_passwordlabelConstraints = new GridBagConstraints();
     reg_passwordlabelConstraints.gridx = 0;
     reg_passwordlabelConstraints.gridy = 0;
     reg_passwordlabelConstraints.insets = new Insets( 10, 0, 10, 0 );
     reg_passwordlabelConstraints.anchor = GridBagConstraints.LINE_START;
     changePasswordPanel.add( passwordlabel, reg_passwordlabelConstraints );
-    GridBagConstraints reg_passwordFieldConstraints = new GridBagConstraints();
+    final GridBagConstraints reg_passwordFieldConstraints = new GridBagConstraints();
     reg_passwordFieldConstraints.gridx = 1;
     reg_passwordFieldConstraints.gridy = 0;
     reg_passwordFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
     changePasswordPanel.add( passwordField, reg_passwordFieldConstraints );
-    GridBagConstraints reg_password2labelConstraints = new GridBagConstraints();
+    final GridBagConstraints reg_password2labelConstraints = new GridBagConstraints();
     reg_password2labelConstraints.gridx = 0;
     reg_password2labelConstraints.gridy = 1;
     reg_password2labelConstraints.insets = new Insets( 0, 0, 10, 0 );
     reg_password2labelConstraints.anchor = GridBagConstraints.LINE_START;
     changePasswordPanel.add( password2label, reg_password2labelConstraints );
-    GridBagConstraints reg_password2FieldConstraints = new GridBagConstraints();
+    final GridBagConstraints reg_password2FieldConstraints = new GridBagConstraints();
     reg_password2FieldConstraints.gridx = 1;
     reg_password2FieldConstraints.gridy = 1;
     reg_password2FieldConstraints.insets = new Insets( 0, 5, 5, 0 );
     changePasswordPanel.add( password2Field, reg_password2FieldConstraints );
-    GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
+    final GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
     passwordCompareLabelConstraints.gridx = 1;
     passwordCompareLabelConstraints.gridy = 2;
     passwordCompareLabelConstraints.anchor = GridBagConstraints.LINE_START;
     passwordCompareLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
     changePasswordPanel.add( passwordCompareLabel, passwordCompareLabelConstraints );
-    JPanel buttonPanel = new JPanel( new FlowLayout() );
+    final JPanel buttonPanel = new JPanel( new FlowLayout() );
     buttonPanel.add( savePasswordButton );
     buttonPanel.add( pass_abortButton );
-    GridBagConstraints reg_buttonpanelConstraints = new GridBagConstraints();
+    final GridBagConstraints reg_buttonpanelConstraints = new GridBagConstraints();
     reg_buttonpanelConstraints.gridx = 0;
     reg_buttonpanelConstraints.gridy = 3;
     reg_buttonpanelConstraints.gridwidth = 2;
     changePasswordPanel.add( buttonPanel, reg_buttonpanelConstraints );
 
-    Color green = new Color( 33, 122, 34 );
-    DocumentListener documentListener = new DocumentListener()
+    final Color green = new Color( 33, 122, 34 );
+    final DocumentListener documentListener = new DocumentListener()
     {
 
       @Override
-      public void removeUpdate( DocumentEvent e )
+      public void removeUpdate( final DocumentEvent e )
       {
         compare();
       }
 
       @Override
-      public void insertUpdate( DocumentEvent e )
+      public void insertUpdate( final DocumentEvent e )
       {
         compare();
       }
 
       @Override
-      public void changedUpdate( DocumentEvent e )
+      public void changedUpdate( final DocumentEvent e )
       {
       }
 
@@ -255,45 +252,32 @@ class Settings extends JPanel
         }
       }
     };
-    pass_abortButton.addActionListener( new ActionListener()
+    pass_abortButton.addActionListener( e -> changePasswordFrame.dispose() );
+    savePasswordButton.addActionListener( e ->
     {
+      final boolean isPasswordOrUserNameIncorrect = passwordField.getPassword() == null || passwordField.getPassword().length == 0
+          || password2Field.getPassword() == null || password2Field.getPassword().length == 0;
 
-      @Override
-      public void actionPerformed( ActionEvent e )
+      if ( isPasswordOrUserNameIncorrect )
       {
-        changePasswordFrame.dispose();
+        JOptionPane.showMessageDialog( changePasswordFrame, "Passwort ist nicht zulässig.", "Passwort ändern",
+            JOptionPane.WARNING_MESSAGE );
       }
-    } );
-    savePasswordButton.addActionListener( new ActionListener()
-    {
-
-      @Override
-      public void actionPerformed( ActionEvent e )
+      else if ( !String.valueOf( passwordField.getPassword() ).equals( String.valueOf( password2Field.getPassword() ) ) )
       {
-        boolean isPasswordOrUserNameIncorrect = passwordField.getPassword() == null || passwordField.getPassword().length == 0
-            || password2Field.getPassword() == null || password2Field.getPassword().length == 0;
-
-        if ( isPasswordOrUserNameIncorrect )
+        JOptionPane.showMessageDialog( changePasswordFrame, "Die Passwörter stimmen nicht überein.", "Passwort ändern",
+            JOptionPane.WARNING_MESSAGE );
+      }
+      else
+      {
+        final char[] password = passwordField.getPassword();
+        final int reply =
+            JOptionPane.showConfirmDialog( changePasswordFrame, "Wollen Sie wirklich das neue Passwort spechern?", "Passwort ändern",
+                JOptionPane.INFORMATION_MESSAGE );
+        if ( reply == JOptionPane.YES_OPTION )
         {
-          JOptionPane.showMessageDialog( changePasswordFrame, "Passwort ist nicht zulässig.", "Passwort ändern",
-              JOptionPane.WARNING_MESSAGE );
-        }
-        else if ( !String.valueOf( passwordField.getPassword() ).equals( String.valueOf( password2Field.getPassword() ) ) )
-        {
-          JOptionPane.showMessageDialog( changePasswordFrame, "Die Passwörter stimmen nicht überein.", "Passwort ändern",
-              JOptionPane.WARNING_MESSAGE );
-        }
-        else
-        {
-          char[] password = passwordField.getPassword();
-          int reply =
-              JOptionPane.showConfirmDialog( changePasswordFrame, "Wollen Sie wirklich das neue Passwort spechern?", "Passwort ändern",
-                  JOptionPane.INFORMATION_MESSAGE );
-          if ( reply == JOptionPane.YES_OPTION )
-          {
-            ServerCommunication.getInstance().changePassword( Login.getInstance().getHash( String.valueOf( password ) ) );
-            changePasswordFrame.dispose();
-          }
+          ServerCommunication.getInstance().changePassword( Login.getInstance().getHash( String.valueOf( password ) ) );
+          changePasswordFrame.dispose();
         }
       }
     } );
@@ -314,79 +298,66 @@ class Settings extends JPanel
 
   private void showDisplayNameChangeDialog()
   {
-    JDialog changeDisplayNameFrame = new JDialog( Mainframe.getInstance(), "Anzeigenamen ändern", true );
-    JPanel changeDisplayNamePanel = new JPanel( new GridBagLayout() );
-    JLabel displayNamelabel = new JLabel( "Anzeigename:" );
-    JTextField displayNameField = new JTextField();
-    JButton saveDisplayNameButton = new JButton( "Speichern" );
-    JButton abortDisplayNameButton = new JButton( "Abbrechen" );
+    final JDialog changeDisplayNameFrame = new JDialog( Mainframe.getInstance(), "Anzeigenamen ändern", true );
+    final JPanel changeDisplayNamePanel = new JPanel( new GridBagLayout() );
+    final JLabel displayNamelabel = new JLabel( "Anzeigename:" );
+    final JTextField displayNameField = new JTextField();
+    final JButton saveDisplayNameButton = new JButton( "Speichern" );
+    final JButton abortDisplayNameButton = new JButton( "Abbrechen" );
 
     changeDisplayNameFrame.getRootPane().setDefaultButton( saveDisplayNameButton );
 
-    int prefHeight = displayNameField.getPreferredSize().height;
+    final int prefHeight = displayNameField.getPreferredSize().height;
     displayNameField.setPreferredSize( new Dimension( 100, prefHeight ) );
 
-    GridBagConstraints displayNamelabelConstraints = new GridBagConstraints();
+    final GridBagConstraints displayNamelabelConstraints = new GridBagConstraints();
     displayNamelabelConstraints.gridx = 0;
     displayNamelabelConstraints.gridy = 0;
     displayNamelabelConstraints.insets = new Insets( 10, 0, 10, 0 );
     displayNamelabelConstraints.anchor = GridBagConstraints.LINE_START;
     changeDisplayNamePanel.add( displayNamelabel, displayNamelabelConstraints );
-    GridBagConstraints displayNameFieldConstraints = new GridBagConstraints();
+    final GridBagConstraints displayNameFieldConstraints = new GridBagConstraints();
     displayNameFieldConstraints.gridx = 1;
     displayNameFieldConstraints.gridy = 0;
     displayNameFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
     changeDisplayNamePanel.add( displayNameField, displayNameFieldConstraints );
-    JPanel buttonPanel = new JPanel( new FlowLayout() );
+    final JPanel buttonPanel = new JPanel( new FlowLayout() );
     buttonPanel.add( saveDisplayNameButton );
     buttonPanel.add( abortDisplayNameButton );
-    GridBagConstraints displayname_buttonpanelConstraints = new GridBagConstraints();
+    final GridBagConstraints displayname_buttonpanelConstraints = new GridBagConstraints();
     displayname_buttonpanelConstraints.gridx = 0;
     displayname_buttonpanelConstraints.gridy = 1;
     displayname_buttonpanelConstraints.gridwidth = 2;
     changeDisplayNamePanel.add( buttonPanel, displayname_buttonpanelConstraints );
 
 
-    abortDisplayNameButton.addActionListener( new ActionListener()
+    abortDisplayNameButton.addActionListener( e -> changeDisplayNameFrame.dispose() );
+    saveDisplayNameButton.addActionListener( e ->
     {
+      final boolean isDisplayNameIncorrect = displayNameField.getText() == null || displayNameField.getText().length() == 0;
 
-      @Override
-      public void actionPerformed( ActionEvent e )
+      if ( isDisplayNameIncorrect )
       {
-        changeDisplayNameFrame.dispose();
+        JOptionPane.showMessageDialog( changeDisplayNameFrame, "Der Anzeigename darf nicht leer sein", "Anzeigenamen ändern",
+            JOptionPane.WARNING_MESSAGE );
       }
-    } );
-    saveDisplayNameButton.addActionListener( new ActionListener()
-    {
-
-      @Override
-      public void actionPerformed( ActionEvent e )
+      else if ( displayNameField.getText().length() > 10 )
       {
-        boolean isDisplayNameIncorrect = displayNameField.getText() == null || displayNameField.getText().length() == 0;
-
-        if ( isDisplayNameIncorrect )
+        JOptionPane.showMessageDialog( changeDisplayNameFrame, "Der Anzeigename darf nicht länger als 10 Zeichen sein",
+            "Anzeigenamen ändern",
+            JOptionPane.WARNING_MESSAGE );
+      }
+      else
+      {
+        final String displayName = displayNameField.getText();
+        final int reply =
+            JOptionPane.showConfirmDialog( changeDisplayNameFrame, "Wollen Sie wirklich den neuen Anzeigenamen spechern?",
+                "Anzeigenamen ändern",
+                JOptionPane.INFORMATION_MESSAGE );
+        if ( reply == JOptionPane.YES_OPTION )
         {
-          JOptionPane.showMessageDialog( changeDisplayNameFrame, "Der Anzeigename darf nicht leer sein", "Anzeigenamen ändern",
-              JOptionPane.WARNING_MESSAGE );
-        }
-        else if ( displayNameField.getText().length() > 10 )
-        {
-          JOptionPane.showMessageDialog( changeDisplayNameFrame, "Der Anzeigename darf nicht länger als 10 Zeichen sein",
-              "Anzeigenamen ändern",
-              JOptionPane.WARNING_MESSAGE );
-        }
-        else
-        {
-          String displayName = displayNameField.getText();
-          int reply =
-              JOptionPane.showConfirmDialog( changeDisplayNameFrame, "Wollen Sie wirklich den neuen Anzeigenamen spechern?",
-                  "Anzeigenamen ändern",
-                  JOptionPane.INFORMATION_MESSAGE );
-          if ( reply == JOptionPane.YES_OPTION )
-          {
-            ServerCommunication.getInstance().changeDisplayName( displayName );
-            changeDisplayNameFrame.dispose();
-          }
+          ServerCommunication.getInstance().changeDisplayName( displayName );
+          changeDisplayNameFrame.dispose();
         }
       }
     } );
@@ -406,10 +377,10 @@ class Settings extends JPanel
 
   private void addConsumptionNotification()
   {
-    JLabel consumptionNotificationLabel = MeMateUIManager.createJLabel();
+    final JLabel consumptionNotificationLabel = MeMateUIManager.createJLabel();
     consumptionNotificationLabel.setText( "Benachrichtigung wenn jemand etwas trinkt." );
     consumptionNotificationLabel.setFont( consumptionNotificationLabel.getFont().deriveFont( 18f ) );
-    GridBagConstraints consumptionNotificationLabelConstraints = new GridBagConstraints();
+    final GridBagConstraints consumptionNotificationLabelConstraints = new GridBagConstraints();
     consumptionNotificationLabelConstraints.gridx = 0;
     consumptionNotificationLabelConstraints.gridy = 8;
     consumptionNotificationLabelConstraints.gridwidth = 10;
@@ -417,8 +388,8 @@ class Settings extends JPanel
     consumptionNotificationLabelConstraints.insets = new Insets( 30, 20, 0, 0 );
 
     add( consumptionNotificationLabel, consumptionNotificationLabelConstraints );
-    ToggleSwitch consumptionSwitch = new ToggleSwitch();
-    GridBagConstraints consumptionSwitchConstraints = new GridBagConstraints();
+    final ToggleSwitch consumptionSwitch = new ToggleSwitch();
+    final GridBagConstraints consumptionSwitchConstraints = new GridBagConstraints();
     consumptionSwitchConstraints.gridx = 0;
     consumptionSwitchConstraints.gridy = 9;
     consumptionSwitchConstraints.ipadx = 70;
@@ -429,15 +400,15 @@ class Settings extends JPanel
     consumptionSwitch.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseReleased( MouseEvent arg0 )
+      public void mouseReleased( final MouseEvent arg0 )
       {
         consumptionSwitch.activated = !consumptionSwitch.activated;
         consumptionSwitch.repaint();
         try
         {
-          File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-          InputStream input = new FileInputStream( file );
-          Properties userProperties = new Properties();
+          final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+          final InputStream input = new FileInputStream( file );
+          final Properties userProperties = new Properties();
           userProperties.load( input );
           String state = "false";
           if ( consumptionSwitch.activated )
@@ -445,10 +416,10 @@ class Settings extends JPanel
             state = "true";
           }
           userProperties.setProperty( "ConsumptionNotification", state );
-          OutputStream output = new FileOutputStream( file );
+          final OutputStream output = new FileOutputStream( file );
           userProperties.store( output, "" );
         }
-        catch ( IOException exception )
+        catch ( final IOException exception )
         {
           ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
           ClientLog.newLog( exception.getMessage() );
@@ -461,17 +432,17 @@ class Settings extends JPanel
     }
   }
 
-  private boolean loadPrefAndSetState( String propertry )
+  private boolean loadPrefAndSetState( final String propertry )
   {
     String state = null;
     try ( InputStream input =
         new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
     {
-      Properties userProperties = new Properties();
+      final Properties userProperties = new Properties();
       userProperties.load( input );
       state = userProperties.getProperty( propertry );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
       ClientLog.newLog( exception.getMessage() );
@@ -486,10 +457,10 @@ class Settings extends JPanel
 
   private void addMeetingNotification()
   {
-    JLabel meetingNotificationLabel = MeMateUIManager.createJLabel();
+    final JLabel meetingNotificationLabel = MeMateUIManager.createJLabel();
     meetingNotificationLabel.setText( "Benachrichtigung für Standup-Meeting" );
     meetingNotificationLabel.setFont( meetingNotificationLabel.getFont().deriveFont( 18f ) );
-    GridBagConstraints meetingNotificationLabelcBagConstraints = new GridBagConstraints();
+    final GridBagConstraints meetingNotificationLabelcBagConstraints = new GridBagConstraints();
     meetingNotificationLabelcBagConstraints.gridx = 0;
     meetingNotificationLabelcBagConstraints.gridy = 5;
     meetingNotificationLabelcBagConstraints.gridwidth = 10;
@@ -497,8 +468,8 @@ class Settings extends JPanel
     meetingNotificationLabelcBagConstraints.anchor = GridBagConstraints.LINE_START;
     meetingNotificationLabelcBagConstraints.insets = new Insets( 30, 20, 0, 0 );
     add( meetingNotificationLabel, meetingNotificationLabelcBagConstraints );
-    ToggleSwitch meetingSwitch = new ToggleSwitch();
-    GridBagConstraints meetingSwitchConstraints = new GridBagConstraints();
+    final ToggleSwitch meetingSwitch = new ToggleSwitch();
+    final GridBagConstraints meetingSwitchConstraints = new GridBagConstraints();
     meetingSwitchConstraints.gridx = 0;
     meetingSwitchConstraints.gridy = 6;
     meetingSwitchConstraints.ipadx = 70;
@@ -509,15 +480,15 @@ class Settings extends JPanel
     meetingSwitch.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseReleased( MouseEvent arg0 )
+      public void mouseReleased( final MouseEvent arg0 )
       {
         meetingSwitch.activated = !meetingSwitch.activated;
         meetingSwitch.repaint();
         try
         {
-          File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-          InputStream input = new FileInputStream( file );
-          Properties userProperties = new Properties();
+          final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+          final InputStream input = new FileInputStream( file );
+          final Properties userProperties = new Properties();
           userProperties.load( input );
           String state = "false";
           if ( meetingSwitch.activated )
@@ -525,10 +496,10 @@ class Settings extends JPanel
             state = "true";
           }
           userProperties.setProperty( "MeetingNotification", state );
-          OutputStream output = new FileOutputStream( file );
+          final OutputStream output = new FileOutputStream( file );
           userProperties.store( output, "" );
         }
-        catch ( IOException exception )
+        catch ( final IOException exception )
         {
           ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
           ClientLog.newLog( exception.getMessage() );
@@ -543,86 +514,82 @@ class Settings extends JPanel
 
   private void addDarkmodeSettings()
   {
-    JLabel pickDarkmodeLabel = MeMateUIManager.createJLabel();
+    final JLabel pickDarkmodeLabel = MeMateUIManager.createJLabel();
     pickDarkmodeLabel.setText( "Standard-App-Modus wählen" );
     pickDarkmodeLabel.setFont( pickDarkmodeLabel.getFont().deriveFont( 18f ) );
-    GridBagConstraints pickDarkmodeLabelConstraints = new GridBagConstraints();
+    final GridBagConstraints pickDarkmodeLabelConstraints = new GridBagConstraints();
     pickDarkmodeLabelConstraints.gridx = 0;
     pickDarkmodeLabelConstraints.gridy = 2;
     pickDarkmodeLabelConstraints.anchor = GridBagConstraints.LINE_START;
     pickDarkmodeLabelConstraints.insets = new Insets( 30, 20, 0, 0 );
 
     add( pickDarkmodeLabel, pickDarkmodeLabelConstraints );
-    ButtonGroup group = new ButtonGroup();
+    final ButtonGroup group = new ButtonGroup();
     group.add( daymodeButton );
     group.add( darkmodeButton );
-    ActionListener toggleDarkModeListener = new ActionListener()
+    final ActionListener toggleDarkModeListener = e ->
     {
-      @Override
-      public void actionPerformed( ActionEvent e )
+      final JRadioButton source = (JRadioButton) e.getSource();
+      final String mode = source.getActionCommand();
+      if ( mode.equals( "Dunkel" ) )
       {
-        JRadioButton source = (JRadioButton) e.getSource();
-        String mode = source.getActionCommand();
-        if ( mode.equals( "Dunkel" ) )
+        if ( MeMateUIManager.getDarkModeState() )
         {
-          if ( MeMateUIManager.getDarkModeState() )
-          {
-            return;
-          }
-          MeMateUIManager.showDarkMode();
-          try
-          {
-            File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-            InputStream input = new FileInputStream( file );
-            Properties userProperties = new Properties();
-            userProperties.load( input );
-            userProperties.setProperty( "Darkmode", "on" );
-            OutputStream output = new FileOutputStream( file );
-            userProperties.store( output, "" );
-          }
-          catch ( IOException exception )
-          {
-            ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
-            ClientLog.newLog( exception.getMessage() );
-          }
-          Mainframe.getInstance().bar.showDarkmode();
+          return;
         }
-        else
+        MeMateUIManager.showDarkMode();
+        try
         {
-          if ( !MeMateUIManager.getDarkModeState() )
-          {
-            return;
-          }
-          MeMateUIManager.showDayMode();
-          try
-          {
-            File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-            InputStream input = new FileInputStream( file );
-            Properties userProperties = new Properties();
-            userProperties.load( input );
-            userProperties.setProperty( "Darkmode", "off" );
-            OutputStream output = new FileOutputStream( file );
-            userProperties.store( output, "" );
-          }
-          catch ( IOException exception )
-          {
-            ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
-            ClientLog.newLog( exception.getMessage() );
-          }
-          Mainframe.getInstance().bar.showDaymode();
+          final File file1 = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+          final InputStream input1 = new FileInputStream( file1 );
+          final Properties userProperties1 = new Properties();
+          userProperties1.load( input1 );
+          userProperties1.setProperty( "Darkmode", "on" );
+          final OutputStream output1 = new FileOutputStream( file1 );
+          userProperties1.store( output1, "" );
         }
+        catch ( final IOException exception1 )
+        {
+          ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
+          ClientLog.newLog( exception1.getMessage() );
+        }
+        Mainframe.getInstance().bar.showDarkmode();
+      }
+      else
+      {
+        if ( !MeMateUIManager.getDarkModeState() )
+        {
+          return;
+        }
+        MeMateUIManager.showDayMode();
+        try
+        {
+          final File file2 = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+          final InputStream input2 = new FileInputStream( file2 );
+          final Properties userProperties2 = new Properties();
+          userProperties2.load( input2 );
+          userProperties2.setProperty( "Darkmode", "off" );
+          final OutputStream output2 = new FileOutputStream( file2 );
+          userProperties2.store( output2, "" );
+        }
+        catch ( final IOException exception2 )
+        {
+          ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
+          ClientLog.newLog( exception2.getMessage() );
+        }
+        Mainframe.getInstance().bar.showDaymode();
       }
     };
     daymodeButton.addActionListener( toggleDarkModeListener );
     darkmodeButton.addActionListener( toggleDarkModeListener );
     getPrefsAndSelectButton();
-    GridBagConstraints dayModeButtonConstraints = new GridBagConstraints();
+    final GridBagConstraints dayModeButtonConstraints = new GridBagConstraints();
     dayModeButtonConstraints.gridx = 0;
     dayModeButtonConstraints.gridy = 3;
     dayModeButtonConstraints.gridwidth = 1;
     dayModeButtonConstraints.anchor = GridBagConstraints.LINE_START;
     dayModeButtonConstraints.insets = new Insets( 5, 20, 0, 0 );
-    GridBagConstraints darkModeButtonConstraints = new GridBagConstraints();
+    final GridBagConstraints darkModeButtonConstraints = new GridBagConstraints();
     darkModeButtonConstraints.gridx = 0;
     darkModeButtonConstraints.gridy = 4;
     darkModeButtonConstraints.gridwidth = 1;
@@ -638,11 +605,11 @@ class Settings extends JPanel
     try ( InputStream input =
         new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
     {
-      Properties userProperties = new Properties();
+      final Properties userProperties = new Properties();
       userProperties.load( input );
       state = userProperties.getProperty( "Darkmode" );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
       ClientLog.newLog( exception.getMessage() );
@@ -664,10 +631,10 @@ class Settings extends JPanel
   private void addColorThemePicker()
   {
     MeMateUIManager.registerComboBox( colorThemeComboBox );
-    JLabel pickThemeLabel = MeMateUIManager.createJLabel();
+    final JLabel pickThemeLabel = MeMateUIManager.createJLabel();
     pickThemeLabel.setText( "Color Scheme auswählen" );
     pickThemeLabel.setFont( pickThemeLabel.getFont().deriveFont( 18f ) );
-    GridBagConstraints pickThemeLabelConstraints = new GridBagConstraints();
+    final GridBagConstraints pickThemeLabelConstraints = new GridBagConstraints();
     pickThemeLabelConstraints.gridx = 0;
     pickThemeLabelConstraints.gridy = 0;
     pickThemeLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -675,15 +642,15 @@ class Settings extends JPanel
     pickThemeLabelConstraints.insets = new Insets( 10, 20, 0, 0 );
     add( pickThemeLabel, pickThemeLabelConstraints );
 
-    colorThemeComboBox.addItem( "Blue" );
+    colorThemeComboBox.addItem( "Cyan" );
     colorThemeComboBox.addItem( "Dark Blue" );
-    colorThemeComboBox.addItem( "Red / Gray" );
-    colorThemeComboBox.addItem( "Green / Gray" );
-    colorThemeComboBox.addItem( "Blue / Black" );
-    colorThemeComboBox.addItem( "Orange / Black" );
-    colorThemeComboBox.addItem( "Coral / Black" );
+    colorThemeComboBox.addItem( "Red" );
     colorThemeComboBox.addItem( "Green" );
-    GridBagConstraints colorThemeComboBoxConstraints = new GridBagConstraints();
+    colorThemeComboBox.addItem( "Blue" );
+    colorThemeComboBox.addItem( "Orange" );
+    colorThemeComboBox.addItem( "Coral" );
+    colorThemeComboBox.addItem( "Tripple Green" );
+    final GridBagConstraints colorThemeComboBoxConstraints = new GridBagConstraints();
     colorThemeComboBoxConstraints.gridx = 0;
     colorThemeComboBoxConstraints.gridy = 1;
     colorThemeComboBoxConstraints.gridwidth = 1;
@@ -693,40 +660,35 @@ class Settings extends JPanel
     getPrefsAndSelectItem();
     add( colorThemeComboBox, colorThemeComboBoxConstraints );
 
-    colorThemeComboBox.addItemListener( new ItemListener()
+    colorThemeComboBox.addItemListener( e ->
     {
-
-      @Override
-      public void itemStateChanged( ItemEvent e )
+      final String color = String.valueOf( colorThemeComboBox.getSelectedItem() );
+      switch ( color )
       {
-        String color = String.valueOf( colorThemeComboBox.getSelectedItem() );
-        switch ( color )
-        {
-          case "Dark Blue":
-            setColors( color, new Color( 0, 173, 181 ), new Color( 34, 40, 49 ), new Color( 57, 62, 70 ), new Color( 42, 51, 64 ) );
-            break;
-          case "Red / Gray":
-            setColors( color, new Color( 226, 62, 87 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
-            break;
-          case "Green / Gray":
-            setColors( color, new Color( 153, 180, 51 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
-            break;
-          case "Blue / Black":
-            setColors( color, new Color( 85, 172, 238 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-            break;
-          case "Orange / Black":
-            setColors( color, new Color( 227, 162, 26 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-            break;
-          case "Coral / Black":
-            setColors( color, new Color( 255, 111, 97 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-            break;
-          case "Green":
-            setColors( color, new Color( 153, 180, 51 ), new Color( 11, 40, 25 ), new Color( 30, 113, 69 ), new Color( 13, 48, 30 ) );
-            break;
-          default :
-            setColors( color, new Color( 29, 164, 165 ), new Color( 36, 43, 55 ), new Color( 52, 73, 94 ), new Color( 42, 51, 64 ) );
-            break;
-        }
+        case "Dark Blue":
+          setColors( color, new Color( 0, 173, 181 ), new Color( 34, 40, 49 ), new Color( 57, 62, 70 ), new Color( 42, 51, 64 ) );
+          break;
+        case "Red":
+          setColors( color, new Color( 226, 62, 87 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
+          break;
+        case "Green":
+          setColors( color, new Color( 153, 180, 51 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
+          break;
+        case "Blue":
+          setColors( color, new Color( 85, 172, 238 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+          break;
+        case "Orange":
+          setColors( color, new Color( 227, 162, 26 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+          break;
+        case "Coral":
+          setColors( color, new Color( 255, 111, 97 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+          break;
+        case "Tripple Green":
+          setColors( color, new Color( 153, 180, 51 ), new Color( 11, 40, 25 ), new Color( 30, 113, 69 ), new Color( 13, 48, 30 ) );
+          break;
+        default :
+          setColors( color, new Color( 29, 164, 165 ), new Color( 36, 43, 55 ), new Color( 52, 73, 94 ), new Color( 42, 51, 64 ) );
+          break;
       }
     } );
   }
@@ -738,11 +700,11 @@ class Settings extends JPanel
     try ( InputStream input =
         new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
     {
-      Properties userProperties = new Properties();
+      final Properties userProperties = new Properties();
       userProperties.load( input );
       color = userProperties.getProperty( "colorScheme" );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
       ClientLog.newLog( exception.getMessage() );
@@ -756,31 +718,31 @@ class Settings extends JPanel
       case "Dark Blue":
         colorThemeComboBox.setSelectedItem( "Dark Blue" );
         break;
-      case "Red / Gray":
-        colorThemeComboBox.setSelectedItem( "Red / Gray" );
-        break;
-      case "Green / Gray":
-        colorThemeComboBox.setSelectedItem( "Green / Gray" );
-        break;
-      case "Blue / Black":
-        colorThemeComboBox.setSelectedItem( "Blue / Black" );
-        break;
-      case "Orange / Black":
-        colorThemeComboBox.setSelectedItem( "Orange / Black" );
-        break;
-      case "Coral / Black":
-        colorThemeComboBox.setSelectedItem( "Coral / Black" );
+      case "Red":
+        colorThemeComboBox.setSelectedItem( "Red" );
         break;
       case "Green":
         colorThemeComboBox.setSelectedItem( "Green" );
         break;
-      default :
+      case "Blue":
         colorThemeComboBox.setSelectedItem( "Blue" );
+        break;
+      case "Orange":
+        colorThemeComboBox.setSelectedItem( "Orange" );
+        break;
+      case "Coral":
+        colorThemeComboBox.setSelectedItem( "Coral" );
+        break;
+      case "Tripple Green":
+        colorThemeComboBox.setSelectedItem( "Green" );
+        break;
+      default :
+        colorThemeComboBox.setSelectedItem( "Cyan" );
         break;
     }
   }
 
-  private void setColors( String theme, Color appColor, Color background, Color background2, Color actionbar )
+  private void setColors( final String theme, final Color appColor, final Color background, final Color background2, final Color actionbar )
   {
     UIManager.put( "AppColor", appColor );
     UIManager.put( "App.Background", background );
@@ -797,15 +759,15 @@ class Settings extends JPanel
     }
     try
     {
-      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      InputStream input = new FileInputStream( file );
-      Properties userProperties = new Properties();
+      final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
+      final InputStream input = new FileInputStream( file );
+      final Properties userProperties = new Properties();
       userProperties.load( input );
       userProperties.setProperty( "colorScheme", theme );
-      OutputStream output = new FileOutputStream( file );
+      final OutputStream output = new FileOutputStream( file );
       userProperties.store( output, "" );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
       ClientLog.newLog( exception.getMessage() );
