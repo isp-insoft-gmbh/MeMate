@@ -14,6 +14,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -44,6 +46,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
+import com.isp.memate.util.InfoIcon;
 
 
 /**
@@ -93,7 +96,7 @@ class DrinkConsumptionButton extends JPanel
    */
   DrinkConsumptionButton( final Mainframe mainFrame, String price, final String name, final Icon icon )
   {
-    infoButton = new JButton( "Info" )
+    infoButton = new JButton( new InfoIcon() )
     {
       JToolTip tooltip;
 
@@ -249,16 +252,16 @@ class DrinkConsumptionButton extends JPanel
     };
     infoButton.setToolTipText( "" );
     infoButton.setContentAreaFilled( false );
-    infoButton.setOpaque( true );
-    infoButton.setEnabled( false );
+    infoButton.setOpaque( false );
     infoButton.setFocusable( false );
-    MeMateUIManager.registerButton( infoButton );
+    infoButton.setBorder( BorderFactory.createEmptyBorder() );
+
+    MeMateUIManager.registerInfoButton( infoButton );
 
 
     setLayout( new BorderLayout() );
     acceptButton.setText( "Ja" );
     abortButton.setText( "Nein" );
-    infoButton.setText( "Info" );
     askWhetherToReallyConsumeLabel.setText( "Wirklich konsumieren?" );
     nameLabelAndDrinkInfoButtonPanel.setLayout( new GridBagLayout() );
     infoPanel.setLayout( new GridBagLayout() );
@@ -280,16 +283,25 @@ class DrinkConsumptionButton extends JPanel
       infoButtonConstraints.anchor = GridBagConstraints.LINE_END;
       nameLabelAndDrinkInfoButtonPanel.add( infoButton, infoButtonConstraints );
 
-      fillLable.setPreferredSize( new Dimension( 33, 21 ) );
       final GridBagConstraints fillLablenConstraints = new GridBagConstraints();
       fillLablenConstraints.gridx = 0;
       fillLablenConstraints.gridy = 0;
       fillLablenConstraints.weightx = 0.1;
       fillLablenConstraints.anchor = GridBagConstraints.LINE_START;
       nameLabelAndDrinkInfoButtonPanel.add( fillLable, fillLablenConstraints );
-
-
     }
+    infoButton.addComponentListener( new ComponentAdapter()
+    {
+      @Override
+      public void componentResized( final ComponentEvent e )
+      {
+        fillLable.setPreferredSize( infoButton.getPreferredSize() );
+        fillLable.setMaximumSize( infoButton.getMaximumSize() );
+        fillLable.setMinimumSize( infoButton.getMinimumSize() );
+        fillLable.setSize( infoButton.getSize() );
+        nameLabelAndDrinkInfoButtonPanel.revalidate();
+      }
+    } );
 
     price = price.replace( "€", "" );
     final Float priceAsFloat = Float.valueOf( price );
@@ -325,6 +337,7 @@ class DrinkConsumptionButton extends JPanel
       remove( askWhetherToReallyConsumeLabel );
       iconLabel.setVisible( true );
       infoButton.setVisible( true );
+      fillLable.setVisible( true );
       repaint();
       revalidate();
       requestFocus();
@@ -337,6 +350,7 @@ class DrinkConsumptionButton extends JPanel
       remove( askWhetherToReallyConsumeLabel );
       iconLabel.setVisible( true );
       infoButton.setVisible( true );
+      fillLable.setVisible( true );
       if ( MeMateUIManager.getDarkModeState() )
       {
         setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
@@ -592,6 +606,7 @@ class DrinkConsumptionButton extends JPanel
           DrinkConsumptionButton.this.addKeyListener( keyListener );
           Mainframe.getInstance().setUndoButtonEnabled( true );
           fillLable.setVisible( true );
+          infoButton.setVisible( true );
           askWhetherToReallyConsumeLabelIsActive = false;
         }
         catch ( final Exception exception )
@@ -615,6 +630,7 @@ class DrinkConsumptionButton extends JPanel
         DrinkConsumptionButton.this.addKeyListener( keyListener );
         abortButton.removeActionListener( this );
         fillLable.setVisible( true );
+        infoButton.setVisible( true );
         askWhetherToReallyConsumeLabelIsActive = false;
       }
     };
@@ -657,5 +673,10 @@ class DrinkConsumptionButton extends JPanel
     revalidate();
     requestFocus();
     askWhetherToReallyConsumeLabelIsActive = false;
+  }
+
+  JButton getInfoButton()
+  {
+    return infoButton;
   }
 }

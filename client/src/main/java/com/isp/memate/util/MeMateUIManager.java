@@ -53,6 +53,7 @@ public class MeMateUIManager
   private static final Multimap<String, JPanel>                panelList           = ArrayListMultimap.create();
   private static final Multimap<String, MeMateActionBarButton> buttonList          = ArrayListMultimap.create();
   private static final Multimap<String, JButton>               normalButtonList    = ArrayListMultimap.create();
+  private static final Multimap<String, JButton>               infoButtonList      = ArrayListMultimap.create();
   private static final Multimap<String, JComponent>            separatorList       = ArrayListMultimap.create();
   private static final Multimap<String, JTable>                tableList           = ArrayListMultimap.create();
   private static final Multimap<String, JScrollPane>           scrollPaneList      = ArrayListMultimap.create();
@@ -518,6 +519,10 @@ public class MeMateUIManager
           }
         }
       }
+      for ( final JButton button : infoButtonList.get( key ) )
+      {
+        button.setIcon( new InfoIcon() );
+      }
       for ( final JTextPane textPane : textPaneList.get( key ) )
       {
         if ( darkModeState )
@@ -707,7 +712,6 @@ public class MeMateUIManager
         Login.getInstance().showDayHeader();
       }
     }
-
   }
 
 
@@ -774,5 +778,10 @@ public class MeMateUIManager
     {
       return darkIcon;
     }
+  }
+
+  public static void registerInfoButton( final JButton infoButton )
+  {
+    infoButtonList.put( "button", infoButton );
   }
 }

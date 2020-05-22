@@ -46,7 +46,7 @@ import com.isp.memate.util.ClientLog;
  * Beispielsweise bei checkLogin schickt die Klasse ein Objekt, welches
  * den Befehl CHECK_LOGIN und ein Userobjekt, welches Nutzername und
  * gehashtes Passwort enthält an der Server.
- * 
+ *
  * @author nwe
  * @since 24.10.2019
  */
@@ -54,7 +54,7 @@ class ServerCommunication
 {
   private static final ServerCommunication    instance                  = new ServerCommunication();
   final ReentrantLock                         lock                      = new ReentrantLock( true );
-  private ArrayList<String>                   alreadyShownNotifications = new ArrayList<>();
+  private final ArrayList<String>             alreadyShownNotifications = new ArrayList<>();
   private final ArrayList<Byte>               byteImageList             = new ArrayList<>();
   private final List<String>                  drinkNames                = new ArrayList<>();
   private final Map<String, Float>            priceMap                  = new HashMap<>();
@@ -103,7 +103,7 @@ class ServerCommunication
       outStream = new ObjectOutputStream( socket.getOutputStream() );
       inStream = new ObjectInputStream( socket.getInputStream() );
     }
-    catch ( Exception __ )
+    catch ( final Exception __ )
     {
       ClientLog.newLog( "Der Server konnte nicht gefunden werden " + __.getMessage() );
       JOptionPane.showMessageDialog( Login.getInstance(),
@@ -115,15 +115,15 @@ class ServerCommunication
      * Dieser Task überprüft alle 100 Milliseconds, ob der Server etwas gesendet hat.
      * Wenn ja wird das Objekt zugeordnet und die entsprechenede Aufgabe ausgeführt.
      */
-    TimerTask task = new TimerTask()
+    final TimerTask task = new TimerTask()
     {
       @Override
       public void run()
       {
         try
         {
-          Shared shared = (Shared) inStream.readObject();
-          Operation operation = shared.operation;
+          final Shared shared = (Shared) inStream.readObject();
+          final Operation operation = shared.operation;
           ClientLog.newLog( operation.toString() );
           switch ( operation )
           {
@@ -150,7 +150,7 @@ class ServerCommunication
               updateScoreboard( shared.scoreboard );
               break;
             case GET_USERNAME_FOR_SESSION_ID_RESULT:
-              String username = shared.username;
+              final String username = shared.username;
               updateCurrentUser( username );
               if ( username == null )
               {
@@ -197,7 +197,7 @@ class ServerCommunication
     };
 
 
-    TimerTask task3 = new TimerTask()
+    final TimerTask task3 = new TimerTask()
     {
       @Override
       public void run()
@@ -205,31 +205,31 @@ class ServerCommunication
         tellServerToSendHistoryData();
       }
     };
-    TimerTask task4 = new TimerTask()
+    final TimerTask task4 = new TimerTask()
     {
 
       @Override
       public void run()
       {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "HH:mm" );
-        LocalDateTime now = LocalDateTime.now();
-        String date = dtf.format( now );
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "HH:mm" );
+        final LocalDateTime now = LocalDateTime.now();
+        final String date = dtf.format( now );
         if ( date.equals( "12:19" ) )
         {
           if ( showNotifications( "MeetingNotification" ) )
           {
             if ( SystemTray.isSupported() )
             {
-              SystemTray tray = SystemTray.getSystemTray();
-              Image image = Mainframe.frameImage;
-              TrayIcon trayIcon = new TrayIcon( image );
+              final SystemTray tray = SystemTray.getSystemTray();
+              final Image image = Mainframe.frameImage;
+              final TrayIcon trayIcon = new TrayIcon( image );
               trayIcon.setImageAutoSize( true );
               trayIcon.setToolTip( "MeMate" );
               try
               {
                 tray.add( trayIcon );
               }
-              catch ( AWTException exception )
+              catch ( final AWTException exception )
               {
                 ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
               }
@@ -240,28 +240,28 @@ class ServerCommunication
       }
     };
     tellServertoSendUserArray();
-    Timer timer = new Timer();
+    final Timer timer = new Timer();
     timer.schedule( task, 0, 100 );
-    Timer timer3 = new Timer();
+    final Timer timer3 = new Timer();
     timer3.schedule( task3, 5000, 300000 );
-    Timer timer4 = new Timer();
+    final Timer timer4 = new Timer();
     timer4.schedule( task4, 0, 60000 );
   }
 
   /*
    * Gibt zurück ob die gegebene Property enabled ist oder nicht.
    */
-  private boolean showNotifications( String property )
+  private boolean showNotifications( final String property )
   {
     String state = null;
     try ( InputStream input =
         new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
     {
-      Properties userProperties = new Properties();
+      final Properties userProperties = new Properties();
       userProperties.load( input );
       state = userProperties.getProperty( property );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
       ClientLog.newLog( exception.getMessage() );
@@ -279,7 +279,7 @@ class ServerCommunication
      * Dieser Task sorgt dafür, dass die Getränke alle 30
      * Sekunden aktualisiert werden.
      */
-    TimerTask task2 = new TimerTask()
+    final TimerTask task2 = new TimerTask()
     {
       @Override
       public void run()
@@ -287,13 +287,13 @@ class ServerCommunication
         tellServerToSendDrinkInformations();
       }
     };
-    Timer timer2 = new Timer();
+    final Timer timer2 = new Timer();
     timer2.schedule( task2, 10000, 30000 );
   }
 
-  private void updateHistory( String[][] history )
+  private void updateHistory( final String[][] history )
   {
-    List<String[]> list = Arrays.asList( history );
+    final List<String[]> list = Arrays.asList( history );
     Collections.reverse( list );
     this.history = list.toArray( history ).clone();
   }
@@ -304,22 +304,22 @@ class ServerCommunication
    */
   private void checkForChanges()
   {
-    String[][] history = getShortHistory();
+    final String[][] history = getShortHistory();
     if ( history != null && showNotifications( "ConsumptionNotification" ) )
     {
-      ZonedDateTime today = ZonedDateTime.now();
-      ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );
-      for ( String[] data : history )
+      final ZonedDateTime today = ZonedDateTime.now();
+      final ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );
+      for ( final String[] data : history )
       {
-        String action = data[ 0 ];
-        String consumer = data[ 1 ];
-        String date = data[ 2 ];
-        String drinkname = action.substring( 0, action.length() - 10 );
+        final String action = data[ 0 ];
+        final String consumer = data[ 1 ];
+        final String date = data[ 2 ];
+        final String drinkname = action.substring( 0, action.length() - 10 );
         if ( action.contains( "getrunken" ) )
         {
           try
           {
-            Date eventDate = new SimpleDateFormat( "yyyy-MM-dd HH:mm" ).parse( date );
+            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd HH:mm" ).parse( date );
             if ( !eventDate.toInstant().isBefore( twentyMinutesAgo.toInstant() ) )
             {
               if ( !alreadyShownNotifications.contains( date ) )
@@ -329,16 +329,16 @@ class ServerCommunication
                   alreadyShownNotifications.add( date );
                   if ( SystemTray.isSupported() )
                   {
-                    SystemTray tray = SystemTray.getSystemTray();
-                    Image image = Mainframe.frameImage;
-                    TrayIcon trayIcon = new TrayIcon( image );
+                    final SystemTray tray = SystemTray.getSystemTray();
+                    final Image image = Mainframe.frameImage;
+                    final TrayIcon trayIcon = new TrayIcon( image );
                     trayIcon.setImageAutoSize( true );
                     trayIcon.setToolTip( "MeMate" );
                     try
                     {
                       tray.add( trayIcon );
                     }
-                    catch ( AWTException exception )
+                    catch ( final AWTException exception )
                     {
                       ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
                     }
@@ -349,7 +349,7 @@ class ServerCommunication
               }
             }
           }
-          catch ( ParseException exception )
+          catch ( final ParseException exception )
           {
             ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
@@ -358,45 +358,45 @@ class ServerCommunication
     }
   }
 
-  private void updateShortHistory( String[][] history )
+  private void updateShortHistory( final String[][] history )
   {
     this.shortHistory = history;
     checkForChanges();
   }
 
-  private void updateScoreboard( String[][] scoreboard )
+  private void updateScoreboard( final String[][] scoreboard )
   {
     lock.lock();
     this.scoreboard = scoreboard;
     lock.unlock();
   }
 
-  ImageIcon getIcon( String name )
+  ImageIcon getIcon( final String name )
   {
     return imageMap.get( name );
   }
 
-  Float getPrice( String name )
+  Float getPrice( final String name )
   {
     return priceMap.get( name );
   }
 
-  Integer getID( String name )
+  Integer getID( final String name )
   {
     return drinkIDMap.get( name );
   }
 
-  Integer getAmount( String name )
+  Integer getAmount( final String name )
   {
     return amountMap.get( name );
   }
 
-  DrinkIngredients getIngredients( String name )
+  DrinkIngredients getIngredients( final String name )
   {
     return IngredientsMap.get( name );
   }
 
-  Boolean hasIngredients( String name )
+  Boolean hasIngredients( final String name )
   {
     return drinkIngredientsMap.get( name );
   }
@@ -409,17 +409,17 @@ class ServerCommunication
    * Die Methode wird beim Start des Programms aufgerufen oder wenn
    * Veränderungen an Getränken vorgenommen werden.
    */
-  private void updateMaps( Drink[] drinkInfos )
+  private void updateMaps( final Drink[] drinkInfos )
   {
     lock.lock();
     try
     {
-      List<String> oldDrinkNames = new ArrayList<>( drinkNames );
-      Map<String, Float> oldPriceMap = new HashMap<>();
+      final List<String> oldDrinkNames = new ArrayList<>( drinkNames );
+      final Map<String, Float> oldPriceMap = new HashMap<>();
       oldPriceMap.putAll( priceMap );
-      Map<String, Integer> oldAmountMap = new HashMap<>();
+      final Map<String, Integer> oldAmountMap = new HashMap<>();
       oldAmountMap.putAll( amountMap );
-      ArrayList<Byte> oldByteImageList = new ArrayList<>( byteImageList );
+      final ArrayList<Byte> oldByteImageList = new ArrayList<>( byteImageList );
 
       priceMap.clear();
       amountMap.clear();
@@ -429,19 +429,19 @@ class ServerCommunication
       drinkIngredientsMap.clear();
       IngredientsMap.clear();
       byteImageList.clear();
-      for ( Drink drink : drinkInfos )
+      for ( final Drink drink : drinkInfos )
       {
-        String name = drink.name;
-        Float price = drink.price;
-        int amount = drink.amount;
-        byte[] pictureInBytes = drink.pictureInBytes;
-        Integer id = drink.id;
-        ImageIcon icon = new ImageIcon( pictureInBytes );
+        final String name = drink.name;
+        final Float price = drink.price;
+        final int amount = drink.amount;
+        final byte[] pictureInBytes = drink.pictureInBytes;
+        final Integer id = drink.id;
+        final ImageIcon icon = new ImageIcon( pictureInBytes );
         priceMap.put( name, price );
         imageMap.put( name, icon );
         amountMap.put( name, amount );
         //FIXME Das muss besser werden
-        //Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend mit der vorherigen Liste verglichen wird. 
+        //Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend mit der vorherigen Liste verglichen wird.
         byteImageList.add( pictureInBytes[ 355 ] );
         drinkIDMap.put( name, id );
         drinkNames.add( name );
@@ -455,7 +455,7 @@ class ServerCommunication
       }
       Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( exception.getMessage() );
     }
@@ -475,7 +475,7 @@ class ServerCommunication
     {
       outStream.writeObject( new Shared( Operation.GET_HISTORY, new String[0][0] ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ClientLog.newLog( "Die Historie konnte nicht geladen werden. " + exception );
     }
@@ -490,7 +490,7 @@ class ServerCommunication
     {
       outStream.writeObject( new Shared( Operation.GET_USERS, null ) );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die Nutzer konnten nicht geladen werden. " + exception );
     }
@@ -505,7 +505,7 @@ class ServerCommunication
     {
       outStream.writeObject( new Shared( Operation.GET_VERSION, "x" ) );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Die Versionsnummer konnte nicht geladen werden. " + exception );
     }
@@ -521,13 +521,13 @@ class ServerCommunication
       outStream.writeObject( new Shared( Operation.UNDO, null ) );
       Mainframe.getInstance().setUndoButtonEnabled( false );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ClientLog.newLog( "Die letzte Aktion konnte nicht rückgängig gemacht werden. " + exception );
     }
   }
 
-  private void showErrorDialog( String message, String title )
+  private void showErrorDialog( final String message, final String title )
   {
     ClientLog.newLog( message );
     JOptionPane.showMessageDialog( Mainframe.getInstance(), message, title, JOptionPane.ERROR_MESSAGE, null );
@@ -536,10 +536,10 @@ class ServerCommunication
   /**
    * Wird beim Login aufgerufen, damit der
    * Socket weiß, um welchen User es sich handelt.
-   * 
+   *
    * @param username Benutzername
    */
-  void updateCurrentUser( String username )
+  void updateCurrentUser( final String username )
   {
     this.currentUser = username;
   }
@@ -556,7 +556,7 @@ class ServerCommunication
       outStream.writeObject( new Shared( Operation.GET_DRINKINFO, new Drink[0] ) );
       outStream.reset();
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog(
           "Die Getränke konnten nicht geladen werden.\nBitte stellen Sie sicher, dass der Server an ist\nund Sie mit dem Internet verbunden sind",
@@ -566,16 +566,16 @@ class ServerCommunication
 
   /**
    * Fügt einem Getränk optional die Inhaltsstoffe hinzu.
-   * 
+   *
    * @param drinkIngredients Inhaltsstoffe
    */
-  void registerIngredients( DrinkIngredients drinkIngredients )
+  void registerIngredients( final DrinkIngredients drinkIngredients )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.REGISTER_INGREDIENTS, drinkIngredients ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog(
           "Die Getränke konnten nicht geladen werden.\nBitte stellen Sie sicher, dass der Server an ist\nund Sie mit dem Internet verbunden sind",
@@ -587,17 +587,17 @@ class ServerCommunication
   /**
    * Die eingebenen Logindaten werden an den Server
    * gesendet und dieser überprüft die Korrektheit der Daten.
-   * 
+   *
    * @param login ein {@link LoginInformation} Objekt, welches den Nutzernamen und das gehashte Passwort
    *          enthält.
    */
-  void checkLogin( LoginInformation login )
+  void checkLogin( final LoginInformation login )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.CHECK_LOGIN, login ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog(
           "Die Logininformationen konnten nicht an den Server geschickt werden.\nBitte stellen Sie sicher, dass der Server an ist\nund Sie mit dem Internet verbunden sind",
@@ -615,7 +615,7 @@ class ServerCommunication
     {
       outStream.writeObject( new Shared( Operation.GET_BALANCE, null ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog(
           "Das Guthaben konnte nicht geladen werden.\nBitte stellen Sie sicher, dass der Server gestartet ist\nund Sie mit dem Internet verbunden sind.",
@@ -626,18 +626,18 @@ class ServerCommunication
 
   /**
    * Gibt die Historydaten zurück.
-   * 
+   *
    * @param dateType gibt an in welchem Format das Datum zurück gegeben werden soll
-   * 
+   *
    * @return Die Historydaten als 2D Array
    */
-  String[][] getHistoryData( dateType dateType )
+  String[][] getHistoryData( final dateType dateType )
   {
     if ( history == null )
     {
       return history;
     }
-    String[][] historyArray = new String[history.length][];
+    final String[][] historyArray = new String[history.length][];
     for ( int i = 0; i < history.length; i++ )
     {
       historyArray[ i ] = Arrays.copyOf( history[ i ], history[ i ].length );
@@ -671,7 +671,7 @@ class ServerCommunication
     }
     else
     {
-      String[][] historyArray = new String[shortHistory.length][];
+      final String[][] historyArray = new String[shortHistory.length][];
       for ( int i = 0; i < shortHistory.length; i++ )
       {
         historyArray[ i ] = Arrays.copyOf( shortHistory[ i ], shortHistory[ i ].length );
@@ -699,17 +699,17 @@ class ServerCommunication
   /**
    * Es wird ein Shared-Objekt mit dem Befehl REGISTER_USER und einem User-Objekt
    * mit Name und Passwort an den Server geschickt.
-   * 
+   *
    * @param username Benutzername
    * @param password gehashtes Passwort
    */
-  void registerNewUser( String username, String password )
+  void registerNewUser( final String username, final String password )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.REGISTER_USER, new User( username, password, null, -1 ) ) );
     }
-    catch ( IOException __ )
+    catch ( final IOException __ )
     {
       showErrorDialog( "Es konnte kein neuer Benutzer angelegt werden.", "Registrierung fehlgeschlagen" );
     }
@@ -719,7 +719,7 @@ class ServerCommunication
    * Wenn ein Benutzer ein Getränk bearbeitet, so wird ein Shared-Objekt, welches den Befehl für die
    * Änderung und entweder ein {@linkplain DrinkName}, {@linkplain DrinkPrice} oder {@linkplain DrinkPicture}
    * Objekt enthält. Die genannten Objekte enthalten die ID des des Getränks und die spezifische Änderung.
-   * 
+   *
    * @param id ID des Getränks
    * @param operation kann entweder UPDATE_DRINKNAME, UPDATE_DRINKPRICE oder UPDATE_DRINKPICTURE sein, alle
    *          anderen Operationen werden ignoriert.
@@ -727,7 +727,7 @@ class ServerCommunication
    *          mit dem neuen
    *          Namen, dem neuen Preis oder dem neuen Bild sein.
    */
-  void updateDrinkInformations( Integer id, Operation operation, Object updatedInformation )
+  void updateDrinkInformations( final Integer id, final Operation operation, final Object updatedInformation )
   {
     try
     {
@@ -747,7 +747,7 @@ class ServerCommunication
           break;
       }
     }
-    catch ( IOException __ )
+    catch ( final IOException __ )
     {
       showErrorDialog( "Das Getränk konnte nicht aktualisiert werden.", "Getränk bearbeiten fehlgeschlagen" );
     }
@@ -758,16 +758,16 @@ class ServerCommunication
    * Wenn ein neues Getränk registriert wird, werden zunächst die zugehörigen Daten an
    * den Server geschickt und dieser legt für das Getränk einen neuen Datenbankeintrag an.
    * Außerdem werden anschließend Bildermap. Preismap, Dashboard und Drinkmanager aktualisiert.
-   * 
+   *
    * @param drink ein Drink-Objekt, welches alle angegeben Informationen des Getränks enthält.
    */
-  void registerNewDrink( Drink drink )
+  void registerNewDrink( final Drink drink )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.REGISTER_DRINK, drink ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Das Getränk konnte nicht hinzugefügt werden.", "Getränk hinzufügen fehlgeschlagen" );
     }
@@ -779,17 +779,17 @@ class ServerCommunication
    * Server weitergegeben und dieser löscht den Eintrag in der Datenbank.
    * Als nächstes werden dann Bildermap. Preismap, Dashboard
    * und Drinkmanager aktualisiert.
-   * 
+   *
    * @param id ID des Getränks
    * @param name Name des Getränks
    */
-  void removeDrink( Integer id, String name )
+  void removeDrink( final Integer id, final String name )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.REMOVE_DRINK, new Drink( name, null, null, id, null, -1, false, null ) ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Das Getränk konnte nicht gelöscht werden.", "Getränk löschen fehlgeschlagen" );
     }
@@ -810,17 +810,17 @@ class ServerCommunication
 
   /**
    * Schickt den Nutzername und die zugehörige SessionID an den Server.
-   * 
+   *
    * @param username Nutzername
    * @param uuid SessionID
    */
-  void connectSessionIDToUser( String uuid )
+  void connectSessionIDToUser( final String uuid )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.CONNECT_SESSION_ID, uuid ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Die SessionID konnte nicht mit dem Nutzernamen verbunden werden.", "Session fehlgeschlagen" );
       ClientLog.newLog( exception.getMessage() );
@@ -831,16 +831,16 @@ class ServerCommunication
   /**
    * Wenn man eingeloggt bleibt, bekommt man keine neue SessionID, sondern diese findes diese
    * in den Properties. Dieses SessionID wird dem Server übergeben.
-   * 
+   *
    * @param sessionID SessionID
    */
-  void checkLoginForSessionID( String sessionID )
+  void checkLoginForSessionID( final String sessionID )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.GET_USERNAME_FOR_SESSION_ID, sessionID ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Die SessionID is ungültig oder bereits abgelaufen", "Session ungültig" );
       ClientLog.newLog( exception.getMessage() );
@@ -849,16 +849,16 @@ class ServerCommunication
 
   /**
    * Wenn man Guthaben hinzufügt, wird die Höhe der Einzahlung an den Server geschickt.
-   * 
+   *
    * @param valueToAdd Amount to add to balance
    */
-  void addBalance( int valueToAdd )
+  void addBalance( final int valueToAdd )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.ADD_BALANCE, valueToAdd ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Das Guthaben konnte nicht hinzugefügt werden", "Guthaben hinzufügen fehlgeschlagen" );
       ClientLog.newLog( exception.getMessage() );
@@ -869,16 +869,16 @@ class ServerCommunication
   /**
    * Wenn ein Getränk gekauft wird, so wird der Name des Getränks an den Server weiter geleitet, damit dieser
    * den korrekten Betrag vom Nutzerkonto abziehen kann.
-   * 
+   *
    * @param drinkName Name des Getränks
    */
-  void consumeDrink( String drinkName )
+  void consumeDrink( final String drinkName )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.CONSUM_DRINK, new DrinkPrice( priceMap.get( drinkName ), -1, drinkName ) ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Das Getränk konnte nicht gekauft werden.", "Getränkekauf fehlgeschlagen" );
     }
@@ -888,13 +888,13 @@ class ServerCommunication
   /**
    * @param balance neuer Kontostand des Spaarschweins
    */
-  public void setAdminBalance( Float balance )
+  public void setAdminBalance( final Float balance )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.SET_PIGGYBANK_BALANCE, balance ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Das Guthaben des Spaarschweins konnte nicht gesetzt werden.", "Admin-Error" );
     }
@@ -910,20 +910,20 @@ class ServerCommunication
     {
       outStream.writeObject( new Shared( Operation.PIGGYBANK_BALANCE, 0f ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Das Guthaben des Spaarschweins konnte nicht geladen werden.", "Admin-Error" );
       ClientLog.newLog( exception.getMessage() );
     }
   }
 
-  void setDrinkAmount( String name, int amount )
+  void setDrinkAmount( final String name, final int amount )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.SET_DRINK_AMOUNT, new DrinkAmount( name, amount ) ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ClientLog.newLog( exception.getMessage() );
     }
@@ -938,7 +938,7 @@ class ServerCommunication
     {
       outStream.writeObject( new Shared( Operation.LOGOUT, null ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Ausloggen fehlgeschlagen", "Ausloggen" );
       ClientLog.newLog( exception.getMessage() );
@@ -958,43 +958,43 @@ class ServerCommunication
 
   /**
    * Teilt dem Server eine Passwortänderung mit.
-   * 
+   *
    * @param username Nutzername
    * @param password neues Passwort
    */
-  void changePassword( String username, String password )
+  void changePassword( final String username, final String password )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.CHANGE_PASSWORD, new User( username, password, 0f, 1 ) ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Passwort ändern fehlgeschlagen.", "Passwort" );
       ClientLog.newLog( exception.getMessage() );
     }
   }
 
-  void changePassword( String newPass )
+  void changePassword( final String newPass )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.CHANGE_PASSWORD_USER, newPass ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Passwort ändern fehlgeschlagen.", "Passwort" );
       ClientLog.newLog( exception.getMessage() );
     }
   }
 
-  public void changeDisplayName( String newDisplayName )
+  public void changeDisplayName( final String newDisplayName )
   {
     try
     {
       outStream.writeObject( new Shared( Operation.CHANGE_DISPLAYNAME, newDisplayName ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       showErrorDialog( "Anzeigenamen ändern fehlgeschlagen.", "Anzeigenamen" );
       ClientLog.newLog( exception.getMessage() );
@@ -1019,10 +1019,10 @@ class ServerCommunication
 
   /**
    * Überprüft Server- und Clientversion, wenn diese nicht übereinstimmen folgt ein Dialog.
-   * 
+   *
    * @param clientVersion Version des Clients
    */
-  void checkVersion( String clientVersion )
+  void checkVersion( final String clientVersion )
   {
     ClientLog.newLog( "CHECK VERSION" );
     ClientLog.newLog( "Server: " + version );
@@ -1042,7 +1042,7 @@ class ServerCommunication
     return piggyBankBalance;
   }
 
-  public void setPiggyBankBalance( Float piggyBankBalance )
+  public void setPiggyBankBalance( final Float piggyBankBalance )
   {
     this.piggyBankBalance = piggyBankBalance;
   }

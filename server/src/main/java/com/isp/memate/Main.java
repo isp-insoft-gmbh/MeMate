@@ -13,7 +13,7 @@ import com.isp.memate.ServerLog.logType;
 
 /**
  * Die Mainklasse startet den Server und verbindet jeden User mit einem eigenen Socket.
- * 
+ *
  * @author nwe
  * @since 23.10.2019
  */
@@ -24,7 +24,7 @@ public class Main
    * @param args Pfad zur Datenbank
    */
   @SuppressWarnings( "resource" )
-  public static void main( String args[] )
+  public static void main( final String args[] )
   {
     new SendServerInformationsToClients().start();
     ServerSocket serverSocket = null;
@@ -34,7 +34,7 @@ public class Main
       serverSocket = new ServerSocket( 3141 ); //Default is 3141 
       ServerLog.newLog( logType.INFO, "Starte MateServer auf Port: " + serverSocket.getLocalPort() );
     }
-    catch ( IOException e )
+    catch ( final IOException e )
     {
       ServerLog.newLog( logType.ERROR, "Der Server konnte nicht gestartet werden" );
       e.printStackTrace();
@@ -49,14 +49,14 @@ public class Main
       dataBasePath = Database.getTargetFolder().toFile().toString() + File.separator + "MeMate.db";
     }
     ServerLog.newLog( logType.INFO, "Datenbankverbindung wird hergestellt...." );
-    Database database = new Database( dataBasePath );
+    final Database database = new Database( dataBasePath );
     while ( true )
     {
       try
       {
         socket = serverSocket.accept();
       }
-      catch ( IOException e )
+      catch ( final IOException e )
       {
         ServerLog.newLog( logType.ERROR, "Es konnte keine Verbindung zwischen Client und Server aufgebaut werden" );
         e.printStackTrace();
