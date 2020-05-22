@@ -36,6 +36,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -49,7 +50,7 @@ import com.isp.memate.util.MeMateUIManager;
  * Die Klasse DrinkConsumptionButton erzeugt eine Komponente, welcher auf einem {@link JPanel}
  * basiert, aber einen Button nachahmt. Man kann ihn fokusieren und auch das
  * Highlighting verhält sich ähnlich zu einem echten Button.
- * 
+ *
  * @author nwe
  * @since 18.10.2019
  */
@@ -61,7 +62,7 @@ class DrinkConsumptionButton extends JPanel
       BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
   private final Border       FOCUS_BORDER           =
       BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createCompoundBorder(
-          BorderFactory.createEmptyBorder( 1, 1, 1, 1 ), BorderFactory.createDashedBorder( Color.BLACK, 1f, 1f ) ) );
+          BorderFactory.createEmptyBorder( 1, 1, 1, 1 ), BorderFactory.createDashedBorder( UIManager.getColor( "AppColor" ), 1f, 1f ) ) );
 
   private final JLabel       nameLabel                              = MeMateUIManager.createJLabel( "drinkButtons" );
   private final JLabel       priceLabel                             = MeMateUIManager.createJLabel( "drinkButtons" );
@@ -84,13 +85,13 @@ class DrinkConsumptionButton extends JPanel
 
   /**
    * Erzeugt eine Komponente, welche auf einem {@link JPanel} basiert, aber einen Button nachahmt.
-   * 
+   *
    * @param mainFrame Parent-Mainframe für Zugriff auf state
    * @param price Preis des Getränks, welcher oben im "Button" angezeigt werden soll
    * @param name Name des Getränks, welcher unten im "Button" angezeigt werden soll
    * @param icon Bild des Getränks, welches mittig im "Button" angezeigt werden soll
    */
-  DrinkConsumptionButton( Mainframe mainFrame, String price, String name, Icon icon )
+  DrinkConsumptionButton( final Mainframe mainFrame, String price, final String name, final Icon icon )
   {
     infoButton = new JButton( "Info" )
     {
@@ -101,8 +102,8 @@ class DrinkConsumptionButton extends JPanel
       {
         if ( tooltip == null )
         {
-          JPanel panel = new JPanel( new GridBagLayout() );
-          GridBagConstraints constraints = new GridBagConstraints();
+          final JPanel panel = new JPanel( new GridBagLayout() );
+          final GridBagConstraints constraints = new GridBagConstraints();
           constraints.gridx = 1;
           constraints.gridy = 1;
           constraints.fill = GridBagConstraints.BOTH;
@@ -110,8 +111,8 @@ class DrinkConsumptionButton extends JPanel
           panel.add( infoPanel, constraints );
           tooltip = super.createToolTip();
           tooltip.setLayout( new BorderLayout() );
-          Insets insets = tooltip.getInsets();
-          Dimension panelSize = panel.getPreferredSize();
+          final Insets insets = tooltip.getInsets();
+          final Dimension panelSize = panel.getPreferredSize();
           panelSize.width += insets.left + insets.right;
           panelSize.height += insets.top + insets.bottom;
           tooltip.setPreferredSize( panelSize );
@@ -123,10 +124,10 @@ class DrinkConsumptionButton extends JPanel
       private void loadInfoPanelSettings()
       {
         infoPanel.setLayout( new GridBagLayout() );
-        DrinkIngredients ingredients = ServerCommunication.getInstance().getIngredients( name );
-        String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
+        final DrinkIngredients ingredients = ServerCommunication.getInstance().getIngredients( name );
+        final String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
         int maxLength = 40;
-        for ( String string : ingredientsArray )
+        for ( final String string : ingredientsArray )
         {
           if ( string.length() > maxLength )
           {
@@ -134,24 +135,24 @@ class DrinkConsumptionButton extends JPanel
           }
         }
         int currentLength = 0;
-        StringBuilder listBuilder = new StringBuilder();
+        final StringBuilder listBuilder = new StringBuilder();
         listBuilder.append( "<html>Zutaten:<br>" );
-        for ( int i = 0; i < ingredientsArray.length; i++ )
+        for ( final String element : ingredientsArray )
         {
-          currentLength += ingredientsArray[ i ].length() + 2;
+          currentLength += element.length() + 2;
           if ( currentLength > maxLength )
           {
             listBuilder.append( "<br>" );
-            currentLength = ingredientsArray[ i ].length() + 2;
+            currentLength = element.length() + 2;
           }
-          listBuilder.append( ingredientsArray[ i ] )
+          listBuilder.append( element )
               .append( ", " );
         }
         textLabel.setText(
             listBuilder.toString().substring( 0, listBuilder.length() - 2 ) + "<br><br>Durchschnittlicher Gehalt je 100ml<br>" );
 
-        textLabel.setHorizontalAlignment( JLabel.LEFT );
-        GridBagConstraints textLabelConstraints = new GridBagConstraints();
+        textLabel.setHorizontalAlignment( SwingConstants.LEFT );
+        final GridBagConstraints textLabelConstraints = new GridBagConstraints();
         textLabelConstraints.gridx = 0;
         textLabelConstraints.gridy = 0;
         textLabelConstraints.gridwidth = 3;
@@ -169,21 +170,21 @@ class DrinkConsumptionButton extends JPanel
         MeMateUIManager.setUISettings();
       }
 
-      private void addPanel( String ingredient, int y, JPanel mainPanel, DrinkIngredients ingredients )
+      private void addPanel( final String ingredient, final int y, final JPanel mainPanel, final DrinkIngredients ingredients )
       {
-        JPanel panel = MeMateUIManager.createJPanel( "drinkButtons" );
+        final JPanel panel = MeMateUIManager.createJPanel( "drinkButtons" );
         panel.setLayout( new GridBagLayout() );
 
-        JLabel label = MeMateUIManager.createJLabel();
+        final JLabel label = MeMateUIManager.createJLabel();
         label.setText( ingredient + " " );
-        GridBagConstraints labelConstraints = new GridBagConstraints();
+        final GridBagConstraints labelConstraints = new GridBagConstraints();
         labelConstraints.gridx = 0;
         labelConstraints.gridy = 0;
         labelConstraints.weightx = 0;
         labelConstraints.anchor = GridBagConstraints.LAST_LINE_START;
         panel.add( label, labelConstraints );
 
-        JComponent separator = new JComponent()
+        final JComponent separator = new JComponent()
         {
           @Override
           public void paintComponent( final Graphics g )
@@ -195,7 +196,7 @@ class DrinkConsumptionButton extends JPanel
           }
         };
         MeMateUIManager.registerSeparator( separator, "default" );
-        GridBagConstraints seperatorConstraints = new GridBagConstraints();
+        final GridBagConstraints seperatorConstraints = new GridBagConstraints();
         seperatorConstraints.gridx = 1;
         seperatorConstraints.gridy = 0;
         seperatorConstraints.weightx = 1;
@@ -204,7 +205,7 @@ class DrinkConsumptionButton extends JPanel
         seperatorConstraints.fill = GridBagConstraints.HORIZONTAL;
         panel.add( separator, seperatorConstraints );
 
-        JLabel amountLabel = MeMateUIManager.createJLabel();
+        final JLabel amountLabel = MeMateUIManager.createJLabel();
         switch ( ingredient )
         {
           case "Salz":
@@ -230,14 +231,14 @@ class DrinkConsumptionButton extends JPanel
           default :
             break;
         }
-        GridBagConstraints amountLabelConstraints = new GridBagConstraints();
+        final GridBagConstraints amountLabelConstraints = new GridBagConstraints();
         amountLabelConstraints.gridx = 2;
         amountLabelConstraints.gridy = 0;
         amountLabelConstraints.weightx = 0;
         amountLabelConstraints.anchor = GridBagConstraints.LAST_LINE_END;
         panel.add( amountLabel, amountLabelConstraints );
 
-        GridBagConstraints panelConstraints = new GridBagConstraints();
+        final GridBagConstraints panelConstraints = new GridBagConstraints();
         panelConstraints.gridx = 0;
         panelConstraints.gridy = y;
         panelConstraints.gridwidth = 3;
@@ -263,8 +264,8 @@ class DrinkConsumptionButton extends JPanel
     infoPanel.setLayout( new GridBagLayout() );
     nameLabel.setText( name );
     nameLabel.setFont( nameLabel.getFont().deriveFont( 14f ) );
-    nameLabel.setHorizontalAlignment( JLabel.CENTER );
-    GridBagConstraints nameLabelConstraints = new GridBagConstraints();
+    nameLabel.setHorizontalAlignment( SwingConstants.CENTER );
+    final GridBagConstraints nameLabelConstraints = new GridBagConstraints();
     nameLabelConstraints.gridx = 1;
     nameLabelConstraints.gridy = 0;
     nameLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -272,7 +273,7 @@ class DrinkConsumptionButton extends JPanel
     nameLabelAndDrinkInfoButtonPanel.add( nameLabel, nameLabelConstraints );
     if ( ServerCommunication.getInstance().hasIngredients( name ) )
     {
-      GridBagConstraints infoButtonConstraints = new GridBagConstraints();
+      final GridBagConstraints infoButtonConstraints = new GridBagConstraints();
       infoButtonConstraints.gridx = 2;
       infoButtonConstraints.gridy = 0;
       infoButtonConstraints.weightx = 0.1;
@@ -280,7 +281,7 @@ class DrinkConsumptionButton extends JPanel
       nameLabelAndDrinkInfoButtonPanel.add( infoButton, infoButtonConstraints );
 
       fillLable.setPreferredSize( new Dimension( 33, 21 ) );
-      GridBagConstraints fillLablenConstraints = new GridBagConstraints();
+      final GridBagConstraints fillLablenConstraints = new GridBagConstraints();
       fillLablenConstraints.gridx = 0;
       fillLablenConstraints.gridy = 0;
       fillLablenConstraints.weightx = 0.1;
@@ -291,13 +292,13 @@ class DrinkConsumptionButton extends JPanel
     }
 
     price = price.replace( "€", "" );
-    Float priceAsFloat = Float.valueOf( price );
-    NumberFormat formatter = NumberFormat.getCurrencyInstance();
-    String format = formatter.format( priceAsFloat.doubleValue() );
+    final Float priceAsFloat = Float.valueOf( price );
+    final NumberFormat formatter = NumberFormat.getCurrencyInstance();
+    final String format = formatter.format( priceAsFloat.doubleValue() );
 
     priceLabel.setText( format + "                                Noch " + ServerCommunication.getInstance().getAmount( name ) + " Stück" );
     priceLabel.setFont( priceLabel.getFont().deriveFont( 14f ) );
-    priceLabel.setHorizontalAlignment( JLabel.CENTER );
+    priceLabel.setHorizontalAlignment( SwingConstants.CENTER );
 
     iconLabel = new JLabel( icon );
     acceptButton.setPreferredSize( new Dimension( 200, 50 ) );
@@ -313,41 +314,54 @@ class DrinkConsumptionButton extends JPanel
     overlay.setLayout( new FlowLayout() );
     overlay.add( acceptButton );
     overlay.add( abortButton );
-    askWhetherToReallyConsumeLabel.setHorizontalAlignment( JLabel.CENTER );
+    askWhetherToReallyConsumeLabel.setHorizontalAlignment( SwingConstants.CENTER );
     askWhetherToReallyConsumeLabel.setBorder( new EmptyBorder( 40, 0, 30, 0 ) );
     askWhetherToReallyConsumeLabel.setFont( askWhetherToReallyConsumeLabel.getFont().deriveFont( 16f ) );
 
 
-    acceptAction = new ActionListener()
+    acceptAction = e ->
     {
-      @Override
-      public void actionPerformed( ActionEvent e )
-      {
-        remove( overlay );
-        remove( askWhetherToReallyConsumeLabel );
-        iconLabel.setVisible( true );
-        infoButton.setVisible( true );
-        repaint();
-        revalidate();
-        requestFocus();
-      }
+      remove( overlay );
+      remove( askWhetherToReallyConsumeLabel );
+      iconLabel.setVisible( true );
+      infoButton.setVisible( true );
+      repaint();
+      revalidate();
+      requestFocus();
     };
     acceptButton.addActionListener( acceptAction );
 
-    abortAction = new ActionListener()
+    abortAction = e ->
     {
-
-      @Override
-      public void actionPerformed( ActionEvent e )
+      remove( overlay );
+      remove( askWhetherToReallyConsumeLabel );
+      iconLabel.setVisible( true );
+      infoButton.setVisible( true );
+      if ( MeMateUIManager.getDarkModeState() )
       {
-        remove( overlay );
-        remove( askWhetherToReallyConsumeLabel );
-        iconLabel.setVisible( true );
-        infoButton.setVisible( true );
-        repaint();
-        revalidate();
-        requestFocus();
+        setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
+        nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
+        infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
+        final Component[] components = infoPanel.getComponents();
+        for ( final Component component : components )
+        {
+          component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
+        }
       }
+      else
+      {
+        setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
+        nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
+        infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
+        final Component[] components = infoPanel.getComponents();
+        for ( final Component component : components )
+        {
+          component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
+        }
+      }
+      repaint();
+      revalidate();
+      requestFocus();
     };
     abortButton.addActionListener( abortAction );
 
@@ -356,21 +370,21 @@ class DrinkConsumptionButton extends JPanel
     mouseListener = new MouseAdapter()
     {
       @Override
-      public void mouseClicked( MouseEvent __ )
+      public void mouseClicked( final MouseEvent __ )
       {
         askWhetherToReallyConsume( name, abortAction );
       }
 
       @Override
-      public void mouseEntered( MouseEvent __ )
+      public void mouseEntered( final MouseEvent __ )
       {
         if ( MeMateUIManager.getDarkModeState() )
         {
           setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
           nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
           infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
-          Component[] components = infoPanel.getComponents();
-          for ( Component component : components )
+          final Component[] components = infoPanel.getComponents();
+          for ( final Component component : components )
           {
             component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
           }
@@ -380,23 +394,24 @@ class DrinkConsumptionButton extends JPanel
           setBackground( HOVER_BACKGROUND_COLOR );
           nameLabelAndDrinkInfoButtonPanel.setBackground( HOVER_BACKGROUND_COLOR );
           infoPanel.setBackground( HOVER_BACKGROUND_COLOR );
-          Component[] components = infoPanel.getComponents();
-          for ( Component component : components )
+          final Component[] components = infoPanel.getComponents();
+          for ( final Component component : components )
           {
             component.setBackground( HOVER_BACKGROUND_COLOR );
           }
         }
       }
 
-      public void mouseExited( MouseEvent __ )
+      @Override
+      public void mouseExited( final MouseEvent __ )
       {
         if ( MeMateUIManager.getDarkModeState() )
         {
           setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
           nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
           infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
-          Component[] components = infoPanel.getComponents();
-          for ( Component component : components )
+          final Component[] components = infoPanel.getComponents();
+          for ( final Component component : components )
           {
             component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
           }
@@ -406,36 +421,38 @@ class DrinkConsumptionButton extends JPanel
           setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
           nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
           infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
-          Component[] components = infoPanel.getComponents();
-          for ( Component component : components )
+          final Component[] components = infoPanel.getComponents();
+          for ( final Component component : components )
           {
             component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
           }
         }
       }
 
-      public void mousePressed( MouseEvent __ )
+      @Override
+      public void mousePressed( final MouseEvent __ )
       {
         requestFocus();
         setBackground( UIManager.getColor( "AppColor" ) );
         nameLabelAndDrinkInfoButtonPanel.setBackground( UIManager.getColor( "AppColor" ) );
         infoPanel.setBackground( UIManager.getColor( "AppColor" ) );
-        Component[] components = infoPanel.getComponents();
-        for ( Component component : components )
+        final Component[] components = infoPanel.getComponents();
+        for ( final Component component : components )
         {
           component.setBackground( UIManager.getColor( "AppColor" ) );
         }
       }
 
-      public void mouseReleased( MouseEvent event )
+      @Override
+      public void mouseReleased( final MouseEvent event )
       {
         if ( SwingUtilities.getLocalBounds( DrinkConsumptionButton.this ).contains( event.getPoint() ) )
         {
           setBackground( HOVER_BACKGROUND_COLOR );
           nameLabelAndDrinkInfoButtonPanel.setBackground( HOVER_BACKGROUND_COLOR );
           infoPanel.setBackground( HOVER_BACKGROUND_COLOR );
-          Component[] components = infoPanel.getComponents();
-          for ( Component component : components )
+          final Component[] components = infoPanel.getComponents();
+          for ( final Component component : components )
           {
             component.setBackground( HOVER_BACKGROUND_COLOR );
           }
@@ -448,8 +465,8 @@ class DrinkConsumptionButton extends JPanel
             setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
             nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
             infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
-            Component[] components = infoPanel.getComponents();
-            for ( Component component : components )
+            final Component[] components = infoPanel.getComponents();
+            for ( final Component component : components )
             {
               component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
             }
@@ -459,8 +476,8 @@ class DrinkConsumptionButton extends JPanel
             setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
             nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
             infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
-            Component[] components = infoPanel.getComponents();
-            for ( Component component : components )
+            final Component[] components = infoPanel.getComponents();
+            for ( final Component component : components )
             {
               component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
             }
@@ -471,13 +488,13 @@ class DrinkConsumptionButton extends JPanel
     focusListener = new FocusListener()
     {
       @Override
-      public void focusLost( FocusEvent __ )
+      public void focusLost( final FocusEvent __ )
       {
         setBorder( DEFAULT_BORDER );
       }
 
       @Override
-      public void focusGained( FocusEvent __ )
+      public void focusGained( final FocusEvent __ )
       {
         setBorder( FOCUS_BORDER );
       }
@@ -485,7 +502,7 @@ class DrinkConsumptionButton extends JPanel
     keyListener = new KeyAdapter()
     {
       @Override
-      public void keyPressed( KeyEvent event )
+      public void keyPressed( final KeyEvent event )
       {
         if ( event.getKeyCode() == KeyEvent.VK_ENTER || event.getKeyCode() == KeyEvent.VK_SPACE )
         {
@@ -493,10 +510,10 @@ class DrinkConsumptionButton extends JPanel
         }
       }
     };
-    Action abortAction = new AbstractAction()
+    final Action abortAction = new AbstractAction()
     {
       @Override
-      public void actionPerformed( ActionEvent e )
+      public void actionPerformed( final ActionEvent e )
       {
         reset();
       }
@@ -516,11 +533,11 @@ class DrinkConsumptionButton extends JPanel
    * Sobald man auf ein Getränk klickt, so öffnet sich ein Dialog, welcher fragt, ob man das
    * Getränk wirklich konsumieren möchte. Bestätigt man dies, so wird {@linkplain ServerCommunication}
    * mitgeteilt, welches Getränk man gekauft hat.
-   * 
+   *
    * @param drinkName Name des Getränks
    * @param abortButtonListener
    */
-  private void askWhetherToReallyConsume( String drinkName, ActionListener abortButtonListener )
+  private void askWhetherToReallyConsume( final String drinkName, final ActionListener abortButtonListener )
   {
     Mainframe.getInstance().getDashboard().resetAllDrinkButtons();
     infoButton.setVisible( false );
@@ -531,8 +548,8 @@ class DrinkConsumptionButton extends JPanel
       setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
       nameLabelAndDrinkInfoButtonPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
       infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
-      Component[] components = infoPanel.getComponents();
-      for ( Component component : components )
+      final Component[] components = infoPanel.getComponents();
+      for ( final Component component : components )
       {
         component.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor().brighter() );
       }
@@ -544,7 +561,7 @@ class DrinkConsumptionButton extends JPanel
     {
       remove( infoPanel );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( exception.getMessage() );
     }
@@ -553,20 +570,20 @@ class DrinkConsumptionButton extends JPanel
     repaint();
     revalidate();
     acceptButton.requestFocus();
-    ActionListener actionListener = new ActionListener()
+    final ActionListener actionListener = new ActionListener()
     {
       @Override
-      public void actionPerformed( ActionEvent e )
+      public void actionPerformed( final ActionEvent e )
       {
-        ReentrantLock lock = ServerCommunication.getInstance().lock;
+        final ReentrantLock lock = ServerCommunication.getInstance().lock;
         lock.lock();
         try
         {
           ServerCommunication.getInstance().consumeDrink( drinkName );
           ServerCommunication.getInstance().getBalance();
           acceptButton.removeActionListener( this );
-          ActionListener[] array = abortButton.getActionListeners();
-          for ( ActionListener actionListener : array )
+          final ActionListener[] array = abortButton.getActionListeners();
+          for ( final ActionListener actionListener : array )
           {
             abortButton.removeActionListener( actionListener );
           }
@@ -577,7 +594,7 @@ class DrinkConsumptionButton extends JPanel
           fillLable.setVisible( true );
           askWhetherToReallyConsumeLabelIsActive = false;
         }
-        catch ( Exception exception )
+        catch ( final Exception exception )
         {
           ClientLog.newLog( exception.getMessage() );
         }
@@ -588,10 +605,10 @@ class DrinkConsumptionButton extends JPanel
       }
     };
     acceptButton.addActionListener( actionListener );
-    ActionListener actionListener2 = new ActionListener()
+    final ActionListener actionListener2 = new ActionListener()
     {
       @Override
-      public void actionPerformed( ActionEvent e )
+      public void actionPerformed( final ActionEvent e )
       {
         acceptButton.removeActionListener( actionListener );
         DrinkConsumptionButton.this.addMouseListener( mouseListener );
@@ -608,13 +625,13 @@ class DrinkConsumptionButton extends JPanel
   {
     infoButton.setVisible( true );
     fillLable.setVisible( true );
-    ActionListener[] abortListenerArray = abortButton.getActionListeners();
-    for ( ActionListener actionListener : abortListenerArray )
+    final ActionListener[] abortListenerArray = abortButton.getActionListeners();
+    for ( final ActionListener actionListener : abortListenerArray )
     {
       abortButton.removeActionListener( actionListener );
     }
-    ActionListener[] acceptListenerArray = abortButton.getActionListeners();
-    for ( ActionListener actionListener : acceptListenerArray )
+    final ActionListener[] acceptListenerArray = abortButton.getActionListeners();
+    for ( final ActionListener actionListener : acceptListenerArray )
     {
       acceptButton.removeActionListener( actionListener );
     }

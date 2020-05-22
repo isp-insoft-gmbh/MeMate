@@ -5,6 +5,8 @@ package com.isp.memate.util;
 
 
 import java.awt.Color;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,13 +27,13 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.table.JTableHeader;
 
 import org.jfree.chart.JFreeChart;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-
 import com.isp.memate.Login;
 import com.isp.memate.actionbar.MeMateActionBarButton;
 import com.isp.memate.actionbar.MeMateActionBarListener;
@@ -40,34 +42,39 @@ import com.isp.memate.actionbar.MeMateActionBarListener;
 /**
  * Der {@link MeMateUIManager} enthält Listen von allen Komponenten den App und kann somit global
  * den Darkmode togglen.
- * 
+ *
  * @author nwe
  * @since 04.02.2020
  *
  */
 public class MeMateUIManager
 {
-  private static final Multimap<String, JLabel>                labelList        = ArrayListMultimap.create();
-  private static final Multimap<String, JPanel>                panelList        = ArrayListMultimap.create();
-  private static final Multimap<String, MeMateActionBarButton> buttonList       = ArrayListMultimap.create();
-  private static final Multimap<String, JButton>               normalButtonList = ArrayListMultimap.create();
-  private static final Multimap<String, JComponent>            separatorList    = ArrayListMultimap.create();
-  private static final Multimap<String, JTable>                tableList        = ArrayListMultimap.create();
-  private static final Multimap<String, JScrollPane>           scrollPaneList   = ArrayListMultimap.create();
-  private static final Multimap<String, JTextPane>             textPaneList     = ArrayListMultimap.create();
-  private static final Multimap<String, JCheckBox>             checkBoxList     = ArrayListMultimap.create();
-  private static final Multimap<String, JList<?>>              listList         = ArrayListMultimap.create();
-  private static final Multimap<String, JSpinner>              spinnerList      = ArrayListMultimap.create();
-  private static final Multimap<String, JRadioButton>          radioButtonList  = ArrayListMultimap.create();
-  private static final Multimap<String, JComboBox<String>>     comboBoxList     = ArrayListMultimap.create();
-  private static final Map<JButton, DarkDayIcon>               iconList         = new HashMap<>();
-  private static final Map<JLabel, DarkDayIcon>                panelIconList    = new HashMap<>();
-  private static final Map<String, DarkDayColor>               backgroundMap    = new HashMap<>();
-  private static final Map<String, DarkDayColor>               foregroundMap    = new HashMap<>();
-  private static final String                                  defaultKey       = "default";
-  private static final Set<String>                             keySet           = new HashSet<>();
-  private static JFreeChart                                    freeChart        = null;
-  private static JFreeChart                                    lineChart        = null;
+  private static final Multimap<String, JLabel>                labelList           = ArrayListMultimap.create();
+  private static final Multimap<String, JPanel>                panelList           = ArrayListMultimap.create();
+  private static final Multimap<String, MeMateActionBarButton> buttonList          = ArrayListMultimap.create();
+  private static final Multimap<String, JButton>               normalButtonList    = ArrayListMultimap.create();
+  private static final Multimap<String, JComponent>            separatorList       = ArrayListMultimap.create();
+  private static final Multimap<String, JTable>                tableList           = ArrayListMultimap.create();
+  private static final Multimap<String, JScrollPane>           scrollPaneList      = ArrayListMultimap.create();
+  private static final Multimap<String, JTextPane>             textPaneList        = ArrayListMultimap.create();
+  private static final Multimap<String, JCheckBox>             checkBoxList        = ArrayListMultimap.create();
+  private static final Multimap<String, JList<?>>              listList            = ArrayListMultimap.create();
+  private static final Multimap<String, JSpinner>              spinnerList         = ArrayListMultimap.create();
+  private static final Multimap<String, JRadioButton>          radioButtonList     = ArrayListMultimap.create();
+  private static final Multimap<String, JComboBox<String>>     comboBoxList        = ArrayListMultimap.create();
+  private static final Map<JButton, DarkDayIcon>               iconList            = new HashMap<>();
+  private static final Map<JLabel, DarkDayIcon>                panelIconList       = new HashMap<>();
+  private static final Map<String, DarkDayColor>               backgroundMap       = new HashMap<>();
+  private static final Map<String, DarkDayColor>               foregroundMap       = new HashMap<>();
+  private static final String                                  defaultKey          = "default";
+  private static final Set<String>                             keySet              = new HashSet<>();
+  private static JFreeChart                                    freeChart           = null;
+  private static JFreeChart                                    lineChart           = null;
+  private static final Border                                  DEFAULT_LINE_BORDER =
+      BorderFactory.createLineBorder( new Color( 173, 173, 173, 0 ) );
+  private static final Border                                  DEFAULT_BORDER      =
+      BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
+
 
   private static boolean darkModeState = false;
 
@@ -101,7 +108,7 @@ public class MeMateUIManager
 
   /**
    * Install a new custom Key with custom colors.
-   * 
+   *
    * @param key keyname
    * @param backgroundColors BG-Colors
    * @param foregroundColors FG-Colors
@@ -190,7 +197,7 @@ public class MeMateUIManager
 
   /**
    * Erstellt ein {@link JPanel} mit defaultKey
-   * 
+   *
    * @return {@link JPanel}
    */
   public static JPanel createJPanel()
@@ -200,7 +207,7 @@ public class MeMateUIManager
 
   /**
    * Erstellt ein {@link JPanel}, welches der panelList hinzugefügt wird.
-   * 
+   *
    * @param key key
    * @return {@link JPanel}
    */
@@ -213,7 +220,7 @@ public class MeMateUIManager
 
   /**
    * Erstellt ein {@link JLabel} mit defaultKey
-   * 
+   *
    * @return {@link JLabel}
    */
   public static JLabel createJLabel()
@@ -223,7 +230,7 @@ public class MeMateUIManager
 
   /**
    * Erstellt ein {@link JLabel}, welches der labelList hinzugefügt wird.
-   * 
+   *
    * @param key key
    * @return {@link JLabel}
    */
@@ -236,7 +243,7 @@ public class MeMateUIManager
 
   /**
    * Erstellt ein {@link JTextPane}, welches der textPaneList hinzugefügt wird.
-   * 
+   *
    * @return {@link JTextPane}
    */
   public static JTextPane createTextPane()
@@ -248,7 +255,7 @@ public class MeMateUIManager
 
   /**
    * Erstellt eine {@link JCheckBox}, welche der checkBoxList hinzugefügt wird.
-   * 
+   *
    * @return {@link JTextPane}
    */
   public static JCheckBox createCheckbox()
@@ -260,12 +267,12 @@ public class MeMateUIManager
 
   /**
    * Erstellt einen {@link JRadioButton}, welche der radioButtonList hinzugefügt wird.
-   * 
+   *
    * @param text buttontext
-   * 
+   *
    * @return {@link JRadioButton}
    */
-  public static JRadioButton createRadioButton( String text )
+  public static JRadioButton createRadioButton( final String text )
   {
     final JRadioButton radioButton = new JRadioButton( text );
     radioButtonList.put( "default", radioButton );
@@ -274,65 +281,82 @@ public class MeMateUIManager
 
   /**
    * Erstellt einen {@link JButton}, welcher der normalButtonList hinzugefügt wird.
-   * 
+   *
    * @param key key
    * @return {@link JButton}
    */
-  public static JButton createNormalButton( String key )
+  public static JButton createNormalButton( final String key )
   {
-    JButton button = new JButton();
+    final JButton button = new JButton();
     button.setContentAreaFilled( false );
     button.setOpaque( true );
     button.setBorder(
         BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( new Color( 41, 48, 60 ).brighter() ),
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
+    button.addFocusListener( new FocusListener()
+    {
+      @Override
+      public void focusLost( final FocusEvent __ )
+      {
+        button.setBorder( DEFAULT_BORDER );
+      }
+
+      @Override
+      public void focusGained( final FocusEvent __ )
+      {
+        button.setBorder( BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER, BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder( 1, 1, 1, 1 ),
+            BorderFactory.createDashedBorder( UIManager.getColor( "AppColor" ), 1f, 1f ) ) ) );
+      }
+    } );
+
     normalButtonList.put( key, button );
     return button;
   }
 
   /**
    * Erstellt einen {@link JButton} mit Icon, welcher der iconList hinzugefügt wird.
-   * 
+   *
    * @param key key
    * @param imageIcon Daymode Icon
    * @param imageIcon2 Darkmode Icon
    * @return {@link JButton}
    */
-  public static JButton createNormalButton( String key, ImageIcon imageIcon, ImageIcon imageIcon2 )
+  public static JButton createNormalButton( final String key, final ImageIcon imageIcon, final ImageIcon imageIcon2 )
   {
-    JButton button = createNormalButton( key );
+    final JButton button = createNormalButton( key );
     iconList.put( button, new DarkDayIcon( imageIcon, imageIcon2 ) );
     return button;
   }
 
 
   @SuppressWarnings( "javadoc" )
-  public static void registerPanel( final String key, JPanel panel )
+  public static void registerPanel( final String key, final JPanel panel )
   {
     panelList.put( key, panel );
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerIconLabel( JLabel infoIconLabel, ImageIcon infoIcon, ImageIcon infoIconWhite )
+  public static void registerIconLabel( final JLabel infoIconLabel, final ImageIcon infoIcon, final ImageIcon infoIconWhite )
   {
     labelList.put( defaultKey, infoIconLabel );
     panelIconList.put( infoIconLabel, new DarkDayIcon( infoIconWhite, infoIcon ) );
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerTable( final String key, JTable table )
+  public static void registerTable( final String key, final JTable table )
   {
     tableList.put( key, table );
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerList( final String key, JList<?> list )
+  public static void registerList( final String key, final JList<?> list )
   {
     listList.put( key, list );
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerScrollPane( final String key, JScrollPane scrollPane )
+  public static void registerScrollPane( final String key, final JScrollPane scrollPane )
   {
     scrollPaneList.put( key, scrollPane );
   }
@@ -344,53 +368,53 @@ public class MeMateUIManager
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerFreeChart( JFreeChart freeChart )
+  public static void registerFreeChart( final JFreeChart freeChart )
   {
     MeMateUIManager.freeChart = freeChart;
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerLineChart( JFreeChart lineChart )
+  public static void registerLineChart( final JFreeChart lineChart )
   {
     MeMateUIManager.lineChart = lineChart;
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerButton( JButton button )
+  public static void registerButton( final JButton button )
   {
     normalButtonList.put( "button", button );
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerSpinner( JSpinner spinner )
+  public static void registerSpinner( final JSpinner spinner )
   {
     spinnerList.put( "spinner", spinner );
   }
 
   @SuppressWarnings( "javadoc" )
-  public static void registerComboBox( JComboBox<String> comboBox )
+  public static void registerComboBox( final JComboBox<String> comboBox )
   {
     comboBoxList.put( "comboBox", comboBox );
   }
 
   /**
    * Gibt die Hintergrundfarben des gegebenen Keys an.
-   * 
+   *
    * @param key Key
    * @return Hintergrundfarben
    */
-  public static DarkDayColor getBackground( String key )
+  public static DarkDayColor getBackground( final String key )
   {
     return backgroundMap.get( key );
   }
 
   /**
    * Gibt die Vordergrundfarben des gegebenen Keys an.
-   * 
+   *
    * @param key Key
    * @return Vordergrundfarben
    */
-  public static DarkDayColor getForeground( String key )
+  public static DarkDayColor getForeground( final String key )
   {
     return foregroundMap.get( key );
   }
@@ -521,7 +545,7 @@ public class MeMateUIManager
         if ( darkModeState )
         {
           table.setBackground( backgroundMap.get( key ).getDarkColor() );
-          JTableHeader header = table.getTableHeader();
+          final JTableHeader header = table.getTableHeader();
           header.setBackground( backgroundMap.get( key ).getDarkColor().brighter().brighter() );
           header.setForeground( foregroundMap.get( key ).getDarkColor() );
           table.setForeground( foregroundMap.get( key ).getDarkColor() );
@@ -530,14 +554,14 @@ public class MeMateUIManager
         else
         {
           table.setBackground( backgroundMap.get( key ).getDayColor() );
-          JTableHeader header = table.getTableHeader();
+          final JTableHeader header = table.getTableHeader();
           header.setBackground( backgroundMap.get( key ).getDayColor().darker() );
           header.setForeground( foregroundMap.get( key ).getDayColor() );
           table.setForeground( foregroundMap.get( key ).getDayColor() );
           table.setSelectionBackground( UIManager.getColor( "AppColor" ) );
         }
       }
-      for ( JScrollPane scrollPane : scrollPaneList.get( key ) )
+      for ( final JScrollPane scrollPane : scrollPaneList.get( key ) )
       {
         if ( darkModeState )
         {
@@ -604,45 +628,17 @@ public class MeMateUIManager
         {
           button.toggleDarkMode( backgroundMap.get( key ).getDarkColor(), foregroundMap.get( key ).getDarkColor() );
           button.setDarkModeState( true );
-          button.addMouseListener( new MeMateActionBarListener( button, new Runnable()
-          {
-
-            @Override
-            public void run()
-            {
-              button.setBackground( backgroundMap.get( key ).getDarkColor() );
-            }
-          }, new Runnable()
-          {
-
-            @Override
-            public void run()
-            {
-              button.setBackground( backgroundMap.get( key ).getDarkColor().darker() );
-            }
-          } ) );
+          button
+              .addMouseListener( new MeMateActionBarListener( button, () -> button.setBackground( backgroundMap.get( key ).getDarkColor() ),
+                  () -> button.setBackground( backgroundMap.get( key ).getDarkColor().darker() ) ) );
         }
         else
         {
           button.toggleDarkMode( backgroundMap.get( key ).getDayColor(), foregroundMap.get( key ).getDayColor() );
           button.setDarkModeState( false );
-          button.addMouseListener( new MeMateActionBarListener( button, new Runnable()
-          {
-
-            @Override
-            public void run()
-            {
-              button.setBackground( backgroundMap.get( key ).getDayColor() );
-            }
-          }, new Runnable()
-          {
-
-            @Override
-            public void run()
-            {
-              button.setBackground( backgroundMap.get( key ).getDayColor().darker() );
-            }
-          } ) );
+          button
+              .addMouseListener( new MeMateActionBarListener( button, () -> button.setBackground( backgroundMap.get( key ).getDayColor() ),
+                  () -> button.setBackground( backgroundMap.get( key ).getDayColor().darker() ) ) );
         }
       }
     }
@@ -717,7 +713,7 @@ public class MeMateUIManager
 
   /**
    * Enthält immer eine Farbe für den Darkmode und eine für den Daymode.
-   * 
+   *
    * @author nwe
    * @since 02.03.2020
    *
@@ -730,7 +726,7 @@ public class MeMateUIManager
 
     /**
      * Setzen der Farben
-     * 
+     *
      * @param darkColor Darkmode Farbe
      * @param dayColor Daymode Farbe
      */
