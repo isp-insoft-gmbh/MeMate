@@ -29,9 +29,9 @@ class Main
   /**
    * @param args unused
    *
-   * @throws UnsupportedLookAndFeelException bei fehlerhafter Look&Feel Initialisierung
+   * @throws UnsupportedLookAndFeelException bei fehlerhafter Look&Feel Initialisierung																																																
    * @throws IllegalAccessException bei fehlerhafter Look&Feel Initialisierung
-   * @throws InstantiationException bei fehlerhafter Look&Feel Initialisierung
+   * @throws InstantiationException bei fehlerhafter Look&Feel Initialisie+rung
    * @throws ClassNotFoundException bei fehlerhafter Look&Feel Initialisierung
    */
   public static void main( final String[] args )

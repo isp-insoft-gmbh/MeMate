@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -159,8 +160,8 @@ class Settings extends JPanel
     final JLabel passwordCompareLabel = new JLabel();
     final JPasswordField passwordField = new JPasswordField();
     final JPasswordField password2Field = new JPasswordField();
-    final JButton savePasswordButton = new JButton( "Speichern" );
-    final JButton pass_abortButton = new JButton( "Abbrechen" );
+    final JButton savePasswordButton = MeMateUIManager.createButton("button", "Speichern");
+    final JButton pass_abortButton = MeMateUIManager.createButton("button", "Abbrechen");
 
     changePasswordFrame.getRootPane().setDefaultButton( savePasswordButton );
 
@@ -302,8 +303,8 @@ class Settings extends JPanel
     final JPanel changeDisplayNamePanel = new JPanel( new GridBagLayout() );
     final JLabel displayNamelabel = new JLabel( "Anzeigename:" );
     final JTextField displayNameField = new JTextField();
-    final JButton saveDisplayNameButton = new JButton( "Speichern" );
-    final JButton abortDisplayNameButton = new JButton( "Abbrechen" );
+    final JButton saveDisplayNameButton = MeMateUIManager.createButton("button","Speichern");
+    final JButton abortDisplayNameButton = MeMateUIManager.createButton("button","Abbrechen");
 
     changeDisplayNameFrame.getRootPane().setDefaultButton( saveDisplayNameButton );
 
@@ -748,6 +749,9 @@ class Settings extends JPanel
     UIManager.put( "App.Background", background );
     UIManager.put( "App.Secondary.Background", background2 );
     UIManager.put( "App.Actionbar", actionbar );
+	UIManager.put("FocusBorder",
+		BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(appColor),
+			BorderFactory.createEmptyBorder(2, 5, 2, 5)));
     MeMateUIManager.installDefaults();
     MeMateUIManager.setUISettings();
     Mainframe.getInstance().headerPanel.setBackground( appColor );

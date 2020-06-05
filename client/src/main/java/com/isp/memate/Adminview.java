@@ -48,12 +48,12 @@ import com.isp.memate.util.MeMateUIManager;
 class Adminview extends JPanel
 {
   private final JButton    exportButton          =
-      MeMateUIManager.createNormalButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "export_white.png" ) ),
+      MeMateUIManager.createIconButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "export_white.png" ) ),
           new ImageIcon( getClass().getClassLoader().getResource( "export_black.png" ) ) );
   private final JButton    resetPasswordButton   =
-      MeMateUIManager.createNormalButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "password_white.png" ) ),
+      MeMateUIManager.createIconButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "password_white.png" ) ),
           new ImageIcon( getClass().getClassLoader().getResource( "password_black.png" ) ) );
-  private final JButton    setAdminBalanceButton = MeMateUIManager.createNormalButton( "button" );
+  private final JButton    setAdminBalanceButton = MeMateUIManager.createButton( "button" );
   private final JDialog    passwordFrame         = new JDialog( Mainframe.getInstance() );
   private final JLabel     piggyBankLabel        = MeMateUIManager.createJLabel();
   private final JPanel     upperPanel            = MeMateUIManager.createJPanel();
@@ -168,8 +168,8 @@ class Adminview extends JPanel
             .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
         String[] user = ServerCommunication.getInstance().getAllUsers();
         JPanel passwordPanel = new JPanel( new GridBagLayout() );
-        JButton saveButton = new JButton( "Speichern" );
-        JButton abortButton = new JButton( "Abbrechen" );
+        JButton saveButton = MeMateUIManager.createButton( "button","Speichern" );
+        JButton abortButton = MeMateUIManager.createButton( "button","Abbrechen" );
         JLabel userLabel = new JLabel( "Nutzer auswählen" );
         JLabel newPassword = new JLabel( "Neues Passwort:  " );
         JTextField passwordField = new JTextField();
@@ -374,7 +374,7 @@ class Adminview extends JPanel
       amountSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
       amountSpinnerConstraints.insets = new Insets( 0, 10, 0, 5 );
       drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
-      JButton setAmountButton = MeMateUIManager.createNormalButton( "button" );
+      JButton setAmountButton = MeMateUIManager.createButton( "button" );
       setAmountButton.setText( "Anzahl setzen" );
       GridBagConstraints setAmountButtonConstraints = new GridBagConstraints();
       setAmountButtonConstraints.gridx = 1;

@@ -88,7 +88,7 @@ class Dashboard extends JPanel
     //    JSpinner.NumberEditor editor = new JSpinner.NumberEditor( valueSpinner, pattern );
     //    valueSpinner.setEditor( editor );
 
-    final JButton aufladenButton = MeMateUIManager.createNormalButton( "button" );
+    final JButton aufladenButton = MeMateUIManager.createButton( "button" );
     aufladenButton.setText( "Einzahlen" );
     aufladenButton.addActionListener( e ->
     {

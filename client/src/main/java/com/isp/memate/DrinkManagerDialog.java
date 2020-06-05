@@ -67,10 +67,10 @@ class DrinkManagerDialog
   private final SpinnerNumberModel spinnerModel      = new SpinnerNumberModel( 0, 0, 1000, 0.10 );
   private final JPanel             layout            = new JPanel( new GridBagLayout() );
   private final JSpinner           drinkPriceSpinner = new JSpinner( spinnerModel );
-  private final JButton            cancelButton      = new JButton( "Abbrechen" );
+  private final JButton            cancelButton      = MeMateUIManager.createButton("button","Abbrechen");
   private final JFileChooser       fileChooser       = new JFileChooser();
   private final JTextField         drinkNameField    = new JTextField();
-  private final JButton            confirmButton     = new JButton();
+  private final JButton            confirmButton     = MeMateUIManager.createButton("button");
   private final JLabel             pictureLabel      = new JLabel();
   private String                   drinkPicturePath  = null;
   private ImageIcon                currentImage;
@@ -246,8 +246,6 @@ class DrinkManagerDialog
 
     confirmButton.setContentAreaFilled( false );
     confirmButton.setOpaque( true );
-    cancelButton.setContentAreaFilled( false );
-    cancelButton.setOpaque( true );
     toggleDarkMode( drinkName, drinkPrice, buttonBar );
   }
 
@@ -261,8 +259,6 @@ class DrinkManagerDialog
       drinkPrice.setForeground( Color.white );
       confirmButton.setBackground( MeMateUIManager.getBackground( "button" ).getDarkColor() );
       confirmButton.setForeground( MeMateUIManager.getForeground( "button" ).getDarkColor() );
-      cancelButton.setBackground( MeMateUIManager.getBackground( "button" ).getDarkColor() );
-      cancelButton.setForeground( MeMateUIManager.getForeground( "button" ).getDarkColor() );
     }
     else
     {
@@ -272,8 +268,6 @@ class DrinkManagerDialog
       drinkPrice.setForeground( Color.black );
       confirmButton.setBackground( MeMateUIManager.getBackground( "button" ).getDayColor() );
       confirmButton.setForeground( MeMateUIManager.getForeground( "button" ).getDayColor() );
-      cancelButton.setBackground( MeMateUIManager.getBackground( "button" ).getDayColor() );
-      cancelButton.setForeground( MeMateUIManager.getForeground( "button" ).getDayColor() );
     }
   }
 

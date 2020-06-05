@@ -33,10 +33,10 @@ import com.isp.memate.util.MeMateUIManager;
 class Drinkmanager extends JPanel
 {
   private String[]          data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
-  private final JButton     addButton         = MeMateUIManager.createNormalButton( "button" );
-  private final JButton     editButton        = MeMateUIManager.createNormalButton( "button" );
-  private final JButton     removeButton      = MeMateUIManager.createNormalButton( "button" );
-  private final JButton     ingredientsButton = MeMateUIManager.createNormalButton( "button" );
+  private final JButton     addButton         = MeMateUIManager.createButton( "button" );
+  private final JButton     editButton        = MeMateUIManager.createButton( "button" );
+  private final JButton     removeButton      = MeMateUIManager.createButton( "button" );
+  private final JButton     ingredientsButton = MeMateUIManager.createButton( "button" );
   private JList<String>     drinkList         = new JList<>( data );
   private final JScrollPane scrollpane        = new JScrollPane();
   private int               currentSelection;
