@@ -385,6 +385,7 @@ class DrinkConsumptionButton extends JPanel
         nameLabelAndDrinkInfoButtonPanel
             .setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
         infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
+        fillPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDarkColor() );
         final Component[] components = infoPanel.getComponents();
         for ( final Component component : components )
         {
@@ -397,6 +398,7 @@ class DrinkConsumptionButton extends JPanel
         nameLabelAndDrinkInfoButtonPanel
             .setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
         infoPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
+        fillPanel.setBackground( MeMateUIManager.getBackground( "drinkButtons" ).getDayColor() );
         final Component[] components = infoPanel.getComponents();
         for ( final Component component : components )
         {
