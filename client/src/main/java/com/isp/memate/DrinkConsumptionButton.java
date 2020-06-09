@@ -326,9 +326,18 @@ class DrinkConsumptionButton extends JPanel
     final Float priceAsFloat = Float.valueOf( price );
     final NumberFormat formatter = NumberFormat.getCurrencyInstance();
     final String format = formatter.format( priceAsFloat.doubleValue() );
-
-    priceLabel.setText( format + "                                Noch "
-        + ServerCommunication.getInstance().getAmount( name ) + " Stück" );
+    final int amount = ServerCommunication.getInstance().getAmount( name );
+    //FIXME(nwe | 09.06.2020): Nicht So !!!!!!!!!
+    if ( amount > 9 )
+    {
+      priceLabel.setText( format + "                               Noch "
+          + amount + " Stück" );
+    }
+    else
+    {
+      priceLabel.setText( format + "                                Noch "
+          + amount + " Stück" );
+    }
     priceLabel.setFont( priceLabel.getFont().deriveFont( 14f ) );
     priceLabel.setHorizontalAlignment( SwingConstants.CENTER );
 
