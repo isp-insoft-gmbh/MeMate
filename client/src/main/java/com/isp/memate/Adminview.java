@@ -21,7 +21,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,6 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.ServerCommunication.dateType;
@@ -40,7 +40,7 @@ import com.isp.memate.util.MeMateUIManager;
 /**
  * In der Adminview kann man das Guthaben des Spaarschweins setzen/sehen,
  * Passwörter der User ändern, Daten exportieren und die Anzahl der Getränke festlegen.
- * 
+ *
  * @author nwe
  * @since 09.12.2019
  *
@@ -78,9 +78,9 @@ class Adminview extends JPanel
    */
   private void loadDefaultSettings()
   {
-    JPanel piggyBankPanel = MeMateUIManager.createJPanel( "adminButton" );
-    JPanel pwChangePanel = MeMateUIManager.createJPanel( "adminButton" );
-    JPanel exportPanel = MeMateUIManager.createJPanel( "adminButton" );
+    final JPanel piggyBankPanel = MeMateUIManager.createJPanel( "adminButton" );
+    final JPanel pwChangePanel = MeMateUIManager.createJPanel( "adminButton" );
+    final JPanel exportPanel = MeMateUIManager.createJPanel( "adminButton" );
 
     removeAllAndLayout();
     setToolTipAndText();
@@ -107,17 +107,17 @@ class Adminview extends JPanel
    */
   private void loadAdminBalanceButtonAction()
   {
-    ActionListener[] setAdminBalanceButtonListeners = setAdminBalanceButton.getActionListeners();
-    for ( ActionListener actionListener : setAdminBalanceButtonListeners )
+    final ActionListener[] setAdminBalanceButtonListeners = setAdminBalanceButton.getActionListeners();
+    for ( final ActionListener actionListener : setAdminBalanceButtonListeners )
     {
       setAdminBalanceButton.removeActionListener( actionListener );
     }
     setAdminBalanceButton.addActionListener( new ActionListener()
     {
       @Override
-      public void actionPerformed( ActionEvent e )
+      public void actionPerformed( final ActionEvent e )
       {
-        String balanceAsString = balanceField.getText();
+        final String balanceAsString = balanceField.getText();
         Float balance = null;
         if ( isNumber( balanceAsString ) )
         {
@@ -131,13 +131,13 @@ class Adminview extends JPanel
         }
       }
 
-      private boolean isNumber( String balanceAsString )
+      private boolean isNumber( final String balanceAsString )
       {
         try
         {
           Float.parseFloat( balanceAsString );
         }
-        catch ( Exception exception )
+        catch ( final Exception exception )
         {
           return false;
         }
@@ -153,84 +153,69 @@ class Adminview extends JPanel
    */
   private void loadResetPasswordButtonAction()
   {
-    ActionListener[] resetPasswordButtonListeners = resetPasswordButton.getActionListeners();
-    for ( ActionListener actionListener : resetPasswordButtonListeners )
+    final ActionListener[] resetPasswordButtonListeners = resetPasswordButton.getActionListeners();
+    for ( final ActionListener actionListener : resetPasswordButtonListeners )
     {
       resetPasswordButton.removeActionListener( actionListener );
     }
-    resetPasswordButton.addActionListener( new ActionListener()
+    resetPasswordButton.addActionListener( e ->
     {
-      @Override
-      public void actionPerformed( ActionEvent e )
+      passwordFrame.setTitle( "Passwort zurücksetzen" );
+      passwordFrame
+          .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+      final String[] user = ServerCommunication.getInstance().getAllUsers();
+      final JPanel passwordPanel = new JPanel( new GridBagLayout() );
+      final JButton saveButton = MeMateUIManager.createButton( "button", "Speichern" );
+      final JButton abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
+      final JLabel userLabel = new JLabel( "Nutzer auswählen" );
+      final JLabel newPassword = new JLabel( "Neues Passwort:  " );
+      final JTextField passwordField = new JTextField();
+      final JComboBox<String> userComboBox = new JComboBox<>( user );
+      passwordPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
+
+      final GridBagConstraints userLabelConstraints = new GridBagConstraints();
+      userLabelConstraints.gridx = 0;
+      userLabelConstraints.gridy = 0;
+      userLabelConstraints.insets = new Insets( 0, 0, 0, 5 );
+      passwordPanel.add( userLabel, userLabelConstraints );
+      final GridBagConstraints userComboBoxConstraints = new GridBagConstraints();
+      userComboBoxConstraints.gridx = 1;
+      userComboBoxConstraints.gridy = 0;
+      userComboBoxConstraints.fill = GridBagConstraints.HORIZONTAL;
+      passwordPanel.add( userComboBox, userComboBoxConstraints );
+      final GridBagConstraints newPasswordConstraints = new GridBagConstraints();
+      newPasswordConstraints.gridx = 0;
+      newPasswordConstraints.gridy = 1;
+      newPasswordConstraints.insets = new Insets( 10, 0, 30, 5 );
+      passwordPanel.add( newPassword, newPasswordConstraints );
+      final GridBagConstraints passwordFieldConstraints = new GridBagConstraints();
+      passwordFieldConstraints.gridx = 1;
+      passwordFieldConstraints.gridy = 1;
+      passwordFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
+      passwordFieldConstraints.insets = new Insets( 10, 0, 30, 0 );
+      passwordPanel.add( passwordField, passwordFieldConstraints );
+      final GridBagConstraints saveButtonConstraints = new GridBagConstraints();
+      saveButtonConstraints.gridx = 0;
+      saveButtonConstraints.gridy = 2;
+      passwordPanel.add( saveButton, saveButtonConstraints );
+      final GridBagConstraints abortButtonConstraints = new GridBagConstraints();
+      abortButtonConstraints.gridx = 1;
+      abortButtonConstraints.gridy = 2;
+      passwordPanel.add( abortButton, abortButtonConstraints );
+
+
+      abortButton.addActionListener( e1 -> passwordFrame.dispose() );
+      saveButton.addActionListener( e1 ->
       {
-        passwordFrame.setTitle( "Passwort zurücksetzen" );
-        passwordFrame
-            .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
-        String[] user = ServerCommunication.getInstance().getAllUsers();
-        JPanel passwordPanel = new JPanel( new GridBagLayout() );
-        JButton saveButton = MeMateUIManager.createButton( "button","Speichern" );
-        JButton abortButton = MeMateUIManager.createButton( "button","Abbrechen" );
-        JLabel userLabel = new JLabel( "Nutzer auswählen" );
-        JLabel newPassword = new JLabel( "Neues Passwort:  " );
-        JTextField passwordField = new JTextField();
-        JComboBox<String> userComboBox = new JComboBox<>( user );
-        passwordPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
-
-        GridBagConstraints userLabelConstraints = new GridBagConstraints();
-        userLabelConstraints.gridx = 0;
-        userLabelConstraints.gridy = 0;
-        userLabelConstraints.insets = new Insets( 0, 0, 0, 5 );
-        passwordPanel.add( userLabel, userLabelConstraints );
-        GridBagConstraints userComboBoxConstraints = new GridBagConstraints();
-        userComboBoxConstraints.gridx = 1;
-        userComboBoxConstraints.gridy = 0;
-        userComboBoxConstraints.fill = GridBagConstraints.HORIZONTAL;
-        passwordPanel.add( userComboBox, userComboBoxConstraints );
-        GridBagConstraints newPasswordConstraints = new GridBagConstraints();
-        newPasswordConstraints.gridx = 0;
-        newPasswordConstraints.gridy = 1;
-        newPasswordConstraints.insets = new Insets( 10, 0, 30, 5 );
-        passwordPanel.add( newPassword, newPasswordConstraints );
-        GridBagConstraints passwordFieldConstraints = new GridBagConstraints();
-        passwordFieldConstraints.gridx = 1;
-        passwordFieldConstraints.gridy = 1;
-        passwordFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
-        passwordFieldConstraints.insets = new Insets( 10, 0, 30, 0 );
-        passwordPanel.add( passwordField, passwordFieldConstraints );
-        GridBagConstraints saveButtonConstraints = new GridBagConstraints();
-        saveButtonConstraints.gridx = 0;
-        saveButtonConstraints.gridy = 2;
-        passwordPanel.add( saveButton, saveButtonConstraints );
-        GridBagConstraints abortButtonConstraints = new GridBagConstraints();
-        abortButtonConstraints.gridx = 1;
-        abortButtonConstraints.gridy = 2;
-        passwordPanel.add( abortButton, abortButtonConstraints );
-
-
-        abortButton.addActionListener( new ActionListener()
-        {
-          @Override
-          public void actionPerformed( ActionEvent e )
-          {
-            passwordFrame.dispose();
-          }
-        } );
-        saveButton.addActionListener( new ActionListener()
-        {
-          @Override
-          public void actionPerformed( ActionEvent e )
-          {
-            ServerCommunication.getInstance().changePassword( String.valueOf( userComboBox.getSelectedItem() ),
-                Login.getInstance().getHash( passwordField.getText() ) );
-            passwordFrame.dispose();
-          }
-        } );
-        passwordFrame.add( passwordPanel );
-        passwordFrame.setSize( 300, 160 );
-        passwordFrame.setLocationRelativeTo( Mainframe.getInstance() );
-        passwordFrame.setVisible( true );
-        passwordFrame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-      }
+        ServerCommunication.getInstance().changePassword( String.valueOf( userComboBox.getSelectedItem() ),
+            Login.getInstance().getHash( passwordField.getText() ) );
+        passwordFrame.dispose();
+      } );
+      passwordFrame.add( passwordPanel );
+      passwordFrame.setSize( 300, 160 );
+      passwordFrame.setLocationRelativeTo( Mainframe.getInstance() );
+      passwordFrame.setVisible( true );
+      passwordFrame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
     } );
   }
 
@@ -239,38 +224,31 @@ class Adminview extends JPanel
    */
   private void loadExportButtonAction()
   {
-    ActionListener[] exportButtonListener = exportButton.getActionListeners();
-    for ( ActionListener actionListener : exportButtonListener )
+    final ActionListener[] exportButtonListener = exportButton.getActionListeners();
+    for ( final ActionListener actionListener : exportButtonListener )
     {
       exportButton.removeActionListener( actionListener );
     }
-    exportButton.addActionListener( new ActionListener()
-    {
-      @Override
-      public void actionPerformed( ActionEvent e )
-      {
-        new DataExport();
-      }
-    } );
+    exportButton.addActionListener( e -> new DataExport() );
   }
 
-  private void layoutHeaderComponents( JPanel pwChangePanel, JPanel piggyBankPanel, JPanel exportPanel )
+  private void layoutHeaderComponents( final JPanel pwChangePanel, final JPanel piggyBankPanel, final JPanel exportPanel )
   {
     upperPanel.add( pwChangePanel );
     upperPanel.add( piggyBankPanel );
     upperPanel.add( exportPanel );
     upperUpperPanel.add( upperPanel, BorderLayout.CENTER );
-    JSeparator separator = new JSeparator( SwingConstants.HORIZONTAL );
+    final JSeparator separator = new JSeparator( SwingConstants.HORIZONTAL );
     upperUpperPanel.add( separator, BorderLayout.SOUTH );
     upperPanel.setBorder( new EmptyBorder( 0, 0, 20, 0 ) );
     upperUpperPanel.setBorder( new EmptyBorder( 40, 20, 20, 20 ) );
   }
 
 
-  private void loadExportPanelSettings( JPanel exportPanel )
+  private void loadExportPanelSettings( final JPanel exportPanel )
   {
     exportPanel.setLayout( new GridBagLayout() );
-    GridBagConstraints exportPanelConstraints = new GridBagConstraints();
+    final GridBagConstraints exportPanelConstraints = new GridBagConstraints();
     exportPanelConstraints.gridx = 0;
     exportPanelConstraints.gridy = 0;
     exportPanelConstraints.weightx = 1;
@@ -282,11 +260,11 @@ class Adminview extends JPanel
   }
 
 
-  private void loadPWChangePanelSettings( JPanel pwChangePanel )
+  private void loadPWChangePanelSettings( final JPanel pwChangePanel )
   {
     pwChangePanel.setPreferredSize( new Dimension( 100, 90 ) );
     pwChangePanel.setLayout( new GridBagLayout() );
-    GridBagConstraints pwChangePanelConstraints = new GridBagConstraints();
+    final GridBagConstraints pwChangePanelConstraints = new GridBagConstraints();
     pwChangePanelConstraints.gridx = 0;
     pwChangePanelConstraints.gridy = 0;
     pwChangePanelConstraints.weightx = 1;
@@ -297,27 +275,27 @@ class Adminview extends JPanel
     pwChangePanel.setPreferredSize( new Dimension( 150, 90 ) );
   }
 
-  private void loadPiggyBankPanelSettings( JPanel piggyBankPanel )
+  private void loadPiggyBankPanelSettings( final JPanel piggyBankPanel )
   {
     updatePiggybankBalanceLabel( ServerCommunication.getInstance().getPiggyBankBalance() );
     piggyBankPanel.setPreferredSize( new Dimension( 430, 90 ) );
     piggyBankPanel.setLayout( new GridBagLayout() );
     piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 25f ) );
-    piggyBankLabel.setHorizontalAlignment( JLabel.CENTER );
+    piggyBankLabel.setHorizontalAlignment( SwingConstants.CENTER );
 
-    GridBagConstraints piggybankLabelConstraints = new GridBagConstraints();
+    final GridBagConstraints piggybankLabelConstraints = new GridBagConstraints();
     piggybankLabelConstraints.gridx = 0;
     piggybankLabelConstraints.gridy = 0;
     piggybankLabelConstraints.gridwidth = 2;
     piggybankLabelConstraints.insets = new Insets( 5, 5, 15, 5 );
     piggyBankPanel.add( piggyBankLabel, piggybankLabelConstraints );
-    GridBagConstraints balanceFieldConstraints = new GridBagConstraints();
+    final GridBagConstraints balanceFieldConstraints = new GridBagConstraints();
     balanceFieldConstraints.gridx = 0;
     balanceFieldConstraints.gridy = 1;
     balanceFieldConstraints.insets = new Insets( 0, 5, 5, 0 );
     balanceFieldConstraints.anchor = GridBagConstraints.LINE_END;
     piggyBankPanel.add( balanceField, balanceFieldConstraints );
-    GridBagConstraints setAdminBalanceButtonConstraints = new GridBagConstraints();
+    final GridBagConstraints setAdminBalanceButtonConstraints = new GridBagConstraints();
     setAdminBalanceButtonConstraints.gridx = 1;
     setAdminBalanceButtonConstraints.gridy = 1;
     setAdminBalanceButtonConstraints.insets = new Insets( 0, 0, 5, 5 );
@@ -350,41 +328,41 @@ class Adminview extends JPanel
    */
   private void addAllDrinks()
   {
-    for ( String drink : ServerCommunication.getInstance().getDrinkNames() )
+    for ( final String drink : ServerCommunication.getInstance().getDrinkNames() )
     {
       drinkAmountPanel = MeMateUIManager.createJPanel( "adminButton" );
       drinkAmountPanel.setLayout( new GridBagLayout() );
-      JLabel drinkNameLabel = MeMateUIManager.createJLabel();
+      final JLabel drinkNameLabel = MeMateUIManager.createJLabel();
       drinkNameLabel.setText( drink );
       drinkNameLabel.setPreferredSize( new Dimension( 150, 30 ) );
       drinkNameLabel.setFont( drinkNameLabel.getFont().deriveFont( 20f ) );
-      GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
+      final GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
       drinkNameLabelConstraints.gridy = 0;
       drinkNameLabelConstraints.gridx = 0;
       drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
       drinkNameLabelConstraints.insets = new Insets( 0, 10, 5, 0 );
       drinkAmountPanel.add( drinkNameLabel, drinkNameLabelConstraints );
-      SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 50, 1 );
-      JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
+      final SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 50, 1 );
+      final JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
       amountSpinner.setValue( ServerCommunication.getInstance().getAmount( drink ) );
       MeMateUIManager.registerSpinner( amountSpinner );
-      GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
+      final GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
       amountSpinnerConstraints.gridx = 0;
       amountSpinnerConstraints.gridy = 2;
       amountSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
       amountSpinnerConstraints.insets = new Insets( 0, 10, 0, 5 );
       drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
-      JButton setAmountButton = MeMateUIManager.createButton( "button" );
+      final JButton setAmountButton = MeMateUIManager.createButton( "button" );
       setAmountButton.setText( "Anzahl setzen" );
-      GridBagConstraints setAmountButtonConstraints = new GridBagConstraints();
+      final GridBagConstraints setAmountButtonConstraints = new GridBagConstraints();
       setAmountButtonConstraints.gridx = 1;
       setAmountButtonConstraints.gridy = 2;
       setAmountButtonConstraints.insets = new Insets( 0, 0, 5, 5 );
       drinkAmountPanel.add( setAmountButton, setAmountButtonConstraints );
-      JLabel daysLeftLabel = MeMateUIManager.createJLabel();
+      final JLabel daysLeftLabel = MeMateUIManager.createJLabel();
       daysLeftLabel.setText( String.format( "in etwa %.2f Tagen leer.", getDaysLeft( drink ) ) );
       daysLeftLabel.setFont( daysLeftLabel.getFont().deriveFont( 15f ) );
-      GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
+      final GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
       daysLeftLabelConstraints.gridx = 0;
       daysLeftLabelConstraints.gridy = 1;
       daysLeftLabelConstraints.insets = new Insets( 0, 10, 10, 0 );
@@ -393,22 +371,22 @@ class Adminview extends JPanel
       setAmountButton.addActionListener( new ActionListener()
       {
         @Override
-        public void actionPerformed( ActionEvent e )
+        public void actionPerformed( final ActionEvent e )
         {
-          String amount = String.valueOf( amountSpinner.getValue() );
+          final String amount = String.valueOf( amountSpinner.getValue() );
           if ( isInteger( amount ) )
           {
             ServerCommunication.getInstance().setDrinkAmount( drink, Integer.valueOf( amount ) );
           }
         }
 
-        private boolean isInteger( String testValue )
+        private boolean isInteger( final String testValue )
         {
           try
           {
             Integer.parseInt( testValue );
           }
-          catch ( Exception exception )
+          catch ( final Exception exception )
           {
             return false;
           }
@@ -424,26 +402,26 @@ class Adminview extends JPanel
    * Berechnet zuerst den Durchschnittswert der letzten Monats aus.
    * Nun wird die Anzahl an noch vorhandenen Getränken durch den Wert geteilt.
    */
-  private Float getDaysLeft( String drink )
+  private Float getDaysLeft( final String drink )
   {
     Float amount = 0f;
-    String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
+    final String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
     if ( historyData != null )
     {
-      for ( String[] data : historyData )
+      for ( final String[] data : historyData )
       {
-        String action = data[ 0 ];
+        final String action = data[ 0 ];
         if ( action.contains( "getrunken" ) )
         {
           if ( action.contains( drink ) )
           {
-            String dateAsString = data[ 4 ].substring( 0, 10 );
+            final String dateAsString = data[ 4 ].substring( 0, 10 );
             Date date;
             try
             {
               date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
-              ZonedDateTime now = ZonedDateTime.now();
-              ZonedDateTime thirtyDaysAgo = now.minusDays( 30 );
+              final ZonedDateTime now = ZonedDateTime.now();
+              final ZonedDateTime thirtyDaysAgo = now.minusDays( 30 );
               if ( !date.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
               {
                 if ( data[ 5 ].equals( "false" ) )
@@ -452,7 +430,7 @@ class Adminview extends JPanel
                 }
               }
             }
-            catch ( ParseException exception )
+            catch ( final ParseException exception )
             {
               ClientLog.newLog( "Das Datum für die Berechnung der noch übrigen Tage konnte nicht geparst werden" );
               ClientLog.newLog( exception.getMessage() );
@@ -461,7 +439,7 @@ class Adminview extends JPanel
         }
       }
     }
-    Float averageConsumption = amount / 30f;
+    final Float averageConsumption = amount / 30f;
     return ServerCommunication.getInstance().getAmount( drink ) / averageConsumption;
   }
 
@@ -479,10 +457,10 @@ class Adminview extends JPanel
 
   /**
    * Updated das Label für das Spaarschweinguthaben.
-   * 
+   *
    * @param balance Guthaben
    */
-  private void updatePiggybankBalanceLabel( Float balance )
+  private void updatePiggybankBalanceLabel( final Float balance )
   {
     piggyBankLabel.setText( String.format( "Im Sparschwein befinden sich %.2f€", balance ) );
   }
