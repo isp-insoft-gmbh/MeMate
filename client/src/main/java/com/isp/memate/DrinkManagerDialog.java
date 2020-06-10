@@ -309,7 +309,7 @@ class DrinkManagerDialog
       drinkPriceSpinner.setUI( new DarkSpinnerUI() );
       drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkPriceSpinner
-          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
+          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor(), 1 ) );
       drinkNameField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkNameField.setForeground( Color.white );
       drinkNameField
@@ -324,6 +324,7 @@ class DrinkManagerDialog
       drinkNameField.setForeground( Color.black );
       drinkNameField.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
     }
+    MeMateUIManager.registerSpinner( drinkPriceSpinner );
     dialog.setTitle( "Getränk bearbeiten" );
     confirmButton.setText( "Speichern" );
     final String oldName = drink;
@@ -424,7 +425,7 @@ class DrinkManagerDialog
       drinkPriceSpinner.setUI( new DarkSpinnerUI() );
       drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkPriceSpinner
-          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
+          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor(), 1 ) );
       drinkNameField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkNameField.setForeground( Color.white );
       drinkNameField
@@ -441,6 +442,7 @@ class DrinkManagerDialog
       drinkNameField.setForeground( Color.black );
       drinkNameField.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
     }
+    MeMateUIManager.registerSpinner( drinkPriceSpinner );
     dialog.setTitle( "Getränk hinzufügen" );
     confirmButton.setText( "Hinzufügen" );
     confirmButton.addActionListener( __ ->
@@ -521,6 +523,7 @@ class DrinkManagerDialog
     layout.add( energyKJLabel, energyKJLabelConstraints );
     final SpinnerModel energykJModel = new SpinnerNumberModel( 0, 0, 500, 1 );
     final JSpinner energykJSpinner = new JSpinner( energykJModel );
+    MeMateUIManager.registerSpinner( energykJSpinner );
     final GridBagConstraints energykJSpinnerConstraints = new GridBagConstraints();
     energykJSpinnerConstraints.gridx = 1;
     energykJSpinnerConstraints.gridy = 1;
@@ -536,6 +539,7 @@ class DrinkManagerDialog
     layout.add( energyKCALLabel, energyKCALLabelConstraints );
     final SpinnerModel energykCALModel = new SpinnerNumberModel( 0, 0, 500, 1 );
     final JSpinner energykCALSpinner = new JSpinner( energykCALModel );
+    MeMateUIManager.registerSpinner( energykCALSpinner );
     final GridBagConstraints energykCALSpinnerConstraints = new GridBagConstraints();
     energykCALSpinnerConstraints.gridx = 1;
     energykCALSpinnerConstraints.gridy = 2;
@@ -551,6 +555,7 @@ class DrinkManagerDialog
     layout.add( fatLabel, fatLabelConstraints );
     final SpinnerModel fatModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
     final JSpinner fatSpinner = new JSpinner( fatModel );
+    MeMateUIManager.registerSpinner( fatSpinner );
     final GridBagConstraints fatSpinnerConstraints = new GridBagConstraints();
     fatSpinnerConstraints.gridx = 1;
     fatSpinnerConstraints.gridy = 3;
@@ -566,6 +571,7 @@ class DrinkManagerDialog
     layout.add( fattyAcidsLabel, fattyAcidsLabelConstraints );
     final SpinnerModel fattyAcidsModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
     final JSpinner fattyAcidsSpinner = new JSpinner( fattyAcidsModel );
+    MeMateUIManager.registerSpinner( fattyAcidsSpinner );
     final GridBagConstraints fattyAcidsSpinnerConstraints = new GridBagConstraints();
     fattyAcidsSpinnerConstraints.gridx = 1;
     fattyAcidsSpinnerConstraints.gridy = 4;
@@ -581,6 +587,7 @@ class DrinkManagerDialog
     layout.add( carbsLabel, carbsLabelConstraints );
     final SpinnerModel carbsModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
     final JSpinner carbsSpinner = new JSpinner( carbsModel );
+    MeMateUIManager.registerSpinner( carbsSpinner );
     final GridBagConstraints carbsSpinnerConstraints = new GridBagConstraints();
     carbsSpinnerConstraints.gridx = 1;
     carbsSpinnerConstraints.gridy = 5;
@@ -596,6 +603,7 @@ class DrinkManagerDialog
     layout.add( sugarLabel, sugarLabelConstraints );
     final SpinnerModel sugarModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
     final JSpinner sugarSpinner = new JSpinner( sugarModel );
+    MeMateUIManager.registerSpinner( sugarSpinner );
     final GridBagConstraints sugarSpinnerConstraints = new GridBagConstraints();
     sugarSpinnerConstraints.gridx = 1;
     sugarSpinnerConstraints.gridy = 6;
@@ -611,6 +619,7 @@ class DrinkManagerDialog
     layout.add( proteinLabel, proteinLabelConstraints );
     final SpinnerModel proteinModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
     final JSpinner proteinSpinner = new JSpinner( proteinModel );
+    MeMateUIManager.registerSpinner( proteinSpinner );
     final GridBagConstraints proteinSpinnerConstraints = new GridBagConstraints();
     proteinSpinnerConstraints.gridx = 1;
     proteinSpinnerConstraints.gridy = 7;
@@ -626,6 +635,7 @@ class DrinkManagerDialog
     layout.add( saltLabel, saltLabelConstraints );
     final SpinnerModel saltModel = new SpinnerNumberModel( 0, 0, 50, 0.1 );
     final JSpinner saltSpinner = new JSpinner( saltModel );
+    MeMateUIManager.registerSpinner( saltSpinner );
     final GridBagConstraints saltSpinnerConstraints = new GridBagConstraints();
     saltSpinnerConstraints.gridx = 1;
     saltSpinnerConstraints.gridy = 8;
@@ -731,7 +741,7 @@ class DrinkManagerDialog
       {
         spinner.setUI( new DarkSpinnerUI() );
         spinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-        spinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
+        spinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor(), 1 ) );
       }
     }
     else

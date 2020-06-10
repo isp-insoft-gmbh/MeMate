@@ -23,8 +23,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
 import com.isp.memate.util.ClientLog;
-import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.InfoIcon;
+import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
 
 import net.miginfocom.layout.CC;

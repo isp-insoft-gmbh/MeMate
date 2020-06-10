@@ -25,11 +25,11 @@ public class DarkSpinnerUI extends BasicSpinnerUI
   @Override
   protected Component createPreviousButton()
   {
-    JButton button =
+    final JButton button =
         new BasicArrowButton( SwingConstants.SOUTH, UIManager.getColor( "App.Background" ).brighter(),
             UIManager.getColor( "App.Background" ).brighter(), UIManager.getColor( "App.Background" ).brighter().brighter().brighter(),
             UIManager.getColor( "App.Background" ).brighter() );
-    Component c = button;
+    final Component c = button;
     c.setName( "Spinner.previousButton" );
     installPreviousButtonListeners( c );
     return c;
@@ -38,11 +38,11 @@ public class DarkSpinnerUI extends BasicSpinnerUI
   @Override
   protected Component createNextButton()
   {
-    JButton button =
+    final JButton button =
         new BasicArrowButton( SwingConstants.NORTH, UIManager.getColor( "App.Background" ).brighter(),
             UIManager.getColor( "App.Background" ).brighter(), UIManager.getColor( "App.Background" ).brighter().brighter().brighter(),
             UIManager.getColor( "App.Background" ).brighter() );
-    Component c = button;
+    final Component c = button;
     c.setName( "Spinner.nextButton" );
     installNextButtonListeners( c );
     return c;
@@ -51,8 +51,8 @@ public class DarkSpinnerUI extends BasicSpinnerUI
   @Override
   protected JComponent createEditor()
   {
-    JComponent textField = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-    JComponent editor = spinner.getEditor();
+    final JComponent textField = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+    final JComponent editor = spinner.getEditor();
     textField.setBackground( UIManager.getColor( "App.Background" ).brighter().brighter() );
     textField.setForeground( Color.white );
     textField.setBorder( new EmptyBorder( 0, 0, 0, 5 ) );

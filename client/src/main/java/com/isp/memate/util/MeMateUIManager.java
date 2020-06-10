@@ -449,6 +449,27 @@ public class MeMateUIManager
   @SuppressWarnings( "javadoc" )
   public static void registerSpinner( final JSpinner spinner )
   {
+    ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField().addFocusListener( new FocusListener()
+    {
+      @Override
+      public void focusLost( final FocusEvent e )
+      {
+        if ( darkModeState )
+        {
+          spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( "spinner" ).getDarkColor(), 1 ) );
+        }
+        else
+        {
+          spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( "spinner" ).getDayColor().darker(), 1 ) );
+        }
+      }
+
+      @Override
+      public void focusGained( final FocusEvent e )
+      {
+        spinner.setBorder( BorderFactory.createLineBorder( UIManager.getColor( "AppColor" ), 1 ) );
+      }
+    } );
     spinnerList.put( "spinner", spinner );
   }
 
