@@ -5,14 +5,13 @@ package com.isp.memate;
 
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -32,7 +31,9 @@ import javax.swing.UIManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -47,10 +48,9 @@ import com.isp.memate.util.MeMateUIManager;
  * In diesem Panel kann der Nutzer sein Konsum von Flaschen pro Tag im letzten Monat anschauen.
  * Man hat die Möglichkeit zwischen verschiedenen Getränken zu filtern oder sich alle
  * an zu schauen. Der Admin sieht hier die Daten von allen Usern.
- * 
+ *
  * @author nwe
  * @since 19.12.2019
- *
  */
 class ConsumptionRate extends JPanel
 {
@@ -59,8 +59,7 @@ class ConsumptionRate extends JPanel
   private JFreeChart                 chart;
   private ChartPanel                 chartPanel;
   private JComboBox<String>          selectDrinkComboBox;
-  private HashSet<String>            consumedDrinks = new LinkedHashSet<>();
-
+  private final HashSet<String>      consumedDrinks = new LinkedHashSet<>();
 
   /**
    * Setzt das Layout
@@ -72,36 +71,36 @@ class ConsumptionRate extends JPanel
 
   /**
    * Erstellt einen neuen Datensatz für das angegebene Getränk.
-   * 
+   *
    * @param drink Name des Getränks.
    * @return Datensatz für den Graphen.
    */
-  private XYDataset createDataset( String drink )
+  private XYDataset createDataset( final String drink )
   {
     amountMap.clear();
-    LocalDateTime now = LocalDateTime.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+    final LocalDateTime now = LocalDateTime.now();
+    final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
     for ( int i = 0; i < 31; i++ )
     {
       amountMap.put( formatter.format( now.minusDays( i ) ).toString(), 0 );
     }
 
-    String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.SHORT ).clone();
-    for ( String[] data : historyData )
+    final String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.SHORT ).clone();
+    for ( final String[] data : historyData )
     {
-      String action = data[ 0 ];
+      final String action = data[ 0 ];
       if ( action.contains( "getrunken" ) )
       {
-        String drinkname = action.substring( 0, action.length() - 10 );
+        final String drinkname = action.substring( 0, action.length() - 10 );
         consumedDrinks.add( drinkname );
         if ( drink.equals( "Alle" ) )
         {
-          String date = data[ 4 ];
-          ZonedDateTime today = ZonedDateTime.now();
-          ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
+          final String date = data[ 4 ];
+          final ZonedDateTime today = ZonedDateTime.now();
+          final ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
           try
           {
-            Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
+            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
             if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
             {
               if ( data[ 5 ].equals( "false" ) )
@@ -110,19 +109,19 @@ class ConsumptionRate extends JPanel
               }
             }
           }
-          catch ( ParseException exception )
+          catch ( final ParseException exception )
           {
             ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
         else if ( action.contains( drink ) )
         {
-          String date = data[ 4 ];
-          ZonedDateTime today = ZonedDateTime.now();
-          ZonedDateTime thirtyDaysAgo = today.minusDays( 31 );
+          final String date = data[ 4 ];
+          final ZonedDateTime today = ZonedDateTime.now();
+          final ZonedDateTime thirtyDaysAgo = today.minusDays( 31 );
           try
           {
-            Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
+            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
             if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
             {
               if ( data[ 5 ].equals( "false" ) )
@@ -131,7 +130,7 @@ class ConsumptionRate extends JPanel
               }
             }
           }
-          catch ( ParseException exception )
+          catch ( final ParseException exception )
           {
             ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
@@ -142,7 +141,7 @@ class ConsumptionRate extends JPanel
 
     for ( int i = 0; i < 31; i++ )
     {
-      Day day = new Day( now.minusDays( i ).getDayOfMonth(), now.minusDays( i ).getMonthValue(), now.minusDays( i ).getYear() );
+      final Day day = new Day( now.minusDays( i ).getDayOfMonth(), now.minusDays( i ).getMonthValue(), now.minusDays( i ).getYear() );
       series.add( day, amountMap.get( formatter.format( now.minusDays( i ) ).toString() ) );
     }
     return new TimeSeriesCollection( series );
@@ -151,14 +150,14 @@ class ConsumptionRate extends JPanel
   /**
    * Erzeugt aus dem Datensatz einen neuen Graphen und lädt
    * anschließend noch Settings, abhängig vom State des Darkmodes.
-   * 
+   *
    * @param dataset Datensatz
    * @return chart
    */
   private JFreeChart createChart( final XYDataset dataset )
   {
-    JFreeChart freeChart = ChartFactory.createTimeSeriesChart(
-        "Konsum von Flaschen pro Tag",
+    final JFreeChart freeChart = ChartFactory.createTimeSeriesChart(
+        "Konsum von Flaschen pro Tag (in den letzen 30 Tagen)",
         "Datum",
         "Anzahl Getränke",
         dataset,
@@ -166,9 +165,15 @@ class ConsumptionRate extends JPanel
         false,
         false );
 
+    final XYPlot plot = freeChart.getXYPlot();
+    final DateAxis dateAxis = new DateAxis();
+    dateAxis.setDateFormatOverride( new SimpleDateFormat( "dd.MM" ) );
+    dateAxis.setLabel( "Datum" );
+    dateAxis.setTickLabelFont( new Font( "Tahoma", Font.PLAIN, 12 ) );
+    dateAxis.setLabelFont( new Font( "Tahoma", Font.BOLD, 14 ) );
+    plot.setDomainAxis( dateAxis );
     freeChart.getXYPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
     freeChart.getXYPlot().getRangeAxis().setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
-
     MeMateUIManager.registerFreeChart( freeChart );
     return freeChart;
   }
@@ -185,36 +190,32 @@ class ConsumptionRate extends JPanel
     chartPanel = new ChartPanel( chart );
     chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
     chartPanel.setMouseZoomable( true, false );
-    GridBagConstraints chartPanelConstraits = getChartPanelConstraits();
+    final GridBagConstraints chartPanelConstraits = getChartPanelConstraits();
     add( chartPanel, chartPanelConstraits );
 
     addDrinkComboBoxItems();
 
-    GridBagConstraints selectedDrinkComboboxConstraints = getSelectedDrinkComboboxConstraits();
+    final GridBagConstraints selectedDrinkComboboxConstraints = getSelectedDrinkComboboxConstraits();
     add( selectDrinkComboBox, selectedDrinkComboboxConstraints );
 
-    JLabel averageConsumption = MeMateUIManager.createJLabel();
+    final JLabel averageConsumption = MeMateUIManager.createJLabel();
     averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
-    GridBagConstraints averageConsumptionConstraints = getAverageConsumptionConstraints();
+    final GridBagConstraints averageConsumptionConstraints = getAverageConsumptionConstraints();
     add( averageConsumption, averageConsumptionConstraints );
 
     appendComponentListener();
 
-    selectDrinkComboBox.addItemListener( new ItemListener()
+    selectDrinkComboBox.addItemListener( e ->
     {
-      @Override
-      public void itemStateChanged( ItemEvent e )
-      {
-        remove( chartPanel );
-        dataset = createDataset( String.valueOf( e.getItem() ) );
-        chart = createChart( dataset );
-        chartPanel.setChart( chart );
-        averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage(), String.valueOf( e.getItem() ) ) );
-        add( chartPanel, chartPanelConstraits );
-        MeMateUIManager.setUISettings();
-        repaint();
-        revalidate();
-      }
+      remove( chartPanel );
+      dataset = createDataset( String.valueOf( e.getItem() ) );
+      chart = createChart( dataset );
+      chartPanel.setChart( chart );
+      averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage(), String.valueOf( e.getItem() ) ) );
+      add( chartPanel, chartPanelConstraits );
+      MeMateUIManager.setUISettings();
+      repaint();
+      revalidate();
     } );
     MeMateUIManager.registerPanel( "default", this );
   }
@@ -229,7 +230,7 @@ class ConsumptionRate extends JPanel
     chartPanel.setMinimumDrawWidth( 10 );
     chartPanel.setMinimumDrawHeight( 10 );
 
-    ComponentListener rateResizeListener = new ComponentAdapter()
+    final ComponentListener rateResizeListener = new ComponentAdapter()
     {
       @Override
       public void componentResized( final ComponentEvent e )
@@ -245,7 +246,7 @@ class ConsumptionRate extends JPanel
     {
       Mainframe.getInstance().removeComponentListener( rateResizeListener );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Der ComponentListener konnte nicht entfernt werden." );
       ClientLog.newLog( exception.getMessage() );
@@ -262,7 +263,7 @@ class ConsumptionRate extends JPanel
     selectDrinkComboBox.addItem( "Alle" );
     selectDrinkComboBox.setSelectedItem( "Alle" );
     MeMateUIManager.registerComboBox( selectDrinkComboBox );
-    for ( String string : consumedDrinks )
+    for ( final String string : consumedDrinks )
     {
       selectDrinkComboBox.addItem( string );
     }
@@ -275,8 +276,8 @@ class ConsumptionRate extends JPanel
    */
   private Float getAverage()
   {
-    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
-    LocalDateTime now = LocalDateTime.now();
+    final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+    final LocalDateTime now = LocalDateTime.now();
     float counter = 0f;
     for ( int i = 0; i < 31; i++ )
     {
@@ -287,7 +288,7 @@ class ConsumptionRate extends JPanel
 
   private GridBagConstraints getAverageConsumptionConstraints()
   {
-    GridBagConstraints averageConsumptionConstraints = new GridBagConstraints();
+    final GridBagConstraints averageConsumptionConstraints = new GridBagConstraints();
     averageConsumptionConstraints.gridx = 1;
     averageConsumptionConstraints.gridy = 1;
     averageConsumptionConstraints.insets = new Insets( 10, 0, 0, 10 );
@@ -297,7 +298,7 @@ class ConsumptionRate extends JPanel
 
   private GridBagConstraints getSelectedDrinkComboboxConstraits()
   {
-    GridBagConstraints selectedDrinkComboboxConstraints = new GridBagConstraints();
+    final GridBagConstraints selectedDrinkComboboxConstraints = new GridBagConstraints();
     selectedDrinkComboboxConstraints.gridx = 1;
     selectedDrinkComboboxConstraints.gridy = 0;
     selectedDrinkComboboxConstraints.insets = new Insets( 35, 0, 0, 10 );
@@ -307,7 +308,7 @@ class ConsumptionRate extends JPanel
 
   private GridBagConstraints getChartPanelConstraits()
   {
-    GridBagConstraints chartPanelConstraits = new GridBagConstraints();
+    final GridBagConstraints chartPanelConstraits = new GridBagConstraints();
     chartPanelConstraits.gridx = 0;
     chartPanelConstraits.gridy = 0;
     chartPanelConstraits.gridheight = 3;

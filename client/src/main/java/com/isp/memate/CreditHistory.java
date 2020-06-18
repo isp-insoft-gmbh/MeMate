@@ -30,7 +30,7 @@ import com.isp.memate.util.MeMateUIManager;
 
 /**
  * In diesem Panel kann der Benutzer den Verlauf seines Guthabens des letzten Monats betrachten.
- * 
+ *
  * @author nwe
  * @since 28.01.2020
  *
@@ -52,12 +52,13 @@ class CreditHistory extends JPanel
   void addChart()
   {
     removeAll();
-    JFreeChart lineChart = ChartFactory.createLineChart( "Guthabenverlauf", "Datum", "Guthaben", createBalanceDataset(),
-        PlotOrientation.VERTICAL, false, true, false );
+    final JFreeChart lineChart =
+        ChartFactory.createLineChart( "Guthabenverlauf (in den letzen 30 Tagen)", "Datum", "Guthaben", createBalanceDataset(),
+            PlotOrientation.VERTICAL, false, true, false );
 
     lineChart.getCategoryPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
     MeMateUIManager.registerLineChart( lineChart );
-    ChartPanel chartPanel = new ChartPanel( lineChart );
+    final ChartPanel chartPanel = new ChartPanel( lineChart );
     loadChartpanelSettingsAndAddChartPanel( chartPanel );
     apendComponentListener( chartPanel );
     repaint();
@@ -67,14 +68,14 @@ class CreditHistory extends JPanel
   /**
    * Meldet einen {@link ComponentListener} an, damit sich die Chart richtig verkleinert/vergrößert.
    */
-  private void apendComponentListener( ChartPanel chartPanel )
+  private void apendComponentListener( final ChartPanel chartPanel )
   {
     chartPanel.setMaximumDrawHeight( 1000 );
     chartPanel.setMaximumDrawWidth( 1000 );
     chartPanel.setMinimumDrawWidth( 10 );
     chartPanel.setMinimumDrawHeight( 10 );
 
-    ComponentListener creditResizeListener = new ComponentAdapter()
+    final ComponentListener creditResizeListener = new ComponentAdapter()
     {
       @Override
       public void componentResized( final ComponentEvent e )
@@ -89,7 +90,7 @@ class CreditHistory extends JPanel
     {
       Mainframe.getInstance().removeComponentListener( creditResizeListener );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ClientLog.newLog( "Der ComponentListener konnte nicht entfernt werden." );
       ClientLog.newLog( exception.getMessage() );
@@ -100,11 +101,11 @@ class CreditHistory extends JPanel
   /**
    * Layout für das Chartpanel.
    */
-  private void loadChartpanelSettingsAndAddChartPanel( ChartPanel chartPanel )
+  private void loadChartpanelSettingsAndAddChartPanel( final ChartPanel chartPanel )
   {
     chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
     chartPanel.setMouseZoomable( true, false );
-    GridBagConstraints chartPanelConstraits = new GridBagConstraints();
+    final GridBagConstraints chartPanelConstraits = new GridBagConstraints();
     chartPanelConstraits.gridx = 0;
     chartPanelConstraits.gridy = 0;
     chartPanelConstraits.gridheight = 3;
@@ -116,41 +117,41 @@ class CreditHistory extends JPanel
 
   private DefaultCategoryDataset createBalanceDataset()
   {
-    DateFormat dateFormat = new SimpleDateFormat( "dd-MMM HH:mm:ss" );
-    DateFormat oldFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS" );
-    String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
-    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    final DateFormat dateFormat = new SimpleDateFormat( "dd.MM HH:mm:ss" );
+    final DateFormat oldFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS" );
+    final String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
+    final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
     if ( historyData != null )
     {
       for ( int i = 0; i < historyData.length / 2; i++ )
       {
-        String[] temp = historyData[ i ];
+        final String[] temp = historyData[ i ];
         historyData[ i ] = historyData[ historyData.length - i - 1 ];
         historyData[ historyData.length - i - 1 ] = temp;
       }
 
-      for ( String[] data : historyData )
+      for ( final String[] data : historyData )
       {
-        String action = data[ 0 ];
+        final String action = data[ 0 ];
         if ( data[ 1 ].equals( ServerCommunication.getInstance().currentUser ) )
         {
           if ( action.contains( "Guthaben" ) || action.contains( "getrunken" ) )
           {
             Date date = null;
-            String dateAsString = data[ 4 ];
+            final String dateAsString = data[ 4 ];
             try
             {
               date = oldFormat.parse( data[ 4 ] );
             }
-            catch ( ParseException exception )
+            catch ( final ParseException exception )
             {
               ClientLog.newLog( "Das Datum konnt nicht formatiert werden." + exception );
             }
-            ZonedDateTime today = ZonedDateTime.now();
-            ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
+            final ZonedDateTime today = ZonedDateTime.now();
+            final ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
             try
             {
-              Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
+              final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
               if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
               {
                 if ( data[ 5 ].equals( "false" ) )
@@ -160,7 +161,7 @@ class CreditHistory extends JPanel
                 }
               }
             }
-            catch ( ParseException exception )
+            catch ( final ParseException exception )
             {
               ClientLog.newLog( "Das Datum ist out of range." + exception );
             }
