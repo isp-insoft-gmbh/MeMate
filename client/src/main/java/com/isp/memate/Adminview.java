@@ -236,7 +236,12 @@ class Adminview extends JPanel
     {
       exportButton.removeActionListener( actionListener );
     }
-    exportButton.addActionListener( e -> new DataExport() );
+    exportButton.addActionListener( e ->
+    {
+      new DataExport();
+      JOptionPane.showMessageDialog( this, "Die Daten wurden erfolgreich exportiert\nund liegen im MeMate AppData Ordner",
+          "Daten exportieren", JOptionPane.INFORMATION_MESSAGE );
+    } );
   }
 
   private void layoutHeaderComponents( final JPanel pwChangePanel, final JPanel piggyBankPanel, final JPanel exportPanel )

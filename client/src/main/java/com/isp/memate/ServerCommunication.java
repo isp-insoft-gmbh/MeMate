@@ -98,6 +98,7 @@ class ServerCommunication
   {
     try
     {
+      //For Debug commented out
       socket = new Socket( FindServer.getServerAddress(), FindServer.getServerPort() );
       //      socket = new Socket( "192.168.168.82", 3142 );// This is for Testing TODO remove later
       outStream = new ObjectOutputStream( socket.getOutputStream() );

@@ -26,12 +26,13 @@ public class Main
   @SuppressWarnings( "resource" )
   public static void main( final String args[] )
   {
+    //For Debug commented out
     new SendServerInformationsToClients().start();
     ServerSocket serverSocket = null;
     Socket socket = null;
     try
     {
-      serverSocket = new ServerSocket( 3141 ); //Default is 3141 
+      serverSocket = new ServerSocket( 3141 ); //Default is 3141 - Debug is 3142
       ServerLog.newLog( logType.INFO, "Starte MateServer auf Port: " + serverSocket.getLocalPort() );
     }
     catch ( final IOException e )
