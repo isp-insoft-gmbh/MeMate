@@ -154,8 +154,13 @@ class DrinkConsumptionButton extends JPanel
           }
           listBuilder.append( element ).append( ", " );
         }
+        String amountString = "";
+        if ( ingredients.amount != 0 )
+        {
+          amountString = "<br><br>Menge: " + String.format( "%.2f", ingredients.amount ) + " Liter";
+        }
         textLabel.setText( listBuilder.toString().substring( 0, listBuilder.length() - 2 )
-            + "<br><br>Durchschnittlicher Gehalt je 100ml<br>" );
+            + amountString + "<br><br>Durchschnittlicher Gehalt je 100ml<br>" );
 
         textLabel.setHorizontalAlignment( SwingConstants.LEFT );
         final GridBagConstraints textLabelConstraints = new GridBagConstraints();

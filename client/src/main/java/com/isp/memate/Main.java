@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -39,7 +40,7 @@ class Main
     UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
     UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0 ) );
     UIManager.put( "DefaultBrightColor", Color.white );
-    //ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
+    ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
 
     setVersion();
     installColors();

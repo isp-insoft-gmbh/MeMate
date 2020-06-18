@@ -648,6 +648,22 @@ class DrinkManagerDialog
     saltSpinnerConstraints.fill = GridBagConstraints.BOTH;
     layout.add( saltSpinner, saltSpinnerConstraints );
 
+    final GridBagConstraints amountLabelConstraints = new GridBagConstraints();
+    amountLabelConstraints.gridx = 0;
+    amountLabelConstraints.gridy = 9;
+    amountLabelConstraints.insets = new Insets( 5, 0, 0, 0 );
+    final JLabel amountLabel = new JLabel( "Literangabe" );
+    layout.add( amountLabel, amountLabelConstraints );
+    final SpinnerModel amountModel = new SpinnerNumberModel( 0, 0, 5, 0.01 );
+    final JSpinner amountSpinner = new JSpinner( amountModel );
+    MeMateUIManager.registerSpinner( amountSpinner );
+    final GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
+    amountSpinnerConstraints.gridx = 1;
+    amountSpinnerConstraints.gridy = 9;
+    amountSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
+    amountSpinnerConstraints.fill = GridBagConstraints.BOTH;
+    layout.add( amountSpinner, amountSpinnerConstraints );
+
     final JPanel buttonBar = new JPanel();
     buttonBar.setLayout( new BoxLayout( buttonBar, BoxLayout.X_AXIS ) );
     buttonBar.add( confirmButton );
@@ -655,16 +671,15 @@ class DrinkManagerDialog
     buttonBar.add( cancelButton );
     final GridBagConstraints buttonBarConstraints = new GridBagConstraints();
     buttonBarConstraints.gridx = 1;
-    buttonBarConstraints.gridy = 9;
+    buttonBarConstraints.gridy = 10;
     buttonBarConstraints.gridwidth = 2;
     buttonBarConstraints.insets = new Insets( 10, 0, 0, 0 );
     buttonBarConstraints.anchor = GridBagConstraints.LINE_END;
     layout.add( buttonBar, buttonBarConstraints );
 
     toggleDarkMode( ingredientsLabel, ingredientsField, energyKJLabel, energyKCALLabel, fatLabel, fattyAcidsLabel, carbsLabel, sugarLabel,
-        proteinLabel,
-        saltLabel, buttonBar, energykJSpinner, energykCALSpinner, fatSpinner, fattyAcidsSpinner, carbsSpinner, sugarSpinner, proteinSpinner,
-        saltSpinner );
+        proteinLabel, saltLabel, amountLabel, buttonBar, energykJSpinner, energykCALSpinner, fatSpinner, fattyAcidsSpinner, carbsSpinner,
+        sugarSpinner, proteinSpinner, saltSpinner, amountSpinner );
 
     final ActionListener[] listeners = confirmButton.getActionListeners();
     for ( final ActionListener actionListener : listeners )
@@ -685,6 +700,7 @@ class DrinkManagerDialog
       sugarSpinner.setValue( ingredients.sugar );
       proteinSpinner.setValue( ingredients.protein );
       saltSpinner.setValue( ingredients.salt );
+      amountSpinner.setValue( ingredients.amount );
     }
 
     confirmButton.addActionListener( e ->
@@ -694,14 +710,15 @@ class DrinkManagerDialog
       if ( energykJSpinner.getValue() instanceof Number || energykCALSpinner.getValue() instanceof Number
           || fatSpinner.getValue() instanceof Number || fattyAcidsSpinner.getValue() instanceof Number
           || carbsSpinner.getValue() instanceof Number || sugarSpinner.getValue() instanceof Number
-          || proteinSpinner.getValue() instanceof Number || saltSpinner.getValue() instanceof Number )
+          || proteinSpinner.getValue() instanceof Number || saltSpinner.getValue() instanceof Number
+          || amountSpinner.getValue() instanceof Number )
       {
         ServerCommunication.getInstance().registerIngredients( new DrinkIngredients( DrinkID,
             ingredientsField.getText(), (int) energykJSpinner.getValue(), (int) energykCALSpinner.getValue(),
             (Double) fatSpinner.getValue(),
             (Double) fattyAcidsSpinner.getValue(),
             (Double) carbsSpinner.getValue(), (Double) sugarSpinner.getValue(),
-            (Double) proteinSpinner.getValue(), (Double) saltSpinner.getValue() ) );
+            (Double) proteinSpinner.getValue(), (Double) saltSpinner.getValue(), (Double) amountSpinner.getValue() ) );
         dialog.dispose();
       }
       else
@@ -724,12 +741,12 @@ class DrinkManagerDialog
                                final JLabel energyKCALLabel,
                                final JLabel fatLabel,
                                final JLabel fattyAcidsLabel, final JLabel carbsLabel, final JLabel sugarLabel, final JLabel proteinLabel,
-                               final JLabel saltLabel,
+                               final JLabel saltLabel, final JLabel amountLabel,
                                final JPanel buttonBar, final JSpinner energykJSpinner, final JSpinner energykCALSpinner,
                                final JSpinner fatSpinner,
                                final JSpinner fattyAcidsSpinner, final JSpinner carbsSpinner, final JSpinner sugarSpinner,
                                final JSpinner proteinSpinner,
-                               final JSpinner saltSpinner )
+                               final JSpinner saltSpinner, final JSpinner amountSpinner )
   {
     final ArrayList<JSpinner> spinnerList = new ArrayList<>();
     spinnerList.add( energykJSpinner );
@@ -740,6 +757,7 @@ class DrinkManagerDialog
     spinnerList.add( sugarSpinner );
     spinnerList.add( proteinSpinner );
     spinnerList.add( saltSpinner );
+    spinnerList.add( amountSpinner );
     if ( MeMateUIManager.getDarkModeState() )
     {
       buttonBar.setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
@@ -752,6 +770,7 @@ class DrinkManagerDialog
       saltLabel.setForeground( Color.white );
       carbsLabel.setForeground( Color.white );
       sugarLabel.setForeground( Color.white );
+      amountLabel.setForeground( Color.white );
       ingredientsField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       ingredientsField.setForeground( Color.white );
       ingredientsField
@@ -773,6 +792,7 @@ class DrinkManagerDialog
       fattyAcidsLabel.setForeground( Color.black );
       proteinLabel.setForeground( Color.black );
       saltLabel.setForeground( Color.black );
+      amountLabel.setForeground( Color.black );
       carbsLabel.setForeground( Color.black );
       sugarLabel.setForeground( Color.black );
       ingredientsField.setBackground( Color.white );

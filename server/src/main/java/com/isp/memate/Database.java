@@ -210,7 +210,8 @@ class Database
         + "carbs double NOT NULL,"
         + "sugar double NOT NULL,"
         + "protein double NOT NULL,"
-        + "salt double NOT NULL"
+        + "salt double NOT NULL,"
+        + "amount double NOT NULL"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -1034,7 +1035,7 @@ class Database
    */
   void addIngredients( final int DrinkID, final String ingredients, final int energy_kJ, final int energy_kcal, final double fat,
                        final double fattyAcids,
-                       final double carbs, final double sugar, final double protein, final double salt )
+                       final double carbs, final double sugar, final double protein, final double salt, final double amount )
   {
     String sql;
     final boolean hasDrinkIngredients = getIngredients( DrinkID ) == null ? false : true;
@@ -1050,14 +1051,15 @@ class Database
           + "carbs = ?,"
           + "sugar = ?,"
           + "protein = ?,"
-          + "salt = ? "
+          + "salt = ?,"
+          + "amount = ? "
           + "WHERE drink = ?";
     }
     //If not, create them
     else
     {
       sql =
-          "INSERT INTO ingredients(drink,ingredients,energy_kJ,energy_kcal,fat,fatty_acids,carbs,sugar,protein,salt) VALUES(?,?,?,?,?,?,?,?,?,?)";
+          "INSERT INTO ingredients(drink,ingredients,energy_kJ,energy_kcal,fat,fatty_acids,carbs,sugar,protein,salt,amount) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
     }
     lock.lock();
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
@@ -1073,7 +1075,8 @@ class Database
         pstmt.setDouble( 7, sugar );
         pstmt.setDouble( 8, protein );
         pstmt.setDouble( 9, salt );
-        pstmt.setInt( 10, DrinkID );
+        pstmt.setDouble( 10, amount );
+        pstmt.setInt( 11, DrinkID );
       }
       else
       {
@@ -1087,6 +1090,7 @@ class Database
         pstmt.setDouble( 8, sugar );
         pstmt.setDouble( 9, protein );
         pstmt.setDouble( 10, salt );
+        pstmt.setDouble( 11, amount );
       }
       pstmt.executeUpdate();
     }
@@ -1127,7 +1131,7 @@ class Database
       return new DrinkIngredients( rs.getInt( "drink" ), rs.getString( "ingredients" ), rs.getInt( "energy_kJ" ),
           rs.getInt( "energy_kcal" ),
           rs.getDouble( "fat" ), rs.getDouble( "fatty_acids" ), rs.getDouble( "carbs" ), rs.getDouble( "sugar" ), rs.getDouble( "protein" ),
-          rs.getDouble( "salt" ) );
+          rs.getDouble( "salt" ), rs.getDouble( "amount" ) );
     }
     catch ( final SQLException e )
     {

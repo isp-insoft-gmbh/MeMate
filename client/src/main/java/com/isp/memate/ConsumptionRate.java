@@ -260,6 +260,7 @@ class ConsumptionRate extends JPanel
   private void addDrinkComboBoxItems()
   {
     selectDrinkComboBox = new JComboBox<>();
+    selectDrinkComboBox.setPrototypeDisplayValue( "This is my maximal lenght" );
     selectDrinkComboBox.addItem( "Alle" );
     selectDrinkComboBox.setSelectedItem( "Alle" );
     MeMateUIManager.registerComboBox( selectDrinkComboBox );
@@ -267,6 +268,7 @@ class ConsumptionRate extends JPanel
     {
       selectDrinkComboBox.addItem( string );
     }
+    //Needed because otherwise very long drinknames would cause a realy wide ComboBox.
     MeMateUIManager.setUISettings();
   }
 

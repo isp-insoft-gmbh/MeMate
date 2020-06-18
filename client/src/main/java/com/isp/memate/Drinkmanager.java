@@ -138,7 +138,6 @@ class Drinkmanager extends JPanel
   void updateList()
   {
     data = new String[ServerCommunication.getInstance().getDrinkNames().size()];
-    System.out.println( data );
     data = ServerCommunication.getInstance().getDrinkNames().toArray( data );
     drinkList = new JList<>( data );
     drinkList.setCellRenderer( new DrinkCellRenderer() );

@@ -21,7 +21,7 @@ import com.isp.memate.Shared.Operation;
  * Damit mehrere Clients sich zum Server verbinden können und
  * der Server nicht abstürzt, wenn ein Client sich
  * beendet, wird jeder clientSocket einen anderen Thread zugewiesen.
- * 
+ *
  * @author nwe
  * @since 24.10.2019
  *
@@ -34,8 +34,8 @@ class SocketThread extends Thread
   private String               currentSessionID;
   private String               currentUser;
   private Map<String, Integer> userIDMap;
-  private Database             database;
-  private Socket               socket;
+  private final Database       database;
+  private final Socket         socket;
   //UNDO
   private boolean lastActionDeposit = false;
   private String  lastDrinkName;
@@ -46,7 +46,7 @@ class SocketThread extends Thread
    * @param clientSocket userSocket
    * @param dataBase Database
    */
-  SocketThread( Socket clientSocket, Database dataBase )
+  SocketThread( final Socket clientSocket, final Database dataBase )
   {
     setVersion();
     this.socket = clientSocket;
@@ -58,11 +58,11 @@ class SocketThread extends Thread
   {
     try ( InputStream input = SocketThread.class.getClassLoader().getResourceAsStream( "version.properties" ) )
     {
-      Properties versionProperties = new Properties();
+      final Properties versionProperties = new Properties();
       versionProperties.load( input );
       version = versionProperties.getProperty( "build_version" );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ServerLog.newLog( logType.ERROR, "Die version.properties konnten nicht geladen werden" );
       ServerLog.newLog( logType.ERROR, exception.getMessage() );
@@ -75,6 +75,7 @@ class SocketThread extends Thread
    * trifft dies zu, dann wird dieser zugeordnet und
    * die zutreffenden Aktionen ausgeführt.
    */
+  @Override
   public void run()
   {
     try
@@ -86,8 +87,8 @@ class SocketThread extends Thread
       {
         try
         {
-          Shared shared = (Shared) objectInputStream.readObject();
-          Operation operation = shared.operation;
+          final Shared shared = (Shared) objectInputStream.readObject();
+          final Operation operation = shared.operation;
           if ( operation != Operation.GET_DRINKINFO && operation != Operation.PIGGYBANK_BALANCE && operation != Operation.GET_HISTORY )
           {
             ServerLog.newLog( logType.COMMAND, operation.toString() );
@@ -202,23 +203,23 @@ class SocketThread extends Thread
               break;
           }
         }
-        catch ( ClassNotFoundException exception )
+        catch ( final ClassNotFoundException exception )
         {
           ServerLog.newLog( logType.ERROR, exception.getMessage() );
         }
       }
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.INFO, "Die Verbindung zu " + currentUser + " wurde getrennt." );
     }
   }
 
-  private void registerIngredients( DrinkIngredients drinkIngredients )
+  private void registerIngredients( final DrinkIngredients drinkIngredients )
   {
     database.addIngredients( drinkIngredients.drinkID, drinkIngredients.ingredients, drinkIngredients.energy_kJ,
         drinkIngredients.energy_kcal, drinkIngredients.fat, drinkIngredients.fatty_acids, drinkIngredients.carbs, drinkIngredients.sugar,
-        drinkIngredients.protein, drinkIngredients.salt );
+        drinkIngredients.protein, drinkIngredients.salt, drinkIngredients.amount );
   }
 
   /**
@@ -239,7 +240,7 @@ class SocketThread extends Thread
   {
     if ( lastActionDeposit )
     {
-      Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - lastTransaction;
+      final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - lastTransaction;
       database.updateBalance( currentSessionID, newBalance );
       database.addLog( "Letzte Aktion rückgängig", currentUser, Float.valueOf( lastTransaction ) * -1f, newBalance,
           LocalDateTime.now().toString() );
@@ -249,7 +250,7 @@ class SocketThread extends Thread
       getBalance();
 
       //For Admin-Balance
-      Float adminBalance = database.getPiggyBankBalance() - lastTransaction;
+      final Float adminBalance = database.getPiggyBankBalance() - lastTransaction;
       database.setPiggyBankBalance( adminBalance );
 
       //For Undo
@@ -258,7 +259,7 @@ class SocketThread extends Thread
     }
     else
     {
-      Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + lastTransaction;
+      final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + lastTransaction;
       database.updateBalance( currentSessionID, newBalance );
       database.addLog( "Letzte Aktion rückgängig", currentUser, lastTransaction, newBalance,
           LocalDateTime.now().toString() );
@@ -283,7 +284,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.PIGGYBANK_BALANCE, database.getPiggyBankBalance() ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Das Guthaben des Spaarschweins konnte nicht geladen werden. " + exception );
     }
@@ -298,7 +299,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_VERSION, version ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die Versionsnummer konnte nicht geladen werden. " + exception );
     }
@@ -313,7 +314,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_USERS_DISPLAYNAMES, database.getDisplayNames() ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
     }
@@ -321,7 +322,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_HISTORY, database.getHistory( currentUser ) ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die Historie konnte nicht geladen werden. " + exception );
     }
@@ -329,7 +330,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_HISTORY_LAST_5, database.getLast5HistoryEntries() ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die Historie konnte nicht geladen werden. " + exception );
     }
@@ -337,7 +338,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_SCOREBOARD, database.getScoreboard() ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Das Scoreboard konnte nicht geladen werden. " + exception );
     }
@@ -352,7 +353,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_USERS_RESULT, database.getUser() ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
     }
@@ -360,7 +361,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_USERS_DISPLAYNAMES, database.getDisplayNames() ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
     }
@@ -368,7 +369,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_FULLUSERS_RESULT, database.getFullUser() ) );
     }
-    catch ( Exception exception )
+    catch ( final Exception exception )
     {
       ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
     }
@@ -376,13 +377,13 @@ class SocketThread extends Thread
 
   /**
    * Enfernt das angegebene Getränk.
-   * 
+   *
    * @param consumedDrink
    */
-  private void removeBalance( DrinkPrice consumedDrink )
+  private void removeBalance( final DrinkPrice consumedDrink )
   {
-    Float drinkPrice = database.getDrinkPrice( consumedDrink.name );
-    Float expectedPrice = consumedDrink.price;
+    final Float drinkPrice = database.getDrinkPrice( consumedDrink.name );
+    final Float expectedPrice = consumedDrink.price;
     if ( drinkPrice == null )
     {
       return;
@@ -394,7 +395,7 @@ class SocketThread extends Thread
       {
         objectOutputStream.writeObject( new Shared( Operation.NO_MORE_DRINKS_AVAIBLE, consumedDrink.name ) );
       }
-      catch ( IOException exception )
+      catch ( final IOException exception )
       {
         ServerLog.newLog( logType.ERROR, exception.getMessage() );
       }
@@ -409,15 +410,15 @@ class SocketThread extends Thread
       {
         objectOutputStream.writeObject( new Shared( Operation.PRICE_CHANGED, new DrinkPrice( drinkPrice, -1, consumedDrink.name ) ) );
       }
-      catch ( IOException exception )
+      catch ( final IOException exception )
       {
         ServerLog.newLog( logType.ERROR, exception.getMessage() );
       }
       return;
     }
-    Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - drinkPrice;
+    final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - drinkPrice;
     database.updateBalance( currentSessionID, newBalance );
-    String date = LocalDateTime.now().toString();
+    final String date = LocalDateTime.now().toString();
     database.addLog( consumedDrink.name + " getrunken", currentUser, drinkPrice * -1, newBalance, date );
     database.decreaseAmountOfDrinks( consumedDrink.name );
     sendHistoryData();
@@ -431,20 +432,20 @@ class SocketThread extends Thread
 
   /**
    * Fügt dem Guthaben Geld hinzu.
-   * 
+   *
    * @param balanceToAdd
    */
-  private void addBalance( int balanceToAdd )
+  private void addBalance( final int balanceToAdd )
   {
-    Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + balanceToAdd;
+    final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + balanceToAdd;
     database.updateBalance( currentSessionID, newBalance );
-    String date = LocalDateTime.now().toString();
+    final String date = LocalDateTime.now().toString();
     database.addLog( "Guthaben aufgeladen", currentUser, Float.valueOf( balanceToAdd ), newBalance, date );
     ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
     sendHistoryData();
 
     //For Admin-Balance
-    Float adminBalance = database.getPiggyBankBalance() + balanceToAdd;
+    final Float adminBalance = database.getPiggyBankBalance() + balanceToAdd;
     database.setPiggyBankBalance( adminBalance );
 
     //For Undo
@@ -455,12 +456,12 @@ class SocketThread extends Thread
 
   /**
    * sendet den passenden Nutzernamen der SessionID an den Client zurück.
-   * 
+   *
    * @param sessionID
    */
-  private void sendUsernameForSessionID( String sessionID )
+  private void sendUsernameForSessionID( final String sessionID )
   {
-    String username = database.getUsernameForSessionID( sessionID );
+    final String username = database.getUsernameForSessionID( sessionID );
     currentSessionID = sessionID;
     currentUser = username;
     try
@@ -469,7 +470,7 @@ class SocketThread extends Thread
       objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( username ) ) );
       ServerLog.newLog( logType.INFO, "Der Nutzer " + username + " gehört zu der SessionID " + sessionID );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Es konnte kein Nutzer für die gegebene Session gefunden werden\n" + exception );
     }
@@ -477,10 +478,10 @@ class SocketThread extends Thread
 
   /**
    * Verbindet die SessionID mit dem Nutzer
-   * 
+   *
    * @param sessionID
    */
-  private void connectSessionID( String sessionID )
+  private void connectSessionID( final String sessionID )
   {
     database.addSessionIDToUser( sessionID, userIDMap.get( currentUser ) );
     currentSessionID = sessionID;
@@ -489,10 +490,10 @@ class SocketThread extends Thread
 
   /**
    * Updated das Bild des Getränks.
-   * 
+   *
    * @param drinkPicture DrinkPicture-Objekt, welches die ID und das Bild in Bytes beinhaltet.
    */
-  private void updateDrinkPicture( DrinkPicture drinkPicture )
+  private void updateDrinkPicture( final DrinkPicture drinkPicture )
   {
     database.updateDrinkInformation( drinkPicture.id, Operation.UPDATE_DRINKPICTURE, drinkPicture.pictureAsBytes );
     ServerLog.newLog( logType.INFO, "Das Bild des Getränk mit der ID " + drinkPicture.id + " wurde geändert." );
@@ -500,10 +501,10 @@ class SocketThread extends Thread
 
   /**
    * Updated den Preis des Getränks.
-   * 
+   *
    * @param drinkPrice DrinkPrice-Objekt, welches die ID und den neuen Preis enthält.
    */
-  private void updateDrinkPrice( DrinkPrice drinkPrice )
+  private void updateDrinkPrice( final DrinkPrice drinkPrice )
   {
     database.updateDrinkInformation( drinkPrice.id, Operation.UPDATE_DRINKPRICE, drinkPrice.price );
     ServerLog.newLog( logType.INFO,
@@ -513,10 +514,10 @@ class SocketThread extends Thread
 
   /**
    * Updated den Namen des Getränks.
-   * 
+   *
    * @param drinkName DrinkName-Objekt, welches die ID und den neuen Namen enthält.
    */
-  private void updateDrinkName( DrinkName drinkName )
+  private void updateDrinkName( final DrinkName drinkName )
   {
     database.updateDrinkInformation( drinkName.id, Operation.UPDATE_DRINKNAME, drinkName.name );
     ServerLog.newLog( logType.INFO, "Das Getränk mit der ID " + drinkName.id + " wurde zu " + drinkName.name + " umbenannt." );
@@ -527,10 +528,10 @@ class SocketThread extends Thread
    * Zuerst wird die zugehörige ID für das Getränk
    * geholt und anschließend der Datensatz für
    * die ID gelöscht.
-   * 
+   *
    * @param drink Drink-Objekt, welches den Namen des Getränks enthält.
    */
-  private void removeDrink( Drink drink )
+  private void removeDrink( final Drink drink )
   {
     database.removeDrink( drink.id );
     ServerLog.newLog( logType.INFO, drink.name + " wurde entfernt." );
@@ -546,7 +547,7 @@ class SocketThread extends Thread
       objectOutputStream.writeObject( new Shared( Operation.GET_DRINKINFO, database.getDrinkInformations() ) );
       objectOutputStream.reset();
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Die Getränkeinformationen konnten nicht geladen werden." + exception );
     }
@@ -555,14 +556,14 @@ class SocketThread extends Thread
   /**
    * Schickt an die Datenbankverbindung die Informationen
    * (Name, Preis, Bildpfad) für ein neues Getränk.
-   * 
+   *
    * @param drink ein Drink-Objekt, welches Name, Preis und Bildpfad enthält.
    */
-  private void registerDrink( Drink drink )
+  private void registerDrink( final Drink drink )
   {
-    String name = drink.name;
-    Float price = drink.price;
-    byte[] picture = drink.pictureInBytes;
+    final String name = drink.name;
+    final Float price = drink.price;
+    final byte[] picture = drink.pictureInBytes;
     database.registerNewDrink( name, price, picture );
     ServerLog.newLog( logType.INFO, "Ein neues Getränk wurde registriert." );
     ServerLog.newLog( logType.INFO, "Name: " + name );
@@ -573,19 +574,19 @@ class SocketThread extends Thread
    * Die UserID wird anhand des Namens beschafft und
    * mit dieser ID wird der Kontostand von der Datenbank
    * erfragt und zurück gegben.
-   * 
-   * 
+   *
+   *
    */
   private void getBalance()
   {
-    Integer userID = userIDMap.get( currentUser );
-    Float balance = database.getBalance( userID );
+    final Integer userID = userIDMap.get( currentUser );
+    final Float balance = database.getBalance( userID );
     ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " beträgt " + balance + "€" );
     try
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_BALANCE_RESULT, balance ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Der Kontostand konnte nicht geladen werden." + exception );
     }
@@ -594,17 +595,17 @@ class SocketThread extends Thread
   /**
    * Die gegebenen Informationen werden mit den Daten in der Datenbank verglichen
    * und das Ergebnis wird an den Client zurück gesendet.
-   * 
+   *
    * @param login ein Login-Objekt mit Benutzername und Passwort.
    */
-  private void checkLogin( LoginInformation login ) throws IOException
+  private void checkLogin( final LoginInformation login ) throws IOException
   {
-    String username = login.username;
-    String password = login.password;
+    final String username = login.username;
+    final String password = login.password;
 
     ServerLog.newLog( logType.INFO, "Loginversuch für " + username );
 
-    LoginResult result = database.checkLogin( username, password );
+    final LoginResult result = database.checkLogin( username, password );
 
     switch ( result )
     {
@@ -637,14 +638,14 @@ class SocketThread extends Thread
 
   /**
    * Es wird ein neuer Datenbankeintrag für den Nutzer angelegt.
-   * 
+   *
    * @param user enthät alle Nutzerinformationen.
    */
-  private void registerUser( User user )
+  private void registerUser( final User user )
   {
-    String username = user.name;
-    String password = user.password;
-    String result = database.registerNewUser( username, password );
+    final String username = user.name;
+    final String password = user.password;
+    final String result = database.registerNewUser( username, password );
     ServerLog.newLog( logType.INFO, "Ein neuer Benutzer mit dem Namen " + username + " wurde registriert." );
     userIDMap.clear();
     userIDMap = database.getUserIDMap();
@@ -652,7 +653,7 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.REGISTRATION_RESULT, result ) );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Der Benutzer konnte nicht angelegt werden." + exception );
     }
