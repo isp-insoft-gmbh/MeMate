@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -663,33 +664,37 @@ class Settings extends JPanel
 
     colorThemeComboBox.addItemListener( e ->
     {
-      final String color = String.valueOf( colorThemeComboBox.getSelectedItem() );
-      switch ( color )
+      //Otherwise the event will trigger twice every time
+      if ( e.getStateChange() == ItemEvent.SELECTED )
       {
-        case "Dark Blue":
-          setColors( color, new Color( 0, 173, 181 ), new Color( 34, 40, 49 ), new Color( 57, 62, 70 ), new Color( 42, 51, 64 ) );
-          break;
-        case "Red":
-          setColors( color, new Color( 226, 62, 87 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
-          break;
-        case "Green":
-          setColors( color, new Color( 153, 180, 51 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
-          break;
-        case "Blue":
-          setColors( color, new Color( 85, 172, 238 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-          break;
-        case "Orange":
-          setColors( color, new Color( 227, 162, 26 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-          break;
-        case "Coral":
-          setColors( color, new Color( 255, 111, 97 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-          break;
-        case "Tripple Green":
-          setColors( color, new Color( 153, 180, 51 ), new Color( 11, 40, 25 ), new Color( 30, 113, 69 ), new Color( 13, 48, 30 ) );
-          break;
-        default :
-          setColors( color, new Color( 29, 164, 165 ), new Color( 36, 43, 55 ), new Color( 52, 73, 94 ), new Color( 42, 51, 64 ) );
-          break;
+        final String color = String.valueOf( colorThemeComboBox.getSelectedItem() );
+        switch ( color )
+        {
+          case "Dark Blue":
+            setColors( color, new Color( 0, 173, 181 ), new Color( 34, 40, 49 ), new Color( 57, 62, 70 ), new Color( 42, 51, 64 ) );
+            break;
+          case "Red":
+            setColors( color, new Color( 226, 62, 87 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
+            break;
+          case "Green":
+            setColors( color, new Color( 153, 180, 51 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
+            break;
+          case "Blue":
+            setColors( color, new Color( 85, 172, 238 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+            break;
+          case "Orange":
+            setColors( color, new Color( 227, 162, 26 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+            break;
+          case "Coral":
+            setColors( color, new Color( 255, 111, 97 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+            break;
+          case "Tripple Green":
+            setColors( color, new Color( 153, 180, 51 ), new Color( 11, 40, 25 ), new Color( 30, 113, 69 ), new Color( 13, 48, 30 ) );
+            break;
+          default :
+            setColors( color, new Color( 29, 164, 165 ), new Color( 36, 43, 55 ), new Color( 52, 73, 94 ), new Color( 42, 51, 64 ) );
+            break;
+        }
       }
     } );
   }

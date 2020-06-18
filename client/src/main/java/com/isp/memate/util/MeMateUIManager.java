@@ -349,19 +349,22 @@ public class MeMateUIManager
   public static JCheckBox createCheckbox()
   {
     final JCheckBox checkbox = new JCheckBox();
+    checkbox.setBorder( BorderFactory.createLineBorder( new Color( 0, 0, 0, 0 ) ) );
+    checkbox.setBorderPainted( true );
+    checkbox.setOpaque( false );
     checkbox.addFocusListener( new FocusListener()
     {
 
       @Override
       public void focusLost( final FocusEvent e )
       {
-        checkbox.setBackground( UIManager.getColor( "Panel.background" ) );
+        checkbox.setBorder( BorderFactory.createLineBorder( new Color( 0, 0, 0, 0 ) ) );
       }
 
       @Override
       public void focusGained( final FocusEvent e )
       {
-        checkbox.setBackground( UIManager.getColor( "AppColor" ) );
+        checkbox.setBorder( BorderFactory.createLineBorder( UIManager.getColor( "AppColor" ) ) );
       }
     } );
     checkBoxList.put( "default", checkbox );
@@ -555,299 +558,24 @@ public class MeMateUIManager
     ClientLog.newLog( "UI-Update" );
     for ( final String key : keySet )
     {
-      for ( final JPanel panel : panelList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          panel.setBackground( backgroundMap.get( key ).getDarkColor() );
-        }
-        else
-        {
-          panel.setBackground( backgroundMap.get( key ).getDayColor() );
-        }
-        if ( key.equals( "drinkButton" ) )
-        {
-          panel.setBorder( UIManager.getBorder( "DefaultBorder" ) );
-        }
-      }
-      for ( final JList<?> list : listList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          list.setBackground( getBackground( key ).getDarkColor() );
-        }
-        else
-        {
-          list.setBackground( getBackground( key ).getDayColor() );
-        }
-      }
-      for ( final JTextField textField : textFieldList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          textField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-          textField.setForeground( Color.white );
-          textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
-        }
-        else
-        {
-          textField.setBackground( Color.white );
-          textField.setForeground( Color.black );
-          textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
-        }
-      }
-      for ( final JPasswordField textField : passwordFieldList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          textField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-          textField.setForeground( Color.white );
-          textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
-        }
-        else
-        {
-          textField.setBackground( Color.white );
-          textField.setForeground( Color.black );
-          textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
-        }
-      }
-      for ( final JLabel label : labelList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          label.setForeground( foregroundMap.get( key ).getDarkColor() );
-          if ( panelIconList.get( label ) != null )
-          {
-            label.setIcon( panelIconList.get( label ).getDarkIcon() );
-          }
-        }
-        else
-        {
-          label.setForeground( foregroundMap.get( key ).getDayColor() );
-          if ( panelIconList.get( label ) != null )
-          {
-            label.setIcon( panelIconList.get( label ).getDayIcon() );
-          }
-        }
-      }
-      for ( final JRadioButton radioButton : radioButtonList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          radioButton.setBackground( backgroundMap.get( key ).getDarkColor() );
-          radioButton.setForeground( Color.white );
-        }
-        else
-        {
-          radioButton.setBackground( backgroundMap.get( key ).getDayColor() );
-          radioButton.setForeground( Color.black );
-        }
-      }
-      for ( final JButton button : normalButtonList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          button.setBackground( backgroundMap.get( key ).getDarkColor() );
-          button.setForeground( foregroundMap.get( key ).getDarkColor() );
-          button.setBorder( UIManager.getBorder( "DefaultBorder" ) );
-          if ( iconList.get( button ) != null )
-          {
-            button.setIcon( iconList.get( button ).getDarkIcon() );
-          }
-        }
-        else
-        {
-          button.setBackground( backgroundMap.get( key ).getDayColor() );
-          button.setForeground( foregroundMap.get( key ).getDayColor() );
-          button.setBorder( UIManager.getBorder( "DefaultBorder" ) );
-          if ( iconList.get( button ) != null )
-          {
-            button.setIcon( iconList.get( button ).getDayIcon() );
-          }
-        }
-      }
-      for ( final JButton button : infoButtonList.get( key ) )
-      {
-        button.setIcon( new InfoIcon() );
-      }
-      for ( final JTextPane textPane : textPaneList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          textPane.setBackground( backgroundMap.get( key ).getDarkColor() );
-        }
-        else
-        {
-          textPane.setBackground( backgroundMap.get( key ).getDayColor() );
-        }
-      }
-      for ( final JCheckBox checkBox : checkBoxList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          checkBox.setBackground( backgroundMap.get( key ).getDarkColor() );
-        }
-        else
-        {
-          checkBox.setBackground( backgroundMap.get( key ).getDayColor() );
-        }
-      }
-      for ( final JTable table : tableList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          table.setBackground( backgroundMap.get( key ).getDarkColor() );
-          final JTableHeader header = table.getTableHeader();
-          header.setBackground( backgroundMap.get( key ).getDarkColor().brighter().brighter() );
-          header.setForeground( foregroundMap.get( key ).getDarkColor() );
-          table.setForeground( foregroundMap.get( key ).getDarkColor() );
-          table.setSelectionBackground( UIManager.getColor( "AppColor" ) );
-        }
-        else
-        {
-          table.setBackground( backgroundMap.get( key ).getDayColor() );
-          final JTableHeader header = table.getTableHeader();
-          header.setBackground( backgroundMap.get( key ).getDayColor().darker() );
-          header.setForeground( foregroundMap.get( key ).getDayColor() );
-          table.setForeground( foregroundMap.get( key ).getDayColor() );
-          table.setSelectionBackground( UIManager.getColor( "AppColor" ) );
-        }
-      }
-      for ( final JScrollPane scrollPane : scrollPaneList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          scrollPane.setBackground( backgroundMap.get( key ).getDarkColor().brighter() );
-          scrollPane.getVerticalScrollBar().setUI( new DarkScrollBarUI() );
-          scrollPane.getViewport().setBackground( backgroundMap.get( key ).getDarkColor() );
-        }
-        else
-        {
-          scrollPane.setBackground( backgroundMap.get( key ).getDayColor().darker() );
-          scrollPane.getVerticalScrollBar().setUI( new BrightScrollBarUI() );
-          scrollPane.getViewport().setBackground( backgroundMap.get( key ).getDayColor() );
-        }
-      }
-      for ( final JComponent separator : separatorList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          separator.setForeground( foregroundMap.get( key ).getDarkColor() );
-        }
-        else
-        {
-          separator.setForeground( foregroundMap.get( key ).getDayColor() );
-        }
-      }
-      for ( final JSpinner spinner : spinnerList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          spinner.setUI( new DarkSpinnerUI() );
-          spinner.setBackground( backgroundMap.get( key ).getDarkColor() );
-          spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor(), 1 ) );
-        }
-        else
-        {
-          spinner.setUI( new DaySpinnerUI() );
-          spinner.setBackground( backgroundMap.get( key ).getDayColor() );
-          spinner.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
-        }
-      }
-      for ( final JComboBox<String> comboBox : comboBoxList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          comboBox.setUI( new DarkComboBoxUI() );
-          comboBox.setBackground( backgroundMap.get( key ).getDarkColor() );
-          comboBox.setForeground( foregroundMap.get( key ).getDarkColor() );
-          comboBox.setBorder( BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor(), 1 ) );
-
-        }
-        else
-        {
-          comboBox.setUI( new DayComboBoxUI() );
-          comboBox.setBackground( backgroundMap.get( key ).getDayColor() );
-          comboBox.setForeground( foregroundMap.get( key ).getDayColor() );
-          comboBox.setBorder(
-              BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
-
-        }
-      }
-      for ( final MeMateActionBarButton button : buttonList.get( key ) )
-      {
-        if ( darkModeState )
-        {
-          button.toggleDarkMode( backgroundMap.get( key ).getDarkColor(), foregroundMap.get( key ).getDarkColor() );
-          button.setDarkModeState( true );
-          button.addMouseListener( new MeMateActionBarListener( button,
-              () -> button.setBackground( backgroundMap.get( key ).getDarkColor() ),
-              () -> button.setBackground( backgroundMap.get( key ).getDarkColor().darker() ) ) );
-        }
-        else
-        {
-          button.toggleDarkMode( backgroundMap.get( key ).getDayColor(), foregroundMap.get( key ).getDayColor() );
-          button.setDarkModeState( false );
-          button.addMouseListener( new MeMateActionBarListener( button,
-              () -> button.setBackground( backgroundMap.get( key ).getDayColor() ),
-              () -> button.setBackground( backgroundMap.get( key ).getDayColor().darker() ) ) );
-        }
-      }
+      updateJPanel( key );
+      updateList( key );
+      updateTextField( key );
+      updatePasswordField( key );
+      updateLabel( key );
+      updateRadioButtons( key );
+      updateButton( key );
+      updateInfoButton( key );
+      updateTextPane( key );
+      updateCheckBox( key );
+      updateTable( key );
+      updateScrollPane( key );
+      updateSeperator( key );
+      updateSpinner( key );
+      updateComboBox( key );
+      updateActionBarButtons( key );
     }
-    if ( freeChart != null )
-    {
-      if ( darkModeState )
-      {
-        freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-        freeChart.getTitle().setPaint( Color.white );
-        freeChart.getXYPlot().setBackgroundPaint( UIManager.getColor( "App.Background" ).brighter() );
-        freeChart.getXYPlot().setDomainGridlinesVisible( false );
-        freeChart.getXYPlot().setRangeGridlinesVisible( false );
-        freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.white );
-        freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.white );
-        freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.white );
-        freeChart.getXYPlot().getRangeAxis().setLabelPaint( Color.white );
-      }
-      else
-      {
-        freeChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
-        freeChart.getXYPlot().setBackgroundPaint( new Color( 192, 192, 192 ) );
-        freeChart.getXYPlot().setDomainGridlinesVisible( false );
-        freeChart.getXYPlot().setRangeGridlinesVisible( false );
-        freeChart.getTitle().setPaint( Color.black );
-        freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( Color.black );
-        freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( Color.black );
-        freeChart.getXYPlot().getDomainAxis().setLabelPaint( Color.black );
-        freeChart.getXYPlot().getRangeAxis().setLabelPaint( Color.black );
-      }
-    }
-    if ( lineChart != null )
-    {
-      if ( darkModeState )
-      {
-        lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-        lineChart.getCategoryPlot().setBackgroundPaint( UIManager.getColor( "App.Background" ).brighter() );
-        lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
-        lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
-        lineChart.getTitle().setPaint( Color.white );
-        lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.white );
-        lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.white );
-        lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( Color.white );
-        lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( Color.white );
-      }
-      else
-      {
-        lineChart.setBackgroundPaint( MeMateUIManager.getBackground( "default" ).getDayColor() );
-        lineChart.getCategoryPlot().setBackgroundPaint( new Color( 192, 192, 192 ) );
-        lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
-        lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
-        lineChart.getTitle().setPaint( Color.black );
-        lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( Color.black );
-        lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( Color.black );
-        lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( Color.black );
-        lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( Color.black );
-      }
-    }
+    updateGraphs();
     if ( Login.getInstance() != null )
     {
       if ( darkModeState )
@@ -861,12 +589,214 @@ public class MeMateUIManager
     }
   }
 
+  public static void updateList( final String key )
+  {
+    for ( final JList<?> list : listList.get( key ) )
+    {
+      list.setBackground( darkModeState ? getBackground( key ).getDarkColor() : getBackground( key ).getDayColor() );
+    }
+  }
+
+  public static void updateTextField( final String key )
+  {
+    for ( final JTextField textField : textFieldList.get( key ) )
+    {
+      textField.setBackground( darkModeState ? MeMateUIManager.getBackground( "spinner" ).getDarkColor() : Color.white );
+      textField.setForeground( darkModeState ? Color.white : Color.black );
+      textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+    }
+  }
+
+  public static void updatePasswordField( final String key )
+  {
+    for ( final JPasswordField textField : passwordFieldList.get( key ) )
+    {
+      textField.setBackground( darkModeState ? MeMateUIManager.getBackground( "spinner" ).getDarkColor() : Color.white );
+      textField.setForeground( darkModeState ? Color.white : Color.black );
+      textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+    }
+  }
+
+  public static void updateLabel( final String key )
+  {
+    for ( final JLabel label : labelList.get( key ) )
+    {
+      label.setForeground( darkModeState ? foregroundMap.get( key ).getDarkColor() : foregroundMap.get( key ).getDayColor() );
+      if ( panelIconList.get( label ) != null )
+      {
+        label.setIcon( darkModeState ? panelIconList.get( label ).getDarkIcon() : panelIconList.get( label ).getDayIcon() );
+      }
+    }
+  }
+
+  public static void updateRadioButtons( final String key )
+  {
+    for ( final JRadioButton radioButton : radioButtonList.get( key ) )
+    {
+      radioButton.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+      radioButton.setForeground( darkModeState ? Color.white : Color.black );
+    }
+  }
+
+  public static void updateInfoButton( final String key )
+  {
+    for ( final JButton button : infoButtonList.get( key ) )
+    {
+      button.setIcon( new InfoIcon() );
+    }
+  }
+
+  public static void updateButton( final String key )
+  {
+    for ( final JButton button : normalButtonList.get( key ) )
+    {
+      button.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+      button.setForeground( darkModeState ? foregroundMap.get( key ).getDarkColor() : foregroundMap.get( key ).getDayColor() );
+      button.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+      if ( iconList.get( button ) != null )
+      {
+        button.setIcon( darkModeState ? iconList.get( button ).getDarkIcon() : iconList.get( button ).getDayIcon() );
+      }
+    }
+  }
+
+  public static void updateTextPane( final String key )
+  {
+    for ( final JTextPane textPane : textPaneList.get( key ) )
+    {
+      textPane.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+    }
+  }
+
+  public static void updateCheckBox( final String key )
+  {
+    for ( final JCheckBox checkBox : checkBoxList.get( key ) )
+    {
+      checkBox.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+    }
+  }
+
+  public static void updateTable( final String key )
+  {
+    for ( final JTable table : tableList.get( key ) )
+    {
+      table.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+      final JTableHeader header = table.getTableHeader();
+      header.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor().brighter().brighter()
+          : backgroundMap.get( key ).getDayColor().darker() );
+      header.setForeground( darkModeState ? foregroundMap.get( key ).getDarkColor() : foregroundMap.get( key ).getDayColor() );
+      table.setForeground( darkModeState ? foregroundMap.get( key ).getDarkColor() : foregroundMap.get( key ).getDayColor() );
+      table.setSelectionBackground( UIManager.getColor( "AppColor" ) );
+    }
+  }
+
+  public static void updateScrollPane( final String key )
+  {
+    for ( final JScrollPane scrollPane : scrollPaneList.get( key ) )
+    {
+      scrollPane.setBackground(
+          darkModeState ? backgroundMap.get( key ).getDarkColor().brighter() : backgroundMap.get( key ).getDayColor().darker() );
+      scrollPane.getVerticalScrollBar().setUI( darkModeState ? new DarkScrollBarUI() : new BrightScrollBarUI() );
+      scrollPane.getViewport()
+          .setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+    }
+  }
+
+  public static void updateActionBarButtons( final String key )
+  {
+    for ( final MeMateActionBarButton button : buttonList.get( key ) )
+    {
+      button.toggleDarkMode( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor(),
+          darkModeState ? foregroundMap.get( key ).getDarkColor() : foregroundMap.get( key ).getDayColor() );
+      button.setDarkModeState( darkModeState ? true : false );
+      button.addMouseListener( new MeMateActionBarListener( button,
+          () -> button
+              .setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() ),
+          () -> button.setBackground(
+              darkModeState ? backgroundMap.get( key ).getDarkColor().darker() : backgroundMap.get( key ).getDayColor().darker() ) ) );
+    }
+  }
+
+  public static void updateComboBox( final String key )
+  {
+    for ( final JComboBox<String> comboBox : comboBoxList.get( key ) )
+    {
+      comboBox.setUI( darkModeState ? new DarkComboBoxUI() : new DayComboBoxUI() );
+      comboBox.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+      comboBox.setForeground( darkModeState ? foregroundMap.get( key ).getDarkColor() : foregroundMap.get( key ).getDayColor() );
+      comboBox.setBorder( darkModeState ? BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor(), 1 )
+          : BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
+    }
+  }
+
+  public static void updateSpinner( final String key )
+  {
+    for ( final JSpinner spinner : spinnerList.get( key ) )
+    {
+      spinner.setUI( darkModeState ? new DarkSpinnerUI() : new DaySpinnerUI() );
+      spinner.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+      spinner.setBorder( darkModeState ? BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor(), 1 )
+          : BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
+    }
+  }
+
+  public static void updateSeperator( final String key )
+  {
+    for ( final JComponent separator : separatorList.get( key ) )
+    {
+      separator.setForeground( darkModeState ? foregroundMap.get( key ).getDarkColor() : foregroundMap.get( key ).getDayColor() );
+    }
+  }
+
+  public static void updateJPanel( final String key )
+  {
+    for ( final JPanel panel : panelList.get( key ) )
+    {
+      panel.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
+      if ( key.equals( "drinkButton" ) )
+      {
+        panel.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+      }
+    }
+  }
+
+  public static void updateGraphs()
+  {
+    if ( freeChart != null )
+    {
+      freeChart.setBackgroundPaint( darkModeState ? MeMateUIManager.getBackground( "default" ).getDarkColor()
+          : MeMateUIManager.getBackground( "default" ).getDayColor() );
+      freeChart.getTitle().setPaint( darkModeState ? Color.white : Color.black );
+      freeChart.getXYPlot()
+          .setBackgroundPaint( darkModeState ? UIManager.getColor( "App.Background" ).brighter() : new Color( 192, 192, 192 ) );
+      freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( darkModeState ? Color.white : Color.black );
+      freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( darkModeState ? Color.white : Color.black );
+      freeChart.getXYPlot().getDomainAxis().setLabelPaint( darkModeState ? Color.white : Color.black );
+      freeChart.getXYPlot().getRangeAxis().setLabelPaint( darkModeState ? Color.white : Color.black );
+      freeChart.getXYPlot().setDomainGridlinesVisible( false );
+      freeChart.getXYPlot().setRangeGridlinesVisible( false );
+    }
+    if ( lineChart != null )
+    {
+      lineChart.setBackgroundPaint( darkModeState ? MeMateUIManager.getBackground( "default" ).getDarkColor()
+          : MeMateUIManager.getBackground( "default" ).getDayColor() );
+      lineChart.getCategoryPlot()
+          .setBackgroundPaint( darkModeState ? UIManager.getColor( "App.Background" ).brighter() : new Color( 192, 192, 192 ) );
+      lineChart.getTitle().setPaint( darkModeState ? Color.white : Color.black );
+      lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( darkModeState ? Color.white : Color.black );
+      lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( darkModeState ? Color.white : Color.black );
+      lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( darkModeState ? Color.white : Color.black );
+      lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( darkModeState ? Color.white : Color.black );
+      lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
+      lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
+    }
+  }
+
   /**
    * Enthält immer eine Farbe für den Darkmode und eine für den Daymode.
    *
    * @author nwe
    * @since 02.03.2020
-   *
    */
   public static class DarkDayColor
   {

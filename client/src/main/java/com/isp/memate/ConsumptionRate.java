@@ -213,7 +213,7 @@ class ConsumptionRate extends JPanel
       chartPanel.setChart( chart );
       averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage(), String.valueOf( e.getItem() ) ) );
       add( chartPanel, chartPanelConstraits );
-      MeMateUIManager.setUISettings();
+      MeMateUIManager.updateGraphs();
       repaint();
       revalidate();
     } );
@@ -260,6 +260,7 @@ class ConsumptionRate extends JPanel
   private void addDrinkComboBoxItems()
   {
     selectDrinkComboBox = new JComboBox<>();
+    //Needed because otherwise very long drinknames would cause a realy wide ComboBox.
     selectDrinkComboBox.setPrototypeDisplayValue( "This is my maximal lenght" );
     selectDrinkComboBox.addItem( "Alle" );
     selectDrinkComboBox.setSelectedItem( "Alle" );
@@ -268,8 +269,6 @@ class ConsumptionRate extends JPanel
     {
       selectDrinkComboBox.addItem( string );
     }
-    //Needed because otherwise very long drinknames would cause a realy wide ComboBox.
-    MeMateUIManager.setUISettings();
   }
 
 

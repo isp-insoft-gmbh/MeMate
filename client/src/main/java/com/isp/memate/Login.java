@@ -398,7 +398,7 @@ public class Login extends JFrame
     final GridBagConstraints checkboxConstraints = new GridBagConstraints();
     checkboxConstraints.gridx = 2;
     checkboxConstraints.gridy = 3;
-    checkboxConstraints.insets = new Insets( 0, 6, 0, 0 );
+    checkboxConstraints.insets = new Insets( 0, 8, 0, 0 );
     loginPanel.add( stayLoggedInCheckBox, checkboxConstraints );
 
     final GridBagConstraints loginButtonConstraints = new GridBagConstraints();

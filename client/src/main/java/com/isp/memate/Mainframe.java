@@ -191,7 +191,6 @@ public class Mainframe extends JFrame
         "Öffnet die Einstellungen", color, () ->
         {
           contentPanel.removeAll();
-          MeMateUIManager.setUISettings();
           contentPanel.add( new Settings() );
           contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
           contentPanel.repaint();

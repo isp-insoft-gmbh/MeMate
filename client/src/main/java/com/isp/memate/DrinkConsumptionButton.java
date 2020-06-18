@@ -178,7 +178,10 @@ class DrinkConsumptionButton extends JPanel
         addPanel( "Zucker", 7, infoPanel, ingredients );
         addPanel( "Eiweiß", 8, infoPanel, ingredients );
         addPanel( "Salz", 9, infoPanel, ingredients );
-        MeMateUIManager.setUISettings();
+        //Otherwise the generated panels aren't rendered correctly
+        MeMateUIManager.updateJPanel( "drinkButtons" );
+        MeMateUIManager.updateLabel( "default" );
+        MeMateUIManager.updateSeperator( "default" );
       }
 
       private void addPanel( final String ingredient, final int y, final JPanel mainPanel,
