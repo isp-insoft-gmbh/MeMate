@@ -334,21 +334,25 @@ class Adminview extends JPanel
       drinkAmountPanel.setLayout( new GridBagLayout() );
       final JLabel drinkNameLabel = MeMateUIManager.createJLabel();
       drinkNameLabel.setText( drink );
-      drinkNameLabel.setPreferredSize( new Dimension( 150, 30 ) );
+      //      drinkNameLabel.setPreferredSize( new Dimension( 150, 30 ) );
       drinkNameLabel.setFont( drinkNameLabel.getFont().deriveFont( 20f ) );
       final GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
       drinkNameLabelConstraints.gridy = 0;
+      drinkNameLabelConstraints.weightx = 0;
+      drinkNameLabelConstraints.weighty = 0;
       drinkNameLabelConstraints.gridx = 0;
       drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
       drinkNameLabelConstraints.insets = new Insets( 0, 10, 5, 0 );
       drinkAmountPanel.add( drinkNameLabel, drinkNameLabelConstraints );
-      final SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 50, 1 );
+      final SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 10000, 1 );
       final JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
       amountSpinner.setValue( ServerCommunication.getInstance().getAmount( drink ) );
       MeMateUIManager.registerSpinner( amountSpinner );
       final GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
       amountSpinnerConstraints.gridx = 0;
       amountSpinnerConstraints.gridy = 2;
+      amountSpinnerConstraints.weightx = 1;
+      amountSpinnerConstraints.weighty = 1;
       amountSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
       amountSpinnerConstraints.insets = new Insets( 0, 10, 0, 5 );
       drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
@@ -357,6 +361,8 @@ class Adminview extends JPanel
       final GridBagConstraints setAmountButtonConstraints = new GridBagConstraints();
       setAmountButtonConstraints.gridx = 1;
       setAmountButtonConstraints.gridy = 2;
+      setAmountButtonConstraints.weightx = 1;
+      setAmountButtonConstraints.weighty = 1;
       setAmountButtonConstraints.insets = new Insets( 0, 0, 5, 5 );
       drinkAmountPanel.add( setAmountButton, setAmountButtonConstraints );
       final JLabel daysLeftLabel = MeMateUIManager.createJLabel();
@@ -365,6 +371,8 @@ class Adminview extends JPanel
       final GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
       daysLeftLabelConstraints.gridx = 0;
       daysLeftLabelConstraints.gridy = 1;
+      daysLeftLabelConstraints.weightx = 1;
+      daysLeftLabelConstraints.weighty = 1;
       daysLeftLabelConstraints.insets = new Insets( 0, 10, 10, 0 );
       drinkAmountPanel.add( daysLeftLabel, daysLeftLabelConstraints );
 

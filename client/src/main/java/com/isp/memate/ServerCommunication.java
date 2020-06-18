@@ -99,7 +99,7 @@ class ServerCommunication
     try
     {
       socket = new Socket( FindServer.getServerAddress(), FindServer.getServerPort() );
-      //socket = new Socket( "192.168.168.82", 3142 );// This is for Testing TODO remove later
+      //      socket = new Socket( "192.168.168.82", 3142 );// This is for Testing TODO remove later
       outStream = new ObjectOutputStream( socket.getOutputStream() );
       inStream = new ObjectInputStream( socket.getInputStream() );
     }
@@ -124,7 +124,10 @@ class ServerCommunication
         {
           final Shared shared = (Shared) inStream.readObject();
           final Operation operation = shared.operation;
-          ClientLog.newLog( operation.toString() );
+          if ( operation != Operation.GET_DRINKINFO )
+          {
+            ClientLog.newLog( operation.toString() );
+          }
           switch ( operation )
           {
             case GET_DRINKINFO:
@@ -389,6 +392,18 @@ class ServerCommunication
   Integer getAmount( final String name )
   {
     return amountMap.get( name );
+  }
+
+  String getDrinkName( final int id )
+  {
+    for ( final String string : drinkIDMap.keySet() )
+    {
+      if ( id == drinkIDMap.get( string ) )
+      {
+        return string;
+      }
+    }
+    return null;
   }
 
   DrinkIngredients getIngredients( final String name )

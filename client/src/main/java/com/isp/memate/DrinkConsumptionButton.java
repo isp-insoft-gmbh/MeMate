@@ -328,7 +328,12 @@ class DrinkConsumptionButton extends JPanel
     final String format = formatter.format( priceAsFloat.doubleValue() );
     final int amount = ServerCommunication.getInstance().getAmount( name );
     //FIXME(nwe | 09.06.2020): Nicht So !!!!!!!!!
-    if ( amount > 9 )
+    if ( amount > 99 )
+    {
+      priceLabel.setText( format + "                             Noch "
+          + amount + " Stück" );
+    }
+    else if ( amount > 9 )
     {
       priceLabel.setText( format + "                               Noch "
           + amount + " Stück" );

@@ -6,8 +6,6 @@ package com.isp.memate;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -16,8 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import com.isp.memate.util.MeMateUIManager;
 
@@ -26,7 +22,7 @@ import com.isp.memate.util.MeMateUIManager;
  * Man kann neue Getränke hinzufügen, Getränke entfernen
  * und Getränke beearbeiten, sollte sich zum Beispiel der Preis ändern.
  * Außerdem kann man Getränkeinformationen hinzufügen wie z.B Zutatenliste.
- * 
+ *
  * @author nwe
  * @since 15.10.2019
  */
@@ -74,14 +70,7 @@ class Drinkmanager extends JPanel
       editButton.setEnabled( true );
       removeButton.setEnabled( true );
     }
-    drinkList.addListSelectionListener( new ListSelectionListener()
-    {
-      @Override
-      public void valueChanged( ListSelectionEvent e )
-      {
-        currentSelection = drinkList.getSelectedIndex();
-      }
-    } );
+    drinkList.addListSelectionListener( e -> currentSelection = drinkList.getSelectedIndex() );
     MeMateUIManager.registerPanel( "default", this );
   }
 
@@ -111,50 +100,34 @@ class Drinkmanager extends JPanel
     gridBagConstraints.anchor = GridBagConstraints.LINE_END;
     panel.add( removeButton, gridBagConstraints );
 
-    removeButton.addActionListener( new ActionListener()
+    removeButton.addActionListener( e ->
     {
-      @Override
-      public void actionPerformed( ActionEvent e )
+      final int result = JOptionPane.showConfirmDialog( scrollpane,
+          "Wollen Sie wirklich " + drinkList.getSelectedValue() + " löschen?", "Getränk entfernen",
+          JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE );
+      if ( result == JOptionPane.YES_OPTION )
       {
-        int result = JOptionPane.showConfirmDialog( scrollpane,
-            "Wollen Sie wirklich " + drinkList.getSelectedValue() + " löschen?", "Getränk entfernen",
-            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE );
-        if ( result == JOptionPane.YES_OPTION )
-        {
-          ServerCommunication.getInstance().removeDrink( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ),
-              drinkList.getSelectedValue() );
-        }
-        updateList();
+        ServerCommunication.getInstance().removeDrink( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ),
+            drinkList.getSelectedValue() );
       }
+      updateList();
     } );
-    ingredientsButton.addActionListener( new ActionListener()
+    ingredientsButton.addActionListener( e ->
     {
-      @Override
-      public void actionPerformed( ActionEvent e )
-      {
-        DrinkManagerDialog ingredientsDialog = new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
-        ingredientsDialog.showIngredientsDialog( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ) );
-      }
+      final DrinkManagerDialog ingredientsDialog = new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
+      ingredientsDialog.showIngredientsDialog( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ) );
     } );
-    addButton.addActionListener( new ActionListener()
+    addButton.addActionListener( e ->
     {
-      @Override
-      public void actionPerformed( ActionEvent e )
-      {
-        DrinkManagerDialog addDrinkDialog =
-            new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
-        addDrinkDialog.showNewDialog();
-      }
+      final DrinkManagerDialog addDrinkDialog =
+          new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
+      addDrinkDialog.showNewDialog();
     } );
-    editButton.addActionListener( new ActionListener()
+    editButton.addActionListener( e ->
     {
-      @Override
-      public void actionPerformed( ActionEvent e )
-      {
-        DrinkManagerDialog editDrinkDialog =
-            new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
-        editDrinkDialog.showEditDialog( drinkList.getSelectedValue() );
-      }
+      final DrinkManagerDialog editDrinkDialog =
+          new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
+      editDrinkDialog.showEditDialog( drinkList.getSelectedValue() );
     } );
     return panel;
   }
@@ -165,6 +138,7 @@ class Drinkmanager extends JPanel
   void updateList()
   {
     data = new String[ServerCommunication.getInstance().getDrinkNames().size()];
+    System.out.println( data );
     data = ServerCommunication.getInstance().getDrinkNames().toArray( data );
     drinkList = new JList<>( data );
     drinkList.setCellRenderer( new DrinkCellRenderer() );
@@ -185,13 +159,6 @@ class Drinkmanager extends JPanel
       editButton.setEnabled( true );
       removeButton.setEnabled( true );
     }
-    drinkList.addListSelectionListener( new ListSelectionListener()
-    {
-      @Override
-      public void valueChanged( ListSelectionEvent e )
-      {
-        currentSelection = drinkList.getSelectedIndex();
-      }
-    } );
+    drinkList.addListSelectionListener( e -> currentSelection = drinkList.getSelectedIndex() );
   }
 }

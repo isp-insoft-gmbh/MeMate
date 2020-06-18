@@ -466,6 +466,11 @@ class DrinkManagerDialog
         JOptionPane.showMessageDialog( dialog, "Bitte gültigen Preis für das Getränk angeben.", "Getränk hinzufügen fehlgeschlagen",
             JOptionPane.ERROR_MESSAGE, null );
       }
+      else if ( ServerCommunication.getInstance().getDrinkNames().contains( name ) )
+      {
+        JOptionPane.showMessageDialog( dialog, "Dieser Getränkenamen ist bereits vergeben.", "Getränk hinzufügen fehlgeschlagen",
+            JOptionPane.ERROR_MESSAGE, null );
+      }
       else
       {
         BufferedImage bImage;
@@ -666,10 +671,24 @@ class DrinkManagerDialog
     {
       confirmButton.removeActionListener( actionListener );
     }
+    //Get Data from Server, if ingredients are already existing
+    final DrinkIngredients ingredients =
+        ServerCommunication.getInstance().getIngredients( ServerCommunication.getInstance().getDrinkName( DrinkID ) );
+    if ( ingredients != null )
+    {
+      ingredientsField.setText( ingredients.ingredients );
+      energykJSpinner.setValue( ingredients.energy_kJ );
+      energykCALSpinner.setValue( ingredients.energy_kcal );
+      fatSpinner.setValue( ingredients.fat );
+      fattyAcidsSpinner.setValue( ingredients.fatty_acids );
+      carbsSpinner.setValue( ingredients.carbs );
+      sugarSpinner.setValue( ingredients.sugar );
+      proteinSpinner.setValue( ingredients.protein );
+      saltSpinner.setValue( ingredients.salt );
+    }
 
     confirmButton.addActionListener( e ->
     {
-
       //TODO implement Illegal Argument Check
 
       if ( energykJSpinner.getValue() instanceof Number || energykCALSpinner.getValue() instanceof Number
