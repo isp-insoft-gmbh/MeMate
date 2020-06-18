@@ -20,10 +20,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -62,6 +64,8 @@ public class MeMateUIManager
   private static final Multimap<String, JSpinner>              spinnerList         = ArrayListMultimap.create();
   private static final Multimap<String, JRadioButton>          radioButtonList     = ArrayListMultimap.create();
   private static final Multimap<String, JComboBox<String>>     comboBoxList        = ArrayListMultimap.create();
+  private static final Multimap<String, JTextField>            textFieldList       = ArrayListMultimap.create();
+  private static final Multimap<String, JPasswordField>        passwordFieldList   = ArrayListMultimap.create();
   private static final Map<JButton, DarkDayIcon>               iconList            = new HashMap<>();
   private static final Map<JLabel, DarkDayIcon>                panelIconList       = new HashMap<>();
   private static final Map<String, DarkDayColor>               backgroundMap       = new HashMap<>();
@@ -266,6 +270,40 @@ public class MeMateUIManager
     final JPanel panel = new JPanel();
     panelList.put( key, panel );
     return panel;
+  }
+
+  /**
+   * Erstellt ein {@link JTextField}, welches der textFieldList hinzugefügt wird.
+   *
+   * @param key key
+   * @return {@link JTextField}
+   */
+  public static JTextField createJTextField()
+  {
+    final JTextField textField = new JTextField();
+    textFieldList.put( "spinner", textField );
+    addFocusBorderListener( textField );
+    textField.setBackground( darkModeState ? MeMateUIManager.getBackground( "spinner" ).getDarkColor() : Color.white );
+    textField.setForeground( darkModeState ? Color.white : Color.black );
+    textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+    return textField;
+  }
+
+  /**
+   * Erstellt ein {@link JPasswordField}, welches der JPasswordFieldList hinzugefügt wird.
+   *
+   * @param key key
+   * @return {@link JPasswordField}
+   */
+  public static JPasswordField createJPasswordField()
+  {
+    final JPasswordField passwordField = new JPasswordField();
+    passwordFieldList.put( "spinner", passwordField );
+    addFocusBorderListener( passwordField );
+    passwordField.setBackground( darkModeState ? MeMateUIManager.getBackground( "spinner" ).getDarkColor() : Color.white );
+    passwordField.setForeground( darkModeState ? Color.white : Color.black );
+    passwordField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+    return passwordField;
   }
 
   /**
@@ -541,6 +579,36 @@ public class MeMateUIManager
         else
         {
           list.setBackground( getBackground( key ).getDayColor() );
+        }
+      }
+      for ( final JTextField textField : textFieldList.get( key ) )
+      {
+        if ( darkModeState )
+        {
+          textField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
+          textField.setForeground( Color.white );
+          textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+        }
+        else
+        {
+          textField.setBackground( Color.white );
+          textField.setForeground( Color.black );
+          textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+        }
+      }
+      for ( final JPasswordField textField : passwordFieldList.get( key ) )
+      {
+        if ( darkModeState )
+        {
+          textField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
+          textField.setForeground( Color.white );
+          textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
+        }
+        else
+        {
+          textField.setBackground( Color.white );
+          textField.setForeground( Color.black );
+          textField.setBorder( UIManager.getBorder( "DefaultBorder" ) );
         }
       }
       for ( final JLabel label : labelList.get( key ) )

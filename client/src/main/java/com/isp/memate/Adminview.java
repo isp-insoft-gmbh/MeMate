@@ -24,9 +24,11 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -60,7 +62,7 @@ class Adminview extends JPanel
   private final JPanel     upperUpperPanel       = MeMateUIManager.createJPanel();
   private final JPanel     centerPanel           = MeMateUIManager.createJPanel();
   private JPanel           drinkAmountPanel      = new JPanel( new FlowLayout() );
-  private final JTextField balanceField          = new JTextField();
+  private final JTextField balanceField          = MeMateUIManager.createJTextField();
 
 
   /**
@@ -99,7 +101,12 @@ class Adminview extends JPanel
     ServerCommunication.getInstance().tellServerToSendPiggybankBalance();
     MeMateUIManager.registerPanel( "default", this );
     add( upperUpperPanel, BorderLayout.NORTH );
-    add( centerPanel, BorderLayout.CENTER );
+    final JScrollPane scrollpane = new JScrollPane( centerPanel );
+    scrollpane.getVerticalScrollBar().setUnitIncrement( 12 );
+    scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+    scrollpane.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER );
+    MeMateUIManager.registerScrollPane( "scroll", scrollpane );
+    add( scrollpane, BorderLayout.CENTER );
   }
 
   /**
@@ -169,7 +176,7 @@ class Adminview extends JPanel
       final JButton abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
       final JLabel userLabel = new JLabel( "Nutzer auswählen" );
       final JLabel newPassword = new JLabel( "Neues Passwort:  " );
-      final JTextField passwordField = new JTextField();
+      final JTextField passwordField = MeMateUIManager.createJTextField();
       final JComboBox<String> userComboBox = new JComboBox<>( user );
       passwordPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
 
@@ -278,7 +285,7 @@ class Adminview extends JPanel
   private void loadPiggyBankPanelSettings( final JPanel piggyBankPanel )
   {
     updatePiggybankBalanceLabel( ServerCommunication.getInstance().getPiggyBankBalance() );
-    piggyBankPanel.setPreferredSize( new Dimension( 430, 90 ) );
+    piggyBankPanel.setPreferredSize( new Dimension( 460, 90 ) );
     piggyBankPanel.setLayout( new GridBagLayout() );
     piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 25f ) );
     piggyBankLabel.setHorizontalAlignment( SwingConstants.CENTER );
@@ -287,17 +294,23 @@ class Adminview extends JPanel
     piggybankLabelConstraints.gridx = 0;
     piggybankLabelConstraints.gridy = 0;
     piggybankLabelConstraints.gridwidth = 2;
+    piggybankLabelConstraints.weightx = 0;
+    piggybankLabelConstraints.weighty = 0;
     piggybankLabelConstraints.insets = new Insets( 5, 5, 15, 5 );
     piggyBankPanel.add( piggyBankLabel, piggybankLabelConstraints );
     final GridBagConstraints balanceFieldConstraints = new GridBagConstraints();
     balanceFieldConstraints.gridx = 0;
     balanceFieldConstraints.gridy = 1;
+    balanceFieldConstraints.weightx = 1;
+    balanceFieldConstraints.weighty = 1;
     balanceFieldConstraints.insets = new Insets( 0, 5, 5, 0 );
-    balanceFieldConstraints.anchor = GridBagConstraints.LINE_END;
+    balanceFieldConstraints.anchor = GridBagConstraints.LINE_START;
     piggyBankPanel.add( balanceField, balanceFieldConstraints );
     final GridBagConstraints setAdminBalanceButtonConstraints = new GridBagConstraints();
     setAdminBalanceButtonConstraints.gridx = 1;
     setAdminBalanceButtonConstraints.gridy = 1;
+    setAdminBalanceButtonConstraints.weightx = 0;
+    setAdminBalanceButtonConstraints.weighty = 0;
     setAdminBalanceButtonConstraints.insets = new Insets( 0, 0, 5, 5 );
     setAdminBalanceButtonConstraints.anchor = GridBagConstraints.LINE_END;
     piggyBankPanel.add( setAdminBalanceButton, setAdminBalanceButtonConstraints );
@@ -334,17 +347,25 @@ class Adminview extends JPanel
       drinkAmountPanel.setLayout( new GridBagLayout() );
       final JLabel drinkNameLabel = MeMateUIManager.createJLabel();
       drinkNameLabel.setText( drink );
-      //      drinkNameLabel.setPreferredSize( new Dimension( 150, 30 ) );
       drinkNameLabel.setFont( drinkNameLabel.getFont().deriveFont( 20f ) );
       final GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
       drinkNameLabelConstraints.gridy = 0;
-      drinkNameLabelConstraints.weightx = 0;
-      drinkNameLabelConstraints.weighty = 0;
       drinkNameLabelConstraints.gridx = 0;
+      drinkNameLabelConstraints.gridwidth = 2;
       drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
-      drinkNameLabelConstraints.insets = new Insets( 0, 10, 5, 0 );
+      drinkNameLabelConstraints.insets = new Insets( 5, 10, 5, 0 );
       drinkAmountPanel.add( drinkNameLabel, drinkNameLabelConstraints );
-      final SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 10000, 1 );
+      final JLabel daysLeftLabel = MeMateUIManager.createJLabel();
+      daysLeftLabel.setText( String.format( "in etwa %.2f Tagen leer.", getDaysLeft( drink ) ) );
+      daysLeftLabel.setFont( daysLeftLabel.getFont().deriveFont( 15f ) );
+      final GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
+      daysLeftLabelConstraints.gridx = 0;
+      daysLeftLabelConstraints.gridy = 1;
+      daysLeftLabelConstraints.gridwidth = 2;
+      daysLeftLabelConstraints.anchor = GridBagConstraints.LINE_START;
+      daysLeftLabelConstraints.insets = new Insets( 0, 10, 10, 0 );
+      drinkAmountPanel.add( daysLeftLabel, daysLeftLabelConstraints );
+      final SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 1000, 1 );
       final JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
       amountSpinner.setValue( ServerCommunication.getInstance().getAmount( drink ) );
       MeMateUIManager.registerSpinner( amountSpinner );
@@ -354,7 +375,7 @@ class Adminview extends JPanel
       amountSpinnerConstraints.weightx = 1;
       amountSpinnerConstraints.weighty = 1;
       amountSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
-      amountSpinnerConstraints.insets = new Insets( 0, 10, 0, 5 );
+      amountSpinnerConstraints.insets = new Insets( 0, 10, 5, 5 );
       drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
       final JButton setAmountButton = MeMateUIManager.createButton( "button" );
       setAmountButton.setText( "Anzahl setzen" );
@@ -363,18 +384,9 @@ class Adminview extends JPanel
       setAmountButtonConstraints.gridy = 2;
       setAmountButtonConstraints.weightx = 1;
       setAmountButtonConstraints.weighty = 1;
-      setAmountButtonConstraints.insets = new Insets( 0, 0, 5, 5 );
+      setAmountButtonConstraints.anchor = GridBagConstraints.LINE_END;
+      setAmountButtonConstraints.insets = new Insets( 0, 0, 5, 10 );
       drinkAmountPanel.add( setAmountButton, setAmountButtonConstraints );
-      final JLabel daysLeftLabel = MeMateUIManager.createJLabel();
-      daysLeftLabel.setText( String.format( "in etwa %.2f Tagen leer.", getDaysLeft( drink ) ) );
-      daysLeftLabel.setFont( daysLeftLabel.getFont().deriveFont( 15f ) );
-      final GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
-      daysLeftLabelConstraints.gridx = 0;
-      daysLeftLabelConstraints.gridy = 1;
-      daysLeftLabelConstraints.weightx = 1;
-      daysLeftLabelConstraints.weighty = 1;
-      daysLeftLabelConstraints.insets = new Insets( 0, 10, 10, 0 );
-      drinkAmountPanel.add( daysLeftLabel, daysLeftLabelConstraints );
 
       setAmountButton.addActionListener( new ActionListener()
       {
@@ -401,7 +413,7 @@ class Adminview extends JPanel
           return true;
         }
       } );
-      drinkAmountPanel.setPreferredSize( new Dimension( 260, 90 ) );
+      drinkAmountPanel.setPreferredSize( new Dimension( 260, 95 ) );
       centerPanel.add( drinkAmountPanel );
     }
   }

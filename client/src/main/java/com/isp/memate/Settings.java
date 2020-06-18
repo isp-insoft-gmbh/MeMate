@@ -158,8 +158,8 @@ class Settings extends JPanel
     final JLabel passwordlabel = new JLabel( "Passwort:" );
     final JLabel password2label = new JLabel( "Passwort wiederholen:" );
     final JLabel passwordCompareLabel = new JLabel();
-    final JPasswordField passwordField = new JPasswordField();
-    final JPasswordField password2Field = new JPasswordField();
+    final JPasswordField passwordField = MeMateUIManager.createJPasswordField();
+    final JPasswordField password2Field = MeMateUIManager.createJPasswordField();
     final JButton savePasswordButton = MeMateUIManager.createButton( "button", "Speichern" );
     final JButton pass_abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
 
@@ -302,7 +302,7 @@ class Settings extends JPanel
     final JDialog changeDisplayNameFrame = new JDialog( Mainframe.getInstance(), "Anzeigenamen ändern", true );
     final JPanel changeDisplayNamePanel = new JPanel( new GridBagLayout() );
     final JLabel displayNamelabel = new JLabel( "Anzeigename:" );
-    final JTextField displayNameField = new JTextField();
+    final JTextField displayNameField = MeMateUIManager.createJTextField();
     final JButton saveDisplayNameButton = MeMateUIManager.createButton( "button", "Speichern" );
     final JButton abortDisplayNameButton = MeMateUIManager.createButton( "button", "Abbrechen" );
 

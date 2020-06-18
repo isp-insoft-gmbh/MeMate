@@ -69,7 +69,7 @@ class DrinkManagerDialog
   private final JSpinner           drinkPriceSpinner = new JSpinner( spinnerModel );
   private final JButton            cancelButton      = MeMateUIManager.createButton( "button", "Abbrechen" );
   private final JFileChooser       fileChooser       = new JFileChooser();
-  private final JTextField         drinkNameField    = new JTextField();
+  private final JTextField         drinkNameField    = MeMateUIManager.createJTextField();
   private final JButton            confirmButton     = MeMateUIManager.createButton( "button" );
   private final JLabel             pictureLabel      = new JLabel();
   private String                   drinkPicturePath  = null;
@@ -310,19 +310,12 @@ class DrinkManagerDialog
       drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkPriceSpinner
           .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor(), 1 ) );
-      drinkNameField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-      drinkNameField.setForeground( Color.white );
-      drinkNameField
-          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
     }
     else
     {
       drinkPriceSpinner.setUI( new DaySpinnerUI() );
       drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDayColor() );
       drinkPriceSpinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
-      drinkNameField.setBackground( Color.white );
-      drinkNameField.setForeground( Color.black );
-      drinkNameField.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
     }
     MeMateUIManager.registerSpinner( drinkPriceSpinner );
     dialog.setTitle( "Getränk bearbeiten" );
@@ -426,10 +419,6 @@ class DrinkManagerDialog
       drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
       drinkPriceSpinner
           .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor(), 1 ) );
-      drinkNameField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-      drinkNameField.setForeground( Color.white );
-      drinkNameField
-          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
     }
     else
     {
@@ -438,9 +427,6 @@ class DrinkManagerDialog
       drinkPriceSpinner.setUI( new DaySpinnerUI() );
       drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDayColor() );
       drinkPriceSpinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
-      drinkNameField.setBackground( Color.white );
-      drinkNameField.setForeground( Color.black );
-      drinkNameField.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
     }
     MeMateUIManager.registerSpinner( drinkPriceSpinner );
     dialog.setTitle( "Getränk hinzufügen" );
@@ -513,7 +499,7 @@ class DrinkManagerDialog
     ingredientsLabelConstraints.gridy = 0;
     final JLabel ingredientsLabel = new JLabel( "Zutaten" );
     layout.add( ingredientsLabel, ingredientsLabelConstraints );
-    final JTextField ingredientsField = new JTextField();
+    final JTextField ingredientsField = MeMateUIManager.createJTextField();
     ingredientsField.setPreferredSize( new Dimension( 200, 20 ) );
     final GridBagConstraints ingredientsFieldConstraints = new GridBagConstraints();
     ingredientsFieldConstraints.gridx = 1;
@@ -771,10 +757,6 @@ class DrinkManagerDialog
       carbsLabel.setForeground( Color.white );
       sugarLabel.setForeground( Color.white );
       amountLabel.setForeground( Color.white );
-      ingredientsField.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-      ingredientsField.setForeground( Color.white );
-      ingredientsField
-          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor().brighter(), 1 ) );
       for ( final JSpinner spinner : spinnerList )
       {
         spinner.setUI( new DarkSpinnerUI() );
@@ -795,9 +777,6 @@ class DrinkManagerDialog
       amountLabel.setForeground( Color.black );
       carbsLabel.setForeground( Color.black );
       sugarLabel.setForeground( Color.black );
-      ingredientsField.setBackground( Color.white );
-      ingredientsField.setForeground( Color.black );
-      ingredientsField.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
       for ( final JSpinner spinner : spinnerList )
       {
         spinner.setUI( new DaySpinnerUI() );

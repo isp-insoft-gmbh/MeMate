@@ -74,8 +74,8 @@ public class Login extends JFrame
   private final JLabel         usernameLabel           = MeMateUIManager.createJLabel();
   private final JLabel         passwordLabel           = MeMateUIManager.createJLabel();
   private final JLabel         stayLoggedInLabel       = MeMateUIManager.createJLabel();
-  private final JPasswordField passwordField           = new JPasswordField();
-  private final JTextField     usernameTextField       = new JTextField();
+  private final JPasswordField passwordField           = MeMateUIManager.createJPasswordField();
+  private final JTextField     usernameTextField       = MeMateUIManager.createJTextField();
   private static String        currentUsername;
 
   /**
@@ -161,9 +161,9 @@ public class Login extends JFrame
         final JLabel reg_passwordlabel = new JLabel( "Passwort:" );
         final JLabel reg_password2label = new JLabel( "Passwort wiederholen:" );
         final JLabel passwordCompareLabel = new JLabel();
-        final JTextField reg_usernameTextField = new JTextField();
-        final JPasswordField reg_passwordField = new JPasswordField();
-        final JPasswordField reg_password2Field = new JPasswordField();
+        final JTextField reg_usernameTextField = MeMateUIManager.createJTextField();
+        final JPasswordField reg_passwordField = MeMateUIManager.createJPasswordField();
+        final JPasswordField reg_password2Field = MeMateUIManager.createJPasswordField();
         final JButton reg_registrationButton = MeMateUIManager.createButton( "button", "Registrieren" );
         final JButton reg_abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
 
