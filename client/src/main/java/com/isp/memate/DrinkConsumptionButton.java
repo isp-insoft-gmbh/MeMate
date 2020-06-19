@@ -42,7 +42,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.util.ClientLog;
@@ -59,14 +58,7 @@ import com.isp.memate.util.MeMateUIManager;
  */
 class DrinkConsumptionButton extends JPanel
 {
-  private static final Color HOVER_BACKGROUND_COLOR = new Color( 186, 232, 232 );
-  private final Border       DEFAULT_LINE_BORDER    = BorderFactory.createLineBorder( new Color( 173, 173, 173, 0 ) );
-  private final Border       DEFAULT_BORDER         = BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER,
-      BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) );
-  private final Border       FOCUS_BORDER           =
-      BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( UIManager.getColor( "AppColor" ) ),
-          BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) );
-
+  private static final Color HOVER_BACKGROUND_COLOR                 = new Color( 186, 232, 232 );
   private final JLabel       nameLabel                              = MeMateUIManager.createJLabel( "drinkButtons" );
   private final JLabel       priceLabel                             = MeMateUIManager.createJLabel( "drinkButtons" );
   private final JPanel       infoPanel                              = MeMateUIManager.createJPanel( "drinkButtons" );
@@ -361,7 +353,7 @@ class DrinkConsumptionButton extends JPanel
     add( nameLabelAndDrinkInfoButtonPanel, BorderLayout.NORTH );
     add( iconLabel, BorderLayout.CENTER );
     add( priceLabel, BorderLayout.SOUTH );
-    setBorder( DEFAULT_BORDER );
+    UIManager.getBorder( "DefaultBorder" );
     setFocusable( true );
     setPreferredSize( new Dimension( 270, 270 ) );
 

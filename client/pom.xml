@@ -195,7 +195,36 @@
 			<artifactId>maven-model</artifactId>
 			<version>3.3.9</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.swinglabs.swingx</groupId>
+			<artifactId>swingx-action</artifactId>
+			<version>1.6.7-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.swinglabs.swingx</groupId>
+			<artifactId>swingx-autocomplete</artifactId>
+			<version>1.6.7-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.swinglabs.swingx</groupId>
+			<artifactId>swingx-common</artifactId>
+			<version>1.6.7-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.swinglabs.swingx</groupId>
+			<artifactId>swingx-core</artifactId>
+			<version>1.6.7-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.swinglabs.swingx</groupId>
+			<artifactId>swingx-painters</artifactId>
+			<version>1.6.7-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.swinglabs.swingx</groupId>
+			<artifactId>swingx-plaf</artifactId>
+			<version>1.6.7-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 </project>

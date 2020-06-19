@@ -12,22 +12,32 @@ import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
 import javax.swing.UIManager;
 
+import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -54,19 +64,242 @@ import com.isp.memate.util.MeMateUIManager;
  */
 class ConsumptionRate extends JPanel
 {
-  private final Map<String, Integer> amountMap      = new HashMap<>();
   private XYDataset                  dataset;
   private JFreeChart                 chart;
+  private final Map<String, Integer> amountMap          = new HashMap<>();
+  private final JPanel               pickerPanel        = MeMateUIManager.createJPanel();
+  private final JXMonthView          monthView          = new JXMonthView();
+  final JLabel                       averageConsumption = MeMateUIManager.createJLabel();
+  private JSpinner                   spinnerTimeFrom;
+  private JSpinner                   spinnerTimeTo;
+  private JButton                    currentDateButton;
   private ChartPanel                 chartPanel;
   private JComboBox<String>          selectDrinkComboBox;
-  private final HashSet<String>      consumedDrinks = new LinkedHashSet<>();
+  private String                     selectedDrink      = "Alle";
+  private Date                       startDate;
+  private Date                       endDate;
 
   /**
    * Setzt das Layout
    */
   public ConsumptionRate()
   {
+    setDefaultDates();
+    initComponents();
+    addComponents();
+    addListener();
     setLayout( new GridBagLayout() );
+  }
+
+  private void addComponents()
+  {
+    add( selectDrinkComboBox, getSelectedDrinkComboboxConstraits() );
+    add( chartPanel, getChartPanelConstraits() );
+    add( pickerPanel, getDateRangePickerConstraits() );
+    add( averageConsumption, getAverageConsumptionConstraints() );
+  }
+
+  private void setDefaultDates()
+  {
+    final ZonedDateTime today = ZonedDateTime.now();
+    final ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
+    startDate = Date.from( thirtyDaysAgo.toInstant() );
+    endDate = Date.from( today.toInstant() );
+  }
+
+  public void initComponents()
+  {
+    initComboBox();
+    initPickerPanel();
+    initMonthView();
+    initChart();
+    averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
+  }
+
+  private void initChart()
+  {
+    dataset = createDataset();
+    chart = createChart( dataset );
+    chartPanel = new ChartPanel( chart );
+    chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
+    chartPanel.setMouseZoomable( true, false );
+    MeMateUIManager.registerPanel( "default", this );
+  }
+
+  public void initComboBox()
+  {
+    selectDrinkComboBox = new JComboBox<>();
+    //Needed because otherwise very long drinknames would cause a realy wide ComboBox.
+    selectDrinkComboBox.setPrototypeDisplayValue( "This is my maximal length" );
+    selectDrinkComboBox.addItem( "Alle" );
+    selectDrinkComboBox.setSelectedItem( "Alle" );
+    MeMateUIManager.registerComboBox( selectDrinkComboBox );
+  }
+
+  private void initMonthView()
+  {
+    monthView.setSelectionMode( SelectionMode.MULTIPLE_INTERVAL_SELECTION );
+    monthView.setShowingLeadingDays( true );
+    monthView.setShowingTrailingDays( true );
+    monthView.setShowingWeekNumber( true );
+    monthView.setTraversable( true );
+  }
+
+  private void initPickerPanel()
+  {
+    spinnerTimeFrom = new JSpinner( new SpinnerDateModel() );
+    spinnerTimeFrom.setEditor( new JSpinner.DateEditor( spinnerTimeFrom, "dd.MM.yyyy" ) );
+    spinnerTimeTo = new JSpinner( new SpinnerDateModel() );
+    spinnerTimeTo.setEditor( new JSpinner.DateEditor( spinnerTimeTo, "dd.MM.yyyy" ) );
+    currentDateButton = new JButton( "Heute" );
+    currentDateButton.setToolTipText( "Zum/Zur aktuellen Tag/Woche springen" );
+    final Insets compInset = new Insets( 3, 5, 0, 5 );
+
+    final GridBagConstraints pickerLabelConstraint = new GridBagConstraints();
+    pickerLabelConstraint.anchor = GridBagConstraints.WEST;
+    pickerLabelConstraint.insets = compInset;
+
+    final GridBagConstraints pickerCompConstraint = new GridBagConstraints();
+    pickerCompConstraint.gridx = 1;
+    pickerCompConstraint.gridy = 0;
+    pickerCompConstraint.anchor = GridBagConstraints.WEST;
+    pickerCompConstraint.fill = GridBagConstraints.HORIZONTAL;
+    pickerCompConstraint.weightx = 0.1;
+    pickerCompConstraint.insets = compInset;
+    pickerPanel.setLayout( new GridBagLayout() );
+
+    pickerPanel.add( new JLabel( "Von: " ), pickerLabelConstraint );
+    pickerPanel.add( spinnerTimeFrom, pickerCompConstraint );
+
+    pickerLabelConstraint.gridy = 1;
+    pickerCompConstraint.gridy = 1;
+
+    pickerPanel.add( new JLabel( "Bis: " ), pickerLabelConstraint );
+    pickerPanel.add( spinnerTimeTo, pickerCompConstraint );
+
+    pickerCompConstraint.gridx = 0;
+    pickerCompConstraint.gridy = 2;
+    pickerCompConstraint.gridwidth = 2;
+    pickerCompConstraint.insets = new Insets( 5, 0, 3, 0 );
+
+    pickerPanel.add( monthView, pickerCompConstraint );
+
+    pickerCompConstraint.insets = compInset;
+    pickerCompConstraint.gridy = 3;
+    pickerPanel.add( currentDateButton, pickerCompConstraint );
+
+    pickerCompConstraint.gridy = 4;
+    pickerCompConstraint.weighty = 0.1;
+
+    pickerPanel.add( Box.createVerticalGlue(), pickerCompConstraint );
+  }
+
+  public void updateComboBox()
+  {
+    selectDrinkComboBox.removeAllItems();
+    selectDrinkComboBox.addItem( "Alle" );
+    selectDrinkComboBox.setSelectedItem( "Alle" );
+    for ( final String drink : ServerCommunication.getInstance().getDrinkNames() )
+    {
+      selectDrinkComboBox.addItem( drink );
+    }
+  }
+
+  public void addListener()
+  {
+    appendComponentListener();
+    selectDrinkComboBox.addItemListener( e ->
+    {
+      selectedDrink = String.valueOf( e.getItem() );
+      dataset = createDataset();
+      chart = createChart( dataset );
+      chartPanel.setChart( chart );
+      averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage(), String.valueOf( e.getItem() ) ) );
+      MeMateUIManager.updateGraphs();
+      repaint();
+      revalidate();
+    } );
+    monthView.addActionListener( __ ->
+    {
+      final Calendar endDate = Calendar.getInstance();
+      endDate.setTime( monthView.getSelection().last() );
+      dateRangeChanged( monthView.getSelection().first(), endDate.getTime() );
+    } );
+
+    currentDateButton.addActionListener( evt -> showCurrentDate() );
+    ((JSpinner.DefaultEditor) spinnerTimeTo.getEditor()).getTextField().addKeyListener( new KeyAdapter()
+    {
+      @Override
+      public void keyReleased( final KeyEvent e )
+      {
+        if ( e.getKeyCode() == KeyEvent.VK_ENTER )
+        {
+          changeCustomTime();
+        }
+      }
+    } );
+
+    ((JSpinner.DefaultEditor) spinnerTimeFrom.getEditor()).getTextField().addFocusListener( new FocusAdapter()
+    {
+      @Override
+      public void focusLost( final FocusEvent e )
+      {
+        changeCustomTime();
+      }
+    } );
+
+    ((JSpinner.DefaultEditor) spinnerTimeTo.getEditor()).getTextField().addFocusListener( new FocusAdapter()
+    {
+      @Override
+      public void focusLost( final FocusEvent e )
+      {
+        changeCustomTime();
+      }
+    } );
+  }
+
+  /**
+   * Zeigt den aktuellen Tag / Woche an.
+   */
+  public void showCurrentDate()
+  {
+    final Date today = new Date();
+    dateRangeChanged( today, today );
+  }
+
+  private void changeCustomTime()
+  {
+    final Calendar start = Calendar.getInstance();
+    start.setTimeInMillis( ((SpinnerDateModel) spinnerTimeFrom.getModel()).getDate().getTime() );
+    final Calendar end = Calendar.getInstance();
+    end.setTimeInMillis( ((SpinnerDateModel) spinnerTimeTo.getModel()).getDate().getTime() );
+    updateToEndOfDay( end );
+
+    if ( start.getTimeInMillis() > end.getTimeInMillis() )
+    {
+      end.setTimeInMillis( start.getTimeInMillis() );
+      end.add( Calendar.DAY_OF_YEAR, 1 );
+    }
+    dateRangeChanged( start.getTime(), end.getTime() );
+  }
+
+  public void dateRangeChanged( final Date startDate, final Date endDate )
+  {
+    this.startDate = startDate;
+    this.endDate = endDate;
+    monthView.setSelectionInterval( startDate, endDate );
+    spinnerTimeFrom.setValue( startDate );
+    spinnerTimeTo.setValue( endDate );
+  }
+
+  private static Calendar updateToEndOfDay( final Calendar calendar )
+  {
+    calendar.set( Calendar.HOUR_OF_DAY, 23 );
+    calendar.set( Calendar.MINUTE, 59 );
+    calendar.set( Calendar.SECOND, 59 );
+    calendar.set( Calendar.MILLISECOND, 999 );
+
+    return calendar;
   }
 
   /**
@@ -75,74 +308,99 @@ class ConsumptionRate extends JPanel
    * @param drink Name des Getränks.
    * @return Datensatz für den Graphen.
    */
-  private XYDataset createDataset( final String drink )
+  private XYDataset createDataset()
   {
     amountMap.clear();
-    final LocalDateTime now = LocalDateTime.now();
-    final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
-    for ( int i = 0; i < 31; i++ )
-    {
-      amountMap.put( formatter.format( now.minusDays( i ) ).toString(), 0 );
-    }
 
-    final String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.SHORT ).clone();
-    for ( final String[] data : historyData )
+    final Calendar startDate = Calendar.getInstance();
+    startDate.setTime( this.startDate );
+    final LocalDateTime selectedStartDate = LocalDateTime.ofInstant( startDate.toInstant(), ZoneId.systemDefault() );
+
+    final Calendar endDate = Calendar.getInstance();
+    endDate.setTime( this.endDate );
+    final LocalDateTime selectedEndDate = LocalDateTime.ofInstant( endDate.toInstant(), ZoneId.systemDefault() );
+
+    final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+
+    int i = 0;
+    final String startDateAsString = formatter.format( selectedStartDate ).toString();
+    String currentDateAsString = formatter.format( selectedEndDate ).toString();
+
+    //Special case if only 1 day is selected
+    if ( currentDateAsString.contentEquals( startDateAsString ) )
     {
-      final String action = data[ 0 ];
-      if ( action.contains( "getrunken" ) )
+      amountMap.put( currentDateAsString, 0 );
+    }
+    while ( !startDateAsString.equals( currentDateAsString ) )
+    {
+      currentDateAsString = formatter.format( selectedEndDate.minusDays( i ) ).toString();
+      amountMap.put( currentDateAsString, 0 );
+      i++;
+    }
+    //Reset after filling the map
+    currentDateAsString = formatter.format( selectedEndDate ).toString();
+
+    final String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.SHORT ) == null ? null
+        : ServerCommunication.getInstance().getHistoryData( dateType.SHORT ).clone();
+    if ( historyData != null )
+    {
+      for ( final String[] data : historyData )
       {
-        final String drinkname = action.substring( 0, action.length() - 10 );
-        consumedDrinks.add( drinkname );
-        if ( drink.equals( "Alle" ) )
+        final String action = data[ 0 ];
+        if ( action.contains( "getrunken" ) )
         {
-          final String date = data[ 4 ];
-          final ZonedDateTime today = ZonedDateTime.now();
-          final ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
-          try
+          if ( selectedDrink.equals( "Alle" ) )
           {
-            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
-            if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+            final String date = data[ 4 ];
+            try
             {
-              if ( data[ 5 ].equals( "false" ) )
+              final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
+              if ( !eventDate.toInstant().isBefore( selectedStartDate.atZone( ZoneId.systemDefault() ).toInstant() ) )
               {
-                amountMap.put( date, amountMap.get( date ) + 1 );
+                if ( data[ 5 ].equals( "false" ) )
+                {
+                  amountMap.put( date, amountMap.get( date ) + 1 );
+                }
               }
             }
-          }
-          catch ( final ParseException exception )
-          {
-            ClientLog.newLog( "Das Datum ist out of range." + exception );
-          }
-        }
-        else if ( action.contains( drink ) )
-        {
-          final String date = data[ 4 ];
-          final ZonedDateTime today = ZonedDateTime.now();
-          final ZonedDateTime thirtyDaysAgo = today.minusDays( 31 );
-          try
-          {
-            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
-            if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+            catch ( final ParseException exception )
             {
-              if ( data[ 5 ].equals( "false" ) )
-              {
-                amountMap.put( date, amountMap.get( date ) + 1 );
-              }
+              ClientLog.newLog( "Das Datum ist out of range." + exception );
             }
           }
-          catch ( final ParseException exception )
+          else if ( action.contains( selectedDrink ) )
           {
-            ClientLog.newLog( "Das Datum ist out of range." + exception );
+            final String date = data[ 4 ];
+            try
+            {
+              final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
+              if ( !eventDate.toInstant().isBefore( selectedStartDate.atZone( ZoneId.systemDefault() ).toInstant() ) )
+              {
+                if ( data[ 5 ].equals( "false" ) )
+                {
+                  amountMap.put( date, amountMap.get( date ) + 1 );
+                }
+              }
+            }
+            catch ( final ParseException exception )
+            {
+              ClientLog.newLog( "Das Datum ist out of range." + exception );
+            }
           }
         }
       }
     }
     final TimeSeries series = new TimeSeries( "DrinksOverTime" );
 
-    for ( int i = 0; i < 31; i++ )
+    int j = 0;
+
+    while ( !startDateAsString.equals( currentDateAsString ) )
     {
-      final Day day = new Day( now.minusDays( i ).getDayOfMonth(), now.minusDays( i ).getMonthValue(), now.minusDays( i ).getYear() );
-      series.add( day, amountMap.get( formatter.format( now.minusDays( i ) ).toString() ) );
+      final Day day = new Day( selectedEndDate.minusDays( j ).getDayOfMonth(), selectedEndDate.minusDays( j ).getMonthValue(),
+          selectedEndDate.minusDays( j ).getYear() );
+      series.add( day, amountMap.get( formatter.format( selectedEndDate.minusDays( j ) ).toString() ) );
+      currentDateAsString = formatter.format( selectedEndDate.minusDays( j ) ).toString();
+      j++;
     }
     return new TimeSeriesCollection( series );
   }
@@ -179,48 +437,6 @@ class ConsumptionRate extends JPanel
   }
 
   /**
-   * Zuerst wird ein neuer Datensatz generiert und anhand davon das neue chartPanel.
-   * Außerdem wird das Layout gesetzt, einige Settings geladen und Component- und ItemListener angemeldet.
-   */
-  void addGraph()
-  {
-    removeAll();
-    dataset = createDataset( "Alle" );
-    chart = createChart( dataset );
-    chartPanel = new ChartPanel( chart );
-    chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
-    chartPanel.setMouseZoomable( true, false );
-    final GridBagConstraints chartPanelConstraits = getChartPanelConstraits();
-    add( chartPanel, chartPanelConstraits );
-
-    addDrinkComboBoxItems();
-
-    final GridBagConstraints selectedDrinkComboboxConstraints = getSelectedDrinkComboboxConstraits();
-    add( selectDrinkComboBox, selectedDrinkComboboxConstraints );
-
-    final JLabel averageConsumption = MeMateUIManager.createJLabel();
-    averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
-    final GridBagConstraints averageConsumptionConstraints = getAverageConsumptionConstraints();
-    add( averageConsumption, averageConsumptionConstraints );
-
-    appendComponentListener();
-
-    selectDrinkComboBox.addItemListener( e ->
-    {
-      remove( chartPanel );
-      dataset = createDataset( String.valueOf( e.getItem() ) );
-      chart = createChart( dataset );
-      chartPanel.setChart( chart );
-      averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage(), String.valueOf( e.getItem() ) ) );
-      add( chartPanel, chartPanelConstraits );
-      MeMateUIManager.updateGraphs();
-      repaint();
-      revalidate();
-    } );
-    MeMateUIManager.registerPanel( "default", this );
-  }
-
-  /**
    * Fügt einen {@link ComponentListener} hinzu, damit sich die Chart beim Verkleinern/Vergrößern anpasst.
    */
   private void appendComponentListener()
@@ -254,37 +470,33 @@ class ConsumptionRate extends JPanel
     Mainframe.getInstance().addComponentListener( rateResizeListener );
   }
 
-  /**
-   * Fügt jedes bisher getrunkene Getränk in die Combobox hinzu.
-   */
-  private void addDrinkComboBoxItems()
-  {
-    selectDrinkComboBox = new JComboBox<>();
-    //Needed because otherwise very long drinknames would cause a realy wide ComboBox.
-    selectDrinkComboBox.setPrototypeDisplayValue( "This is my maximal lenght" );
-    selectDrinkComboBox.addItem( "Alle" );
-    selectDrinkComboBox.setSelectedItem( "Alle" );
-    MeMateUIManager.registerComboBox( selectDrinkComboBox );
-    for ( final String string : consumedDrinks )
-    {
-      selectDrinkComboBox.addItem( string );
-    }
-  }
-
 
   /**
    * Teilt die Anzahl der kosumierten Getränke des letzen Monats durch 31.
    */
   private Float getAverage()
   {
+    final Calendar endDate = Calendar.getInstance();
+    endDate.setTime( this.endDate );
+    updateToEndOfDay( endDate );
+    final LocalDateTime selectedEndDate = LocalDateTime.ofInstant( endDate.toInstant(), ZoneId.systemDefault() );
+    final Calendar startDate = Calendar.getInstance();
+    startDate.setTime( this.startDate );
+    updateToEndOfDay( startDate );
+    final LocalDateTime selectedStartDate = LocalDateTime.ofInstant( startDate.toInstant(), ZoneId.systemDefault() );
     final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
-    final LocalDateTime now = LocalDateTime.now();
+    final String startDateAsString = formatter.format( selectedStartDate ).toString();
+    String currentDateAsString = formatter.format( selectedEndDate ).toString();
     float counter = 0f;
-    for ( int i = 0; i < 31; i++ )
+    int i = 0;
+
+    while ( !startDateAsString.equals( currentDateAsString ) )
     {
-      counter = counter + amountMap.get( formatter.format( now.minusDays( i ) ).toString() );
+      counter = counter + amountMap.get( formatter.format( selectedEndDate.minusDays( i ) ).toString() );
+      currentDateAsString = formatter.format( selectedEndDate.minusDays( i ) ).toString();
+      i++;
     }
-    return counter / 31f;
+    return counter / i;
   }
 
   private GridBagConstraints getAverageConsumptionConstraints()
@@ -307,6 +519,16 @@ class ConsumptionRate extends JPanel
     return selectedDrinkComboboxConstraints;
   }
 
+  private GridBagConstraints getDateRangePickerConstraits()
+  {
+    final GridBagConstraints selectedDrinkComboboxConstraints = new GridBagConstraints();
+    selectedDrinkComboboxConstraints.gridx = 1;
+    selectedDrinkComboboxConstraints.gridy = 1;
+    selectedDrinkComboboxConstraints.insets = new Insets( 35, 0, 0, 10 );
+    selectedDrinkComboboxConstraints.anchor = GridBagConstraints.NORTH;
+    return selectedDrinkComboboxConstraints;
+  }
+
   private GridBagConstraints getChartPanelConstraits()
   {
     final GridBagConstraints chartPanelConstraits = new GridBagConstraints();
@@ -317,5 +539,10 @@ class ConsumptionRate extends JPanel
     chartPanelConstraits.weightx = 1;
     chartPanelConstraits.weighty = 1;
     return chartPanelConstraits;
+  }
+
+  public void updateSettings()
+  {
+    updateComboBox();
   }
 }

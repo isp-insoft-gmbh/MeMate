@@ -223,7 +223,7 @@ public class Mainframe extends JFrame
         "Hier können sie ihren durchschnittlichen Konsum sehen", color, () ->
         {
           contentPanel.removeAll();
-          consumptionRate.addGraph();
+          consumptionRate.updateSettings();
           MeMateUIManager.setUISettings();
           contentPanel.add( consumptionRate );
           contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );

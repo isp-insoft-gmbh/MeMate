@@ -27,12 +27,12 @@ public class Main
   public static void main( final String args[] )
   {
     //For Debug commented out
-    new SendServerInformationsToClients().start();
+    //    new SendServerInformationsToClients().start();
     ServerSocket serverSocket = null;
     Socket socket = null;
     try
     {
-      serverSocket = new ServerSocket( 3141 ); //Default is 3141 - Debug is 3142
+      serverSocket = new ServerSocket( 3142 ); //Default is 3141 - Debug is 3142
       ServerLog.newLog( logType.INFO, "Starte MateServer auf Port: " + serverSocket.getLocalPort() );
     }
     catch ( final IOException e )

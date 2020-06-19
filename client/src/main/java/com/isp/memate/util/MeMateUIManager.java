@@ -28,7 +28,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.table.JTableHeader;
 
@@ -50,37 +49,31 @@ import com.isp.memate.actionbar.MeMateActionBarListener;
  */
 public class MeMateUIManager
 {
-  private static final Multimap<String, JLabel>                labelList           = ArrayListMultimap.create();
-  private static final Multimap<String, JPanel>                panelList           = ArrayListMultimap.create();
-  private static final Multimap<String, MeMateActionBarButton> buttonList          = ArrayListMultimap.create();
-  private static final Multimap<String, JButton>               normalButtonList    = ArrayListMultimap.create();
-  private static final Multimap<String, JButton>               infoButtonList      = ArrayListMultimap.create();
-  private static final Multimap<String, JComponent>            separatorList       = ArrayListMultimap.create();
-  private static final Multimap<String, JTable>                tableList           = ArrayListMultimap.create();
-  private static final Multimap<String, JScrollPane>           scrollPaneList      = ArrayListMultimap.create();
-  private static final Multimap<String, JTextPane>             textPaneList        = ArrayListMultimap.create();
-  private static final Multimap<String, JCheckBox>             checkBoxList        = ArrayListMultimap.create();
-  private static final Multimap<String, JList<?>>              listList            = ArrayListMultimap.create();
-  private static final Multimap<String, JSpinner>              spinnerList         = ArrayListMultimap.create();
-  private static final Multimap<String, JRadioButton>          radioButtonList     = ArrayListMultimap.create();
-  private static final Multimap<String, JComboBox<String>>     comboBoxList        = ArrayListMultimap.create();
-  private static final Multimap<String, JTextField>            textFieldList       = ArrayListMultimap.create();
-  private static final Multimap<String, JPasswordField>        passwordFieldList   = ArrayListMultimap.create();
-  private static final Map<JButton, DarkDayIcon>               iconList            = new HashMap<>();
-  private static final Map<JLabel, DarkDayIcon>                panelIconList       = new HashMap<>();
-  private static final Map<String, DarkDayColor>               backgroundMap       = new HashMap<>();
-  private static final Map<String, DarkDayColor>               foregroundMap       = new HashMap<>();
-  private static final String                                  defaultKey          = "default";
-  private static final Set<String>                             keySet              = new HashSet<>();
-  private static JFreeChart                                    freeChart           = null;
-  private static JFreeChart                                    lineChart           = null;
-  private static final Border                                  DEFAULT_LINE_BORDER =
-      BorderFactory.createLineBorder( new Color( 173, 173, 173, 0 ) );
-  private static final Border                                  DEFAULT_BORDER      =
-      BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER,
-          BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
-
-  private static boolean darkModeState = false;
+  private static final Multimap<String, JLabel>                labelList         = ArrayListMultimap.create();
+  private static final Multimap<String, JPanel>                panelList         = ArrayListMultimap.create();
+  private static final Multimap<String, MeMateActionBarButton> buttonList        = ArrayListMultimap.create();
+  private static final Multimap<String, JButton>               normalButtonList  = ArrayListMultimap.create();
+  private static final Multimap<String, JButton>               infoButtonList    = ArrayListMultimap.create();
+  private static final Multimap<String, JComponent>            separatorList     = ArrayListMultimap.create();
+  private static final Multimap<String, JTable>                tableList         = ArrayListMultimap.create();
+  private static final Multimap<String, JScrollPane>           scrollPaneList    = ArrayListMultimap.create();
+  private static final Multimap<String, JTextPane>             textPaneList      = ArrayListMultimap.create();
+  private static final Multimap<String, JCheckBox>             checkBoxList      = ArrayListMultimap.create();
+  private static final Multimap<String, JList<?>>              listList          = ArrayListMultimap.create();
+  private static final Multimap<String, JSpinner>              spinnerList       = ArrayListMultimap.create();
+  private static final Multimap<String, JRadioButton>          radioButtonList   = ArrayListMultimap.create();
+  private static final Multimap<String, JComboBox<String>>     comboBoxList      = ArrayListMultimap.create();
+  private static final Multimap<String, JTextField>            textFieldList     = ArrayListMultimap.create();
+  private static final Multimap<String, JPasswordField>        passwordFieldList = ArrayListMultimap.create();
+  private static final Map<JButton, DarkDayIcon>               iconList          = new HashMap<>();
+  private static final Map<JLabel, DarkDayIcon>                panelIconList     = new HashMap<>();
+  private static final Map<String, DarkDayColor>               backgroundMap     = new HashMap<>();
+  private static final Map<String, DarkDayColor>               foregroundMap     = new HashMap<>();
+  private static final String                                  defaultKey        = "default";
+  private static final Set<String>                             keySet            = new HashSet<>();
+  private static JFreeChart                                    freeChart         = null;
+  private static JFreeChart                                    lineChart         = null;
+  private static boolean                                       darkModeState     = false;
 
   /**
    * Install Default Key with default colors.
@@ -354,7 +347,6 @@ public class MeMateUIManager
     checkbox.setOpaque( false );
     checkbox.addFocusListener( new FocusListener()
     {
-
       @Override
       public void focusLost( final FocusEvent e )
       {
