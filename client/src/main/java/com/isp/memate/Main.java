@@ -45,6 +45,7 @@ class Main
     setVersion();
     installColors();
     installColorKeys();
+    ServerCommunication serverCommunication = ServerCommunication.getInstance();
 
     String sessionID = null;
     String darkmode = null;
@@ -76,33 +77,33 @@ class Main
     }
     if ( sessionID == null || sessionID.equals( "null" ) )
     {
-      ServerCommunication.getInstance().tellServertoSendVersionNumber();
+      serverCommunication.tellServertoSendVersionNumber();
       final Login login = Login.getInstance();
       MeMateUIManager.setUISettings();
       login.setVisible( true );
-      ServerCommunication.getInstance().checkVersion( version );
+      serverCommunication.checkVersion( version );
     }
     else
     {
-      ServerCommunication.getInstance().checkLoginForSessionID( sessionID );
-      ServerCommunication.getInstance().tellServertoSendVersionNumber();
+      serverCommunication.tellServertoSendVersionNumber();
+      serverCommunication.checkLoginForSessionID( sessionID );
       final Mainframe mainframe = Mainframe.getInstance();
-      if ( ServerCommunication.getInstance().currentUser == null )
+      if ( serverCommunication.currentUser == null )
       {
         ClientLog.newLog( "Es wurde kein Nutzer für die angegeben Session gefunden." );
         final Login login = Login.getInstance();
         MeMateUIManager.setUISettings();
         login.setVisible( true );
-        ServerCommunication.getInstance().checkVersion( version );
+        serverCommunication.checkVersion( version );
       }
       else
       {
         mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         mainframe.setVisible( true );
         mainframe.addActionBar();
-        ServerCommunication.getInstance().startDrinkInfoTimer();
-        ServerCommunication.getInstance().tellServerToSendHistoryData();
-        ServerCommunication.getInstance().checkVersion( version );
+        serverCommunication.startDrinkInfoTimer();
+        serverCommunication.tellServerToSendHistoryData();
+        serverCommunication.checkVersion( version );
         mainframe.requestFocus();
         MeMateUIManager.setUISettings();
       }
