@@ -231,7 +231,6 @@ class ServerCommunication
 
     final TimerTask task4 = new TimerTask()
     {
-
       @Override
       public void run()
       {
@@ -250,6 +249,7 @@ class ServerCommunication
         }
       }
     };
+
     tellServertoSendUserArray();
     final Timer timer = new Timer();
     timer.schedule( task, 0, 100 );
@@ -317,7 +317,7 @@ class ServerCommunication
   private void checkForChanges()
   {
     final String[][] history = getShortHistory();
-    if ( history != null && showNotifications( "ConsumptionNotification" ) )
+    if ( history != null && currentUser != null && showNotifications( "ConsumptionNotification" ) )
     {
       final ZonedDateTime today = ZonedDateTime.now();
       final ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );
