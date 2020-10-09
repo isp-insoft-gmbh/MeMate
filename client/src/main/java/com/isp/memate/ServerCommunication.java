@@ -7,6 +7,7 @@ import java.awt.AWTException;
 import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
@@ -41,11 +42,10 @@ import com.isp.memate.Shared.Operation;
 import com.isp.memate.util.ClientLog;
 
 /**
- * Die Klasse ServerCommunication kommuniziert mit dem Server
- * und schickt verschiedenen Shared-Objekte an der Server.
- * Beispielsweise bei checkLogin schickt die Klasse ein Objekt, welches
- * den Befehl CHECK_LOGIN und ein Userobjekt, welches Nutzername und
- * gehashtes Passwort enthält an der Server.
+ * Die Klasse ServerCommunication kommuniziert mit dem Server und schickt
+ * verschiedenen Shared-Objekte an der Server. Beispielsweise bei checkLogin
+ * schickt die Klasse ein Objekt, welches den Befehl CHECK_LOGIN und ein
+ * Userobjekt, welches Nutzername und gehashtes Passwort enthält an der Server.
  *
  * @author nwe
  * @since 24.10.2019
@@ -77,7 +77,7 @@ class ServerCommunication
   private Socket                              socket;
   private ObjectInputStream                   inStream;
   private ObjectOutputStream                  outStream;
-
+  private TrayIcon                            trayIcon                  = null;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -88,17 +88,16 @@ class ServerCommunication
   }
 
   /**
-   * Erzeugt eine Socketverbindung zum Server.
-   * Außerdem wird ein Output- und Inputsteam definiert.
-   * Dannach werden zwei Tasks in bestimmten Abständen ausgeführt,
-   * um die Serveranfragen zu bearbeiten und die Getränke auf dem
+   * Erzeugt eine Socketverbindung zum Server. Außerdem wird ein Output- und
+   * Inputsteam definiert. Dannach werden zwei Tasks in bestimmten Abständen
+   * ausgeführt, um die Serveranfragen zu bearbeiten und die Getränke auf dem
    * neusten Stand zu halten.
    */
   public ServerCommunication()
   {
     try
     {
-      //For Debug commented out
+      // For Debug commented out
       socket = new Socket( FindServer.getServerAddress(), FindServer.getServerPort() );
       //      socket = new Socket( "192.168.168.82", 3142 );// This is for Testing TODO remove later
       outStream = new ObjectOutputStream( socket.getOutputStream() );
@@ -108,13 +107,14 @@ class ServerCommunication
     {
       ClientLog.newLog( "Der Server konnte nicht gefunden werden " + __.getMessage() );
       JOptionPane.showMessageDialog( Login.getInstance(),
-          "Es konnte kein Server gefunden werden. Bitte stelle sicher, dass der Server an ist", "Server nicht gefunden",
-          JOptionPane.ERROR_MESSAGE, null );
+          "Es konnte kein Server gefunden werden. Bitte stelle sicher, dass der Server an ist",
+          "Server nicht gefunden", JOptionPane.ERROR_MESSAGE, null );
       System.exit( 1 );
     }
     /**
-     * Dieser Task überprüft alle 100 Milliseconds, ob der Server etwas gesendet hat.
-     * Wenn ja wird das Objekt zugeordnet und die entsprechenede Aufgabe ausgeführt.
+     * Dieser Task überprüft alle 100 Milliseconds, ob der Server etwas gesendet
+     * hat. Wenn ja wird das Objekt zugeordnet und die entsprechenede Aufgabe
+     * ausgeführt.
      */
     final TimerTask task = new TimerTask()
     {
@@ -165,7 +165,8 @@ class ServerCommunication
               getBalance();
               break;
             case PRICE_CHANGED:
-              Mainframe.getInstance().getDashboard().showPriceChangedDialog( shared.drinkPrice.name, shared.drinkPrice.price );
+              Mainframe.getInstance().getDashboard().showPriceChangedDialog( shared.drinkPrice.name,
+                  shared.drinkPrice.price );
               break;
             case NO_MORE_DRINKS_AVAIBLE:
               Mainframe.getInstance().getDashboard().showNoMoreDrinksDialog( shared.consumedDrink );
@@ -200,7 +201,6 @@ class ServerCommunication
       }
     };
 
-
     final TimerTask task3 = new TimerTask()
     {
       @Override
@@ -209,6 +209,26 @@ class ServerCommunication
         tellServerToSendHistoryData();
       }
     };
+
+    // init TrayIcon
+    if ( SystemTray.isSupported() )
+    {
+      SystemTray tray = SystemTray.getSystemTray();
+      Image trayImage = Toolkit.getDefaultToolkit()
+          .getImage( ServerCommunication.class.getClassLoader().getResource( "trayicon.png" ) );
+      trayIcon = new TrayIcon( trayImage );
+      trayIcon.setImageAutoSize( true );
+      trayIcon.setToolTip( "MeMate" );
+      try
+      {
+        tray.add( trayIcon );
+      }
+      catch ( final AWTException exception )
+      {
+        ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
+      }
+    }
+
     final TimerTask task4 = new TimerTask()
     {
 
@@ -224,19 +244,6 @@ class ServerCommunication
           {
             if ( SystemTray.isSupported() )
             {
-              final SystemTray tray = SystemTray.getSystemTray();
-              final Image image = Mainframe.frameImage;
-              final TrayIcon trayIcon = new TrayIcon( image );
-              trayIcon.setImageAutoSize( true );
-              trayIcon.setToolTip( "MeMate" );
-              try
-              {
-                tray.add( trayIcon );
-              }
-              catch ( final AWTException exception )
-              {
-                ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
-              }
               trayIcon.displayMessage( "MeMate", "Standup Meeting", MessageType.NONE );
             }
           }
@@ -258,8 +265,8 @@ class ServerCommunication
   private boolean showNotifications( final String property )
   {
     String state = null;
-    try ( InputStream input =
-        new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
+    try ( InputStream input = new FileInputStream(
+        System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
     {
       final Properties userProperties = new Properties();
       userProperties.load( input );
@@ -280,8 +287,8 @@ class ServerCommunication
   void startDrinkInfoTimer()
   {
     /**
-     * Dieser Task sorgt dafür, dass die Getränke alle 30
-     * Sekunden aktualisiert werden.
+     * Dieser Task sorgt dafür, dass die Getränke alle 30 Sekunden aktualisiert
+     * werden.
      */
     final TimerTask task2 = new TimerTask()
     {
@@ -303,8 +310,9 @@ class ServerCommunication
   }
 
   /**
-   * Sollte es Änderungen der History geben, so wird geprüft, ob jemand etwas getrunken hat.
-   * Wenn dies der Fall ist, popt eine Benachrichtigung auf, sollte der User diese Einstellung aktiviert haben.
+   * Sollte es Änderungen der History geben, so wird geprüft, ob jemand etwas
+   * getrunken hat. Wenn dies der Fall ist, popt eine Benachrichtigung auf, sollte
+   * der User diese Einstellung aktiviert haben.
    */
   private void checkForChanges()
   {
@@ -333,20 +341,8 @@ class ServerCommunication
                   alreadyShownNotifications.add( date );
                   if ( SystemTray.isSupported() )
                   {
-                    final SystemTray tray = SystemTray.getSystemTray();
-                    final Image image = Mainframe.frameImage;
-                    final TrayIcon trayIcon = new TrayIcon( image );
-                    trayIcon.setImageAutoSize( true );
-                    trayIcon.setToolTip( "MeMate" );
-                    try
-                    {
-                      tray.add( trayIcon );
-                    }
-                    catch ( final AWTException exception )
-                    {
-                      ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
-                    }
-                    trayIcon.displayMessage( "MeMate", consumer + " trinkt gerade " + drinkname, MessageType.NONE );
+                    trayIcon.displayMessage( "MeMate", consumer + " trinkt gerade " + drinkname,
+                        MessageType.NONE );
                   }
 
                 }
@@ -417,13 +413,11 @@ class ServerCommunication
     return drinkIngredientsMap.get( name );
   }
 
-
   /**
-   * Die Preismap, Bildermap und eine Liste von allen Namen
-   * der Getränke werden gefüllt. Diese Maps werden unter anderem
-   * von dem Dashboard oder dem Drinkmanager genutzt.
-   * Die Methode wird beim Start des Programms aufgerufen oder wenn
-   * Veränderungen an Getränken vorgenommen werden.
+   * Die Preismap, Bildermap und eine Liste von allen Namen der Getränke werden
+   * gefüllt. Diese Maps werden unter anderem von dem Dashboard oder dem
+   * Drinkmanager genutzt. Die Methode wird beim Start des Programms aufgerufen
+   * oder wenn Veränderungen an Getränken vorgenommen werden.
    */
   private void updateMaps( final Drink[] drinkInfos )
   {
@@ -456,16 +450,17 @@ class ServerCommunication
         priceMap.put( name, price );
         imageMap.put( name, icon );
         amountMap.put( name, amount );
-        //FIXME Das muss besser werden
-        //Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend mit der vorherigen Liste verglichen wird.
+        // FIXME Das muss besser werden
+        // Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend
+        // mit der vorherigen Liste verglichen wird.
         byteImageList.add( pictureInBytes[ 355 ] );
         drinkIDMap.put( name, id );
         drinkNames.add( name );
         drinkIngredientsMap.put( name, drink.ingredients );
         IngredientsMap.put( name, drink.drinkIngredients );
       }
-      if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap ) || !byteImageList.equals( oldByteImageList )
-          || !amountMap.equals( oldAmountMap ) )
+      if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap )
+          || !byteImageList.equals( oldByteImageList ) || !amountMap.equals( oldAmountMap ) )
       {
         Mainframe.getInstance().updateDashboard();
       }
@@ -480,7 +475,6 @@ class ServerCommunication
       lock.unlock();
     }
   }
-
 
   /**
    * Teilt dem Server mit, dass er die Historie schicken soll.
@@ -550,8 +544,8 @@ class ServerCommunication
   }
 
   /**
-   * Wird beim Login aufgerufen, damit der
-   * Socket weiß, um welchen User es sich handelt.
+   * Wird beim Login aufgerufen, damit der Socket weiß, um welchen User es sich
+   * handelt.
    *
    * @param username Benutzername
    */
@@ -560,10 +554,9 @@ class ServerCommunication
     this.currentUser = username;
   }
 
-
   /**
-   * Schickt einen Befehl an den Server, damit dieser
-   * die Getränksinformationen sendet.
+   * Schickt einen Befehl an den Server, damit dieser die Getränksinformationen
+   * sendet.
    */
   void tellServerToSendDrinkInformations()
   {
@@ -599,13 +592,12 @@ class ServerCommunication
     }
   }
 
-
   /**
-   * Die eingebenen Logindaten werden an den Server
-   * gesendet und dieser überprüft die Korrektheit der Daten.
+   * Die eingebenen Logindaten werden an den Server gesendet und dieser überprüft
+   * die Korrektheit der Daten.
    *
-   * @param login ein {@link LoginInformation} Objekt, welches den Nutzernamen und das gehashte Passwort
-   *          enthält.
+   * @param login ein {@link LoginInformation} Objekt, welches den Nutzernamen und
+   *          das gehashte Passwort enthält.
    */
   void checkLogin( final LoginInformation login )
   {
@@ -622,8 +614,7 @@ class ServerCommunication
   }
 
   /**
-   * Es wird ein Shared-Objekt mit dem Befehl GET_BALANCE
-   * an den Server geschickt.
+   * Es wird ein Shared-Objekt mit dem Befehl GET_BALANCE an den Server geschickt.
    */
   void getBalance()
   {
@@ -639,11 +630,11 @@ class ServerCommunication
     }
   }
 
-
   /**
    * Gibt die Historydaten zurück.
    *
-   * @param dateType gibt an in welchem Format das Datum zurück gegeben werden soll
+   * @param dateType gibt an in welchem Format das Datum zurück gegeben werden
+   *          soll
    *
    * @return Die Historydaten als 2D Array
    */
@@ -732,16 +723,19 @@ class ServerCommunication
   }
 
   /**
-   * Wenn ein Benutzer ein Getränk bearbeitet, so wird ein Shared-Objekt, welches den Befehl für die
-   * Änderung und entweder ein {@linkplain DrinkName}, {@linkplain DrinkPrice} oder {@linkplain DrinkPicture}
-   * Objekt enthält. Die genannten Objekte enthalten die ID des des Getränks und die spezifische Änderung.
+   * Wenn ein Benutzer ein Getränk bearbeitet, so wird ein Shared-Objekt, welches
+   * den Befehl für die Änderung und entweder ein {@linkplain DrinkName},
+   * {@linkplain DrinkPrice} oder {@linkplain DrinkPicture} Objekt enthält. Die
+   * genannten Objekte enthalten die ID des des Getränks und die spezifische
+   * Änderung.
    *
    * @param id ID des Getränks
-   * @param operation kann entweder UPDATE_DRINKNAME, UPDATE_DRINKPRICE oder UPDATE_DRINKPICTURE sein, alle
-   *          anderen Operationen werden ignoriert.
-   * @param updatedInformation enthät die neue Informationen. Abhängig von der Operation kann dies ein Objekt
-   *          mit dem neuen
-   *          Namen, dem neuen Preis oder dem neuen Bild sein.
+   * @param operation kann entweder UPDATE_DRINKNAME, UPDATE_DRINKPRICE
+   *          oder UPDATE_DRINKPICTURE sein, alle anderen
+   *          Operationen werden ignoriert.
+   * @param updatedInformation enthät die neue Informationen. Abhängig von der
+   *          Operation kann dies ein Objekt mit dem neuen Namen,
+   *          dem neuen Preis oder dem neuen Bild sein.
    */
   void updateDrinkInformations( final Integer id, final Operation operation, final Object updatedInformation )
   {
@@ -750,14 +744,16 @@ class ServerCommunication
       switch ( operation )
       {
         case UPDATE_DRINKNAME:
-          outStream.writeObject( new Shared( Operation.UPDATE_DRINKNAME, new DrinkName( (String) updatedInformation, id ) ) );
+          outStream.writeObject(
+              new Shared( Operation.UPDATE_DRINKNAME, new DrinkName( (String) updatedInformation, id ) ) );
           break;
         case UPDATE_DRINKPRICE:
-          outStream.writeObject( new Shared( Operation.UPDATE_DRINKPRICE, new DrinkPrice( (Float) updatedInformation, id, null ) ) );
+          outStream.writeObject(
+              new Shared( Operation.UPDATE_DRINKPRICE, new DrinkPrice( (Float) updatedInformation, id, null ) ) );
           break;
         case UPDATE_DRINKPICTURE:
-          outStream
-              .writeObject( new Shared( Operation.UPDATE_DRINKPICTURE, new DrinkPicture( (byte[]) updatedInformation, id ) ) );
+          outStream.writeObject(
+              new Shared( Operation.UPDATE_DRINKPICTURE, new DrinkPicture( (byte[]) updatedInformation, id ) ) );
           break;
         default :
           break;
@@ -771,11 +767,13 @@ class ServerCommunication
   }
 
   /**
-   * Wenn ein neues Getränk registriert wird, werden zunächst die zugehörigen Daten an
-   * den Server geschickt und dieser legt für das Getränk einen neuen Datenbankeintrag an.
-   * Außerdem werden anschließend Bildermap. Preismap, Dashboard und Drinkmanager aktualisiert.
+   * Wenn ein neues Getränk registriert wird, werden zunächst die zugehörigen
+   * Daten an den Server geschickt und dieser legt für das Getränk einen neuen
+   * Datenbankeintrag an. Außerdem werden anschließend Bildermap. Preismap,
+   * Dashboard und Drinkmanager aktualisiert.
    *
-   * @param drink ein Drink-Objekt, welches alle angegeben Informationen des Getränks enthält.
+   * @param drink ein Drink-Objekt, welches alle angegeben Informationen des
+   *          Getränks enthält.
    */
   void registerNewDrink( final Drink drink )
   {
@@ -792,9 +790,9 @@ class ServerCommunication
 
   /**
    * Wenn ein Getränk entfernt werden soll, so wird die ID des Getränks an der
-   * Server weitergegeben und dieser löscht den Eintrag in der Datenbank.
-   * Als nächstes werden dann Bildermap. Preismap, Dashboard
-   * und Drinkmanager aktualisiert.
+   * Server weitergegeben und dieser löscht den Eintrag in der Datenbank. Als
+   * nächstes werden dann Bildermap. Preismap, Dashboard und Drinkmanager
+   * aktualisiert.
    *
    * @param id ID des Getränks
    * @param name Name des Getränks
@@ -803,7 +801,8 @@ class ServerCommunication
   {
     try
     {
-      outStream.writeObject( new Shared( Operation.REMOVE_DRINK, new Drink( name, null, null, id, null, -1, false, null ) ) );
+      outStream.writeObject(
+          new Shared( Operation.REMOVE_DRINK, new Drink( name, null, null, id, null, -1, false, null ) ) );
     }
     catch ( final IOException exception )
     {
@@ -838,15 +837,15 @@ class ServerCommunication
     }
     catch ( final IOException exception )
     {
-      showErrorDialog( "Die SessionID konnte nicht mit dem Nutzernamen verbunden werden.", "Session fehlgeschlagen" );
+      showErrorDialog( "Die SessionID konnte nicht mit dem Nutzernamen verbunden werden.",
+          "Session fehlgeschlagen" );
       ClientLog.newLog( exception.getMessage() );
     }
   }
 
-
   /**
-   * Wenn man eingeloggt bleibt, bekommt man keine neue SessionID, sondern diese findes diese
-   * in den Properties. Dieses SessionID wird dem Server übergeben.
+   * Wenn man eingeloggt bleibt, bekommt man keine neue SessionID, sondern diese
+   * findes diese in den Properties. Dieses SessionID wird dem Server übergeben.
    *
    * @param sessionID SessionID
    */
@@ -864,7 +863,8 @@ class ServerCommunication
   }
 
   /**
-   * Wenn man Guthaben hinzufügt, wird die Höhe der Einzahlung an den Server geschickt.
+   * Wenn man Guthaben hinzufügt, wird die Höhe der Einzahlung an den Server
+   * geschickt.
    *
    * @param valueToAdd Amount to add to balance
    */
@@ -883,8 +883,9 @@ class ServerCommunication
   }
 
   /**
-   * Wenn ein Getränk gekauft wird, so wird der Name des Getränks an den Server weiter geleitet, damit dieser
-   * den korrekten Betrag vom Nutzerkonto abziehen kann.
+   * Wenn ein Getränk gekauft wird, so wird der Name des Getränks an den Server
+   * weiter geleitet, damit dieser den korrekten Betrag vom Nutzerkonto abziehen
+   * kann.
    *
    * @param drinkName Name des Getränks
    */
@@ -892,7 +893,8 @@ class ServerCommunication
   {
     try
     {
-      outStream.writeObject( new Shared( Operation.CONSUM_DRINK, new DrinkPrice( priceMap.get( drinkName ), -1, drinkName ) ) );
+      outStream.writeObject(
+          new Shared( Operation.CONSUM_DRINK, new DrinkPrice( priceMap.get( drinkName ), -1, drinkName ) ) );
     }
     catch ( final IOException exception )
     {
@@ -915,7 +917,6 @@ class ServerCommunication
       showErrorDialog( "Das Guthaben des Spaarschweins konnte nicht gesetzt werden.", "Admin-Error" );
     }
   }
-
 
   /**
    * Teilt dem Server mit, dass er den Kontostand des Spaarschweins schicken soll.
@@ -960,7 +961,6 @@ class ServerCommunication
       ClientLog.newLog( exception.getMessage() );
     }
   }
-
 
   public String[] getAllUsers()
   {
@@ -1034,7 +1034,8 @@ class ServerCommunication
   }
 
   /**
-   * Überprüft Server- und Clientversion, wenn diese nicht übereinstimmen folgt ein Dialog.
+   * Überprüft Server- und Clientversion, wenn diese nicht übereinstimmen folgt
+   * ein Dialog.
    *
    * @param clientVersion Version des Clients
    */
@@ -1045,11 +1046,11 @@ class ServerCommunication
     ClientLog.newLog( "Client: " + clientVersion );
     if ( !version.equals( clientVersion ) )
     {
-      JOptionPane.showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(),
-          "Es sind Updates verfügbar.\nInstallierte Produkt-Version: " + Main.version + "\nServer-Version: "
-              + ServerCommunication.version,
-          "Update",
-          JOptionPane.ERROR_MESSAGE, null );
+      JOptionPane
+          .showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(),
+              "Es sind Updates verfügbar.\nInstallierte Produkt-Version: " + Main.version
+                  + "\nServer-Version: " + ServerCommunication.version,
+              "Update", JOptionPane.ERROR_MESSAGE, null );
     }
   }
 
