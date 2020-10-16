@@ -63,7 +63,6 @@ class ServerCommunication
   private final Map<String, Integer>          drinkIDMap                = new HashMap<>();
   private final Map<String, Boolean>          drinkIngredientsMap       = new HashMap<>();
   private final Map<String, DrinkIngredients> IngredientsMap            = new HashMap<>();
-  private static String                       version                   = "couldn't get serverversion";
   private String[]                            userArray                 = null;
   private String[]                            displayNamesArray         = null;
   private User[]                              fullUserArray             = null;
@@ -85,6 +84,11 @@ class ServerCommunication
   static ServerCommunication getInstance()
   {
     return instance;
+  }
+
+  public String getCurrentUser()
+  {
+    return currentUser;
   }
 
   /**
@@ -111,11 +115,39 @@ class ServerCommunication
           "Server nicht gefunden", JOptionPane.ERROR_MESSAGE, null );
       System.exit( 1 );
     }
-    /**
-     * Dieser Task überprüft alle 100 Milliseconds, ob der Server etwas gesendet
-     * hat. Wenn ja wird das Objekt zugeordnet und die entsprechenede Aufgabe
-     * ausgeführt.
-     */
+    initTrayIcon();
+
+    initReceiverTask();
+    initHistoryTask();
+    initMeetingNotificationTask();
+
+    tellServertoSendVersionNumber();
+    tellServertoSendUserArray();
+  }
+
+  /**
+   * The task tells the server every 3 minutes to send the historydata.
+   */
+  private void initHistoryTask()
+  {
+    final TimerTask task = new TimerTask()
+    {
+      @Override
+      public void run()
+      {
+        tellServerToSendHistoryData();
+      }
+    };
+    final Timer timer = new Timer();
+    timer.schedule( task, 5000, 300000 );
+  }
+
+  /**
+   * The task checks every 100 milliseconds if the server has sended an object.
+   * If so the object gets assigned and the corresponding task gets executed.
+   */
+  private void initReceiverTask()
+  {
     final TimerTask task = new TimerTask()
     {
       @Override
@@ -188,7 +220,8 @@ class ServerCommunication
               fullUserArray = shared.fullUserArray;
               break;
             case GET_VERSION:
-              version = shared.version;
+              Cache cache = Cache.getInstance();
+              cache.setServerVersion( shared.version );
               break;
             default :
               break;
@@ -200,36 +233,15 @@ class ServerCommunication
         }
       }
     };
+    final Timer timer = new Timer();
+    timer.schedule( task, 0, 100 );
+  }
 
-    final TimerTask task3 = new TimerTask()
-    {
-      @Override
-      public void run()
-      {
-        tellServerToSendHistoryData();
-      }
-    };
-
-    // init TrayIcon
-    if ( SystemTray.isSupported() )
-    {
-      SystemTray tray = SystemTray.getSystemTray();
-      Image trayImage = Toolkit.getDefaultToolkit()
-          .getImage( ServerCommunication.class.getClassLoader().getResource( "trayicon.png" ) );
-      trayIcon = new TrayIcon( trayImage );
-      trayIcon.setImageAutoSize( true );
-      trayIcon.setToolTip( "MeMate" );
-      try
-      {
-        tray.add( trayIcon );
-      }
-      catch ( final AWTException exception )
-      {
-        ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
-      }
-    }
-
-    final TimerTask task4 = new TimerTask()
+  //Checks once every minute if the time is equal to 12:19
+  //If so and notification are on the app will show an traymessage
+  private void initMeetingNotificationTask()
+  {
+    final TimerTask task = new TimerTask()
     {
       @Override
       public void run()
@@ -249,14 +261,29 @@ class ServerCommunication
         }
       }
     };
-
-    tellServertoSendUserArray();
     final Timer timer = new Timer();
-    timer.schedule( task, 0, 100 );
-    final Timer timer3 = new Timer();
-    timer3.schedule( task3, 5000, 300000 );
-    final Timer timer4 = new Timer();
-    timer4.schedule( task4, 0, 60000 );
+    timer.schedule( task, 0, 60000 );
+  }
+
+  private void initTrayIcon()
+  {
+    if ( SystemTray.isSupported() )
+    {
+      SystemTray tray = SystemTray.getSystemTray();
+      Image trayImage = Toolkit.getDefaultToolkit()
+          .getImage( ServerCommunication.class.getClassLoader().getResource( "trayicon.png" ) );
+      trayIcon = new TrayIcon( trayImage );
+      trayIcon.setImageAutoSize( true );
+      trayIcon.setToolTip( "MeMate" );
+      try
+      {
+        tray.add( trayIcon );
+      }
+      catch ( final AWTException exception )
+      {
+        ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
+      }
+    }
   }
 
   /*
@@ -1031,27 +1058,6 @@ class ServerCommunication
   public Drink[] getDrinkArray()
   {
     return drinkArray;
-  }
-
-  /**
-   * Überprüft Server- und Clientversion, wenn diese nicht übereinstimmen folgt
-   * ein Dialog.
-   *
-   * @param clientVersion Version des Clients
-   */
-  void checkVersion( final String clientVersion )
-  {
-    ClientLog.newLog( "CHECK VERSION" );
-    ClientLog.newLog( "Server: " + version );
-    ClientLog.newLog( "Client: " + clientVersion );
-    if ( !version.equals( clientVersion ) )
-    {
-      JOptionPane
-          .showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(),
-              "Es sind Updates verfügbar.\nInstallierte Produkt-Version: " + Main.version
-                  + "\nServer-Version: " + ServerCommunication.version,
-              "Update", JOptionPane.ERROR_MESSAGE, null );
-    }
   }
 
   public Float getPiggyBankBalance()
