@@ -170,7 +170,7 @@ class Adminview extends JPanel
       passwordFrame.setTitle( "Passwort zurücksetzen" );
       passwordFrame
           .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
-      final String[] user = ServerCommunication.getInstance().getAllUsers();
+      final String[] user = Cache.getInstance().getUserArray();
       final JPanel passwordPanel = new JPanel( new GridBagLayout() );
       final JButton saveButton = MeMateUIManager.createButton( "button", "Speichern" );
       final JButton abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
@@ -289,7 +289,7 @@ class Adminview extends JPanel
 
   private void loadPiggyBankPanelSettings( final JPanel piggyBankPanel )
   {
-    updatePiggybankBalanceLabel( ServerCommunication.getInstance().getPiggyBankBalance() );
+    updatePiggybankBalanceLabel( Cache.getInstance().getPiggyBankBalance() );
     piggyBankPanel.setPreferredSize( new Dimension( 460, 90 ) );
     piggyBankPanel.setLayout( new GridBagLayout() );
     piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 25f ) );
@@ -430,7 +430,7 @@ class Adminview extends JPanel
   private Float getDaysLeft( final String drink )
   {
     Float amount = 0f;
-    final String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
+    final String[][] historyData = Cache.getInstance().getHistory( dateType.LONG );
     if ( historyData != null )
     {
       for ( final String[] data : historyData )

@@ -52,7 +52,7 @@ class DataExport
    */
   private void historyExport()
   {
-    String[][] history = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
+    String[][] history = Cache.getInstance().getHistory( dateType.LONG );
     try
     {
       DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
@@ -182,7 +182,7 @@ class DataExport
    */
   private void userExport()
   {
-    userArray = ServerCommunication.getInstance().getUserArray();
+    userArray = Cache.getInstance().getFullUserArray();
     try
     {
       DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();

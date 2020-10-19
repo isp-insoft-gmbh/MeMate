@@ -64,7 +64,7 @@ class History extends JPanel
    */
   void updateHistory()
   {
-    tableModel = new DefaultTableModel( ServerCommunication.getInstance().getHistoryData( dateType.MIDDLE ), columnNames )
+    tableModel = new DefaultTableModel( Cache.getInstance().getHistory( dateType.MIDDLE ), columnNames )
     {
       @Override
       public boolean isCellEditable( int row, int column )

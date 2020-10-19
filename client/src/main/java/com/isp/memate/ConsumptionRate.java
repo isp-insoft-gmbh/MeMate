@@ -85,7 +85,7 @@ class ConsumptionRate extends JPanel
       amountMap.put( formatter.format( now.minusDays( i ) ).toString(), 0 );
     }
 
-    final String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.SHORT ).clone();
+    final String[][] historyData = Cache.getInstance().getHistory( dateType.SHORT ).clone();
     for ( final String[] data : historyData )
     {
       final String action = data[ 0 ];

@@ -23,8 +23,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +32,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.FocusManager;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -53,6 +50,7 @@ import com.isp.memate.util.ClientLog;
 class ServerCommunication
 {
   private static final ServerCommunication    instance                  = new ServerCommunication();
+  Cache                                       cache                     = Cache.getInstance();
   final ReentrantLock                         lock                      = new ReentrantLock( true );
   private final ArrayList<String>             alreadyShownNotifications = new ArrayList<>();
   private final ArrayList<Byte>               byteImageList             = new ArrayList<>();
@@ -63,16 +61,9 @@ class ServerCommunication
   private final Map<String, Integer>          drinkIDMap                = new HashMap<>();
   private final Map<String, Boolean>          drinkIngredientsMap       = new HashMap<>();
   private final Map<String, DrinkIngredients> IngredientsMap            = new HashMap<>();
-  private String[]                            userArray                 = null;
-  private String[]                            displayNamesArray         = null;
-  private User[]                              fullUserArray             = null;
   private Drink[]                             drinkArray                = null;
   private String                              displayname               = null;
-  private String[][]                          shortHistory              = null;
-  String                                      currentUser               = null;
-  private String[][]                          history;
   private String[][]                          scoreboard;
-  private Float                               piggyBankBalance;
   private Socket                              socket;
   private ObjectInputStream                   inStream;
   private ObjectOutputStream                  outStream;
@@ -84,11 +75,6 @@ class ServerCommunication
   static ServerCommunication getInstance()
   {
     return instance;
-  }
-
-  public String getCurrentUser()
-  {
-    return currentUser;
   }
 
   /**
@@ -177,18 +163,18 @@ class ServerCommunication
               Login.getInstance().validateRegistartionResult( shared.registrationResult );
               break;
             case GET_HISTORY:
-              updateHistory( shared.history );
+              cache.setHistory( shared.history );
               break;
             case GET_HISTORY_LAST_5:
-              updateShortHistory( shared.shortHistory );
+              cache.setShortHistory( shared.shortHistory );
+              checkForChanges();
               break;
             case GET_SCOREBOARD:
               updateScoreboard( shared.scoreboard );
               break;
             case GET_USERNAME_FOR_SESSION_ID_RESULT:
-              final String username = shared.username;
-              updateCurrentUser( username );
-              if ( username == null )
+              cache.setUsername( shared.username );
+              if ( shared.username == null )
               {
                 break;
               }
@@ -204,23 +190,22 @@ class ServerCommunication
               Mainframe.getInstance().getDashboard().showNoMoreDrinksDialog( shared.consumedDrink );
               break;
             case PIGGYBANK_BALANCE:
-              setPiggyBankBalance( shared.userBalance );
+              cache.setPiggyBankBalance( shared.userBalance );
               break;
             case GET_USERS_RESULT:
-              userArray = shared.users;
+              cache.setUserArray( shared.users );
               break;
             case GET_DISPLAYNAME:
               displayname = shared.displayname;
               Mainframe.getInstance().setHelloLabel( displayname );
               break;
             case GET_USERS_DISPLAYNAMES:
-              displayNamesArray = shared.displaynames;
+              cache.setDisplayNamesArray( shared.displaynames );
               break;
             case GET_FULLUSERS_RESULT:
-              fullUserArray = shared.fullUserArray;
+              cache.setFullUserArray( shared.fullUserArray );
               break;
             case GET_VERSION:
-              Cache cache = Cache.getInstance();
               cache.setServerVersion( shared.version );
               break;
             default :
@@ -329,13 +314,6 @@ class ServerCommunication
     timer2.schedule( task2, 10000, 30000 );
   }
 
-  private void updateHistory( final String[][] history )
-  {
-    final List<String[]> list = Arrays.asList( history );
-    Collections.reverse( list );
-    this.history = list.toArray( history ).clone();
-  }
-
   /**
    * Sollte es Änderungen der History geben, so wird geprüft, ob jemand etwas
    * getrunken hat. Wenn dies der Fall ist, popt eine Benachrichtigung auf, sollte
@@ -343,8 +321,8 @@ class ServerCommunication
    */
   private void checkForChanges()
   {
-    final String[][] history = getShortHistory();
-    if ( history != null && currentUser != null && showNotifications( "ConsumptionNotification" ) )
+    final String[][] history = cache.getShortHistory();
+    if ( history != null && cache.getUsername() != null && showNotifications( "ConsumptionNotification" ) )
     {
       final ZonedDateTime today = ZonedDateTime.now();
       final ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );
@@ -363,15 +341,11 @@ class ServerCommunication
             {
               if ( !alreadyShownNotifications.contains( date ) )
               {
-                if ( shortHistory != null )
+                alreadyShownNotifications.add( date );
+                if ( SystemTray.isSupported() )
                 {
-                  alreadyShownNotifications.add( date );
-                  if ( SystemTray.isSupported() )
-                  {
-                    trayIcon.displayMessage( "MeMate", consumer + " trinkt gerade " + drinkname,
-                        MessageType.NONE );
-                  }
-
+                  trayIcon.displayMessage( "MeMate", consumer + " trinkt gerade " + drinkname,
+                      MessageType.NONE );
                 }
               }
             }
@@ -383,12 +357,6 @@ class ServerCommunication
         }
       }
     }
-  }
-
-  private void updateShortHistory( final String[][] history )
-  {
-    this.shortHistory = history;
-    checkForChanges();
   }
 
   private void updateScoreboard( final String[][] scoreboard )
@@ -570,16 +538,6 @@ class ServerCommunication
     JOptionPane.showMessageDialog( Mainframe.getInstance(), message, title, JOptionPane.ERROR_MESSAGE, null );
   }
 
-  /**
-   * Wird beim Login aufgerufen, damit der Socket weiß, um welchen User es sich
-   * handelt.
-   *
-   * @param username Benutzername
-   */
-  void updateCurrentUser( final String username )
-  {
-    this.currentUser = username;
-  }
 
   /**
    * Schickt einen Befehl an den Server, damit dieser die Getränksinformationen
@@ -657,66 +615,6 @@ class ServerCommunication
     }
   }
 
-  /**
-   * Gibt die Historydaten zurück.
-   *
-   * @param dateType gibt an in welchem Format das Datum zurück gegeben werden
-   *          soll
-   *
-   * @return Die Historydaten als 2D Array
-   */
-  String[][] getHistoryData( final dateType dateType )
-  {
-    if ( history == null )
-    {
-      return history;
-    }
-    final String[][] historyArray = new String[history.length][];
-    for ( int i = 0; i < history.length; i++ )
-    {
-      historyArray[ i ] = Arrays.copyOf( history[ i ], history[ i ].length );
-    }
-    if ( dateType != null && dateType == com.isp.memate.ServerCommunication.dateType.SHORT )
-    {
-      for ( int i = 0; i < historyArray.length; i++ )
-      {
-        historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 10 );
-      }
-    }
-    else if ( dateType == com.isp.memate.ServerCommunication.dateType.MIDDLE )
-    {
-      for ( int i = 0; i < historyArray.length; i++ )
-      {
-        historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 16 ).replace( "T", " " );
-        historyArray[ i ][ 1 ] = historyArray[ i ][ 6 ];
-      }
-    }
-    return historyArray;
-  }
-
-  /**
-   * @return die letzten fünf Einträge der History.
-   */
-  public String[][] getShortHistory()
-  {
-    if ( shortHistory == null )
-    {
-      return shortHistory;
-    }
-    else
-    {
-      final String[][] historyArray = new String[shortHistory.length][];
-      for ( int i = 0; i < shortHistory.length; i++ )
-      {
-        historyArray[ i ] = Arrays.copyOf( shortHistory[ i ], shortHistory[ i ].length );
-      }
-      for ( int i = 0; i < historyArray.length; i++ )
-      {
-        historyArray[ i ][ 2 ] = historyArray[ i ][ 2 ].substring( 0, 16 ).replace( "T", " " );
-      }
-      return historyArray;
-    }
-  }
 
   public String[][] getScoreboard()
   {
@@ -989,16 +887,6 @@ class ServerCommunication
     }
   }
 
-  public String[] getAllUsers()
-  {
-    return userArray;
-  }
-
-  public String[] getAllDisplayNames()
-  {
-    return displayNamesArray;
-  }
-
   /**
    * Teilt dem Server eine Passwortänderung mit.
    *
@@ -1045,28 +933,10 @@ class ServerCommunication
   }
 
   /**
-   * @return ein user Array mit allen Informationen um diese zu exportieren.
-   */
-  public User[] getUserArray()
-  {
-    return fullUserArray;
-  }
-
-  /**
    * @return ein Array mit allen Getränken.
    */
   public Drink[] getDrinkArray()
   {
     return drinkArray;
-  }
-
-  public Float getPiggyBankBalance()
-  {
-    return piggyBankBalance;
-  }
-
-  public void setPiggyBankBalance( final Float piggyBankBalance )
-  {
-    this.piggyBankBalance = piggyBankBalance;
   }
 }

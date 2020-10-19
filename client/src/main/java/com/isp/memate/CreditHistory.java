@@ -119,7 +119,7 @@ class CreditHistory extends JPanel
   {
     final DateFormat dateFormat = new SimpleDateFormat( "dd.MM HH:mm:ss" );
     final DateFormat oldFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS" );
-    final String[][] historyData = ServerCommunication.getInstance().getHistoryData( dateType.LONG );
+    final String[][] historyData = Cache.getInstance().getHistory( dateType.LONG );
     final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
     if ( historyData != null )
     {
@@ -133,7 +133,7 @@ class CreditHistory extends JPanel
       for ( final String[] data : historyData )
       {
         final String action = data[ 0 ];
-        if ( data[ 1 ].equals( ServerCommunication.getInstance().currentUser ) )
+        if ( data[ 1 ].equals( Cache.getInstance().getUsername() ) )
         {
           if ( action.contains( "Guthaben" ) || action.contains( "getrunken" ) )
           {

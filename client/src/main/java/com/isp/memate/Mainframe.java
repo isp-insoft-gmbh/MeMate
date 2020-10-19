@@ -46,6 +46,7 @@ import com.isp.memate.util.MeMateUIManager;
 public class Mainframe extends JFrame
 {
   private static final Mainframe instance               = new Mainframe();
+  Cache                          cache                  = Cache.getInstance();
   private final Dashboard        dashboard              = new Dashboard( instance );
   private final Icon             dashboardIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_black.png" ) );
   private final Icon             dashboardIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_white.png" ) );
@@ -256,7 +257,7 @@ public class Mainframe extends JFrame
   {
     logoutButton = bar.addActionButton( logoutIconBlack, logoutIconWhite, "Logout", "Ausloggen", () ->
     {
-      ServerCommunication.getInstance().currentUser = null;
+      cache.setUsername( null );
       ServerCommunication.getInstance().logout();
       setUndoButtonEnabled( false );
       try
@@ -296,7 +297,7 @@ public class Mainframe extends JFrame
 
   private void toggleAdminButtons()
   {
-    if ( ServerCommunication.getInstance().currentUser.equals( "admin" ) )
+    if ( cache.getUsername().equals( "admin" ) )
     {
       bar.addActionButton( drinkManagerIconBlack, drinkManagerIconWhite, "Getränkemanager",
           "Getränkemanager öffnen", color, () ->

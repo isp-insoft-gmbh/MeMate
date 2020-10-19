@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.swing.ToolTipManager;
@@ -46,6 +45,7 @@ class Main
     installColors();
     installColorKeys();
     ServerCommunication serverCommunication = ServerCommunication.getInstance();
+    Cache cache = Cache.getInstance();
 
     createPropFile();
     loadUserProperties();
@@ -53,34 +53,30 @@ class Main
 
     if ( sessionIDPropertry == null || sessionIDPropertry.equals( "null" ) )
     {
-      final Login login = Login.getInstance();
-      MeMateUIManager.setUISettings();
-      login.setVisible( true );
-      Compare.checkVersion();
+      showLogin();
     }
     else
     {
       serverCommunication.checkLoginForSessionID( sessionIDPropertry );
-      final long startTime = System.currentTimeMillis();
-      String currentUser = serverCommunication.getCurrentUser();
-      do
+
+      //This synchronized Thread will take care of blocking further executions 
+      //until the client has recieved the username.
+      synchronized ( cache.usernameSync )
       {
-        //Waiting to receive currentUser from Server
-        currentUser = serverCommunication.getCurrentUser();
-        if ( (startTime + 15 * 1000) - System.currentTimeMillis() <= 0 )
+        try
         {
-          // At this point the server didn't answered or 15 second till the request has passed.
-          break;
+          cache.usernameSync.wait();
+        }
+        catch ( InterruptedException e )
+        {
+          // Happens if someone interrupts this thread.
         }
       }
-      while ( currentUser == null );
-      if ( currentUser == null )
+
+      if ( cache.getUsername() == null )
       {
         ClientLog.newLog( "Es wurde kein Nutzer für die angegeben Session gefunden." );
-        final Login login = Login.getInstance();
-        MeMateUIManager.setUISettings();
-        login.setVisible( true );
-        Compare.checkVersion();
+        showLogin();
       }
       else
       {
@@ -95,6 +91,14 @@ class Main
         MeMateUIManager.setUISettings();
       }
     }
+  }
+
+  private static void showLogin()
+  {
+    final Login login = Login.getInstance();
+    MeMateUIManager.setUISettings();
+    login.setVisible( true );
+    Compare.checkVersion();
   }
 
   private static void applyTheme()

@@ -42,6 +42,7 @@ class Social extends JPanel
   private static JPanel scoreBoardPanel       = MeMateUIManager.createJPanel();
   private static JPanel weeklyScoreBoardPanel = MeMateUIManager.createJPanel();
   private static JPanel activityPanel         = MeMateUIManager.createJPanel();
+  static Cache          cache                 = Cache.getInstance();
 
 
   public Social()
@@ -85,7 +86,7 @@ class Social extends JPanel
   {
     activityPanel.setLayout( new GridBagLayout() );
     int ypos = 0;
-    String[][] history = ServerCommunication.getInstance().getShortHistory();
+    String[][] history = cache.getShortHistory();
     if ( history != null )
     {
       ZonedDateTime today = ZonedDateTime.now();
@@ -155,7 +156,7 @@ class Social extends JPanel
 
   private static void loadScoreBoardSettings()
   {
-    final String[] userNames = ServerCommunication.getInstance().getAllDisplayNames();
+    final String[] userNames = cache.getDisplayNamesArray();
     final Map<String, Integer> scoreMap = new HashMap<>();
     for ( String username : userNames )
     {
@@ -252,7 +253,7 @@ class Social extends JPanel
 
   private static void loadWeeklyScoreBoardSettings()
   {
-    final String[] userNames = ServerCommunication.getInstance().getAllDisplayNames();
+    final String[] userNames = cache.getDisplayNamesArray();
     final Map<String, Integer> scoreMap = new HashMap<>();
     for ( String username : userNames )
     {

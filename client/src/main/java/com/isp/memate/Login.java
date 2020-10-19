@@ -63,6 +63,7 @@ import com.isp.memate.util.SwingUtil;
 public class Login extends JFrame
 {
   private static final Login   instance                = new Login();
+  Cache                        cache                   = Cache.getInstance();
   private final Font           LABEL_FONT              = UIManager.getFont( "Label.font" ).deriveFont( 15f );
   private final JButton        loginButton             = MeMateUIManager.createButton( "button" );
   private final JLabel         headerLabel             = new JLabel(
@@ -469,7 +470,7 @@ public class Login extends JFrame
     if ( loginResult == LoginResult.LOGIN_SUCCESSFULL )
     {
       ServerCommunication.getInstance().startDrinkInfoTimer();
-      ServerCommunication.getInstance().updateCurrentUser( currentUsername );
+      cache.setUsername( currentUsername );
       generateSessionID( currentUsername );
       dispose();
       final Mainframe mainframe = Mainframe.getInstance();
@@ -615,7 +616,7 @@ public class Login extends JFrame
           {
             ServerCommunication.getInstance().changePassword( getHash( String.valueOf( password ) ) );
             ServerCommunication.getInstance().startDrinkInfoTimer();
-            ServerCommunication.getInstance().updateCurrentUser( currentUsername );
+            cache.setUsername( currentUsername );
             generateSessionID( currentUsername );
             changePasswordFrame.dispose();
             dispose();
