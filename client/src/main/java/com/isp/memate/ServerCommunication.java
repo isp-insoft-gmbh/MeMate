@@ -49,25 +49,16 @@ import com.isp.memate.util.ClientLog;
  */
 class ServerCommunication
 {
-  private static final ServerCommunication    instance                  = new ServerCommunication();
-  Cache                                       cache                     = Cache.getInstance();
-  final ReentrantLock                         lock                      = new ReentrantLock( true );
-  private final ArrayList<String>             alreadyShownNotifications = new ArrayList<>();
-  private final ArrayList<Byte>               byteImageList             = new ArrayList<>();
-  private final List<String>                  drinkNames                = new ArrayList<>();
-  private final Map<String, Float>            priceMap                  = new HashMap<>();
-  private final Map<String, ImageIcon>        imageMap                  = new HashMap<>();
-  private final Map<String, Integer>          amountMap                 = new HashMap<>();
-  private final Map<String, Integer>          drinkIDMap                = new HashMap<>();
-  private final Map<String, Boolean>          drinkIngredientsMap       = new HashMap<>();
-  private final Map<String, DrinkIngredients> IngredientsMap            = new HashMap<>();
-  private Drink[]                             drinkArray                = null;
-  private String                              displayname               = null;
-  private String[][]                          scoreboard;
-  private Socket                              socket;
-  private ObjectInputStream                   inStream;
-  private ObjectOutputStream                  outStream;
-  private TrayIcon                            trayIcon                  = null;
+  private final boolean                    debug                     = false;
+  private static final ServerCommunication instance                  = new ServerCommunication();
+  Cache                                    cache                     = Cache.getInstance();
+  final ReentrantLock                      lock                      = new ReentrantLock( true );
+  private final ArrayList<String>          alreadyShownNotifications = new ArrayList<>();
+  private String                           displayname               = null;
+  private Socket                           socket;
+  private ObjectInputStream                inStream;
+  private ObjectOutputStream               outStream;
+  private TrayIcon                         trayIcon                  = null;
 
   /**
    * @return the static instance of {@link ServerCommunication}
@@ -87,9 +78,14 @@ class ServerCommunication
   {
     try
     {
-      // For Debug commented out
-      socket = new Socket( FindServer.getServerAddress(), FindServer.getServerPort() );
-      //      socket = new Socket( "192.168.168.82", 3142 );// This is for Testing TODO remove later
+      if ( !debug )
+      {
+        socket = new Socket( FindServer.getServerAddress(), FindServer.getServerPort() );
+      }
+      else
+      {
+        socket = new Socket( "192.168.168.82", 3142 );// This is for Testing TODO remove later
+      }
       outStream = new ObjectOutputStream( socket.getOutputStream() );
       inStream = new ObjectInputStream( socket.getInputStream() );
     }
@@ -150,8 +146,16 @@ class ServerCommunication
           switch ( operation )
           {
             case GET_DRINKINFO:
-              drinkArray = shared.drinkInfos;
-              updateMaps( shared.drinkInfos );
+              cache.setDrinkArray( shared.drinkInfos );
+              lock.lock();
+              try
+              {
+                cache.updateMaps();
+              }
+              finally
+              {
+                lock.unlock();
+              }
               break;
             case LOGIN_RESULT:
               Login.getInstance().validateLoginResult( shared.loginResult );
@@ -170,7 +174,9 @@ class ServerCommunication
               checkForChanges();
               break;
             case GET_SCOREBOARD:
-              updateScoreboard( shared.scoreboard );
+              lock.lock();
+              cache.setScoreboard( shared.scoreboard );
+              lock.unlock();
               break;
             case GET_USERNAME_FOR_SESSION_ID_RESULT:
               cache.setUsername( shared.username );
@@ -359,118 +365,6 @@ class ServerCommunication
     }
   }
 
-  private void updateScoreboard( final String[][] scoreboard )
-  {
-    lock.lock();
-    this.scoreboard = scoreboard;
-    lock.unlock();
-  }
-
-  ImageIcon getIcon( final String name )
-  {
-    return imageMap.get( name );
-  }
-
-  Float getPrice( final String name )
-  {
-    return priceMap.get( name );
-  }
-
-  Integer getID( final String name )
-  {
-    return drinkIDMap.get( name );
-  }
-
-  Integer getAmount( final String name )
-  {
-    return amountMap.get( name );
-  }
-
-  String getDrinkName( final int id )
-  {
-    for ( final String string : drinkIDMap.keySet() )
-    {
-      if ( id == drinkIDMap.get( string ) )
-      {
-        return string;
-      }
-    }
-    return null;
-  }
-
-  DrinkIngredients getIngredients( final String name )
-  {
-    return IngredientsMap.get( name );
-  }
-
-  Boolean hasIngredients( final String name )
-  {
-    return drinkIngredientsMap.get( name );
-  }
-
-  /**
-   * Die Preismap, Bildermap und eine Liste von allen Namen der Getränke werden
-   * gefüllt. Diese Maps werden unter anderem von dem Dashboard oder dem
-   * Drinkmanager genutzt. Die Methode wird beim Start des Programms aufgerufen
-   * oder wenn Veränderungen an Getränken vorgenommen werden.
-   */
-  private void updateMaps( final Drink[] drinkInfos )
-  {
-    lock.lock();
-    try
-    {
-      final List<String> oldDrinkNames = new ArrayList<>( drinkNames );
-      final Map<String, Float> oldPriceMap = new HashMap<>();
-      oldPriceMap.putAll( priceMap );
-      final Map<String, Integer> oldAmountMap = new HashMap<>();
-      oldAmountMap.putAll( amountMap );
-      final ArrayList<Byte> oldByteImageList = new ArrayList<>( byteImageList );
-
-      priceMap.clear();
-      amountMap.clear();
-      imageMap.clear();
-      drinkIDMap.clear();
-      drinkNames.clear();
-      drinkIngredientsMap.clear();
-      IngredientsMap.clear();
-      byteImageList.clear();
-      for ( final Drink drink : drinkInfos )
-      {
-        final String name = drink.name;
-        final Float price = drink.price;
-        final int amount = drink.amount;
-        final byte[] pictureInBytes = drink.pictureInBytes;
-        final Integer id = drink.id;
-        final ImageIcon icon = new ImageIcon( pictureInBytes );
-        priceMap.put( name, price );
-        imageMap.put( name, icon );
-        amountMap.put( name, amount );
-        // FIXME Das muss besser werden
-        // Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend
-        // mit der vorherigen Liste verglichen wird.
-        byteImageList.add( pictureInBytes[ 355 ] );
-        drinkIDMap.put( name, id );
-        drinkNames.add( name );
-        drinkIngredientsMap.put( name, drink.ingredients );
-        IngredientsMap.put( name, drink.drinkIngredients );
-      }
-      if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap )
-          || !byteImageList.equals( oldByteImageList ) || !amountMap.equals( oldAmountMap ) )
-      {
-        Mainframe.getInstance().updateDashboard();
-      }
-      Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
-    }
-    catch ( final Exception exception )
-    {
-      ClientLog.newLog( exception.getMessage() );
-    }
-    finally
-    {
-      lock.unlock();
-    }
-  }
-
   /**
    * Teilt dem Server mit, dass er die Historie schicken soll.
    */
@@ -616,11 +510,6 @@ class ServerCommunication
   }
 
 
-  public String[][] getScoreboard()
-  {
-    return scoreboard;
-  }
-
   enum dateType
   {
     SHORT,
@@ -736,18 +625,6 @@ class ServerCommunication
     tellServerToSendDrinkInformations();
   }
 
-  public List<String> getDrinkNames()
-  {
-    if ( drinkNames != null )
-    {
-      return new ArrayList<>( drinkNames );
-    }
-    else
-    {
-      return new ArrayList<>();
-    }
-  }
-
   /**
    * Schickt den Nutzername und die zugehörige SessionID an den Server.
    *
@@ -819,7 +696,7 @@ class ServerCommunication
     try
     {
       outStream.writeObject(
-          new Shared( Operation.CONSUM_DRINK, new DrinkPrice( priceMap.get( drinkName ), -1, drinkName ) ) );
+          new Shared( Operation.CONSUM_DRINK, new DrinkPrice( cache.getPrice( drinkName ), -1, drinkName ) ) );
     }
     catch ( final IOException exception )
     {
@@ -930,13 +807,5 @@ class ServerCommunication
       showErrorDialog( "Anzeigenamen ändern fehlgeschlagen.", "Anzeigenamen" );
       ClientLog.newLog( exception.getMessage() );
     }
-  }
-
-  /**
-   * @return ein Array mit allen Getränken.
-   */
-  public Drink[] getDrinkArray()
-  {
-    return drinkArray;
   }
 }

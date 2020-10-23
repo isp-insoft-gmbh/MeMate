@@ -75,6 +75,7 @@ class DrinkManagerDialog
   private String                   drinkPicturePath  = null;
   private ImageIcon                currentImage;
   private JDialog                  dialog;
+  Cache                            cache             = Cache.getInstance();
 
   /**
    * Erzeugt den Frame und setzt das Layout der vorhandenen Kompnenten.
@@ -321,12 +322,12 @@ class DrinkManagerDialog
     dialog.setTitle( "Getränk bearbeiten" );
     confirmButton.setText( "Speichern" );
     final String oldName = drink;
-    final Float oldPrice = ServerCommunication.getInstance().getPrice( drink );
+    final Float oldPrice = cache.getPrice( drink );
     drinkNameField.setText( oldName );
     drinkPriceSpinner.setValue( oldPrice );
 
 
-    final ImageIcon drinkIcon = ServerCommunication.getInstance().getIcon( drink );
+    final ImageIcon drinkIcon = cache.getIcon( drink );
     final Image drinkImage = drinkIcon.getImage();
     Image scaledImage;
 
@@ -345,7 +346,7 @@ class DrinkManagerDialog
     else
     {
       pictureLabel.setIcon( new ImageIcon(
-          ServerCommunication.getInstance().getIcon( drink ).getImage().getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
+          cache.getIcon( drink ).getImage().getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
     }
 
 
@@ -368,7 +369,7 @@ class DrinkManagerDialog
       }
       else
       {
-        final Integer id = ServerCommunication.getInstance().getID( oldName );
+        final Integer id = cache.getID( oldName );
         if ( drinkPicturePath != null )
         {
           BufferedImage bImage;
@@ -452,7 +453,7 @@ class DrinkManagerDialog
         JOptionPane.showMessageDialog( dialog, "Bitte gültigen Preis für das Getränk angeben.", "Getränk hinzufügen fehlgeschlagen",
             JOptionPane.ERROR_MESSAGE, null );
       }
-      else if ( ServerCommunication.getInstance().getDrinkNames().contains( name ) )
+      else if ( cache.getDrinkNames().contains( name ) )
       {
         JOptionPane.showMessageDialog( dialog, "Dieser Getränkenamen ist bereits vergeben.", "Getränk hinzufügen fehlgeschlagen",
             JOptionPane.ERROR_MESSAGE, null );
@@ -674,7 +675,7 @@ class DrinkManagerDialog
     }
     //Get Data from Server, if ingredients are already existing
     final DrinkIngredients ingredients =
-        ServerCommunication.getInstance().getIngredients( ServerCommunication.getInstance().getDrinkName( DrinkID ) );
+        cache.getIngredients( cache.getDrinkName( DrinkID ) );
     if ( ingredients != null )
     {
       ingredientsField.setText( ingredients.ingredients );

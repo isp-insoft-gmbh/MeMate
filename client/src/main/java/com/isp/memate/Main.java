@@ -12,6 +12,8 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.Compare;
 import com.isp.memate.util.MeMateUIManager;
@@ -41,7 +43,7 @@ class Main
       throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
   {
 
-    setLFandUIDefaults();
+    setLaFandUIDefaults();
     installColors();
     installColorKeys();
     ServerCommunication serverCommunication = ServerCommunication.getInstance();
@@ -130,7 +132,7 @@ class Main
     }
   }
 
-  private static void setLFandUIDefaults()
+  private static void setLaFandUIDefaults()
       throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
   {
     UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );

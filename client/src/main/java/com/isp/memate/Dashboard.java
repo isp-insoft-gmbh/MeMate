@@ -51,6 +51,7 @@ class Dashboard extends JPanel
   private final JLabel                            infoIconLabel = new JLabel( infoIcon );
   private final JScrollPane                       scrollpane;
   private final ArrayList<DrinkConsumptionButton> buttonList    = new ArrayList<>();
+  Cache                                           cache         = Cache.getInstance();
 
   /**
    * Passt Layout, Hintergrund und Borders an.
@@ -156,16 +157,16 @@ class Dashboard extends JPanel
     final JPanel panel = MeMateUIManager.createJPanel();
     panel.setLayout( new WrapLayout( FlowLayout.LEFT ) );
 
-    for ( final String drink : ServerCommunication.getInstance().getDrinkNames() )
+    for ( final String drink : cache.getDrinkNames() )
     {
-      if ( ServerCommunication.getInstance().getAmount( drink ) == 0 )
+      if ( cache.getAmount( drink ) == 0 )
       {
         continue;
       }
       final String drinkName = drink;
-      final Float drinkPriceAsFloat = ServerCommunication.getInstance().getPrice( drink );
+      final Float drinkPriceAsFloat = cache.getPrice( drink );
       final String drinkPrice = String.valueOf( drinkPriceAsFloat );
-      final ImageIcon drinkIcon = ServerCommunication.getInstance().getIcon( drink );
+      final ImageIcon drinkIcon = cache.getIcon( drink );
       final Image image = drinkIcon.getImage();
       Image newImage;
       if ( drinkIcon.getIconHeight() > 220 || drinkIcon.getIconWidth() > 250 )

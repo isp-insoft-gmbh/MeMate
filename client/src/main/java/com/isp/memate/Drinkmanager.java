@@ -28,7 +28,8 @@ import com.isp.memate.util.MeMateUIManager;
  */
 class Drinkmanager extends JPanel
 {
-  private String[]          data              = new String[ServerCommunication.getInstance().getDrinkNames().size()];
+  Cache                     cache             = Cache.getInstance();
+  private String[]          data              = new String[cache.getDrinkNames().size()];
   private final JButton     addButton         = MeMateUIManager.createButton( "button" );
   private final JButton     editButton        = MeMateUIManager.createButton( "button" );
   private final JButton     removeButton      = MeMateUIManager.createButton( "button" );
@@ -48,7 +49,7 @@ class Drinkmanager extends JPanel
     editButton.setText( "Bearbeiten" );
     removeButton.setText( "Entfernen" );
     ingredientsButton.setText( "Inhaltsstoffe" );
-    data = ServerCommunication.getInstance().getDrinkNames().toArray( data );
+    data = cache.getDrinkNames().toArray( data );
     setLayout( new BorderLayout() );
     add( scrollpane, BorderLayout.CENTER );
     add( createButtonPanel(), BorderLayout.SOUTH );
@@ -107,7 +108,7 @@ class Drinkmanager extends JPanel
           JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE );
       if ( result == JOptionPane.YES_OPTION )
       {
-        ServerCommunication.getInstance().removeDrink( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ),
+        ServerCommunication.getInstance().removeDrink( cache.getID( drinkList.getSelectedValue() ),
             drinkList.getSelectedValue() );
       }
       updateList();
@@ -115,7 +116,7 @@ class Drinkmanager extends JPanel
     ingredientsButton.addActionListener( e ->
     {
       final DrinkManagerDialog ingredientsDialog = new DrinkManagerDialog( SwingUtilities.getWindowAncestor( Drinkmanager.this ) );
-      ingredientsDialog.showIngredientsDialog( ServerCommunication.getInstance().getID( drinkList.getSelectedValue() ) );
+      ingredientsDialog.showIngredientsDialog( cache.getID( drinkList.getSelectedValue() ) );
     } );
     addButton.addActionListener( e ->
     {
@@ -137,8 +138,8 @@ class Drinkmanager extends JPanel
    */
   void updateList()
   {
-    data = new String[ServerCommunication.getInstance().getDrinkNames().size()];
-    data = ServerCommunication.getInstance().getDrinkNames().toArray( data );
+    data = new String[cache.getDrinkNames().size()];
+    data = cache.getDrinkNames().toArray( data );
     drinkList = new JList<>( data );
     drinkList.setCellRenderer( new DrinkCellRenderer() );
     drinkList.setFixedCellHeight( 150 );

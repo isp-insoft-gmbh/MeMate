@@ -66,6 +66,7 @@ class DrinkConsumptionButton extends JPanel
   private final Border       FOCUS_BORDER           =
       BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( UIManager.getColor( "AppColor" ) ),
           BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) );
+  Cache                      cache                  = Cache.getInstance();
 
   private final JLabel       nameLabel                              = MeMateUIManager.createJLabel( "drinkButtons" );
   private final JLabel       priceLabel                             = MeMateUIManager.createJLabel( "drinkButtons" );
@@ -131,7 +132,7 @@ class DrinkConsumptionButton extends JPanel
       private void loadInfoPanelSettings()
       {
         infoPanel.setLayout( new GridBagLayout() );
-        final DrinkIngredients ingredients = ServerCommunication.getInstance().getIngredients( name );
+        final DrinkIngredients ingredients = cache.getIngredients( name );
         final String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
         int maxLength = 40;
         for ( final String string : ingredientsArray )
@@ -300,7 +301,7 @@ class DrinkConsumptionButton extends JPanel
     nameLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
     nameLabelConstraints.weightx = 1;
     nameLabelAndDrinkInfoButtonPanel.add( nameLabel, nameLabelConstraints );
-    if ( ServerCommunication.getInstance().hasIngredients( name ) )
+    if ( cache.hasIngredients( name ) )
     {
       final GridBagConstraints infoButtonConstraints = new GridBagConstraints();
       infoButtonConstraints.gridx = 2;
@@ -334,7 +335,7 @@ class DrinkConsumptionButton extends JPanel
     final Float priceAsFloat = Float.valueOf( price );
     final NumberFormat formatter = NumberFormat.getCurrencyInstance();
     final String format = formatter.format( priceAsFloat.doubleValue() );
-    final int amount = ServerCommunication.getInstance().getAmount( name );
+    final int amount = cache.getAmount( name );
     //FIXME(nwe | 09.06.2020): Nicht So !!!!!!!!!
     if ( amount > 99 )
     {

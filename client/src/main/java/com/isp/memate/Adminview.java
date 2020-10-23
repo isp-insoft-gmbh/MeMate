@@ -63,6 +63,7 @@ class Adminview extends JPanel
   private final JPanel     centerPanel           = MeMateUIManager.createJPanel();
   private JPanel           drinkAmountPanel      = new JPanel( new FlowLayout() );
   private final JTextField balanceField          = MeMateUIManager.createJTextField();
+  Cache                    cache                 = Cache.getInstance();
 
 
   /**
@@ -346,7 +347,7 @@ class Adminview extends JPanel
    */
   private void addAllDrinks()
   {
-    for ( final String drink : ServerCommunication.getInstance().getDrinkNames() )
+    for ( final String drink : cache.getDrinkNames() )
     {
       drinkAmountPanel = MeMateUIManager.createJPanel( "adminButton" );
       drinkAmountPanel.setLayout( new GridBagLayout() );
@@ -372,7 +373,7 @@ class Adminview extends JPanel
       drinkAmountPanel.add( daysLeftLabel, daysLeftLabelConstraints );
       final SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 1000, 1 );
       final JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
-      amountSpinner.setValue( ServerCommunication.getInstance().getAmount( drink ) );
+      amountSpinner.setValue( cache.getAmount( drink ) );
       MeMateUIManager.registerSpinner( amountSpinner );
       final GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
       amountSpinnerConstraints.gridx = 0;
@@ -465,9 +466,8 @@ class Adminview extends JPanel
       }
     }
     final Float averageConsumption = amount / 30f;
-    return ServerCommunication.getInstance().getAmount( drink ) / averageConsumption;
+    return cache.getAmount( drink ) / averageConsumption;
   }
-
 
   /**
    * Generiert das AdminPanel neu

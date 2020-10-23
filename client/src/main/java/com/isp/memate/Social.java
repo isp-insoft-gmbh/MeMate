@@ -163,7 +163,7 @@ class Social extends JPanel
       scoreMap.put( username, 0 );
     }
     ServerCommunication.getInstance().lock.lock();
-    String[][] history = ServerCommunication.getInstance().getScoreboard();
+    String[][] history = Cache.getInstance().getScoreboard();
     if ( history != null )
     {
       for ( String[] data : history )
@@ -260,7 +260,7 @@ class Social extends JPanel
       scoreMap.put( username, 0 );
     }
     ServerCommunication.getInstance().lock.lock();
-    String[][] history = ServerCommunication.getInstance().getScoreboard();
+    String[][] history = Cache.getInstance().getScoreboard();
     if ( history != null )
     {
       ZonedDateTime today = ZonedDateTime.now();

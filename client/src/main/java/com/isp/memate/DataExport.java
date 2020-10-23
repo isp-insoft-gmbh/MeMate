@@ -102,7 +102,7 @@ class DataExport
    */
   private void drinksExport()
   {
-    Drink[] drinks = ServerCommunication.getInstance().getDrinkArray();
+    Drink[] drinks = Cache.getInstance().getDrinkArray();
     try
     {
       DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();

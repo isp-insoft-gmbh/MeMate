@@ -20,19 +20,24 @@ import com.isp.memate.ServerLog.logType;
 
 public class Main
 {
+  private final static boolean debug = false;
+
   /**
    * @param args Pfad zur Datenbank
    */
-  @SuppressWarnings( "resource" )
+  @SuppressWarnings( { "resource", "unused" } )
   public static void main( final String args[] )
   {
     //For Debug commented out
-    new SendServerInformationsToClients().start();
+    if ( !debug )
+    {
+      new SendServerInformationsToClients().start();
+    }
     ServerSocket serverSocket = null;
     Socket socket = null;
     try
     {
-      serverSocket = new ServerSocket( 3141 ); //Default is 3141 - Debug is 3142
+      serverSocket = new ServerSocket( debug  ? 3142 : 3141 ); //Default is 3141 - Debug is 3142
       ServerLog.newLog( logType.INFO, "Starte MateServer auf Port: " + serverSocket.getLocalPort() );
     }
     catch ( final IOException e )

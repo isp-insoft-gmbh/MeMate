@@ -41,6 +41,7 @@ class DrinkCellRenderer implements ListCellRenderer<Object>
   private final JLabel drinkNameLabel  = MeMateUIManager.createJLabel();
   private final JLabel priceLabel      = MeMateUIManager.createJLabel();
   private final JLabel pictureLabel    = MeMateUIManager.createJLabel();
+  Cache                cache           = Cache.getInstance();
 
   /**
    * Der DrinkCellRenderer bestimmt wie eine Cell der Liste aussehen soll. Der Renderer benutzt ein
@@ -81,7 +82,7 @@ class DrinkCellRenderer implements ListCellRenderer<Object>
   public Component getListCellRendererComponent( JList<?> list, Object value, int index,
                                                  boolean isSelected, boolean cellHasFocus )
   {
-    Float price = ServerCommunication.getInstance().getPrice( (String) value );
+    Float price = cache.getPrice( (String) value );
     if ( price == null )
     {
       return renderComponent;
@@ -90,7 +91,7 @@ class DrinkCellRenderer implements ListCellRenderer<Object>
     String format = formatter.format( price.doubleValue() );
     priceLabel.setText( format );
 
-    ImageIcon drinkIcon = ServerCommunication.getInstance().getIcon( (String) value );
+    ImageIcon drinkIcon = cache.getIcon( (String) value );
     Image drinkImage = drinkIcon.getImage();
     Image scaledImage;
 
@@ -110,7 +111,7 @@ class DrinkCellRenderer implements ListCellRenderer<Object>
     {
       pictureLabel.setIcon(
           new ImageIcon(
-              ServerCommunication.getInstance().getIcon( (String) value ).getImage().getScaledInstance( 45, 140, Image.SCALE_SMOOTH ) ) );
+              cache.getIcon( (String) value ).getImage().getScaledInstance( 45, 140, Image.SCALE_SMOOTH ) ) );
     }
     pictureLabel.setPreferredSize( new Dimension( 200, 140 ) );
     drinkNameLabel.setText( value.toString() );
