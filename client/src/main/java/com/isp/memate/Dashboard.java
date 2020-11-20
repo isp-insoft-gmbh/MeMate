@@ -82,21 +82,25 @@ class Dashboard extends JPanel
   private JPanel createLowerPanel()
   {
     final JPanel panel = MeMateUIManager.createJPanel();
-    final SpinnerNumberModel spinnerModel = new SpinnerNumberModel( 1, 1, 1000, 1 );
+    final SpinnerNumberModel spinnerModel = new SpinnerNumberModel( 1, -50, 1000, 1 );
     final JSpinner valueSpinner = new JSpinner( spinnerModel );
     MeMateUIManager.registerSpinner( valueSpinner );
-    //    String pattern = "0€";
-    //    JSpinner.NumberEditor editor = new JSpinner.NumberEditor( valueSpinner, pattern );
-    //    valueSpinner.setEditor( editor );
 
     final JButton aufladenButton = MeMateUIManager.createButton( "button" );
     aufladenButton.setText( "Einzahlen" );
     aufladenButton.addActionListener( e ->
     {
       final Object value = valueSpinner.getValue();
+      String description = "<html>Wollen Sie wirklich <b>" + value + "€</b> einzahlen?";
+      String title = "Guthaben hinzufügen";
+      if ( (int) value < 0 )
+      {
+        description = "<html>Wollen Sie wirklich <b>" + (int) value * -1 + "€</b> aus der Kasse nehmen?";
+        title = "Geld leihen";
+      }
       final int result =
-          JOptionPane.showConfirmDialog( Dashboard.this, "<html>Wollen Sie wirklich <b>" + value + "€</b> einzahlen?",
-              "Guthaben hinzufügen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE );
+          JOptionPane.showConfirmDialog( Dashboard.this, description,
+              title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE );
       if ( result == JOptionPane.YES_OPTION )
       {
         final ServerCommunication sc = ServerCommunication.getInstance();
