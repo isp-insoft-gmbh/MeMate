@@ -62,22 +62,17 @@ import com.isp.memate.util.SwingUtil;
  */
 public class Login extends JFrame
 {
-  private static final Login   instance                = new Login();
-  Cache                        cache                   = Cache.getInstance();
-  private final Font           LABEL_FONT              = UIManager.getFont( "Label.font" ).deriveFont( 15f );
-  private final JButton        loginButton             = MeMateUIManager.createButton( "button" );
-  private final JLabel         headerLabel             = new JLabel(
-      new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
-  private final JCheckBox      stayLoggedInCheckBox    = MeMateUIManager.createCheckbox();
-  private final JTextPane      registerHyperLink       = MeMateUIManager.createTextPane();
-  private final JTextPane      forgotPasswordHyperLink = MeMateUIManager.createTextPane();
-  private final JPanel         loginPanel              = MeMateUIManager.createJPanel();
-  private final JLabel         usernameLabel           = MeMateUIManager.createJLabel();
-  private final JLabel         passwordLabel           = MeMateUIManager.createJLabel();
-  private final JLabel         stayLoggedInLabel       = MeMateUIManager.createJLabel();
-  private final JPasswordField passwordField           = MeMateUIManager.createJPasswordField();
-  private final JTextField     usernameTextField       = MeMateUIManager.createJTextField();
-  private static String        currentUsername;
+  private static final Login instance   = new Login();
+  Cache                      cache      = Cache.getInstance();
+  private final Font         LABEL_FONT = UIManager.getFont( "Label.font" ).deriveFont( 15f );
+  private JButton            loginButton;
+  private JLabel             usernameLabel, passwordLabel, stayLoggedInLabel, headerLabel;
+  private JTextPane          registerHyperLink, forgotPasswordHyperLink;
+  private JCheckBox          stayLoggedInCheckBox;
+  private JPanel             loginPanel;
+  private JPasswordField     passwordField;
+  private JTextField         usernameTextField;
+  private static String      currentUsername;
 
   /**
    * @return static instance of Login
@@ -93,23 +88,101 @@ public class Login extends JFrame
    */
   public Login()
   {
-    loginPanel.setLayout( new GridBagLayout() );
+    initComponents();
+    layoutComponents();
+    addActionListener();
+    applyFrameSettings();
+  }
+
+  private void initComponents()
+  {
+    stayLoggedInCheckBox = new JCheckBox();
+    registerHyperLink = new JTextPane();
+    forgotPasswordHyperLink = new JTextPane();
+    loginButton = new JButton();
+    loginPanel = new JPanel();
+    usernameLabel = new JLabel();
+    passwordLabel = new JLabel();
+    stayLoggedInLabel = new JLabel();
+    passwordField = new JPasswordField();
+    usernameTextField = new JTextField();
+    ImageIcon icon;
+
+    if ( MeMateUIManager.getDarkModeState() )
+    {
+      icon = new ImageIcon( getClass().getClassLoader().getResource( "welcome_white.png" ) );
+
+    }
+    else
+    {
+      icon = new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) );
+    }
+
+    headerLabel = new JLabel( icon );
+    loginPanel.setBorder( new EmptyBorder( 10, 10, 10, 10 ) );
+    headerLabel.setBorder( new EmptyBorder( 0, 0, 15, 0 ) );
+    SwingUtil.setPreferredWidth( 420, usernameTextField );
+    SwingUtil.setPreferredWidth( 420, passwordField );
+
     loginButton.setText( "Anmelden" );
     passwordLabel.setText( "Passwort" );
     usernameLabel.setText( "Benutzername" );
     stayLoggedInLabel.setText( "Eingeloggt bleiben" );
-    setIconImage(
-        Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
-    setTitle( "MeMate" );
-    deriveFonts();
-    setBordersAndPreferredSize();
-    layoutComponents();
-    addActionListener();
 
-    setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
-    pack();
-    setResizable( false );
-    setLocationRelativeTo( null );
+    usernameLabel.setFont( LABEL_FONT );
+    passwordLabel.setFont( LABEL_FONT );
+    stayLoggedInLabel.setFont( LABEL_FONT );
+    registerHyperLink.setEditable( false );
+    registerHyperLink.setContentType( "text/html" );
+    registerHyperLink.setText( generateHTMLText( UIManager.getColor( "Label.foreground" ), "Konto erstellen" ) );
+    forgotPasswordHyperLink.setEditable( false );
+    forgotPasswordHyperLink.setContentType( "text/html" );
+    forgotPasswordHyperLink.setText( generateHTMLText( UIManager.getColor( "Label.foreground" ), "Passwort vergessen?" ) );
+
+    registerHyperLink.addFocusListener( new FocusListener()
+    {
+      @Override
+      public void focusLost( final FocusEvent e )
+      {
+        registerHyperLink.setText(
+            generateHTMLText( UIManager.getColor( "Label.foreground" ), "Konto erstellen" ) );
+      }
+
+      @Override
+      public void focusGained( final FocusEvent e )
+      {
+        registerHyperLink.setText(
+            generateHTMLText( UIManager.getColor( "AppColor" ), "Konto erstellen" ) );
+      }
+    } );
+
+    forgotPasswordHyperLink.addFocusListener( new FocusListener()
+    {
+      @Override
+      public void focusLost( final FocusEvent e )
+      {
+        forgotPasswordHyperLink.setText(
+            generateHTMLText( UIManager.getColor( "Label.foreground" ), "Passwort vergessen?" ) );
+      }
+
+      @Override
+      public void focusGained( final FocusEvent e )
+      {
+        forgotPasswordHyperLink.setText(
+            generateHTMLText( UIManager.getColor( "AppColor" ), "Passwort vergessen?" ) );
+      }
+    } );
+  }
+
+  private String generateHTMLText( Color color, String string )
+  {
+    final String fontName = LABEL_FONT.getFontName();
+    if ( color != null )
+    {
+      final String htmlColor = "rgb(" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ")";
+      return "<html><font color='" + htmlColor + "'><font face='" + fontName + "'><a href>" + string + "</a></font></font></html>";
+    }
+    return "<html><font face='" + fontName + "'><a href>" + string + "</a></font></html>";
   }
 
   /**
@@ -121,14 +194,12 @@ public class Login extends JFrame
     {
       if ( usernameTextField.getText().isEmpty() )
       {
-        JOptionPane.showMessageDialog( loginPanel, "Benutzername darf nicht leer sein.", "Login fehlgeschlagen",
-            JOptionPane.WARNING_MESSAGE, null );
+        showMessageDialog( "Benutzername" );
         return;
       }
       else if ( passwordField.getPassword().length == 0 )
       {
-        JOptionPane.showMessageDialog( loginPanel, "Passwort darf nicht leer sein.", "Login fehlgeschlagen",
-            JOptionPane.WARNING_MESSAGE, null );
+        showMessageDialog( "Passwort" );
         return;
       }
       else
@@ -139,7 +210,6 @@ public class Login extends JFrame
         ServerCommunication.getInstance().checkLogin( login );
       }
     } );
-    getRootPane().setDefaultButton( loginButton );
 
     forgotPasswordHyperLink.addMouseListener( new MouseAdapter()
     {
@@ -333,6 +403,12 @@ public class Login extends JFrame
     } );
   }
 
+  private void showMessageDialog( String string )
+  {
+    JOptionPane.showMessageDialog( loginPanel, string + " darf nicht leer sein.", "Login fehlgeschlagen",
+        JOptionPane.WARNING_MESSAGE, null );
+  }
+
   /**
    * Das eingebene Passwort wird gehasht.
    *
@@ -360,6 +436,7 @@ public class Login extends JFrame
 
   private void layoutComponents()
   {
+    loginPanel.setLayout( new GridBagLayout() );
     final GridBagConstraints titleConstraints = new GridBagConstraints();
     titleConstraints.gridx = 0;
     titleConstraints.gridy = 0;
@@ -431,33 +508,18 @@ public class Login extends JFrame
     loginPanel.add( new JSeparator( SwingConstants.HORIZONTAL ), seperatorConstraints );
 
     add( loginPanel );
-    MeMateUIManager.registerPanel( "default", loginPanel );
   }
 
-  private void setBordersAndPreferredSize()
+  private void applyFrameSettings()
   {
-    loginPanel.setBorder( new EmptyBorder( 10, 10, 10, 10 ) );
-    headerLabel.setBorder( new EmptyBorder( 0, 0, 15, 0 ) );
-    SwingUtil.setPreferredWidth( 420, usernameTextField );
-    SwingUtil.setPreferredWidth( 420, passwordField );
-  }
-
-  private void deriveFonts()
-  {
-    final String fontName = LABEL_FONT.getFontName();
-    usernameLabel.setFont( LABEL_FONT );
-    passwordLabel.setFont( LABEL_FONT );
-    stayLoggedInLabel.setFont( LABEL_FONT );
-    registerHyperLink.setEditable( false );
-    registerHyperLink.setContentType( "text/html" );
-    registerHyperLink.setText( "<html><font color=blue><font face='" + fontName
-        + "'><a href>Konto erstellen</a></font></font></html>" );
-    registerHyperLink.setBackground( loginPanel.getBackground() );
-    forgotPasswordHyperLink.setEditable( false );
-    forgotPasswordHyperLink.setContentType( "text/html" );
-    forgotPasswordHyperLink.setText( "<html><font color=blue><font face='" + fontName
-        + "'><a href>Passwort vergessen ?</a></font></font></html>" );
-    forgotPasswordHyperLink.setBackground( loginPanel.getBackground() );
+    setIconImage(
+        Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+    setTitle( "MeMate" );
+    setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
+    pack();
+    setResizable( false );
+    setLocationRelativeTo( null );
+    getRootPane().setDefaultButton( loginButton );
   }
 
   /**
@@ -706,100 +768,5 @@ public class Login extends JFrame
       JOptionPane.showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(), registrationResult,
           "Registrierung fehlgeschlagen", JOptionPane.ERROR_MESSAGE, null );
     }
-  }
-
-  /**
-   * zeigt den Darkmode Header
-   */
-  public void showDarkHeader()
-  {
-    final String fontName = LABEL_FONT.getFontName();
-
-    final Color appColor = UIManager.getColor( "AppColor" );
-    final String htmlAppColor = "rgb(" + appColor.getRed() + ", " + appColor.getGreen() + ", " + appColor.getBlue() + ")";
-    headerLabel.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "welcome_white.png" ) ) );
-    registerHyperLink.setText( "<html><font color=white><font face='" + fontName
-        + "'><a href>Konto erstellen</a></font></font></html>" );
-    forgotPasswordHyperLink.setText( "<html><font color=white><font face='" + fontName
-        + "'><a href>Passwort vergessen ?</a></font></font></html>" );
-    registerHyperLink.addFocusListener( new FocusListener()
-    {
-      @Override
-      public void focusLost( final FocusEvent e )
-      {
-        registerHyperLink.setText( "<html><font color=white><font face='" + fontName
-            + "'><a href>Konto erstellen</a></font></font></html>" );
-      }
-
-      @Override
-      public void focusGained( final FocusEvent e )
-      {
-        registerHyperLink.setText( "<html><font color='" + htmlAppColor + "'><font face='" + fontName
-            + "'><a href>Konto erstellen</a></font></font></html>" );
-      }
-    } );
-    forgotPasswordHyperLink.addFocusListener( new FocusListener()
-    {
-      @Override
-      public void focusLost( final FocusEvent e )
-      {
-        forgotPasswordHyperLink.setText( "<html><font color=white><font face='" + fontName
-            + "'><a href>Passwort vergessen ?</a></font></font></html>" );
-      }
-
-      @Override
-      public void focusGained( final FocusEvent e )
-      {
-        forgotPasswordHyperLink.setText( "<html><font color='" + htmlAppColor + "'><font face='" + fontName
-            + "'><a href>Passwort vergessen ?</a></font></font></html>" );
-      }
-    } );
-  }
-
-  /**
-   * zeigt den Daymode Header
-   */
-  public void showDayHeader()
-  {
-    final String fontName = LABEL_FONT.getFontName();
-    final Color appColor = UIManager.getColor( "AppColor" );
-    final String htmlAppColor = "rgb(" + appColor.getRed() + ", " + appColor.getGreen() + ", " + appColor.getBlue() + ")";
-    headerLabel.setIcon( new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) ) );
-    registerHyperLink.setText( "<html><font color=blue><font face='" + fontName
-        + "'><a href>Konto erstellen</a></font></font></html>" );
-    forgotPasswordHyperLink.setText( "<html><font color=blue><font face='" + fontName
-        + "'><a href>Passwort vergessen ?</a></font></font></html>" );
-    registerHyperLink.addFocusListener( new FocusListener()
-    {
-      @Override
-      public void focusLost( final FocusEvent e )
-      {
-        registerHyperLink.setText( "<html><font color=blue><font face='" + fontName
-            + "'><a href>Konto erstellen</a></font></font></html>" );
-      }
-
-      @Override
-      public void focusGained( final FocusEvent e )
-      {
-        registerHyperLink.setText( "<html><font color='" + htmlAppColor + "'><font face='" + fontName
-            + "'><a href>Konto erstellen</a></font></font></html>" );
-      }
-    } );
-    forgotPasswordHyperLink.addFocusListener( new FocusListener()
-    {
-      @Override
-      public void focusLost( final FocusEvent e )
-      {
-        forgotPasswordHyperLink.setText( "<html><font color=blue><font face='" + fontName
-            + "'><a href>Passwort vergessen ?</a></font></font></html>" );
-      }
-
-      @Override
-      public void focusGained( final FocusEvent e )
-      {
-        forgotPasswordHyperLink.setText( "<html><font color='" + htmlAppColor + "'><font face='" + fontName
-            + "'><a href>Passwort vergessen ?</a></font></font></html>" );
-      }
-    } );
   }
 }

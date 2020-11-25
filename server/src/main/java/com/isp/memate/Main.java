@@ -20,7 +20,7 @@ import com.isp.memate.ServerLog.logType;
 
 public class Main
 {
-  private final static boolean debug = false;
+  private final static boolean debug = true;
 
   /**
    * @param args Pfad zur Datenbank
@@ -28,7 +28,6 @@ public class Main
   @SuppressWarnings( { "resource", "unused" } )
   public static void main( final String args[] )
   {
-    //For Debug commented out
     if ( !debug )
     {
       new SendServerInformationsToClients().start();

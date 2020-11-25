@@ -13,6 +13,9 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.extras.FlatUIDefaultsInspector;
 
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.Compare;
@@ -33,25 +36,19 @@ class Main
 
   /**
    * @param args unused
-   *
-   * @throws UnsupportedLookAndFeelException bei fehlerhafter Look&Feel Initialisierung
-   * @throws IllegalAccessException bei fehlerhafter Look&Feel Initialisierung
-   * @throws InstantiationException bei fehlerhafter Look&Feel Initialisie+rung
-   * @throws ClassNotFoundException bei fehlerhafter Look&Feel Initialisierung
    */
   public static void main( final String[] args )
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
   {
-
-    setLaFandUIDefaults();
+    createPropFile();
+    loadUserProperties();
     installColors();
     installColorKeys();
+    applyTheme();
+    setUIDefaults();
+    FlatUIDefaultsInspector.install( "X" );
     ServerCommunication serverCommunication = ServerCommunication.getInstance();
     Cache cache = Cache.getInstance();
 
-    createPropFile();
-    loadUserProperties();
-    applyTheme();
 
     if ( sessionIDPropertry == null || sessionIDPropertry.equals( "null" ) )
     {
@@ -107,11 +104,13 @@ class Main
   {
     if ( darkmodeProperty != null && darkmodeProperty.equals( "on" ) )
     {
-      MeMateUIManager.iniDarkMode();
+      FlatDarkLaf.install();
+      MeMateUIManager.setDarkModeState( true );
     }
     else
     {
-      MeMateUIManager.iniDayMode();
+      FlatLightLaf.install();
+      MeMateUIManager.setDarkModeState( false );
     }
   }
 
@@ -132,10 +131,16 @@ class Main
     }
   }
 
-  private static void setLaFandUIDefaults()
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
+  private static void setUIDefaults()
   {
-    UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+    Color mainColor = UIManager.getColor( "AppColor" );
+    //FIXME sobald FlatLaf komplett implemetiert ist, dann als focusFarbe AppColor setzte. AppColor muss also noch voher gesetzt werden.
+    UIManager.put( "CheckBox.icon.focusedBorderColor", mainColor );
+    UIManager.put( "CheckBox.icon.selectedFocusedBorderColor", mainColor );
+    UIManager.put( "Component.focusedBorderColor", mainColor );
+    //    UIManager.put( "Button.default.focusedBorderColor", mainColor.brighter() );
+    //    UIManager.put( "Button.default.background", mainColor.darker() );
+    //    UIManager.put( "Button.default.borderColor", mainColor );
     UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0 ) );
     UIManager.put( "DefaultBrightColor", Color.white );
     ToolTipManager.sharedInstance().setDismissDelay( 1000000 );

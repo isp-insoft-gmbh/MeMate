@@ -82,6 +82,11 @@ public class MeMateUIManager
 
   private static boolean darkModeState = false;
 
+  public static void setDarkModeState( boolean darkModeState )
+  {
+    MeMateUIManager.darkModeState = darkModeState;
+  }
+
   /**
    * Install Default Key with default colors.
    */
@@ -162,9 +167,9 @@ public class MeMateUIManager
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
 
     UIManager.put( "OptionPane.background", UIManager.getColor( "App.Background" ) );
-    UIManager.put( "Panel.background", UIManager.getColor( "App.Background" ) );
+    //    UIManager.put( "Panel.background", UIManager.getColor( "App.Background" ) );
     UIManager.put( "OptionPane.messageForeground", Color.white );
-    UIManager.put( "Label.foreground", Color.white );
+    //    UIManager.put( "Label.foreground", Color.white );
     UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
     UIManager.put( "ToolTip.foreground", Color.white );
     UIManager.put( "ComboBox.buttonBackground", new Color( 51, 61, 78 ) );
@@ -187,9 +192,9 @@ public class MeMateUIManager
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
 
     UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
-    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
+    //    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
     UIManager.put( "OptionPane.messageForeground", Color.black );
-    UIManager.put( "Label.foreground", Color.black );
+    //    UIManager.put( "Label.foreground", Color.black );
     UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
     UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
     UIManager.put( "ComboBox.buttonBackground", new Color( 215, 215, 215 ) );
@@ -213,9 +218,9 @@ public class MeMateUIManager
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
 
     UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
-    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
+    //    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
     UIManager.put( "OptionPane.messageForeground", Color.black );
-    UIManager.put( "Label.foreground", Color.black );
+    //    UIManager.put( "Label.foreground", Color.black );
     UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
     UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
     UIManager.put( "ComboBox.buttonBackground", new Color( 215, 215, 215 ) );
@@ -238,9 +243,9 @@ public class MeMateUIManager
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
 
     UIManager.put( "OptionPane.background", UIManager.getColor( "App.Background" ) );
-    UIManager.put( "Panel.background", UIManager.getColor( "App.Background" ) );
+    //    UIManager.put( "Panel.background", UIManager.getColor( "App.Background" ) );
     UIManager.put( "OptionPane.messageForeground", Color.white );
-    UIManager.put( "Label.foreground", Color.white );
+    //    UIManager.put( "Label.foreground", Color.white );
     UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
     UIManager.put( "ToolTip.foreground", Color.white );
     UIManager.put( "ComboBox.buttonBackground", new Color( 51, 61, 78 ) );
@@ -576,17 +581,6 @@ public class MeMateUIManager
       updateActionBarButtons( key );
     }
     updateGraphs();
-    if ( Login.getInstance() != null )
-    {
-      if ( darkModeState )
-      {
-        Login.getInstance().showDarkHeader();
-      }
-      else
-      {
-        Login.getInstance().showDayHeader();
-      }
-    }
   }
 
   public static void updateList( final String key )

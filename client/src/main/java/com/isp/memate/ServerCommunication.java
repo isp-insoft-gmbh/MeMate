@@ -4,7 +4,6 @@
 package com.isp.memate;
 
 import java.awt.AWTException;
-import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
@@ -24,15 +23,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import com.isp.memate.Shared.Operation;
@@ -49,7 +44,7 @@ import com.isp.memate.util.ClientLog;
  */
 class ServerCommunication
 {
-  private final boolean                    debug                     = false;
+  private final boolean                    debug                     = true;
   private static final ServerCommunication instance                  = new ServerCommunication();
   Cache                                    cache                     = Cache.getInstance();
   final ReentrantLock                      lock                      = new ReentrantLock( true );
@@ -84,7 +79,7 @@ class ServerCommunication
       }
       else
       {
-        socket = new Socket( "192.168.168.82", 3142 );// This is for Testing TODO remove later
+        socket = new Socket( "192.168.168.82", 3142 );
       }
       outStream = new ObjectOutputStream( socket.getOutputStream() );
       inStream = new ObjectInputStream( socket.getInputStream() );
