@@ -41,6 +41,7 @@ import javax.swing.event.DocumentListener;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.ToggleSwitch;
+import com.isp.memate.util.Util;
 
 /**
  * Auf dem Settings Panel kann sein gewünschtes Color Scheme auswählen, den Darkmodestate verändern und
@@ -278,7 +279,7 @@ class Settings extends JPanel
                 JOptionPane.INFORMATION_MESSAGE );
         if ( reply == JOptionPane.YES_OPTION )
         {
-          ServerCommunication.getInstance().changePassword( Login.getInstance().getHash( String.valueOf( password ) ) );
+          ServerCommunication.getInstance().changePassword( Util.getHash( String.valueOf( password ) ) );
           changePasswordFrame.dispose();
         }
       }

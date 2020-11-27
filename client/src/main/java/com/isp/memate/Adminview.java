@@ -38,6 +38,7 @@ import javax.swing.border.EmptyBorder;
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.MeMateUIManager;
+import com.isp.memate.util.Util;
 
 /**
  * In der Adminview kann man das Guthaben des Spaarschweins setzen/sehen,
@@ -216,7 +217,7 @@ class Adminview extends JPanel
       saveButton.addActionListener( e1 ->
       {
         ServerCommunication.getInstance().changePassword( String.valueOf( userComboBox.getSelectedItem() ),
-            Login.getInstance().getHash( passwordField.getText() ) );
+           Util.getHash( passwordField.getText() ) );
         passwordFrame.dispose();
       } );
       passwordFrame.add( passwordPanel );

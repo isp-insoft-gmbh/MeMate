@@ -5,9 +5,6 @@ package com.isp.memate;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -22,13 +19,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.swing.FocusManager;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -44,13 +37,12 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
+import com.isp.memate.util.Util;
 
 /**
  * Im LoginFrame kann der Benutzer sich registrieren oder wenn er bereits ein
@@ -62,32 +54,23 @@ import com.isp.memate.util.SwingUtil;
  */
 public class Login extends JFrame
 {
-  private static final Login instance   = new Login();
-  Cache                      cache      = Cache.getInstance();
-  private final Font         LABEL_FONT = UIManager.getFont( "Label.font" ).deriveFont( 15f );
-  private JButton            loginButton;
-  private JLabel             usernameLabel, passwordLabel, stayLoggedInLabel, headerLabel;
-  private JTextPane          registerHyperLink, forgotPasswordHyperLink;
-  private JCheckBox          stayLoggedInCheckBox;
-  private JPanel             loginPanel;
-  private JPasswordField     passwordField;
-  private JTextField         usernameTextField;
-  private static String      currentUsername;
+  private static final long   serialVersionUID   = 2601644901607012389L;
+  private static final String LABEL_FOREGROUND   = "Label.foreground";
+  private static final String PASSWORT_VERGESSEN = "Passwort vergessen?";
+  private static final String KONTO_ERSTELLEN    = "Konto erstellen";
+  Cache                       cache              = Cache.getInstance();
+  private JButton             loginButton;
+  private JLabel              usernameLabel, passwordLabel, stayLoggedInLabel, headerLabel;
+  private JTextPane           registerHyperLink, forgotPasswordHyperLink;
+  private JCheckBox           stayLoggedInCheckBox;
+  private JPanel              loginPanel;
+  private JPasswordField      passwordField;
+  private JTextField          usernameTextField;
+  private static String       currentUsername;
 
-  /**
-   * @return static instance of Login
-   */
-  public static Login getInstance()
-  {
-    return instance;
-  }
-
-  /**
-   * Passt Schriftgrößen, Borders und Größen an. Außerdem werden die Komponenten
-   * gelayoutet und ActionListener für Login und Registrieren werden hinzugefügt.
-   */
   public Login()
   {
+    GUIObjects.loginFrame = this;
     initComponents();
     layoutComponents();
     addActionListener();
@@ -111,7 +94,6 @@ public class Login extends JFrame
     if ( MeMateUIManager.getDarkModeState() )
     {
       icon = new ImageIcon( getClass().getClassLoader().getResource( "welcome_white.png" ) );
-
     }
     else
     {
@@ -129,54 +111,20 @@ public class Login extends JFrame
     usernameLabel.setText( "Benutzername" );
     stayLoggedInLabel.setText( "Eingeloggt bleiben" );
 
-    usernameLabel.setFont( LABEL_FONT );
-    passwordLabel.setFont( LABEL_FONT );
-    stayLoggedInLabel.setFont( LABEL_FONT );
     registerHyperLink.setEditable( false );
     registerHyperLink.setContentType( "text/html" );
-    registerHyperLink.setText( generateHTMLText( UIManager.getColor( "Label.foreground" ), "Konto erstellen" ) );
+    registerHyperLink.setText( generateHTMLText( UIManager.getColor( LABEL_FOREGROUND ), KONTO_ERSTELLEN ) );
     forgotPasswordHyperLink.setEditable( false );
     forgotPasswordHyperLink.setContentType( "text/html" );
-    forgotPasswordHyperLink.setText( generateHTMLText( UIManager.getColor( "Label.foreground" ), "Passwort vergessen?" ) );
+    forgotPasswordHyperLink.setText( generateHTMLText( UIManager.getColor( LABEL_FOREGROUND ), PASSWORT_VERGESSEN ) );
 
-    registerHyperLink.addFocusListener( new FocusListener()
-    {
-      @Override
-      public void focusLost( final FocusEvent e )
-      {
-        registerHyperLink.setText(
-            generateHTMLText( UIManager.getColor( "Label.foreground" ), "Konto erstellen" ) );
-      }
-
-      @Override
-      public void focusGained( final FocusEvent e )
-      {
-        registerHyperLink.setText(
-            generateHTMLText( UIManager.getColor( "AppColor" ), "Konto erstellen" ) );
-      }
-    } );
-
-    forgotPasswordHyperLink.addFocusListener( new FocusListener()
-    {
-      @Override
-      public void focusLost( final FocusEvent e )
-      {
-        forgotPasswordHyperLink.setText(
-            generateHTMLText( UIManager.getColor( "Label.foreground" ), "Passwort vergessen?" ) );
-      }
-
-      @Override
-      public void focusGained( final FocusEvent e )
-      {
-        forgotPasswordHyperLink.setText(
-            generateHTMLText( UIManager.getColor( "AppColor" ), "Passwort vergessen?" ) );
-      }
-    } );
+    addHyperlinkFocusListener( registerHyperLink, KONTO_ERSTELLEN );
+    addHyperlinkFocusListener( forgotPasswordHyperLink, PASSWORT_VERGESSEN );
   }
 
   private String generateHTMLText( Color color, String string )
   {
-    final String fontName = LABEL_FONT.getFontName();
+    final String fontName = UIManager.getFont( "Label.font" ).getFontName();
     if ( color != null )
     {
       final String htmlColor = "rgb(" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ")";
@@ -185,9 +133,26 @@ public class Login extends JFrame
     return "<html><font face='" + fontName + "'><a href>" + string + "</a></font></html>";
   }
 
-  /**
-   * Enthält die Logik, für das Einloggen und Registrieren von Nutzern.
-   */
+  private void addHyperlinkFocusListener( JTextPane hyperlink, String text )
+  {
+    hyperlink.addFocusListener( new FocusListener()
+    {
+      @Override
+      public void focusLost( final FocusEvent e )
+      {
+        hyperlink.setText(
+            generateHTMLText( UIManager.getColor( LABEL_FOREGROUND ), text ) );
+      }
+
+      @Override
+      public void focusGained( final FocusEvent e )
+      {
+        hyperlink.setText(
+            generateHTMLText( UIManager.getColor( "AppColor" ), text ) );
+      }
+    } );
+  }
+
   private void addActionListener()
   {
     loginButton.addActionListener( __ ->
@@ -206,7 +171,7 @@ public class Login extends JFrame
       {
         currentUsername = usernameTextField.getText();
         final LoginInformation login = new LoginInformation( usernameTextField.getText(),
-            getHash( String.valueOf( passwordField.getPassword() ) ) );
+            Util.getHash( String.valueOf( passwordField.getPassword() ) ) );
         ServerCommunication.getInstance().checkLogin( login );
       }
     } );
@@ -226,179 +191,7 @@ public class Login extends JFrame
       @Override
       public void mouseClicked( final MouseEvent e )
       {
-        final JFrame registrationFrame = new JFrame( "Konto erstellen" );
-        final JPanel registrationPanel = new JPanel( new GridBagLayout() );
-        final JLabel reg_usernamelabel = new JLabel( "Benutzername:" );
-        final JLabel reg_passwordlabel = new JLabel( "Passwort:" );
-        final JLabel reg_password2label = new JLabel( "Passwort wiederholen:" );
-        final JLabel passwordCompareLabel = new JLabel();
-        final JTextField reg_usernameTextField = MeMateUIManager.createJTextField();
-        final JPasswordField reg_passwordField = MeMateUIManager.createJPasswordField();
-        final JPasswordField reg_password2Field = MeMateUIManager.createJPasswordField();
-        final JButton reg_registrationButton = MeMateUIManager.createButton( "button", "Registrieren" );
-        final JButton reg_abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
-
-        registrationFrame.getRootPane().setDefaultButton( reg_registrationButton );
-
-        final int prefHeight = reg_usernameTextField.getPreferredSize().height;
-        reg_usernameTextField.setPreferredSize( new Dimension( 200, prefHeight ) );
-        reg_passwordField.setPreferredSize( new Dimension( 200, prefHeight ) );
-        reg_password2Field.setPreferredSize( new Dimension( 200, prefHeight ) );
-        passwordCompareLabel.setPreferredSize( new Dimension( 200, prefHeight ) );
-
-        final GridBagConstraints reg_usernameLabelConstraints = new GridBagConstraints();
-        reg_usernameLabelConstraints.gridx = 0;
-        reg_usernameLabelConstraints.gridy = 0;
-        reg_usernameLabelConstraints.anchor = GridBagConstraints.LINE_START;
-        registrationPanel.add( reg_usernamelabel, reg_usernameLabelConstraints );
-        final GridBagConstraints reg_usernameTextFieldConstraints = new GridBagConstraints();
-        reg_usernameTextFieldConstraints.gridx = 1;
-        reg_usernameTextFieldConstraints.gridy = 0;
-        reg_usernameTextFieldConstraints.insets = new Insets( 0, 5, 0, 0 );
-        registrationPanel.add( reg_usernameTextField, reg_usernameTextFieldConstraints );
-        final GridBagConstraints reg_passwordlabelConstraints = new GridBagConstraints();
-        reg_passwordlabelConstraints.gridx = 0;
-        reg_passwordlabelConstraints.gridy = 1;
-        reg_passwordlabelConstraints.insets = new Insets( 10, 0, 10, 0 );
-        reg_passwordlabelConstraints.anchor = GridBagConstraints.LINE_START;
-        registrationPanel.add( reg_passwordlabel, reg_passwordlabelConstraints );
-        final GridBagConstraints reg_passwordFieldConstraints = new GridBagConstraints();
-        reg_passwordFieldConstraints.gridx = 1;
-        reg_passwordFieldConstraints.gridy = 1;
-        reg_passwordFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
-        registrationPanel.add( reg_passwordField, reg_passwordFieldConstraints );
-        final GridBagConstraints reg_password2labelConstraints = new GridBagConstraints();
-        reg_password2labelConstraints.gridx = 0;
-        reg_password2labelConstraints.gridy = 2;
-        reg_password2labelConstraints.insets = new Insets( 0, 0, 10, 0 );
-        reg_password2labelConstraints.anchor = GridBagConstraints.LINE_START;
-        registrationPanel.add( reg_password2label, reg_password2labelConstraints );
-        final GridBagConstraints reg_password2FieldConstraints = new GridBagConstraints();
-        reg_password2FieldConstraints.gridx = 1;
-        reg_password2FieldConstraints.gridy = 2;
-        reg_password2FieldConstraints.insets = new Insets( 0, 5, 5, 0 );
-        registrationPanel.add( reg_password2Field, reg_password2FieldConstraints );
-        final GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
-        passwordCompareLabelConstraints.gridx = 1;
-        passwordCompareLabelConstraints.gridy = 3;
-        passwordCompareLabelConstraints.anchor = GridBagConstraints.LINE_START;
-        passwordCompareLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
-        registrationPanel.add( passwordCompareLabel, passwordCompareLabelConstraints );
-        final JPanel buttonPanel = new JPanel( new FlowLayout() );
-        buttonPanel.add( reg_registrationButton );
-        buttonPanel.add( reg_abortButton );
-        final GridBagConstraints reg_buttonpanelConstraints = new GridBagConstraints();
-        reg_buttonpanelConstraints.gridx = 0;
-        reg_buttonpanelConstraints.gridy = 4;
-        reg_buttonpanelConstraints.gridwidth = 2;
-        registrationPanel.add( buttonPanel, reg_buttonpanelConstraints );
-
-        final Color green = new Color( 33, 122, 34 );
-        final DocumentListener documentListener = new DocumentListener()
-        {
-
-          @Override
-          public void removeUpdate( final DocumentEvent e )
-          {
-            compare();
-          }
-
-          @Override
-          public void insertUpdate( final DocumentEvent e )
-          {
-            compare();
-          }
-
-          @Override
-          public void changedUpdate( final DocumentEvent e )
-          {
-          }
-
-          private void compare()
-          {
-            if ( reg_passwordField.getPassword() == null || reg_passwordField.getPassword().length == 0
-                || reg_password2Field.getPassword() == null
-                || reg_password2Field.getPassword().length == 0 )
-            {
-              passwordCompareLabel.setText( "" );
-              passwordCompareLabel.setForeground( Color.black );
-            }
-            else
-            {
-              if ( String.valueOf( reg_passwordField.getPassword() )
-                  .equals( String.valueOf( reg_password2Field.getPassword() ) ) )
-              {
-                passwordCompareLabel.setText( "Die Passwörter stimmen überein." );
-                passwordCompareLabel.setForeground( green );
-              }
-              else
-              {
-                passwordCompareLabel.setText( "Die Passwörter stimmen nicht überein." );
-                passwordCompareLabel.setForeground( Color.red );
-              }
-            }
-          }
-        };
-        reg_password2Field.getDocument().addDocumentListener( documentListener );
-        reg_passwordField.getDocument().addDocumentListener( documentListener );
-
-        getRootPane().setDefaultButton( reg_registrationButton );
-        registrationFrame.add( registrationPanel );
-        registrationFrame.pack();
-        registrationFrame.setResizable( false );
-        registrationFrame.setSize( registrationFrame.getWidth() + 30, registrationFrame.getHeight() + 20 );
-        registrationFrame.setLocationRelativeTo( Login.this );
-        registrationFrame.setIconImage( Toolkit.getDefaultToolkit()
-            .getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
-        registrationFrame.setVisible( true );
-
-        reg_abortButton.addActionListener( e1 ->
-        {
-          registrationFrame.dispose();
-          getRootPane().setDefaultButton( loginButton );
-        } );
-
-        reg_registrationButton.addActionListener( e1 ->
-        {
-          final boolean isPasswordOrUserNameIncorrect = reg_passwordField.getPassword() == null
-              || reg_passwordField.getPassword().length == 0
-              || reg_password2Field.getPassword() == null
-              || reg_password2Field.getPassword().length == 0
-              || reg_usernameTextField.getText() == null || reg_usernameTextField.getText().isEmpty()
-              || reg_usernameTextField.getText().trim().length() == 0;
-
-          if ( isPasswordOrUserNameIncorrect )
-          {
-            JOptionPane.showMessageDialog( registrationFrame,
-                "Passwort oder Benutzername sind nicht zulässig.", "Registrieren",
-                JOptionPane.WARNING_MESSAGE );
-          }
-          else if ( !String.valueOf( reg_passwordField.getPassword() )
-              .equals( String.valueOf( reg_password2Field.getPassword() ) ) )
-          {
-            JOptionPane.showMessageDialog( registrationFrame, "Die Passwörter stimmen nicht überein.",
-                "Registrieren", JOptionPane.WARNING_MESSAGE );
-          }
-          else
-          {
-            final String username = reg_usernameTextField.getText();
-            final char[] password = reg_passwordField.getPassword();
-            final int reply = JOptionPane.showConfirmDialog( registrationFrame,
-                "Wollen Sie wirklich einen neuen Benutzer anlegen?", "Registrieren",
-                JOptionPane.INFORMATION_MESSAGE );
-            if ( reply == JOptionPane.YES_OPTION )
-            {
-              ServerCommunication.getInstance().registerNewUser( username,
-                  getHash( String.valueOf( password ) ) );
-              registrationFrame.dispose();
-              getRootPane().setDefaultButton( loginButton );
-              currentUsername = username;
-              final LoginInformation login = new LoginInformation( reg_usernameTextField.getText(),
-                  getHash( String.valueOf( reg_passwordField.getPassword() ) ) );
-              ServerCommunication.getInstance().checkLogin( login );
-            }
-          }
-        } );
+        new RegistrationDialog();
       }
     } );
   }
@@ -407,31 +200,6 @@ public class Login extends JFrame
   {
     JOptionPane.showMessageDialog( loginPanel, string + " darf nicht leer sein.", "Login fehlgeschlagen",
         JOptionPane.WARNING_MESSAGE, null );
-  }
-
-  /**
-   * Das eingebene Passwort wird gehasht.
-   *
-   * @param input eingebenes Passwort
-   * @return gehashtes Passwort
-   */
-  String getHash( final String input )
-  {
-    try
-    {
-      final MessageDigest passwordHasher = MessageDigest.getInstance( "SHA-256" );
-      final byte[] hashedPasswordArray = passwordHasher.digest( input.getBytes( StandardCharsets.UTF_8 ) );
-      final StringBuilder asString = new StringBuilder( hashedPasswordArray.length * 2 );
-      for ( final byte b : hashedPasswordArray )
-      {
-        asString.append( Integer.toHexString( b & 0xff ) );
-      }
-      return asString.toString().toUpperCase();
-    }
-    catch ( final NoSuchAlgorithmException exception )
-    {
-      throw new RuntimeException( exception );
-    }
   }
 
   private void layoutComponents()
@@ -534,6 +302,7 @@ public class Login extends JFrame
       ServerCommunication.getInstance().startDrinkInfoTimer();
       cache.setUsername( currentUsername );
       generateSessionID( currentUsername );
+      GUIObjects.loginFrame = null;
       dispose();
       final Mainframe mainframe = Mainframe.getInstance();
       mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
@@ -546,165 +315,7 @@ public class Login extends JFrame
     }
     else if ( loginResult == LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD )
     {
-      final JFrame changePasswordFrame = new JFrame( "Passwort ändern" );
-      final JPanel changePasswordPanel = new JPanel( new GridBagLayout() );
-      final JLabel passwordlabel = new JLabel( "Passwort:" );
-      final JLabel password2label = new JLabel( "Passwort wiederholen:" );
-      final JLabel passwordCompareLabel = new JLabel();
-      final JPasswordField passwordField = new JPasswordField();
-      final JPasswordField password2Field = new JPasswordField();
-      final JButton savePasswordButton = MeMateUIManager.createButton( "button", "Speichern" );
-      final JButton pass_abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
-
-      changePasswordFrame.getRootPane().setDefaultButton( savePasswordButton );
-
-      final int prefHeight = passwordField.getPreferredSize().height;
-      passwordField.setPreferredSize( new Dimension( 200, prefHeight ) );
-      password2Field.setPreferredSize( new Dimension( 200, prefHeight ) );
-      passwordCompareLabel.setPreferredSize( new Dimension( 200, prefHeight ) );
-
-      final GridBagConstraints reg_passwordlabelConstraints = new GridBagConstraints();
-      reg_passwordlabelConstraints.gridx = 0;
-      reg_passwordlabelConstraints.gridy = 0;
-      reg_passwordlabelConstraints.insets = new Insets( 10, 0, 10, 0 );
-      reg_passwordlabelConstraints.anchor = GridBagConstraints.LINE_START;
-      changePasswordPanel.add( passwordlabel, reg_passwordlabelConstraints );
-      final GridBagConstraints reg_passwordFieldConstraints = new GridBagConstraints();
-      reg_passwordFieldConstraints.gridx = 1;
-      reg_passwordFieldConstraints.gridy = 0;
-      reg_passwordFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
-      changePasswordPanel.add( passwordField, reg_passwordFieldConstraints );
-      final GridBagConstraints reg_password2labelConstraints = new GridBagConstraints();
-      reg_password2labelConstraints.gridx = 0;
-      reg_password2labelConstraints.gridy = 1;
-      reg_password2labelConstraints.insets = new Insets( 0, 0, 10, 0 );
-      reg_password2labelConstraints.anchor = GridBagConstraints.LINE_START;
-      changePasswordPanel.add( password2label, reg_password2labelConstraints );
-      final GridBagConstraints reg_password2FieldConstraints = new GridBagConstraints();
-      reg_password2FieldConstraints.gridx = 1;
-      reg_password2FieldConstraints.gridy = 1;
-      reg_password2FieldConstraints.insets = new Insets( 0, 5, 5, 0 );
-      changePasswordPanel.add( password2Field, reg_password2FieldConstraints );
-      final GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
-      passwordCompareLabelConstraints.gridx = 1;
-      passwordCompareLabelConstraints.gridy = 2;
-      passwordCompareLabelConstraints.anchor = GridBagConstraints.LINE_START;
-      passwordCompareLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
-      changePasswordPanel.add( passwordCompareLabel, passwordCompareLabelConstraints );
-      final JPanel buttonPanel = new JPanel( new FlowLayout() );
-      buttonPanel.add( savePasswordButton );
-      buttonPanel.add( pass_abortButton );
-      final GridBagConstraints reg_buttonpanelConstraints = new GridBagConstraints();
-      reg_buttonpanelConstraints.gridx = 0;
-      reg_buttonpanelConstraints.gridy = 3;
-      reg_buttonpanelConstraints.gridwidth = 2;
-      changePasswordPanel.add( buttonPanel, reg_buttonpanelConstraints );
-
-      final Color green = new Color( 33, 122, 34 );
-      final DocumentListener documentListener = new DocumentListener()
-      {
-
-        @Override
-        public void removeUpdate( final DocumentEvent e )
-        {
-          compare();
-        }
-
-        @Override
-        public void insertUpdate( final DocumentEvent e )
-        {
-          compare();
-        }
-
-        @Override
-        public void changedUpdate( final DocumentEvent e )
-        {
-        }
-
-        private void compare()
-        {
-          if ( passwordField.getPassword() == null || passwordField.getPassword().length == 0
-              || password2Field.getPassword() == null || password2Field.getPassword().length == 0 )
-          {
-            passwordCompareLabel.setText( "" );
-            passwordCompareLabel.setForeground( Color.black );
-          }
-          else
-          {
-            if ( String.valueOf( passwordField.getPassword() )
-                .equals( String.valueOf( password2Field.getPassword() ) ) )
-            {
-              passwordCompareLabel.setText( "Die Passwörter stimmen überein." );
-              passwordCompareLabel.setForeground( green );
-            }
-            else
-            {
-              passwordCompareLabel.setText( "Die Passwörter stimmen nicht überein." );
-              passwordCompareLabel.setForeground( Color.red );
-            }
-          }
-        }
-      };
-      pass_abortButton.addActionListener( e ->
-      {
-        changePasswordFrame.dispose();
-        getRootPane().setDefaultButton( loginButton );
-        validateLoginResult( LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD );
-      } );
-      savePasswordButton.addActionListener( e ->
-      {
-        final boolean isPasswordOrUserNameIncorrect = passwordField.getPassword() == null
-            || passwordField.getPassword().length == 0 || password2Field.getPassword() == null
-            || password2Field.getPassword().length == 0;
-
-        if ( isPasswordOrUserNameIncorrect )
-        {
-          JOptionPane.showMessageDialog( changePasswordFrame, "Passwort ist nicht zulässig.",
-              "Passwort ändern", JOptionPane.WARNING_MESSAGE );
-        }
-        else if ( !String.valueOf( passwordField.getPassword() )
-            .equals( String.valueOf( password2Field.getPassword() ) ) )
-        {
-          JOptionPane.showMessageDialog( changePasswordFrame, "Die Passwörter stimmen nicht überein.",
-              "Passwort ändern", JOptionPane.WARNING_MESSAGE );
-        }
-        else
-        {
-          final char[] password = passwordField.getPassword();
-          final int reply = JOptionPane.showConfirmDialog( changePasswordFrame,
-              "Wollen Sie wirklich das neue Passwort spechern?", "Passwort ändern",
-              JOptionPane.INFORMATION_MESSAGE );
-          if ( reply == JOptionPane.YES_OPTION )
-          {
-            ServerCommunication.getInstance().changePassword( getHash( String.valueOf( password ) ) );
-            ServerCommunication.getInstance().startDrinkInfoTimer();
-            cache.setUsername( currentUsername );
-            generateSessionID( currentUsername );
-            changePasswordFrame.dispose();
-            dispose();
-            final Mainframe mainframe = Mainframe.getInstance();
-            mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
-            mainframe.setVisible( true );
-            ServerCommunication.getInstance().tellServerToSendDrinkInformations();
-            ServerCommunication.getInstance().getBalance();
-            ServerCommunication.getInstance().tellServerToSendHistoryData();
-            mainframe.requestFocus();
-          }
-        }
-      } );
-
-      password2Field.getDocument().addDocumentListener( documentListener );
-      passwordField.getDocument().addDocumentListener( documentListener );
-
-      getRootPane().setDefaultButton( savePasswordButton );
-      changePasswordFrame.add( changePasswordPanel );
-      changePasswordFrame.pack();
-      changePasswordFrame.setResizable( false );
-      changePasswordFrame.setSize( changePasswordFrame.getWidth() + 30, changePasswordFrame.getHeight() + 20 );
-      changePasswordFrame.setLocationRelativeTo( Login.this );
-      changePasswordFrame.setIconImage(
-          Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
-      changePasswordFrame.setVisible( true );
+      new NewPasswordRequestDialog();
     }
     else
     {
@@ -755,18 +366,18 @@ public class Login extends JFrame
     }
   }
 
-  /**
-   * Wenn bei der Registrierung ein Fehler aufgetreten ist, so wird dieser dem
-   * Nutzer angezeigt.
-   *
-   * @param registrationResult Die Antwort des Servers auf die Registrierung.
-   */
-  void validateRegistartionResult( final String registrationResult )
+  public void newPasswordHasBeenSet()
   {
-    if ( !registrationResult.equals( "Registrierung erfolgreich." ) )
-    {
-      JOptionPane.showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(), registrationResult,
-          "Registrierung fehlgeschlagen", JOptionPane.ERROR_MESSAGE, null );
-    }
+    cache.setUsername( currentUsername );
+    generateSessionID( currentUsername );
+    GUIObjects.loginFrame = null;
+    dispose();
+    final Mainframe mainframe = Mainframe.getInstance();
+    mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
+    mainframe.setVisible( true );
+    ServerCommunication.getInstance().tellServerToSendDrinkInformations();
+    ServerCommunication.getInstance().getBalance();
+    ServerCommunication.getInstance().tellServerToSendHistoryData();
+    mainframe.requestFocus();
   }
 }

@@ -94,7 +94,7 @@ class Main
 
   private static void showLogin()
   {
-    final Login login = Login.getInstance();
+    final Login login = new Login();
     MeMateUIManager.setUISettings();
     login.setVisible( true );
     Compare.checkVersion();

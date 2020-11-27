@@ -32,6 +32,7 @@ import javax.swing.JOptionPane;
 
 import com.isp.memate.Shared.Operation;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 
 /**
  * Die Klasse ServerCommunication kommuniziert mit dem Server und schickt
@@ -87,7 +88,7 @@ class ServerCommunication
     catch ( final Exception __ )
     {
       ClientLog.newLog( "Der Server konnte nicht gefunden werden " + __.getMessage() );
-      JOptionPane.showMessageDialog( Login.getInstance(),
+      JOptionPane.showMessageDialog( GUIObjects.loginFrame,
           "Es konnte kein Server gefunden werden. Bitte stelle sicher, dass der Server an ist",
           "Server nicht gefunden", JOptionPane.ERROR_MESSAGE, null );
       System.exit( 1 );
@@ -153,13 +154,13 @@ class ServerCommunication
               }
               break;
             case LOGIN_RESULT:
-              Login.getInstance().validateLoginResult( shared.loginResult );
+              GUIObjects.loginFrame.validateLoginResult( shared.loginResult );
               break;
             case GET_BALANCE_RESULT:
               Mainframe.getInstance().updateBalanceLabel( shared.userBalance );
               break;
             case REGISTRATION_RESULT:
-              Login.getInstance().validateRegistartionResult( shared.registrationResult );
+              GUIObjects.registrationFrame.validateRegistartionResult( shared.registrationResult );
               break;
             case GET_HISTORY:
               cache.setHistory( shared.history );

@@ -276,7 +276,7 @@ public class Mainframe extends JFrame
         ClientLog.newLog( exception.getMessage() );
       }
       dispose();
-      final Login login = Login.getInstance();
+      final Login login = new Login();
       login.setVisible( true );
       logoutButton.setBackground( bar.getBackground() );
     } );
