@@ -26,6 +26,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -88,14 +89,14 @@ class CreditHistory extends JPanel
     };
     try
     {
-      Mainframe.getInstance().removeComponentListener( creditResizeListener );
+      GUIObjects.mainframe.removeComponentListener( creditResizeListener );
     }
     catch ( final Exception exception )
     {
       ClientLog.newLog( "Der ComponentListener konnte nicht entfernt werden." );
       ClientLog.newLog( exception.getMessage() );
     }
-    Mainframe.getInstance().addComponentListener( creditResizeListener );
+    GUIObjects.mainframe.addComponentListener( creditResizeListener );
   }
 
   /**

@@ -49,8 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.isp.memate.Shared.Operation;
 import com.isp.memate.util.ClientLog;
-import com.isp.memate.util.DarkSpinnerUI;
-import com.isp.memate.util.DaySpinnerUI;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -305,20 +304,6 @@ class DrinkManagerDialog
    */
   void showEditDialog( final String drink )
   {
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      drinkPriceSpinner.setUI( new DarkSpinnerUI() );
-      drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-      drinkPriceSpinner
-          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor(), 1 ) );
-    }
-    else
-    {
-      drinkPriceSpinner.setUI( new DaySpinnerUI() );
-      drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDayColor() );
-      drinkPriceSpinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
-    }
-    MeMateUIManager.registerSpinner( drinkPriceSpinner );
     dialog.setTitle( "Getränk bearbeiten" );
     confirmButton.setText( "Speichern" );
     final String oldName = drink;
@@ -396,7 +381,7 @@ class DrinkManagerDialog
           ServerCommunication.getInstance().updateDrinkInformations( id, Operation.UPDATE_DRINKNAME, newName );
         }
         dialog.dispose();
-        Mainframe.getInstance().getDrinkManager().updateList();
+        GUIObjects.mainframe.getDrinkManager().updateList();
       }
     } );
     final Dimension oldPreferredSize = dialog.getPreferredSize();
@@ -416,18 +401,11 @@ class DrinkManagerDialog
     {
       pictureLabel.setIcon( new ImageIcon( new ImageIcon( getClass().getClassLoader().getResource( "placeholder2.png" ) ).getImage()
           .getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
-      drinkPriceSpinner.setUI( new DarkSpinnerUI() );
-      drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-      drinkPriceSpinner
-          .setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor(), 1 ) );
     }
     else
     {
       pictureLabel.setIcon( new ImageIcon( new ImageIcon( getClass().getClassLoader().getResource( "placeholder.png" ) ).getImage()
           .getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
-      drinkPriceSpinner.setUI( new DaySpinnerUI() );
-      drinkPriceSpinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDayColor() );
-      drinkPriceSpinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
     }
     MeMateUIManager.registerSpinner( drinkPriceSpinner );
     dialog.setTitle( "Getränk hinzufügen" );
@@ -476,7 +454,7 @@ class DrinkManagerDialog
         ServerCommunication.getInstance()
             .registerNewDrink( new Drink( name, price, drinkPicturePath, -1, bytes, 0, false, null ) );
         dialog.dispose();
-        Mainframe.getInstance().getDrinkManager().updateList();
+        GUIObjects.mainframe.getDrinkManager().updateList();
       }
     } );
     final Dimension oldPreferredSize = dialog.getPreferredSize();
@@ -758,12 +736,6 @@ class DrinkManagerDialog
       carbsLabel.setForeground( Color.white );
       sugarLabel.setForeground( Color.white );
       amountLabel.setForeground( Color.white );
-      for ( final JSpinner spinner : spinnerList )
-      {
-        spinner.setUI( new DarkSpinnerUI() );
-        spinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDarkColor() );
-        spinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDarkColor(), 1 ) );
-      }
     }
     else
     {
@@ -778,12 +750,6 @@ class DrinkManagerDialog
       amountLabel.setForeground( Color.black );
       carbsLabel.setForeground( Color.black );
       sugarLabel.setForeground( Color.black );
-      for ( final JSpinner spinner : spinnerList )
-      {
-        spinner.setUI( new DaySpinnerUI() );
-        spinner.setBackground( MeMateUIManager.getBackground( "spinner" ).getDayColor() );
-        spinner.setBorder( BorderFactory.createLineBorder( MeMateUIManager.getBackground( "spinner" ).getDayColor().darker(), 1 ) );
-      }
     }
   }
 }

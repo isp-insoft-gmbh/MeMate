@@ -4,6 +4,8 @@
 package com.isp.memate;
 
 import java.awt.BorderLayout;
+import java.util.Arrays;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -11,13 +13,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import com.isp.memate.ServerCommunication.dateType;
-import com.isp.memate.util.MeMateUIManager;
+import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 
 /**
  * In der Historie soll der Nutzer alle bisherigen Buchungen sehen, egal ob er etwas
@@ -28,44 +30,47 @@ import com.isp.memate.util.MeMateUIManager;
  * @author nwe
  * @since 15.10.2019
  */
-class History extends JPanel
+public class History extends JPanel
 {
-  private final String[]    columnNames  = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
-  private final JScrollPane scrollPane   = new JScrollPane();
-  private JTable            historyTable = new JTable();
+  private static final long serialVersionUID = 1101621387826893800L;
+  private final String[]    columnNames      = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
+  private JScrollPane       scrollPane;
   private DefaultTableModel tableModel;
+  private JTable            historyTable;
+  private String[][]        historyData;
 
-
-  /**
-   * Erzeugt einen Table mit einigen Einstellungen und setzt diesen Table in ein Scrollpane.
-   */
   public History()
   {
-    super( new BorderLayout() );
+    GUIObjects.history = this;
+    initComponents();
+    setLayout( new BorderLayout() );
+    add( scrollPane, BorderLayout.CENTER );
+  }
+
+  private void initComponents()
+  {
+    historyTable = new JTable();
     historyTable.setAutoCreateRowSorter( true );
     historyTable.setShowGrid( false );
+
     JTableHeader header = historyTable.getTableHeader();
     header.setOpaque( false );
     header.setReorderingAllowed( false );
     historyTable.setRowHeight( 30 );
+
+    scrollPane = new JScrollPane();
     scrollPane.setBorder( BorderFactory.createEmptyBorder() );
     scrollPane.setViewportView( historyTable );
-    add( scrollPane, BorderLayout.CENTER );
-
-    historyTable.setSelectionBackground( UIManager.getColor( "AppColor" ) );
-    MeMateUIManager.registerPanel( "default", this );
-    MeMateUIManager.registerTable( "table", historyTable );
-    MeMateUIManager.registerScrollPane( "scroll", scrollPane );
+    historyData = Cache.getInstance().getHistory( dateType.MIDDLE );
+    applyTableModel();
   }
 
-  /**
-   * Sollte man selber oder ein anderer Nutzer etwas machen, so kann mit dieser
-   * Methode die History von Außen geupdated werden.
-   */
-  void updateHistory()
+  private void applyTableModel()
   {
-    tableModel = new DefaultTableModel( Cache.getInstance().getHistory( dateType.MIDDLE ), columnNames )
+    tableModel = new DefaultTableModel( historyData, columnNames )
     {
+      private static final long serialVersionUID = 5784707478211745948L;
+
       @Override
       public boolean isCellEditable( int row, int column )
       {
@@ -73,6 +78,11 @@ class History extends JPanel
       }
     };
     historyTable.setModel( tableModel );
+    applyCellRenderer();
+  }
+
+  private void applyCellRenderer()
+  {
     historyTable.getColumnModel().getColumn( 0 ).setHeaderRenderer( new HorizontalAlignmentHeaderRenderer( SwingConstants.CENTER ) );
     DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
     centerRenderer.setHorizontalAlignment( JLabel.CENTER );
@@ -81,5 +91,12 @@ class History extends JPanel
     historyTable.getColumnModel().getColumn( 2 ).setCellRenderer( centerRenderer );
     historyTable.getColumnModel().getColumn( 3 ).setCellRenderer( centerRenderer );
     historyTable.getColumnModel().getColumn( 4 ).setCellRenderer( centerRenderer );
+  }
+
+  //TODO(nwe | 02.12.2020): Sobald der Client neue History-Daten vom Server erhält soll er diese analysieren und wenn es Unterscheide gibt, dann soll die historytable automatisch geupdatet werden, wenn die View bereits geöffnet wurde
+  void updateTableModel( String[][] historyData )
+  {
+    this.historyData = historyData;
+    applyTableModel();
   }
 }

@@ -157,7 +157,7 @@ class ServerCommunication
               GUIObjects.loginFrame.validateLoginResult( shared.loginResult );
               break;
             case GET_BALANCE_RESULT:
-              Mainframe.getInstance().updateBalanceLabel( shared.userBalance );
+              GUIObjects.mainframe.updateBalanceLabel( shared.userBalance );
               break;
             case REGISTRATION_RESULT:
               GUIObjects.registrationFrame.validateRegistartionResult( shared.registrationResult );
@@ -180,16 +180,16 @@ class ServerCommunication
               {
                 break;
               }
-              Mainframe.getInstance().setHelloLabel( displayname );
+              GUIObjects.mainframe.setHelloLabel( displayname );
               tellServerToSendDrinkInformations();
               getBalance();
               break;
             case PRICE_CHANGED:
-              Mainframe.getInstance().getDashboard().showPriceChangedDialog( shared.drinkPrice.name,
+              GUIObjects.mainframe.getDashboard().showPriceChangedDialog( shared.drinkPrice.name,
                   shared.drinkPrice.price );
               break;
             case NO_MORE_DRINKS_AVAIBLE:
-              Mainframe.getInstance().getDashboard().showNoMoreDrinksDialog( shared.consumedDrink );
+              GUIObjects.mainframe.getDashboard().showNoMoreDrinksDialog( shared.consumedDrink );
               break;
             case PIGGYBANK_BALANCE:
               cache.setPiggyBankBalance( shared.userBalance );
@@ -199,7 +199,10 @@ class ServerCommunication
               break;
             case GET_DISPLAYNAME:
               displayname = shared.displayname;
-              Mainframe.getInstance().setHelloLabel( displayname );
+              if ( displayname != null )
+              {
+                GUIObjects.mainframe.setHelloLabel( displayname );
+              }
               break;
             case GET_USERS_DISPLAYNAMES:
               cache.setDisplayNamesArray( shared.displaynames );
@@ -414,7 +417,7 @@ class ServerCommunication
     try
     {
       outStream.writeObject( new Shared( Operation.UNDO, null ) );
-      Mainframe.getInstance().setUndoButtonEnabled( false );
+      GUIObjects.mainframe.setUndoButtonEnabled( false );
     }
     catch ( final IOException exception )
     {
@@ -425,7 +428,7 @@ class ServerCommunication
   private void showErrorDialog( final String message, final String title )
   {
     ClientLog.newLog( message );
-    JOptionPane.showMessageDialog( Mainframe.getInstance(), message, title, JOptionPane.ERROR_MESSAGE, null );
+    JOptionPane.showMessageDialog( GUIObjects.mainframe, message, title, JOptionPane.ERROR_MESSAGE, null );
   }
 
 

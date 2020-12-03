@@ -37,6 +37,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.Util;
 
@@ -57,7 +58,7 @@ class Adminview extends JPanel
       MeMateUIManager.createIconButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "password_white.png" ) ),
           new ImageIcon( getClass().getClassLoader().getResource( "password_black.png" ) ) );
   private final JButton    setAdminBalanceButton = MeMateUIManager.createButton( "button" );
-  private final JDialog    passwordFrame         = new JDialog( Mainframe.getInstance() );
+  private final JDialog    passwordFrame         = new JDialog( GUIObjects.mainframe );
   private final JLabel     piggyBankLabel        = MeMateUIManager.createJLabel();
   private final JPanel     upperPanel            = MeMateUIManager.createJPanel();
   private final JPanel     upperUpperPanel       = MeMateUIManager.createJPanel();
@@ -136,7 +137,7 @@ class Adminview extends JPanel
         }
         else
         {
-          JOptionPane.showMessageDialog( Mainframe.getInstance(), "Bitte geben Sie einen gültigen Wert an." );
+          JOptionPane.showMessageDialog( GUIObjects.mainframe, "Bitte geben Sie einen gültigen Wert an." );
         }
       }
 
@@ -217,12 +218,12 @@ class Adminview extends JPanel
       saveButton.addActionListener( e1 ->
       {
         ServerCommunication.getInstance().changePassword( String.valueOf( userComboBox.getSelectedItem() ),
-           Util.getHash( passwordField.getText() ) );
+            Util.getHash( passwordField.getText() ) );
         passwordFrame.dispose();
       } );
       passwordFrame.add( passwordPanel );
       passwordFrame.setSize( 300, 160 );
-      passwordFrame.setLocationRelativeTo( Mainframe.getInstance() );
+      passwordFrame.setLocationRelativeTo( GUIObjects.mainframe );
       passwordFrame.setVisible( true );
       passwordFrame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
     } );

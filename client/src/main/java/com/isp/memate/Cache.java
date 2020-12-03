@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 
 public class Cache
 {
@@ -248,9 +249,9 @@ public class Cache
       if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap )
           || !byteImageList.equals( oldByteImageList ) || !amountMap.equals( oldAmountMap ) )
       {
-        Mainframe.getInstance().updateDashboard();
+        GUIObjects.mainframe.updateDashboard();
       }
-      Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
+      GUIObjects.mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
     }
     catch ( final Exception exception )
     {

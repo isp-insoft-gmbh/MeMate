@@ -41,6 +41,7 @@ import org.jfree.data.xy.XYDataset;
 
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 
 
@@ -244,14 +245,14 @@ class ConsumptionRate extends JPanel
 
     try
     {
-      Mainframe.getInstance().removeComponentListener( rateResizeListener );
+      GUIObjects.mainframe.removeComponentListener( rateResizeListener );
     }
     catch ( final Exception exception )
     {
       ClientLog.newLog( "Der ComponentListener konnte nicht entfernt werden." );
       ClientLog.newLog( exception.getMessage() );
     }
-    Mainframe.getInstance().addComponentListener( rateResizeListener );
+    GUIObjects.mainframe.addComponentListener( rateResizeListener );
   }
 
   /**

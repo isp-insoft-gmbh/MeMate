@@ -45,6 +45,7 @@ class Main
     installColorKeys();
     applyTheme();
     setUIDefaults();
+    MeMateUIManager.putIconsInUIManager();
     FlatUIDefaultsInspector.install( "X" );
     ServerCommunication serverCommunication = ServerCommunication.getInstance();
     Cache cache = Cache.getInstance();
@@ -79,7 +80,7 @@ class Main
       }
       else
       {
-        final Mainframe mainframe = Mainframe.getInstance();
+        final Mainframe mainframe = new Mainframe();
         mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         mainframe.setVisible( true );
         mainframe.addActionBar();
@@ -138,6 +139,7 @@ class Main
     UIManager.put( "CheckBox.icon.focusedBorderColor", mainColor );
     UIManager.put( "CheckBox.icon.selectedFocusedBorderColor", mainColor );
     UIManager.put( "Component.focusedBorderColor", mainColor );
+    UIManager.put( "Table.selectionBackground", mainColor );
     //    UIManager.put( "Button.default.focusedBorderColor", mainColor.brighter() );
     //    UIManager.put( "Button.default.background", mainColor.darker() );
     //    UIManager.put( "Button.default.borderColor", mainColor );

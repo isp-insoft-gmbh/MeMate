@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -79,12 +80,40 @@ public class MeMateUIManager
   private static final Border                                  DEFAULT_BORDER      =
       BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER,
           BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
+  static ClassLoader                                           classLoader         = MeMateUIManager.class.getClassLoader();
 
   private static boolean darkModeState = false;
 
   public static void setDarkModeState( boolean darkModeState )
   {
     MeMateUIManager.darkModeState = darkModeState;
+  }
+
+  public static void putIconsInUIManager()
+  {
+    UIManager.put( "dashboard.icon.black", getIcon( "dashboard_black.png" ) );
+    UIManager.put( "dashboard.icon.white", getIcon( "dashboard_white.png" ) );
+    UIManager.put( "adminview.icon.black", getIcon( "adminview_black.png" ) );
+    UIManager.put( "adminview.icon.white", getIcon( "adminview_white.png" ) );
+    UIManager.put( "logout.icon.black", getIcon( "logout_black_24.png" ) );
+    UIManager.put( "logout.icon.white", getIcon( "logout_white_24.png" ) );
+    UIManager.put( "history.icon.black", getIcon( "history_black.png" ) );
+    UIManager.put( "history.icon.white", getIcon( "history_white.png" ) );
+    UIManager.put( "social.icon.black", getIcon( "social_black.png" ) );
+    UIManager.put( "social.icon.white", getIcon( "social_white.png" ) );
+    UIManager.put( "undo.icon.black", getIcon( "back_black.png" ) );
+    UIManager.put( "undo.icon.white", getIcon( "back_white.png" ) );
+    UIManager.put( "drinkmanager.icon.black", getIcon( "drinkmanager_black.png" ) );
+    UIManager.put( "drinkmanager.icon.white", getIcon( "drinkmanager_white.png" ) );
+    UIManager.put( "consumption.icon.black", getIcon( "consumption_black.png" ) );
+    UIManager.put( "consumption.icon.white", getIcon( "consumption_white.png" ) );
+    UIManager.put( "creditHistory.icon.black", getIcon( "creditHistory_black.png" ) );
+    UIManager.put( "creditHistory.icon.white", getIcon( "creditHistory_white.png" ) );
+  }
+
+  private static Icon getIcon( String string )
+  {
+    return new ImageIcon( classLoader.getResource( string ) );
   }
 
   /**
@@ -574,10 +603,7 @@ public class MeMateUIManager
       updateTextPane( key );
       updateCheckBox( key );
       updateTable( key );
-      updateScrollPane( key );
       updateSeperator( key );
-      updateSpinner( key );
-      updateComboBox( key );
       updateActionBarButtons( key );
     }
     updateGraphs();
@@ -684,17 +710,6 @@ public class MeMateUIManager
     }
   }
 
-  public static void updateScrollPane( final String key )
-  {
-    for ( final JScrollPane scrollPane : scrollPaneList.get( key ) )
-    {
-      scrollPane.setBackground(
-          darkModeState ? backgroundMap.get( key ).getDarkColor().brighter() : backgroundMap.get( key ).getDayColor().darker() );
-      scrollPane.getVerticalScrollBar().setUI( darkModeState ? new DarkScrollBarUI() : new BrightScrollBarUI() );
-      scrollPane.getViewport()
-          .setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
-    }
-  }
 
   public static void updateActionBarButtons( final String key )
   {
@@ -708,29 +723,6 @@ public class MeMateUIManager
               .setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() ),
           () -> button.setBackground(
               darkModeState ? backgroundMap.get( key ).getDarkColor().darker() : backgroundMap.get( key ).getDayColor().darker() ) ) );
-    }
-  }
-
-  public static void updateComboBox( final String key )
-  {
-    for ( final JComboBox<String> comboBox : comboBoxList.get( key ) )
-    {
-      comboBox.setUI( darkModeState ? new DarkComboBoxUI() : new DayComboBoxUI() );
-      comboBox.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
-      comboBox.setForeground( darkModeState ? foregroundMap.get( key ).getDarkColor() : foregroundMap.get( key ).getDayColor() );
-      comboBox.setBorder( darkModeState ? BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor(), 1 )
-          : BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
-    }
-  }
-
-  public static void updateSpinner( final String key )
-  {
-    for ( final JSpinner spinner : spinnerList.get( key ) )
-    {
-      spinner.setUI( darkModeState ? new DarkSpinnerUI() : new DaySpinnerUI() );
-      spinner.setBackground( darkModeState ? backgroundMap.get( key ).getDarkColor() : backgroundMap.get( key ).getDayColor() );
-      spinner.setBorder( darkModeState ? BorderFactory.createLineBorder( backgroundMap.get( key ).getDarkColor(), 1 )
-          : BorderFactory.createLineBorder( backgroundMap.get( key ).getDayColor().darker(), 1 ) );
     }
   }
 

@@ -304,7 +304,7 @@ public class Login extends JFrame
       generateSessionID( currentUsername );
       GUIObjects.loginFrame = null;
       dispose();
-      final Mainframe mainframe = Mainframe.getInstance();
+      final Mainframe mainframe = new Mainframe();
       mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
       mainframe.addActionBar();
       mainframe.setVisible( true );
@@ -372,7 +372,7 @@ public class Login extends JFrame
     generateSessionID( currentUsername );
     GUIObjects.loginFrame = null;
     dispose();
-    final Mainframe mainframe = Mainframe.getInstance();
+    final Mainframe mainframe = new Mainframe();
     mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
     mainframe.setVisible( true );
     ServerCommunication.getInstance().tellServerToSendDrinkInformations();

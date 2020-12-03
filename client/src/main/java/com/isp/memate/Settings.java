@@ -39,6 +39,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.ToggleSwitch;
 import com.isp.memate.util.Util;
@@ -155,7 +156,7 @@ class Settings extends JPanel
 
   private void showPasswordChangeDialog()
   {
-    final JDialog changePasswordFrame = new JDialog( Mainframe.getInstance(), "Passwort ändern", true );
+    final JDialog changePasswordFrame = new JDialog( GUIObjects.mainframe, "Passwort ändern", true );
     final JPanel changePasswordPanel = new JPanel( new GridBagLayout() );
     final JLabel passwordlabel = new JLabel( "Passwort:" );
     final JLabel password2label = new JLabel( "Passwort wiederholen:" );
@@ -301,7 +302,7 @@ class Settings extends JPanel
 
   private void showDisplayNameChangeDialog()
   {
-    final JDialog changeDisplayNameFrame = new JDialog( Mainframe.getInstance(), "Anzeigenamen ändern", true );
+    final JDialog changeDisplayNameFrame = new JDialog( GUIObjects.mainframe, "Anzeigenamen ändern", true );
     final JPanel changeDisplayNamePanel = new JPanel( new GridBagLayout() );
     final JLabel displayNamelabel = new JLabel( "Anzeigename:" );
     final JTextField displayNameField = MeMateUIManager.createJTextField();
@@ -556,7 +557,7 @@ class Settings extends JPanel
           ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
           ClientLog.newLog( exception1.getMessage() );
         }
-        Mainframe.getInstance().bar.showDarkmode();
+        GUIObjects.mainframe.bar.showDarkmode();
       }
       else
       {
@@ -580,7 +581,7 @@ class Settings extends JPanel
           ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
           ClientLog.newLog( exception2.getMessage() );
         }
-        Mainframe.getInstance().bar.showDaymode();
+        GUIObjects.mainframe.bar.showDaymode();
       }
     };
     daymodeButton.addActionListener( toggleDarkModeListener );
@@ -760,12 +761,12 @@ class Settings extends JPanel
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
     MeMateUIManager.installDefaults();
     MeMateUIManager.setUISettings();
-    Mainframe.getInstance().headerPanel.setBackground( appColor );
-    Mainframe.getInstance().settingsButton.selected();
+    GUIObjects.mainframe.headerPanel.setBackground( appColor );
+    GUIObjects.mainframe.settingsButton.selected();
     if ( MeMateUIManager.getDarkModeState() )
     {
-      Mainframe.getInstance().bar.setBackground( actionbar );
-      Mainframe.getInstance().burgerButton.setBackground( actionbar );
+      GUIObjects.mainframe.bar.setBackground( actionbar );
+      GUIObjects.mainframe.burgerButton.setBackground( actionbar );
     }
     try
     {

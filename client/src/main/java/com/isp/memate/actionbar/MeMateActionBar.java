@@ -297,28 +297,28 @@ public class MeMateActionBar extends JPanel
   }
 
   @SuppressWarnings( "javadoc" )
-  public MeMateActionBarButton addActionButton( final Icon icon, final Icon pressedIcon, final String title, final String tooltip,
+  public MeMateActionBarButton addActionButton( final Icon iconBlack, final Icon iconWhite, final String title, final String tooltip,
                                                 final Runnable runnable )
   {
-    return addActionButton( icon, pressedIcon, title, tooltip, null, runnable );
+    return addActionButton( iconBlack, iconWhite, title, tooltip, null, runnable );
   }
 
   /**
    * Fügt der Actionbar einen neuen Button hinzu.
    * 
-   * @param icon Icon
-   * @param pressedIcon pressed Icon
+   * @param iconBlack Icon
+   * @param iconWhite pressed Icon
    * @param title Title
    * @param tooltip ToolTip
    * @param markerColor MarkerColor
    * @param runnable Action, welche der Button ausführen soll.
    * @return button
    */
-  public MeMateActionBarButton addActionButton( final Icon icon, final Icon pressedIcon, final String title, final String tooltip,
+  public MeMateActionBarButton addActionButton( final Icon iconBlack, final Icon iconWhite, final String title, final String tooltip,
                                                 final Color markerColor, final Runnable runnable )
   {
     final MeMateActionBarButton button =
-        new MeMateActionBarButton( title, tooltip, icon, pressedIcon, backgroundColor, foregoundColor, markerColor, runnable );
+        new MeMateActionBarButton( title, tooltip, iconBlack, iconWhite, backgroundColor, foregoundColor, markerColor, runnable );
 
     button.addMouseListener( new MeMateActionBarListener( button,
         () -> button.setBackground( backgroundColor ),

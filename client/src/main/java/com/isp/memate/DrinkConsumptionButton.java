@@ -46,6 +46,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.InfoIcon;
 import com.isp.memate.util.MeMateUIManager;
 
@@ -613,7 +614,7 @@ class DrinkConsumptionButton extends JPanel
    */
   private void askWhetherToReallyConsume( final String drinkName, final ActionListener abortButtonListener )
   {
-    Mainframe.getInstance().getDashboard().resetAllDrinkButtons();
+    GUIObjects.mainframe.getDashboard().resetAllDrinkButtons();
     infoButton.setVisible( false );
     fillPanel.setVisible( false );
     askWhetherToReallyConsumeLabelIsActive = true;
@@ -665,7 +666,7 @@ class DrinkConsumptionButton extends JPanel
           abortButton.addActionListener( abortButtonListener );
           DrinkConsumptionButton.this.addMouseListener( mouseListener );
           DrinkConsumptionButton.this.addKeyListener( keyListener );
-          Mainframe.getInstance().setUndoButtonEnabled( true );
+          GUIObjects.mainframe.setUndoButtonEnabled( true );
           fillPanel.setVisible( true );
           infoButton.setVisible( true );
           askWhetherToReallyConsumeLabelIsActive = false;

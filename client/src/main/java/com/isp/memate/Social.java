@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -34,22 +35,28 @@ import com.isp.memate.util.MeMateUIManager;
  * 
  * @author nwe
  * @since 11.02.2020
- *
  */
-class Social extends JPanel
+public class Social extends JPanel
 {
-  private static JPanel mainPanel             = MeMateUIManager.createJPanel();
-  private static JPanel scoreBoardPanel       = MeMateUIManager.createJPanel();
-  private static JPanel weeklyScoreBoardPanel = MeMateUIManager.createJPanel();
-  private static JPanel activityPanel         = MeMateUIManager.createJPanel();
-  static Cache          cache                 = Cache.getInstance();
-
+  private static final long serialVersionUID = -4292950786301333060L;
+  private static JPanel     mainPanel, scoreBoardPanel, weeklyScoreBoardPanel, activityPanel;
+  static Cache              cache            = Cache.getInstance();
 
   public Social()
   {
+    GUIObjects.social = this;
+    initComponents();
     setLayout( new BorderLayout() );
     mainPanel.setLayout( new GridBagLayout() );
     add( mainPanel, BorderLayout.CENTER );
+  }
+
+  private void initComponents()
+  {
+    mainPanel = new JPanel();
+    scoreBoardPanel = new JPanel();
+    weeklyScoreBoardPanel = new JPanel();
+    activityPanel = new JPanel();
   }
 
   void update()

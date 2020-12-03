@@ -23,6 +23,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.InfoIcon;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
@@ -106,7 +107,7 @@ class Dashboard extends JPanel
         final ServerCommunication sc = ServerCommunication.getInstance();
         sc.addBalance( (int) value );
         ServerCommunication.getInstance().getBalance();
-        Mainframe.getInstance().setUndoButtonEnabled( true );
+        GUIObjects.mainframe.setUndoButtonEnabled( true );
       }
     } );
 
