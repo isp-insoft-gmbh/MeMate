@@ -82,12 +82,11 @@ class Dashboard extends JPanel
    */
   private JPanel createLowerPanel()
   {
-    final JPanel panel = MeMateUIManager.createJPanel();
+    final JPanel panel = new JPanel();
     final SpinnerNumberModel spinnerModel = new SpinnerNumberModel( 1, -50, 1000, 1 );
     final JSpinner valueSpinner = new JSpinner( spinnerModel );
-    MeMateUIManager.registerSpinner( valueSpinner );
 
-    final JButton aufladenButton = MeMateUIManager.createButton( "button" );
+    final JButton aufladenButton = new JButton( "button" );
     aufladenButton.setText( "Einzahlen" );
     aufladenButton.addActionListener( e ->
     {
@@ -99,25 +98,29 @@ class Dashboard extends JPanel
         description = "<html>Wollen Sie wirklich <b>" + (int) value * -1 + "€</b> aus der Kasse nehmen?";
         title = "Geld leihen";
       }
+      if ( (int) value != 0 )
+      {
+
       final int result =
           JOptionPane.showConfirmDialog( Dashboard.this, description,
-              title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE );
+              title, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE );
       if ( result == JOptionPane.YES_OPTION )
       {
         final ServerCommunication sc = ServerCommunication.getInstance();
         sc.addBalance( (int) value );
         ServerCommunication.getInstance().getBalance();
         GUIObjects.mainframe.setUndoButtonEnabled( true );
+        }
       }
     } );
 
-    final JLabel aufladenlabel = MeMateUIManager.createJLabel();
+    final JLabel aufladenlabel = new JLabel();
     final String infoText1 =
         "Einzahlung sind nur in Höhe von gültigen Kombination von 1€ und 2€ Münzen, 5€ Scheinen, 10€ Scheinen und 20€ Scheinen möglich.";
     final String infoText2 =
         "Einmal eingezahltes Guthaben kann nicht wieder ausgezahlt werden und muss durch den Konsum von Getränken aufgebraucht werden.";
-    final JLabel infoTextLabel1 = MeMateUIManager.createJLabel();
-    final JLabel infoTextLabel2 = MeMateUIManager.createJLabel();
+    final JLabel infoTextLabel1 = new JLabel();
+    final JLabel infoTextLabel2 = new JLabel();
     aufladenlabel.setText( "Kontostand aufladen" );
     infoTextLabel1.setText( infoText1 );
     infoTextLabel2.setText( infoText2 );
@@ -159,7 +162,7 @@ class Dashboard extends JPanel
   private JPanel createDrinkButtonPanel()
   {
     buttonList.clear();
-    final JPanel panel = MeMateUIManager.createJPanel();
+    final JPanel panel = new JPanel();
     panel.setLayout( new WrapLayout( FlowLayout.LEFT ) );
 
     for ( final String drink : cache.getDrinkNames() )

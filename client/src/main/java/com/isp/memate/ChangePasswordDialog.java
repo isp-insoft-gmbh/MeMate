@@ -22,7 +22,7 @@ import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.Util;
 
-public class NewPasswordRequestDialog extends JDialog
+public class ChangePasswordDialog extends JDialog
 {
   private static final long serialVersionUID = -7368383844134207306L;
   private JPanel            mainPanel;
@@ -30,7 +30,7 @@ public class NewPasswordRequestDialog extends JDialog
   private JPasswordField    passwordField, repeatPasswordField;
   private JButton           saveButton, abortButton;
 
-  public NewPasswordRequestDialog()
+  public ChangePasswordDialog()
   {
     initComponents();
     addComponents();
@@ -127,18 +127,21 @@ public class NewPasswordRequestDialog extends JDialog
     abortButton.addActionListener( e ->
     {
       dispose();
-      GUIObjects.loginFrame.validateLoginResult( LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD );
+      if ( GUIObjects.loginFrame != null )
+      {
+        GUIObjects.loginFrame.validateLoginResult( LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD );
+      }
     } );
 
     saveButton.addActionListener( e ->
     {
-      final boolean isPasswordOrUserNameIncorrect = passwordField.getPassword() == null
+      final boolean isPasswordFieldEmpty = passwordField.getPassword() == null
           || passwordField.getPassword().length == 0 || repeatPasswordField.getPassword() == null
           || repeatPasswordField.getPassword().length == 0;
 
-      if ( isPasswordOrUserNameIncorrect )
+      if ( isPasswordFieldEmpty )
       {
-        JOptionPane.showMessageDialog( this, "Passwort ist nicht zulässig.",
+        JOptionPane.showMessageDialog( this, "Beide Passwort-Felder müssen gefüllt sein.",
             "Passwort ändern", JOptionPane.WARNING_MESSAGE );
       }
       else if ( !String.valueOf( passwordField.getPassword() )
@@ -153,13 +156,15 @@ public class NewPasswordRequestDialog extends JDialog
         final int reply = JOptionPane.showConfirmDialog( this,
             "Wollen Sie wirklich das neue Passwort speichern?", "Passwort ändern",
             JOptionPane.INFORMATION_MESSAGE );
-
         if ( reply == JOptionPane.YES_OPTION )
         {
           ServerCommunication.getInstance().changePassword( Util.getHash( String.valueOf( password ) ) );
-          ServerCommunication.getInstance().startDrinkInfoTimer();
+          if ( GUIObjects.loginFrame != null )
+          {
+            ServerCommunication.getInstance().startDrinkInfoTimer();
+            GUIObjects.loginFrame.newPasswordHasBeenSet();
+          }
           dispose();
-          GUIObjects.loginFrame.newPasswordHasBeenSet();
         }
       }
     } );
@@ -193,6 +198,7 @@ public class NewPasswordRequestDialog extends JDialog
     setTitle( "Passwort ändern" );
     setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
     getRootPane().setDefaultButton( saveButton );
+    setModal( true );
     pack();
     setResizable( false );
     setSize( getWidth() + 30, getHeight() + 20 );

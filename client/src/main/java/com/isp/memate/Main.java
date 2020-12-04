@@ -2,6 +2,7 @@ package com.isp.memate;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Insets;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -135,6 +136,7 @@ class Main
   private static void setUIDefaults()
   {
     Color mainColor = UIManager.getColor( "AppColor" );
+    
     //FIXME sobald FlatLaf komplett implemetiert ist, dann als focusFarbe AppColor setzte. AppColor muss also noch voher gesetzt werden.
     UIManager.put( "CheckBox.icon.focusedBorderColor", mainColor );
     UIManager.put( "CheckBox.icon.selectedFocusedBorderColor", mainColor );

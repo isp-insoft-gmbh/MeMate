@@ -50,18 +50,30 @@ import com.isp.memate.util.Util;
  *
  * @author nwe
  * @since 05.03.2020
- *
  */
 class Settings extends JPanel
 {
-  private final JComboBox<String> colorThemeComboBox = new JComboBox<>();
-  private final JRadioButton      daymodeButton      = MeMateUIManager.createRadioButton( "Hell" );
-  private final JRadioButton      darkmodeButton     = MeMateUIManager.createRadioButton( "Dunkel" );
+  private static final long serialVersionUID = 2047235494824375544L;
+  private JComboBox<String> colorThemeComboBox;
+  private JRadioButton      lightmodeButton;
+  private JRadioButton      darkmodeButton;
 
   public Settings()
   {
+    initComponents();
     setLayout( new GridBagLayout() );
-    MeMateUIManager.registerPanel( "default", this );
+    addComponents();
+  }
+
+  private void initComponents()
+  {
+    colorThemeComboBox = new JComboBox<>();
+    lightmodeButton = new JRadioButton( "Hell" );
+    darkmodeButton = new JRadioButton( "Dunkel" );
+  }
+
+  private void addComponents()
+  {
     addColorThemePicker();
     addDarkmodeSettings();
     addMeetingNotification();
@@ -69,9 +81,7 @@ class Settings extends JPanel
     addChangePasswordHyperlink();
     addChangeDisplayNameHyperlink();
     addFiller();
-    MeMateUIManager.setUISettings();
   }
-
 
   private void addFiller()
   {
@@ -88,7 +98,7 @@ class Settings extends JPanel
 
   private void addChangePasswordHyperlink()
   {
-    final JLabel hyperlink = MeMateUIManager.createJLabel();
+    final JLabel hyperlink = new JLabel();
     hyperlink.setText( "Passwort ändern" );
     hyperlink.setFont( hyperlink.getFont().deriveFont( 18f ) );
     hyperlink.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
@@ -97,7 +107,7 @@ class Settings extends JPanel
       @Override
       public void mouseClicked( final MouseEvent e )
       {
-        showPasswordChangeDialog();
+        new ChangePasswordDialog();
       }
 
       @Override
@@ -122,7 +132,7 @@ class Settings extends JPanel
 
   private void addChangeDisplayNameHyperlink()
   {
-    final JLabel hyperlink = MeMateUIManager.createJLabel();
+    final JLabel hyperlink = new JLabel();
     hyperlink.setText( "Anzeigenamen ändern" );
     hyperlink.setFont( hyperlink.getFont().deriveFont( 18f ) );
     hyperlink.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
@@ -154,234 +164,37 @@ class Settings extends JPanel
     add( hyperlink, hyperlinkConstraints );
   }
 
-  private void showPasswordChangeDialog()
-  {
-    final JDialog changePasswordFrame = new JDialog( GUIObjects.mainframe, "Passwort ändern", true );
-    final JPanel changePasswordPanel = new JPanel( new GridBagLayout() );
-    final JLabel passwordlabel = new JLabel( "Passwort:" );
-    final JLabel password2label = new JLabel( "Passwort wiederholen:" );
-    final JLabel passwordCompareLabel = new JLabel();
-    final JPasswordField passwordField = MeMateUIManager.createJPasswordField();
-    final JPasswordField password2Field = MeMateUIManager.createJPasswordField();
-    final JButton savePasswordButton = MeMateUIManager.createButton( "button", "Speichern" );
-    final JButton pass_abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
-
-    changePasswordFrame.getRootPane().setDefaultButton( savePasswordButton );
-
-    final int prefHeight = passwordField.getPreferredSize().height;
-    passwordField.setPreferredSize( new Dimension( 200, prefHeight ) );
-    password2Field.setPreferredSize( new Dimension( 200, prefHeight ) );
-    passwordCompareLabel.setPreferredSize( new Dimension( 200, prefHeight ) );
-
-    final GridBagConstraints reg_passwordlabelConstraints = new GridBagConstraints();
-    reg_passwordlabelConstraints.gridx = 0;
-    reg_passwordlabelConstraints.gridy = 0;
-    reg_passwordlabelConstraints.insets = new Insets( 10, 0, 10, 0 );
-    reg_passwordlabelConstraints.anchor = GridBagConstraints.LINE_START;
-    changePasswordPanel.add( passwordlabel, reg_passwordlabelConstraints );
-    final GridBagConstraints reg_passwordFieldConstraints = new GridBagConstraints();
-    reg_passwordFieldConstraints.gridx = 1;
-    reg_passwordFieldConstraints.gridy = 0;
-    reg_passwordFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
-    changePasswordPanel.add( passwordField, reg_passwordFieldConstraints );
-    final GridBagConstraints reg_password2labelConstraints = new GridBagConstraints();
-    reg_password2labelConstraints.gridx = 0;
-    reg_password2labelConstraints.gridy = 1;
-    reg_password2labelConstraints.insets = new Insets( 0, 0, 10, 0 );
-    reg_password2labelConstraints.anchor = GridBagConstraints.LINE_START;
-    changePasswordPanel.add( password2label, reg_password2labelConstraints );
-    final GridBagConstraints reg_password2FieldConstraints = new GridBagConstraints();
-    reg_password2FieldConstraints.gridx = 1;
-    reg_password2FieldConstraints.gridy = 1;
-    reg_password2FieldConstraints.insets = new Insets( 0, 5, 5, 0 );
-    changePasswordPanel.add( password2Field, reg_password2FieldConstraints );
-    final GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
-    passwordCompareLabelConstraints.gridx = 1;
-    passwordCompareLabelConstraints.gridy = 2;
-    passwordCompareLabelConstraints.anchor = GridBagConstraints.LINE_START;
-    passwordCompareLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
-    changePasswordPanel.add( passwordCompareLabel, passwordCompareLabelConstraints );
-    final JPanel buttonPanel = new JPanel( new FlowLayout() );
-    buttonPanel.add( savePasswordButton );
-    buttonPanel.add( pass_abortButton );
-    final GridBagConstraints reg_buttonpanelConstraints = new GridBagConstraints();
-    reg_buttonpanelConstraints.gridx = 0;
-    reg_buttonpanelConstraints.gridy = 3;
-    reg_buttonpanelConstraints.gridwidth = 2;
-    changePasswordPanel.add( buttonPanel, reg_buttonpanelConstraints );
-
-    final Color green = new Color( 33, 122, 34 );
-    final DocumentListener documentListener = new DocumentListener()
-    {
-
-      @Override
-      public void removeUpdate( final DocumentEvent e )
-      {
-        compare();
-      }
-
-      @Override
-      public void insertUpdate( final DocumentEvent e )
-      {
-        compare();
-      }
-
-      @Override
-      public void changedUpdate( final DocumentEvent e )
-      {
-      }
-
-      private void compare()
-      {
-        if ( passwordField.getPassword() == null
-            || passwordField.getPassword().length == 0
-            || password2Field.getPassword() == null
-            || password2Field.getPassword().length == 0 )
-        {
-          passwordCompareLabel.setText( "" );
-          passwordCompareLabel.setForeground( Color.black );
-        }
-        else
-        {
-          if ( String.valueOf( passwordField.getPassword() ).equals( String.valueOf( password2Field.getPassword() ) ) )
-          {
-            passwordCompareLabel.setText( "Die Passwörter stimmen überein." );
-            passwordCompareLabel.setForeground( green );
-          }
-          else
-          {
-            passwordCompareLabel.setText( "Die Passwörter stimmen nicht überein." );
-            passwordCompareLabel.setForeground( Color.red );
-          }
-        }
-      }
-    };
-    pass_abortButton.addActionListener( e -> changePasswordFrame.dispose() );
-    savePasswordButton.addActionListener( e ->
-    {
-      final boolean isPasswordOrUserNameIncorrect = passwordField.getPassword() == null || passwordField.getPassword().length == 0
-          || password2Field.getPassword() == null || password2Field.getPassword().length == 0;
-
-      if ( isPasswordOrUserNameIncorrect )
-      {
-        JOptionPane.showMessageDialog( changePasswordFrame, "Passwort ist nicht zulässig.", "Passwort ändern",
-            JOptionPane.WARNING_MESSAGE );
-      }
-      else if ( !String.valueOf( passwordField.getPassword() ).equals( String.valueOf( password2Field.getPassword() ) ) )
-      {
-        JOptionPane.showMessageDialog( changePasswordFrame, "Die Passwörter stimmen nicht überein.", "Passwort ändern",
-            JOptionPane.WARNING_MESSAGE );
-      }
-      else
-      {
-        final char[] password = passwordField.getPassword();
-        final int reply =
-            JOptionPane.showConfirmDialog( changePasswordFrame, "Wollen Sie wirklich das neue Passwort spechern?", "Passwort ändern",
-                JOptionPane.INFORMATION_MESSAGE );
-        if ( reply == JOptionPane.YES_OPTION )
-        {
-          ServerCommunication.getInstance().changePassword( Util.getHash( String.valueOf( password ) ) );
-          changePasswordFrame.dispose();
-        }
-      }
-    } );
-
-    password2Field.getDocument().addDocumentListener( documentListener );
-    passwordField.getDocument().addDocumentListener( documentListener );
-
-    getRootPane().setDefaultButton( savePasswordButton );
-    changePasswordFrame.getContentPane().add( changePasswordPanel );
-    changePasswordFrame.pack();
-    changePasswordFrame.setResizable( false );
-    changePasswordFrame.setSize( changePasswordFrame.getWidth() + 30, changePasswordFrame.getHeight() + 20 );
-    changePasswordFrame.setLocationRelativeTo( Settings.this );
-    changePasswordFrame
-        .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
-    changePasswordFrame.setVisible( true );
-  }
-
   private void showDisplayNameChangeDialog()
   {
-    final JDialog changeDisplayNameFrame = new JDialog( GUIObjects.mainframe, "Anzeigenamen ändern", true );
-    final JPanel changeDisplayNamePanel = new JPanel( new GridBagLayout() );
-    final JLabel displayNamelabel = new JLabel( "Anzeigename:" );
-    final JTextField displayNameField = MeMateUIManager.createJTextField();
-    final JButton saveDisplayNameButton = MeMateUIManager.createButton( "button", "Speichern" );
-    final JButton abortDisplayNameButton = MeMateUIManager.createButton( "button", "Abbrechen" );
-
-    changeDisplayNameFrame.getRootPane().setDefaultButton( saveDisplayNameButton );
-
-    final int prefHeight = displayNameField.getPreferredSize().height;
-    displayNameField.setPreferredSize( new Dimension( 100, prefHeight ) );
-
-    final GridBagConstraints displayNamelabelConstraints = new GridBagConstraints();
-    displayNamelabelConstraints.gridx = 0;
-    displayNamelabelConstraints.gridy = 0;
-    displayNamelabelConstraints.insets = new Insets( 10, 0, 10, 0 );
-    displayNamelabelConstraints.anchor = GridBagConstraints.LINE_START;
-    changeDisplayNamePanel.add( displayNamelabel, displayNamelabelConstraints );
-    final GridBagConstraints displayNameFieldConstraints = new GridBagConstraints();
-    displayNameFieldConstraints.gridx = 1;
-    displayNameFieldConstraints.gridy = 0;
-    displayNameFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
-    changeDisplayNamePanel.add( displayNameField, displayNameFieldConstraints );
-    final JPanel buttonPanel = new JPanel( new FlowLayout() );
-    buttonPanel.add( saveDisplayNameButton );
-    buttonPanel.add( abortDisplayNameButton );
-    final GridBagConstraints displayname_buttonpanelConstraints = new GridBagConstraints();
-    displayname_buttonpanelConstraints.gridx = 0;
-    displayname_buttonpanelConstraints.gridy = 1;
-    displayname_buttonpanelConstraints.gridwidth = 2;
-    changeDisplayNamePanel.add( buttonPanel, displayname_buttonpanelConstraints );
-
-
-    abortDisplayNameButton.addActionListener( e -> changeDisplayNameFrame.dispose() );
-    saveDisplayNameButton.addActionListener( e ->
+    final JTextField nameField = new JTextField();
+    final String title = "Anzeigenamen ändern";
+    final Object[] buttonNames = { "Speichern", "Abbrechen" };
+    final Object[] params = { title + ":", nameField };
+    int answer = JOptionPane.showOptionDialog( this, params, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+        buttonNames, buttonNames[ 0 ] );
+    if ( answer == JOptionPane.YES_OPTION )
     {
-      final boolean isDisplayNameIncorrect = displayNameField.getText() == null || displayNameField.getText().length() == 0;
-
-      if ( isDisplayNameIncorrect )
+      final String username = nameField.getText();
+      if ( username == null || username.length() == 0 )
       {
-        JOptionPane.showMessageDialog( changeDisplayNameFrame, "Der Anzeigename darf nicht leer sein", "Anzeigenamen ändern",
-            JOptionPane.WARNING_MESSAGE );
+        JOptionPane.showMessageDialog( this, "Der Anzeigename darf nicht leer sein.", title, JOptionPane.WARNING_MESSAGE );
       }
-      else if ( displayNameField.getText().length() > 10 )
+      else if ( username.length() > 10 )
       {
-        JOptionPane.showMessageDialog( changeDisplayNameFrame, "Der Anzeigename darf nicht länger als 10 Zeichen sein",
-            "Anzeigenamen ändern",
+        JOptionPane.showMessageDialog( this, "Der Anzeigename darf nicht länger als 10 Zeichen sein.", title,
             JOptionPane.WARNING_MESSAGE );
       }
       else
       {
-        final String displayName = displayNameField.getText();
-        final int reply =
-            JOptionPane.showConfirmDialog( changeDisplayNameFrame, "Wollen Sie wirklich den neuen Anzeigenamen spechern?",
-                "Anzeigenamen ändern",
-                JOptionPane.INFORMATION_MESSAGE );
-        if ( reply == JOptionPane.YES_OPTION )
-        {
-          ServerCommunication.getInstance().changeDisplayName( displayName );
-          changeDisplayNameFrame.dispose();
-        }
+        ServerCommunication.getInstance().changeDisplayName( username );
       }
-    } );
-
-
-    getRootPane().setDefaultButton( saveDisplayNameButton );
-    changeDisplayNameFrame.getContentPane().add( changeDisplayNamePanel );
-    changeDisplayNameFrame.pack();
-    changeDisplayNameFrame.setResizable( false );
-    changeDisplayNameFrame.setSize( changeDisplayNameFrame.getWidth() + 30, changeDisplayNameFrame.getHeight() + 20 );
-    changeDisplayNameFrame.setLocationRelativeTo( Settings.this );
-    changeDisplayNameFrame
-        .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
-    changeDisplayNameFrame.setVisible( true );
+    }
   }
 
 
   private void addConsumptionNotification()
   {
-    final JLabel consumptionNotificationLabel = MeMateUIManager.createJLabel();
+    final JLabel consumptionNotificationLabel = new JLabel();
     consumptionNotificationLabel.setText( "Benachrichtigung wenn jemand etwas trinkt." );
     consumptionNotificationLabel.setFont( consumptionNotificationLabel.getFont().deriveFont( 18f ) );
     final GridBagConstraints consumptionNotificationLabelConstraints = new GridBagConstraints();
@@ -461,7 +274,7 @@ class Settings extends JPanel
 
   private void addMeetingNotification()
   {
-    final JLabel meetingNotificationLabel = MeMateUIManager.createJLabel();
+    final JLabel meetingNotificationLabel = new JLabel();
     meetingNotificationLabel.setText( "Benachrichtigung für Standup-Meeting" );
     meetingNotificationLabel.setFont( meetingNotificationLabel.getFont().deriveFont( 18f ) );
     final GridBagConstraints meetingNotificationLabelcBagConstraints = new GridBagConstraints();
@@ -518,7 +331,7 @@ class Settings extends JPanel
 
   private void addDarkmodeSettings()
   {
-    final JLabel pickDarkmodeLabel = MeMateUIManager.createJLabel();
+    final JLabel pickDarkmodeLabel = new JLabel();
     pickDarkmodeLabel.setText( "Standard-App-Modus wählen" );
     pickDarkmodeLabel.setFont( pickDarkmodeLabel.getFont().deriveFont( 18f ) );
     final GridBagConstraints pickDarkmodeLabelConstraints = new GridBagConstraints();
@@ -529,7 +342,7 @@ class Settings extends JPanel
 
     add( pickDarkmodeLabel, pickDarkmodeLabelConstraints );
     final ButtonGroup group = new ButtonGroup();
-    group.add( daymodeButton );
+    group.add( lightmodeButton );
     group.add( darkmodeButton );
     final ActionListener toggleDarkModeListener = e ->
     {
@@ -584,7 +397,7 @@ class Settings extends JPanel
         GUIObjects.mainframe.bar.showDaymode();
       }
     };
-    daymodeButton.addActionListener( toggleDarkModeListener );
+    lightmodeButton.addActionListener( toggleDarkModeListener );
     darkmodeButton.addActionListener( toggleDarkModeListener );
     getPrefsAndSelectButton();
     final GridBagConstraints dayModeButtonConstraints = new GridBagConstraints();
@@ -599,7 +412,7 @@ class Settings extends JPanel
     darkModeButtonConstraints.gridwidth = 1;
     darkModeButtonConstraints.anchor = GridBagConstraints.LINE_START;
     darkModeButtonConstraints.insets = new Insets( 3, 20, 0, 0 );
-    add( daymodeButton, dayModeButtonConstraints );
+    add( lightmodeButton, dayModeButtonConstraints );
     add( darkmodeButton, darkModeButtonConstraints );
   }
 
@@ -628,14 +441,14 @@ class Settings extends JPanel
     }
     else
     {
-      daymodeButton.setSelected( true );
+      lightmodeButton.setSelected( true );
     }
   }
 
   private void addColorThemePicker()
   {
     MeMateUIManager.registerComboBox( colorThemeComboBox );
-    final JLabel pickThemeLabel = MeMateUIManager.createJLabel();
+    final JLabel pickThemeLabel = new JLabel();
     pickThemeLabel.setText( "Color Scheme auswählen" );
     pickThemeLabel.setFont( pickThemeLabel.getFont().deriveFont( 18f ) );
     final GridBagConstraints pickThemeLabelConstraints = new GridBagConstraints();

@@ -114,7 +114,7 @@ public class Social extends JPanel
               JPanel panel = new JPanel();
               panel.setPreferredSize( new Dimension( 240, 70 ) );
               panel.setLayout( new GridBagLayout() );
-              JLabel nameLabel = MeMateUIManager.createJLabel();
+              JLabel nameLabel = new JLabel();
               nameLabel.setText( consumer + " trinkt gerade" );
               nameLabel.setFont( nameLabel.getFont().deriveFont( 20f ) );
               GridBagConstraints nameLabelConstraints = new GridBagConstraints();
@@ -124,7 +124,7 @@ public class Social extends JPanel
               nameLabelConstraints.weightx = 1;
               nameLabelConstraints.anchor = GridBagConstraints.LINE_START;
               panel.add( nameLabel, nameLabelConstraints );
-              JLabel drinkNameLabel = MeMateUIManager.createJLabel();
+              JLabel drinkNameLabel = new JLabel();
               drinkNameLabel.setText( drinkname );
               drinkNameLabel.setFont( nameLabel.getFont().deriveFont( 20f ) );
               GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
@@ -133,7 +133,7 @@ public class Social extends JPanel
               drinkNameLabelConstraints.insets = new Insets( 5, 5, 5, 0 );
               drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
               panel.add( drinkNameLabel, drinkNameLabelConstraints );
-              JLabel dateLabel = MeMateUIManager.createJLabel();
+              JLabel dateLabel = new JLabel();
               dateLabel.setText( date.substring( date.length() - 6, date.length() ) );
               dateLabel.setFont( nameLabel.getFont().deriveFont( 11f ) );
               GridBagConstraints dateLabelConstraints = new GridBagConstraints();
@@ -192,8 +192,8 @@ public class Social extends JPanel
   private static void loadScoreBoard( List<Score> scoreList, JPanel panel, String title )
   {
     panel.setLayout( new GridBagLayout() );
-    JLabel scoreBoardLabel = MeMateUIManager.createJLabel();
-    JLabel overallLabel = MeMateUIManager.createJLabel();
+    JLabel scoreBoardLabel = new JLabel();
+    JLabel overallLabel = new JLabel();
     JLabel firstPlaceLabel = new JLabel();
     JLabel secondPlaceLabel = new JLabel();
     JLabel thirdPlaceLabel = new JLabel();
