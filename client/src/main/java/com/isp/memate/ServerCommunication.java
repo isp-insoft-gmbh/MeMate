@@ -43,7 +43,7 @@ import com.isp.memate.util.GUIObjects;
  * @author nwe
  * @since 24.10.2019
  */
-class ServerCommunication
+public class ServerCommunication
 {
   private final boolean                    debug                     = true;
   private static final ServerCommunication instance                  = new ServerCommunication();
@@ -59,7 +59,7 @@ class ServerCommunication
   /**
    * @return the static instance of {@link ServerCommunication}
    */
-  static ServerCommunication getInstance()
+  public static ServerCommunication getInstance()
   {
     return instance;
   }
@@ -180,7 +180,6 @@ class ServerCommunication
               {
                 break;
               }
-              GUIObjects.mainframe.setHelloLabel( displayname );
               tellServerToSendDrinkInformations();
               getBalance();
               break;
@@ -199,10 +198,7 @@ class ServerCommunication
               break;
             case GET_DISPLAYNAME:
               displayname = shared.displayname;
-              if ( displayname != null )
-              {
-                GUIObjects.mainframe.setHelloLabel( displayname );
-              }
+              cache.setDisplayname( displayname );
               break;
             case GET_USERS_DISPLAYNAMES:
               cache.setDisplayNamesArray( shared.displaynames );
@@ -650,7 +646,7 @@ class ServerCommunication
    *
    * @param sessionID SessionID
    */
-  void checkLoginForSessionID( final String sessionID )
+  public void checkLoginForSessionID( final String sessionID )
   {
     try
     {

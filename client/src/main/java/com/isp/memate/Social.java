@@ -38,7 +38,6 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class Social extends JPanel
 {
-  private static final long serialVersionUID = -4292950786301333060L;
   private static JPanel     mainPanel, scoreBoardPanel, weeklyScoreBoardPanel, activityPanel;
   static Cache              cache            = Cache.getInstance();
 

@@ -24,7 +24,6 @@ import com.isp.memate.util.Util;
 
 public class RegistrationDialog extends JDialog
 {
-  private static final long serialVersionUID = -600053373987266060L;
   private JPanel            mainPanel;
   private JTextField        usernameTextField;
   private JLabel            usernameLabel, passwordLabel, repeatPasswordLabel, passwordCompareLabel;

@@ -28,16 +28,18 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.table.JTableHeader;
 
 import org.jfree.chart.JFreeChart;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.extras.FlatUIDefaultsInspector;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.isp.memate.Login;
 import com.isp.memate.actionbar.MeMateActionBarButton;
 import com.isp.memate.actionbar.MeMateActionBarListener;
 
@@ -51,36 +53,31 @@ import com.isp.memate.actionbar.MeMateActionBarListener;
  */
 public class MeMateUIManager
 {
-  private static final Multimap<String, JLabel>                labelList           = ArrayListMultimap.create();
-  private static final Multimap<String, JPanel>                panelList           = ArrayListMultimap.create();
-  private static final Multimap<String, MeMateActionBarButton> buttonList          = ArrayListMultimap.create();
-  private static final Multimap<String, JButton>               normalButtonList    = ArrayListMultimap.create();
-  private static final Multimap<String, JButton>               infoButtonList      = ArrayListMultimap.create();
-  private static final Multimap<String, JComponent>            separatorList       = ArrayListMultimap.create();
-  private static final Multimap<String, JTable>                tableList           = ArrayListMultimap.create();
-  private static final Multimap<String, JScrollPane>           scrollPaneList      = ArrayListMultimap.create();
-  private static final Multimap<String, JTextPane>             textPaneList        = ArrayListMultimap.create();
-  private static final Multimap<String, JCheckBox>             checkBoxList        = ArrayListMultimap.create();
-  private static final Multimap<String, JList<?>>              listList            = ArrayListMultimap.create();
-  private static final Multimap<String, JSpinner>              spinnerList         = ArrayListMultimap.create();
-  private static final Multimap<String, JRadioButton>          radioButtonList     = ArrayListMultimap.create();
-  private static final Multimap<String, JComboBox<String>>     comboBoxList        = ArrayListMultimap.create();
-  private static final Multimap<String, JTextField>            textFieldList       = ArrayListMultimap.create();
-  private static final Multimap<String, JPasswordField>        passwordFieldList   = ArrayListMultimap.create();
-  private static final Map<JButton, DarkDayIcon>               iconList            = new HashMap<>();
-  private static final Map<JLabel, DarkDayIcon>                panelIconList       = new HashMap<>();
-  private static final Map<String, DarkDayColor>               backgroundMap       = new HashMap<>();
-  private static final Map<String, DarkDayColor>               foregroundMap       = new HashMap<>();
-  private static final String                                  defaultKey          = "default";
-  private static final Set<String>                             keySet              = new HashSet<>();
-  private static JFreeChart                                    freeChart           = null;
-  private static JFreeChart                                    lineChart           = null;
-  private static final Border                                  DEFAULT_LINE_BORDER =
-      BorderFactory.createLineBorder( new Color( 173, 173, 173, 0 ) );
-  private static final Border                                  DEFAULT_BORDER      =
-      BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER,
-          BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
-  static ClassLoader                                           classLoader         = MeMateUIManager.class.getClassLoader();
+  private static final Multimap<String, JLabel>                labelList         = ArrayListMultimap.create();
+  private static final Multimap<String, JPanel>                panelList         = ArrayListMultimap.create();
+  private static final Multimap<String, MeMateActionBarButton> buttonList        = ArrayListMultimap.create();
+  private static final Multimap<String, JButton>               normalButtonList  = ArrayListMultimap.create();
+  private static final Multimap<String, JButton>               infoButtonList    = ArrayListMultimap.create();
+  private static final Multimap<String, JComponent>            separatorList     = ArrayListMultimap.create();
+  private static final Multimap<String, JTable>                tableList         = ArrayListMultimap.create();
+  private static final Multimap<String, JScrollPane>           scrollPaneList    = ArrayListMultimap.create();
+  private static final Multimap<String, JTextPane>             textPaneList      = ArrayListMultimap.create();
+  private static final Multimap<String, JCheckBox>             checkBoxList      = ArrayListMultimap.create();
+  private static final Multimap<String, JList<?>>              listList          = ArrayListMultimap.create();
+  private static final Multimap<String, JSpinner>              spinnerList       = ArrayListMultimap.create();
+  private static final Multimap<String, JRadioButton>          radioButtonList   = ArrayListMultimap.create();
+  private static final Multimap<String, JComboBox<String>>     comboBoxList      = ArrayListMultimap.create();
+  private static final Multimap<String, JTextField>            textFieldList     = ArrayListMultimap.create();
+  private static final Multimap<String, JPasswordField>        passwordFieldList = ArrayListMultimap.create();
+  private static final Map<JButton, DarkDayIcon>               iconList          = new HashMap<>();
+  private static final Map<JLabel, DarkDayIcon>                panelIconList     = new HashMap<>();
+  private static final Map<String, DarkDayColor>               backgroundMap     = new HashMap<>();
+  private static final Map<String, DarkDayColor>               foregroundMap     = new HashMap<>();
+  private static final String                                  defaultKey        = "default";
+  private static final Set<String>                             keySet            = new HashSet<>();
+  private static JFreeChart                                    freeChart         = null;
+  private static JFreeChart                                    lineChart         = null;
+  static ClassLoader                                           classLoader       = MeMateUIManager.class.getClassLoader();
 
   private static boolean darkModeState = false;
 
@@ -843,5 +840,95 @@ public class MeMateUIManager
   public static void registerInfoButton( final JButton infoButton )
   {
     infoButtonList.put( "button", infoButton );
+  }
+
+  public static void applyTheme()
+  {
+    //TODO(nwe | 09.12.2020): Was für on und off digga ? mach doch einfach true false
+    String darkmode = PropertyHelper.getProperty( "Darkmode" );
+    if ( darkmode != null && darkmode.equals( "on" ) )
+    {
+      FlatDarkLaf.install();
+      MeMateUIManager.setDarkModeState( true );
+    }
+    else
+    {
+      FlatLightLaf.install();
+      MeMateUIManager.setDarkModeState( false );
+    }
+  }
+
+  public static void setUIDefaults()
+  {
+    Color mainColor = UIManager.getColor( "AppColor" );
+
+    //FIXME sobald FlatLaf komplett implemetiert ist, dann als focusFarbe AppColor setzte. AppColor muss also noch voher gesetzt werden.
+    UIManager.put( "CheckBox.icon.focusedBorderColor", mainColor );
+    UIManager.put( "CheckBox.icon.selectedFocusedBorderColor", mainColor );
+    UIManager.put( "Component.focusedBorderColor", mainColor );
+    UIManager.put( "Table.selectionBackground", mainColor );
+    //    UIManager.put( "Button.default.focusedBorderColor", mainColor.brighter() );
+    //    UIManager.put( "Button.default.background", mainColor.darker() );
+    //    UIManager.put( "Button.default.borderColor", mainColor );
+    UIManager.put( "Label.disabledShadow", new Color( 0, 0, 0 ) );
+    UIManager.put( "DefaultBrightColor", Color.white );
+    ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
+  }
+
+  /**
+   * Die Userconfig wird gelesen und das richtige Colortheme geladen.
+   */
+  public static void installColors()
+  {
+    String colorScheme = PropertyHelper.getProperty( "colorScheme" );
+    if ( colorScheme == null )
+    {
+      colorScheme = "";
+    }
+    switch ( colorScheme )
+    {
+      case "Dark Blue":
+        putColorsInUIManager( new Color( 0, 173, 181 ), new Color( 34, 40, 49 ), new Color( 57, 62, 70 ), new Color( 42, 51, 64 ) );
+        break;
+      case "Red":
+        putColorsInUIManager( new Color( 226, 62, 87 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
+        break;
+      case "Green":
+        putColorsInUIManager( new Color( 153, 180, 51 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
+        break;
+      case "Blue":
+        putColorsInUIManager( new Color( 85, 172, 238 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+        break;
+      case "Orange":
+        putColorsInUIManager( new Color( 227, 162, 26 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+        break;
+      case "Coral":
+        putColorsInUIManager( new Color( 255, 111, 97 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
+        break;
+      case "Tripple Green":
+        putColorsInUIManager( new Color( 153, 180, 51 ), new Color( 11, 40, 25 ), new Color( 30, 113, 69 ), new Color( 13, 48, 30 ) );
+        break;
+      default :
+        putColorsInUIManager( new Color( 29, 164, 165 ), new Color( 36, 43, 55 ), new Color( 52, 73, 94 ), new Color( 42, 51, 64 ) );
+        break;
+    }
+  }
+
+  private static void putColorsInUIManager( final Color appColor, final Color background, final Color background2, final Color actionbar )
+  {
+    UIManager.put( "AppColor", appColor );
+    UIManager.put( "App.Background", background );
+    UIManager.put( "App.Secondary.Background", background2 );
+    UIManager.put( "App.Actionbar", actionbar );
+  }
+
+  public static void init()
+  {
+    installColors();
+    installDefaults();
+    applyTheme();
+    setUIDefaults();
+    putIconsInUIManager();
+    FlatUIDefaultsInspector.install( "X" );
   }
 }

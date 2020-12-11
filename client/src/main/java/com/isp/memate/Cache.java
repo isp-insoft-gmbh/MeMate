@@ -19,7 +19,7 @@ import com.isp.memate.util.GUIObjects;
 public class Cache
 {
   private static final Cache                  instance            = new Cache();
-  Object                                      usernameSync        = new Object();
+  public Object                               usernameSync        = new Object();
   private String                              serverVersion       = null;
   private String                              clientVersion       = null;
   private String                              username            = null;
@@ -276,7 +276,7 @@ public class Cache
 
   public String getDisplayname()
   {
-    return displayname;
+    return displayname == null ? username : displayname;
   }
 
   public void setDisplayname( String displayname )

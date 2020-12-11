@@ -5,12 +5,9 @@ package com.isp.memate;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
@@ -25,24 +22,17 @@ import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.ToggleSwitch;
-import com.isp.memate.util.Util;
 
 /**
  * Auf dem Settings Panel kann sein gewünschtes Color Scheme auswählen, den Darkmodestate verändern und
@@ -53,7 +43,6 @@ import com.isp.memate.util.Util;
  */
 class Settings extends JPanel
 {
-  private static final long serialVersionUID = 2047235494824375544L;
   private JComboBox<String> colorThemeComboBox;
   private JRadioButton      lightmodeButton;
   private JRadioButton      darkmodeButton;

@@ -54,7 +54,6 @@ import com.isp.memate.util.Util;
  */
 public class Login extends JFrame
 {
-  private static final long   serialVersionUID   = 2601644901607012389L;
   private static final String LABEL_FOREGROUND   = "Label.foreground";
   private static final String PASSWORT_VERGESSEN = "Passwort vergessen?";
   private static final String KONTO_ERSTELLEN    = "Konto erstellen";

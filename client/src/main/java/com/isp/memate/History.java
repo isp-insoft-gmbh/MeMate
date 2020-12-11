@@ -4,9 +4,6 @@
 package com.isp.memate;
 
 import java.awt.BorderLayout;
-import java.util.Arrays;
-import java.util.logging.Logger;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,7 +15,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import com.isp.memate.ServerCommunication.dateType;
-import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 
 /**
@@ -32,8 +28,7 @@ import com.isp.memate.util.GUIObjects;
  */
 public class History extends JPanel
 {
-  private static final long serialVersionUID = 1101621387826893800L;
-  private final String[]    columnNames      = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
+  private final String[]    columnNames = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
   private JScrollPane       scrollPane;
   private DefaultTableModel tableModel;
   private JTable            historyTable;
@@ -69,8 +64,6 @@ public class History extends JPanel
   {
     tableModel = new DefaultTableModel( historyData, columnNames )
     {
-      private static final long serialVersionUID = 5784707478211745948L;
-
       @Override
       public boolean isCellEditable( int row, int column )
       {

@@ -44,7 +44,6 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class Mainframe extends JFrame
 {
-  private static final long     serialVersionUID = -3763506269754256248L;
   Cache                         cache            = Cache.getInstance();
   private final Dashboard       dashboard;
   private final Color           color            = UIManager.getColor( "AppColor" );
@@ -109,6 +108,7 @@ public class Mainframe extends JFrame
     add( contentPanel, BorderLayout.CENTER );
     add( headerPanel, BorderLayout.NORTH );
     MeMateUIManager.setUISettings();
+    setHelloLabel( cache.getDisplayname() );
   }
 
   /**

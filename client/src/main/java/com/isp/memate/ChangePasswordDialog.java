@@ -24,7 +24,6 @@ import com.isp.memate.util.Util;
 
 public class ChangePasswordDialog extends JDialog
 {
-  private static final long serialVersionUID = -7368383844134207306L;
   private JPanel            mainPanel;
   private JLabel            passwordLabel, repeatPasswordLabel, passwordCompareLabel;
   private JPasswordField    passwordField, repeatPasswordField;

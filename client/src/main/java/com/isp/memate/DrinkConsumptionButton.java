@@ -64,9 +64,6 @@ class DrinkConsumptionButton extends JPanel
   private final Border       DEFAULT_LINE_BORDER    = BorderFactory.createLineBorder( new Color( 173, 173, 173, 0 ) );
   private final Border       DEFAULT_BORDER         = BorderFactory.createCompoundBorder( DEFAULT_LINE_BORDER,
       BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) );
-  private final Border       FOCUS_BORDER           =
-      BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( UIManager.getColor( "AppColor" ) ),
-          BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) );
   Cache                      cache                  = Cache.getInstance();
 
   private final JLabel       nameLabel                              = MeMateUIManager.createJLabel( "drinkButtons" );
