@@ -52,19 +52,19 @@ import com.isp.memate.util.Util;
 class Adminview extends JPanel
 {
   private final JButton    exportButton          =
-      MeMateUIManager.createIconButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "export_white.png" ) ),
+      MeMateUIManager.createIconButton( new ImageIcon( getClass().getClassLoader().getResource( "export_white.png" ) ),
           new ImageIcon( getClass().getClassLoader().getResource( "export_black.png" ) ) );
   private final JButton    resetPasswordButton   =
-      MeMateUIManager.createIconButton( "button", new ImageIcon( getClass().getClassLoader().getResource( "password_white.png" ) ),
+      MeMateUIManager.createIconButton( new ImageIcon( getClass().getClassLoader().getResource( "password_white.png" ) ),
           new ImageIcon( getClass().getClassLoader().getResource( "password_black.png" ) ) );
-  private final JButton    setAdminBalanceButton = MeMateUIManager.createButton( "button" );
+  private final JButton    setAdminBalanceButton = new JButton();
   private final JDialog    passwordFrame         = new JDialog( GUIObjects.mainframe );
-  private final JLabel     piggyBankLabel        = MeMateUIManager.createJLabel();
-  private final JPanel     upperPanel            = MeMateUIManager.createJPanel();
-  private final JPanel     upperUpperPanel       = MeMateUIManager.createJPanel();
-  private final JPanel     centerPanel           = MeMateUIManager.createJPanel();
+  private final JLabel     piggyBankLabel        = new JLabel();
+  private final JPanel     upperPanel            = new JPanel();
+  private final JPanel     upperUpperPanel       = new JPanel();
+  private final JPanel     centerPanel           = new JPanel();
   private JPanel           drinkAmountPanel      = new JPanel( new FlowLayout() );
-  private final JTextField balanceField          = MeMateUIManager.createJTextField();
+  private final JTextField balanceField          = new JTextField();
   Cache                    cache                 = Cache.getInstance();
 
 
@@ -83,9 +83,9 @@ class Adminview extends JPanel
    */
   private void loadDefaultSettings()
   {
-    final JPanel piggyBankPanel = MeMateUIManager.createJPanel( "adminButton" );
-    final JPanel pwChangePanel = MeMateUIManager.createJPanel( "adminButton" );
-    final JPanel exportPanel = MeMateUIManager.createJPanel( "adminButton" );
+    final JPanel piggyBankPanel = MeMateUIManager.createJPanelWithThinBorder();
+    final JPanel pwChangePanel = new JPanel();
+    final JPanel exportPanel = new JPanel();
 
     removeAllAndLayout();
     setToolTipAndText();
@@ -102,7 +102,6 @@ class Adminview extends JPanel
     loadAdminBalanceButtonAction();
 
     ServerCommunication.getInstance().tellServerToSendPiggybankBalance();
-    MeMateUIManager.registerPanel( "default", this );
     add( upperUpperPanel, BorderLayout.NORTH );
     final JScrollPane scrollpane = new JScrollPane( centerPanel );
     scrollpane.getVerticalScrollBar().setUnitIncrement( 12 );
@@ -175,8 +174,8 @@ class Adminview extends JPanel
           .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
       final String[] user = Cache.getInstance().getUserArray();
       final JPanel passwordPanel = new JPanel( new GridBagLayout() );
-      final JButton saveButton = MeMateUIManager.createButton( "button", "Speichern" );
-      final JButton abortButton = MeMateUIManager.createButton( "button", "Abbrechen" );
+      final JButton saveButton = new JButton( "Speichern" );
+      final JButton abortButton = new JButton( "Abbrechen" );
       final JLabel userLabel = new JLabel( "Nutzer auswählen" );
       final JLabel newPassword = new JLabel( "Neues Passwort:  " );
       final JTextField passwordField = MeMateUIManager.createJTextField();
@@ -351,9 +350,9 @@ class Adminview extends JPanel
   {
     for ( final String drink : cache.getDrinkNames() )
     {
-      drinkAmountPanel = MeMateUIManager.createJPanel( "adminButton" );
+      drinkAmountPanel = MeMateUIManager.createJPanelWithThinBorder();
       drinkAmountPanel.setLayout( new GridBagLayout() );
-      final JLabel drinkNameLabel = MeMateUIManager.createJLabel();
+      final JLabel drinkNameLabel = new JLabel();
       drinkNameLabel.setText( drink );
       drinkNameLabel.setFont( drinkNameLabel.getFont().deriveFont( 20f ) );
       final GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
@@ -363,7 +362,7 @@ class Adminview extends JPanel
       drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
       drinkNameLabelConstraints.insets = new Insets( 5, 10, 5, 0 );
       drinkAmountPanel.add( drinkNameLabel, drinkNameLabelConstraints );
-      final JLabel daysLeftLabel = MeMateUIManager.createJLabel();
+      final JLabel daysLeftLabel = new JLabel();
       daysLeftLabel.setText( String.format( "in etwa %.2f Tagen leer.", getDaysLeft( drink ) ) );
       daysLeftLabel.setFont( daysLeftLabel.getFont().deriveFont( 15f ) );
       final GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
@@ -376,7 +375,6 @@ class Adminview extends JPanel
       final SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 1000, 1 );
       final JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
       amountSpinner.setValue( cache.getAmount( drink ) );
-      MeMateUIManager.registerSpinner( amountSpinner );
       final GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
       amountSpinnerConstraints.gridx = 0;
       amountSpinnerConstraints.gridy = 2;
@@ -385,7 +383,7 @@ class Adminview extends JPanel
       amountSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
       amountSpinnerConstraints.insets = new Insets( 0, 10, 5, 5 );
       drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
-      final JButton setAmountButton = MeMateUIManager.createButton( "button" );
+      final JButton setAmountButton = new JButton();
       setAmountButton.setText( "Anzahl setzen" );
       final GridBagConstraints setAmountButtonConstraints = new GridBagConstraints();
       setAmountButtonConstraints.gridx = 1;

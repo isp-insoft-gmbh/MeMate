@@ -280,14 +280,12 @@ public class MeMateUIManager
     UIManager.put( "ComboBox.buttonHighlight", new Color( 51, 61, 78 ) );
   }
 
-  /**
-   * Erstellt ein {@link JPanel} mit defaultKey
-   *
-   * @return {@link JPanel}
-   */
-  public static JPanel createJPanel()
+
+  public static JPanel createJPanelWithThinBorder()
   {
-    return createJPanel( defaultKey );
+    final JPanel panel = new JPanel();
+    panel.setBorder( BorderFactory.createLineBorder( UIManager.getColor( "Button.borderColor" ) ) );
+    return panel;
   }
 
   /**
@@ -455,10 +453,22 @@ public class MeMateUIManager
    * @param imageIcon2 Darkmode Icon
    * @return {@link JButton}
    */
-  public static JButton createIconButton( final String key, final ImageIcon imageIcon, final ImageIcon imageIcon2 )
+  public static JButton createIconButton( final ImageIcon imageIcon, final ImageIcon imageIcon2 )
   {
-    final JButton button = createButton( key );
-    iconList.put( button, new DarkDayIcon( imageIcon, imageIcon2 ) );
+    final JButton button = new JButton()
+    {
+      @Override
+      public void updateUI()
+      {
+        super.updateUI();
+        if ( darkModeState )
+        {
+          super.setIcon( imageIcon );
+        }
+        else
+          super.setIcon( imageIcon2 );
+      }
+    };
     return button;
   }
 
@@ -863,10 +873,10 @@ public class MeMateUIManager
     Color mainColor = UIManager.getColor( "AppColor" );
 
     //FIXME sobald FlatLaf komplett implemetiert ist, dann als focusFarbe AppColor setzte. AppColor muss also noch voher gesetzt werden.
-    UIManager.put( "CheckBox.icon.focusedBorderColor", mainColor );
-    UIManager.put( "CheckBox.icon.selectedFocusedBorderColor", mainColor );
-    UIManager.put( "Component.focusedBorderColor", mainColor );
-    UIManager.put( "Table.selectionBackground", mainColor );
+    //    UIManager.put( "CheckBox.icon.focusedBorderColor", mainColor );
+    //    UIManager.put( "CheckBox.icon.selectedFocusedBorderColor", mainColor );
+    //    UIManager.put( "Component.focusedBorderColor", mainColor );
+    //    UIManager.put( "Table.selectionBackground", mainColor );
     //    UIManager.put( "Button.default.focusedBorderColor", mainColor.brighter() );
     //    UIManager.put( "Button.default.background", mainColor.darker() );
     //    UIManager.put( "Button.default.borderColor", mainColor );

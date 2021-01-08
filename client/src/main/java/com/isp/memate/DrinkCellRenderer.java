@@ -37,10 +37,10 @@ class DrinkCellRenderer implements ListCellRenderer<Object>
   private final Border DEFAULT_BORDER  = BorderFactory.createEmptyBorder( 2, 2, 2, 2 );
   private final Border FOCUS_BORDER    = BorderFactory.createCompoundBorder( BorderFactory.createEmptyBorder( 1, 1, 1, 1 ),
       BorderFactory.createDashedBorder( Color.WHITE, 1, 1 ) );
-  private final JPanel renderComponent = MeMateUIManager.createJPanel();
-  private final JLabel drinkNameLabel  = MeMateUIManager.createJLabel();
-  private final JLabel priceLabel      = MeMateUIManager.createJLabel();
-  private final JLabel pictureLabel    = MeMateUIManager.createJLabel();
+  private final JPanel renderComponent = new JPanel();
+  private final JLabel drinkNameLabel  = new JLabel();
+  private final JLabel priceLabel      = new JLabel();
+  private final JLabel pictureLabel    = new JLabel();
   Cache                cache           = Cache.getInstance();
 
   /**

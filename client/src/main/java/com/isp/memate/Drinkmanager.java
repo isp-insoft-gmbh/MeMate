@@ -82,7 +82,7 @@ class Drinkmanager extends JPanel
    */
   private JPanel createButtonPanel()
   {
-    final JPanel panel = MeMateUIManager.createJPanel();
+    final JPanel panel = new JPanel();
     final GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
     panel.setBorder( new EmptyBorder( 5, 5, 5, 5 ) );
