@@ -66,15 +66,14 @@ class DrinkConsumptionButton extends JPanel
       BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) );
   Cache                      cache                  = Cache.getInstance();
 
-  private final JLabel       nameLabel                              = MeMateUIManager.createJLabel( "drinkButtons" );
-  private final JLabel       priceLabel                             = MeMateUIManager.createJLabel( "drinkButtons" );
+  private final JLabel       nameLabel                              = new JLabel();
+  private final JLabel       priceLabel                             = new JLabel();
   private final JPanel       infoPanel                              = MeMateUIManager.createJPanel( "drinkButtons" );
   private final JPanel       nameLabelAndDrinkInfoButtonPanel       = MeMateUIManager.createJPanel( "drinkButtons" );
-  private final JButton      acceptButton                           = MeMateUIManager.createButton( "button" );
-  private final JButton      abortButton                            = MeMateUIManager.createButton( "button" );
-  private JButton            infoButton                             = MeMateUIManager.createButton( "button" );
-  private final JLabel       askWhetherToReallyConsumeLabel         = MeMateUIManager.createJLabel( "drinkButtons" );
-  private final JLabel       textLabel                              = MeMateUIManager.createJLabel();
+  private final JButton      acceptButton                           = new JButton();
+  private final JButton      abortButton                            = new JButton();
+  private JButton            infoButton;
+  private final JLabel       askWhetherToReallyConsumeLabel         = new JLabel();
   private final JLayeredPane overlay                                = new JLayeredPane();
   private final JLabel       iconLabel;
   private final JPanel       fillPanel                              = MeMateUIManager.createJPanel( "drinkButtons" );
@@ -99,190 +98,7 @@ class DrinkConsumptionButton extends JPanel
    */
   DrinkConsumptionButton( final Mainframe mainFrame, String price, final String name, final Icon icon )
   {
-    infoButton = new JButton( new InfoIcon() )
-    {
-      JToolTip tooltip;
-
-      @Override
-      public JToolTip createToolTip()
-      {
-        if ( tooltip == null )
-        {
-          final JPanel panel = new JPanel( new GridBagLayout() );
-          final GridBagConstraints constraints = new GridBagConstraints();
-          constraints.gridx = 1;
-          constraints.gridy = 1;
-          constraints.fill = GridBagConstraints.BOTH;
-          loadInfoPanelSettings();
-          panel.add( infoPanel, constraints );
-          tooltip = super.createToolTip();
-          tooltip.setLayout( new BorderLayout() );
-          final Insets insets = tooltip.getInsets();
-          final Dimension panelSize = panel.getPreferredSize();
-          panelSize.width += insets.left + insets.right;
-          panelSize.height += insets.top + insets.bottom;
-          tooltip.setPreferredSize( panelSize );
-          tooltip.add( panel );
-        }
-        return tooltip;
-      }
-
-      private void loadInfoPanelSettings()
-      {
-        infoPanel.setLayout( new GridBagLayout() );
-        final DrinkIngredients ingredients = cache.getIngredients( name );
-        final String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
-        int maxLength = 40;
-        for ( final String string : ingredientsArray )
-        {
-          if ( string.length() > maxLength )
-          {
-            maxLength = string.length() + 2;
-          }
-        }
-        int currentLength = 0;
-        final StringBuilder listBuilder = new StringBuilder();
-        listBuilder.append( "<html>Zutaten:<br>" );
-        for ( final String element : ingredientsArray )
-        {
-          currentLength += element.length() + 2;
-          if ( currentLength > maxLength )
-          {
-            listBuilder.append( "<br>" );
-            currentLength = element.length() + 2;
-          }
-          listBuilder.append( element ).append( ", " );
-        }
-        String amountString = "";
-        if ( ingredients.amount != 0 )
-        {
-          amountString = "<br><br>Menge: " + String.format( "%.2f", ingredients.amount ) + " Liter";
-        }
-        textLabel.setText( listBuilder.toString().substring( 0, listBuilder.length() - 2 )
-            + amountString + "<br><br>Durchschnittlicher Gehalt je 100ml<br>" );
-
-        textLabel.setHorizontalAlignment( SwingConstants.LEFT );
-        final GridBagConstraints textLabelConstraints = new GridBagConstraints();
-        textLabelConstraints.gridx = 0;
-        textLabelConstraints.gridy = 0;
-        textLabelConstraints.gridwidth = 3;
-        textLabelConstraints.gridheight = 2;
-        textLabelConstraints.anchor = GridBagConstraints.LINE_START;
-        textLabelConstraints.insets = new Insets( 0, 2, 0, 2 );
-        infoPanel.add( textLabel, textLabelConstraints );
-        addPanel( "Energie", 3, infoPanel, ingredients );
-        addPanel( "Fett", 4, infoPanel, ingredients );
-        addPanel( "davon gesättigte Fettsäuren", 5, infoPanel, ingredients );
-        addPanel( "Kohlenhydrate", 6, infoPanel, ingredients );
-        addPanel( "Zucker", 7, infoPanel, ingredients );
-        addPanel( "Eiweiß", 8, infoPanel, ingredients );
-        addPanel( "Salz", 9, infoPanel, ingredients );
-        //Otherwise the generated panels aren't rendered correctly
-        MeMateUIManager.updateJPanel( "drinkButtons" );
-        MeMateUIManager.updateLabel( "default" );
-        MeMateUIManager.updateSeperator( "default" );
-      }
-
-      private void addPanel( final String ingredient, final int y, final JPanel mainPanel,
-                             final DrinkIngredients ingredients )
-      {
-        final JPanel panel = MeMateUIManager.createJPanel( "drinkButtons" );
-        panel.setLayout( new GridBagLayout() );
-
-        final JLabel label = MeMateUIManager.createJLabel();
-        label.setText( ingredient + " " );
-        final GridBagConstraints labelConstraints = new GridBagConstraints();
-        labelConstraints.gridx = 0;
-        labelConstraints.gridy = 0;
-        labelConstraints.weightx = 0;
-        labelConstraints.anchor = GridBagConstraints.LAST_LINE_START;
-        panel.add( label, labelConstraints );
-
-        final JComponent separator = new JComponent()
-        {
-          @Override
-          public void paintComponent( final Graphics g )
-          {
-            for ( int x = 0; x < getWidth(); x += 4 )
-            {
-              g.drawLine( x, 0, x + 1, 0 );
-            }
-          }
-        };
-        MeMateUIManager.registerSeparator( separator, "default" );
-        final GridBagConstraints seperatorConstraints = new GridBagConstraints();
-        seperatorConstraints.gridx = 1;
-        seperatorConstraints.gridy = 0;
-        seperatorConstraints.weightx = 1;
-        seperatorConstraints.insets = new Insets( 0, 0, 3, 0 );
-        seperatorConstraints.anchor = GridBagConstraints.SOUTH;
-        seperatorConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add( separator, seperatorConstraints );
-
-        final JLabel amountLabel = MeMateUIManager.createJLabel();
-        switch ( ingredient )
-        {
-          case "Salz":
-            amountLabel.setText( String.format( " %.2fg", ingredients.salt ) );
-            break;
-          case "Eiweiß":
-            amountLabel.setText( String.format( " %.1fg", ingredients.protein ) );
-            break;
-          case "Energie":
-            amountLabel.setText( " " + ingredients.energy_kJ + " kJ (" + ingredients.energy_kcal + " kcal)" );
-            break;
-          case "Fett":
-            amountLabel.setText( String.format( " %.1fg", ingredients.fat ) );
-            break;
-          case "davon gesättigte Fettsäuren":
-            amountLabel.setText( String.format( " %.1fg", ingredients.fatty_acids ) );
-            break;
-          case "Kohlenhydrate":
-            amountLabel.setText( String.format( " %.1fg", ingredients.carbs ) );
-            break;
-          case "Zucker":
-            amountLabel.setText( String.format( " %.1fg", ingredients.sugar ) );
-          default :
-            break;
-        }
-        final GridBagConstraints amountLabelConstraints = new GridBagConstraints();
-        amountLabelConstraints.gridx = 2;
-        amountLabelConstraints.gridy = 0;
-        amountLabelConstraints.weightx = 0;
-        amountLabelConstraints.anchor = GridBagConstraints.LAST_LINE_END;
-        panel.add( amountLabel, amountLabelConstraints );
-
-        final GridBagConstraints panelConstraints = new GridBagConstraints();
-        panelConstraints.gridx = 0;
-        panelConstraints.gridy = y;
-        panelConstraints.gridwidth = 3;
-        panelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panelConstraints.insets = new Insets( 0, 2, 0, 2 );
-        infoPanel.add( panel, panelConstraints );
-      }
-    };
-    infoButton.setToolTipText( "" );
-    infoButton.setContentAreaFilled( false );
-    infoButton.setOpaque( false );
-    infoButton.setFocusable( false );
-    infoButton.setBorder( BorderFactory.createEmptyBorder() );
-    final int defaultInitialDelay = ToolTipManager.sharedInstance().getInitialDelay();
-    infoButton.addMouseListener( new MouseAdapter()
-    {
-      @Override
-      public void mouseEntered( final MouseEvent me )
-      {
-        ToolTipManager.sharedInstance().setInitialDelay( 1 );
-      }
-
-      @Override
-      public void mouseExited( final MouseEvent me )
-      {
-        ToolTipManager.sharedInstance().setInitialDelay( defaultInitialDelay );
-      }
-    } );
-
-    MeMateUIManager.registerInfoButton( infoButton );
+    infoButton = MeMateUIManager.createInfoButton( name );
 
     setLayout( new BorderLayout() );
     acceptButton.setText( "Ja" );
@@ -595,7 +411,7 @@ class DrinkConsumptionButton extends JPanel
     acceptButton.getActionMap().put( "Abbrechen", abortAction );
     abortButton.getInputMap().put( KeyStroke.getKeyStroke( "ESCAPE" ), "Abbrechen" );
     abortButton.getActionMap().put( "Abbrechen", abortAction );
-    addMouseListener( mouseListener );
+    //    addMouseListener( mouseListener );
     addFocusListener( focusListener );
     addKeyListener( keyListener );
     MeMateUIManager.registerPanel( "drinkButton", this );

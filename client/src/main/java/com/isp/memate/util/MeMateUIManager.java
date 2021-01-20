@@ -6,6 +6,8 @@ package com.isp.memate.util;
 import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,6 +30,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JToolTip;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -40,6 +44,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatUIDefaultsInspector;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+
+import com.isp.memate.DrinkDetailsToolTip;
 import com.isp.memate.actionbar.MeMateActionBarButton;
 import com.isp.memate.actionbar.MeMateActionBarListener;
 
@@ -192,12 +198,12 @@ public class MeMateUIManager
         BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( UIManager.getColor( "AppColor" ) ),
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
 
-    UIManager.put( "OptionPane.background", UIManager.getColor( "App.Background" ) );
+    //    UIManager.put( "OptionPane.background", UIManager.getColor( "App.Background" ) );
     //    UIManager.put( "Panel.background", UIManager.getColor( "App.Background" ) );
-    UIManager.put( "OptionPane.messageForeground", Color.white );
+    //    UIManager.put( "OptionPane.messageForeground", Color.white );
     //    UIManager.put( "Label.foreground", Color.white );
-    UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
-    UIManager.put( "ToolTip.foreground", Color.white );
+    //    UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
+    //    UIManager.put( "ToolTip.foreground", Color.white );
     UIManager.put( "ComboBox.buttonBackground", new Color( 51, 61, 78 ) );
     UIManager.put( "ComboBox.buttonShadow", new Color( 51, 61, 78 ) );
     UIManager.put( "ComboBox.buttonDarkShadow", new Color( 91, 109, 139 ) );
@@ -221,8 +227,8 @@ public class MeMateUIManager
     //    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
     UIManager.put( "OptionPane.messageForeground", Color.black );
     //    UIManager.put( "Label.foreground", Color.black );
-    UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
-    UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
+    //    UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
+    //    UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
     UIManager.put( "ComboBox.buttonBackground", new Color( 215, 215, 215 ) );
     UIManager.put( "ComboBox.buttonShadow", new Color( 215, 215, 215 ) );
     UIManager.put( "ComboBox.buttonDarkShadow", Color.black );
@@ -243,12 +249,12 @@ public class MeMateUIManager
         BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( UIManager.getColor( "AppColor" ) ),
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
 
-    UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
+    //    UIManager.put( "OptionPane.background", new Color( 240, 240, 240 ) );
     //    UIManager.put( "Panel.background", new Color( 240, 240, 240 ) );
-    UIManager.put( "OptionPane.messageForeground", Color.black );
+    //    UIManager.put( "OptionPane.messageForeground", Color.black );
     //    UIManager.put( "Label.foreground", Color.black );
-    UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
-    UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
+    //    UIManager.put( "ToolTip.background", new Color( 255, 255, 225 ) );
+    //    UIManager.put( "ToolTip.foreground", new Color( 0, 0, 0 ) );
     UIManager.put( "ComboBox.buttonBackground", new Color( 215, 215, 215 ) );
     UIManager.put( "ComboBox.buttonShadow", new Color( 215, 215, 215 ) );
     UIManager.put( "ComboBox.buttonDarkShadow", Color.black );
@@ -272,8 +278,8 @@ public class MeMateUIManager
     //    UIManager.put( "Panel.background", UIManager.getColor( "App.Background" ) );
     UIManager.put( "OptionPane.messageForeground", Color.white );
     //    UIManager.put( "Label.foreground", Color.white );
-    UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
-    UIManager.put( "ToolTip.foreground", Color.white );
+    //    UIManager.put( "ToolTip.background", new Color( 72, 87, 111 ) );
+    //    UIManager.put( "ToolTip.foreground", Color.white );
     UIManager.put( "ComboBox.buttonBackground", new Color( 51, 61, 78 ) );
     UIManager.put( "ComboBox.buttonShadow", new Color( 51, 61, 78 ) );
     UIManager.put( "ComboBox.buttonDarkShadow", new Color( 91, 109, 139 ) );
@@ -286,6 +292,104 @@ public class MeMateUIManager
     final JPanel panel = new JPanel();
     panel.setBorder( BorderFactory.createLineBorder( UIManager.getColor( "Button.borderColor" ) ) );
     return panel;
+  }
+
+  public static JPanel createJPanelWithToolTipBackground()
+  {
+    final JPanel panel = new JPanel();
+    panel.setBackground( UIManager.getColor( "ToolTip.background" ) );
+    return panel;
+  }
+
+  public static JPanel createJPanelWithHoverEffect()
+  {
+    final JPanel panel = new JPanel()
+    {
+      @Override
+      public void updateUI()
+      {
+        setBackground( UIManager.getColor( "Button.background" ) );
+      };
+    };
+    panel.addMouseListener( new MouseAdapter()
+    {
+      @Override
+      public void mouseEntered( final MouseEvent __ )
+      {
+        panel.setBackground( UIManager.getColor( "Button.default.hoverBackground" ) );
+      }
+
+      public void mouseExited( MouseEvent __ )
+      {
+        panel.setBackground( UIManager.getColor( "Button.default.background" ) );
+      };
+
+      public void mousePressed( MouseEvent __ )
+      {
+        panel.setBackground( UIManager.getColor( "Button.default.pressedBackground" ) );
+      };
+
+      public void mouseReleased( MouseEvent event )
+      {
+        if ( SwingUtilities.getLocalBounds( panel ).contains( event.getPoint() ) )
+        {
+          panel.setBackground( UIManager.getColor( "Button.default.hoverBackground" ) );
+        }
+        else
+        {
+          panel.setBackground( UIManager.getColor( "Button.default.background" ) );
+        }
+      };
+
+    } );
+    panel.setBackground( UIManager.getColor( "Button.background" ) );
+    return panel;
+  }
+
+  public static JButton createInfoButton( String drinkName )
+  {
+    JButton button = new JButton( new InfoIcon() )
+    {
+      JToolTip tooltip;
+
+      @Override
+      public JToolTip createToolTip()
+      {
+        if ( tooltip == null )
+        {
+          tooltip = new DrinkDetailsToolTip( drinkName );
+        }
+        return tooltip;
+      }
+
+      @Override
+      public void updateUI()
+      {
+        super.updateUI();
+        setIcon( new InfoIcon() );
+      }
+    };
+    button.setToolTipText( "" );
+    button.setContentAreaFilled( false );
+    button.setOpaque( false );
+    button.setFocusable( false );
+    button.setBorder( BorderFactory.createEmptyBorder() );
+    final int defaultInitialDelay = ToolTipManager.sharedInstance().getInitialDelay();
+    button.addMouseListener( new MouseAdapter()
+    {
+      @Override
+      public void mouseEntered( final MouseEvent me )
+      {
+        ToolTipManager.sharedInstance().setInitialDelay( 1 );
+      }
+
+      @Override
+      public void mouseExited( final MouseEvent me )
+      {
+        ToolTipManager.sharedInstance().setInitialDelay( defaultInitialDelay );
+      }
+    } );
+    return button;
   }
 
   /**
