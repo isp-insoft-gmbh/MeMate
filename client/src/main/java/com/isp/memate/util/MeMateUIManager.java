@@ -301,51 +301,6 @@ public class MeMateUIManager
     return panel;
   }
 
-  public static JPanel createJPanelWithHoverEffect()
-  {
-    final JPanel panel = new JPanel()
-    {
-      @Override
-      public void updateUI()
-      {
-        setBackground( UIManager.getColor( "Button.background" ) );
-      };
-    };
-    panel.addMouseListener( new MouseAdapter()
-    {
-      @Override
-      public void mouseEntered( final MouseEvent __ )
-      {
-        panel.setBackground( UIManager.getColor( "Button.default.hoverBackground" ) );
-      }
-
-      public void mouseExited( MouseEvent __ )
-      {
-        panel.setBackground( UIManager.getColor( "Button.default.background" ) );
-      };
-
-      public void mousePressed( MouseEvent __ )
-      {
-        panel.setBackground( UIManager.getColor( "Button.default.pressedBackground" ) );
-      };
-
-      public void mouseReleased( MouseEvent event )
-      {
-        if ( SwingUtilities.getLocalBounds( panel ).contains( event.getPoint() ) )
-        {
-          panel.setBackground( UIManager.getColor( "Button.default.hoverBackground" ) );
-        }
-        else
-        {
-          panel.setBackground( UIManager.getColor( "Button.default.background" ) );
-        }
-      };
-
-    } );
-    panel.setBackground( UIManager.getColor( "Button.background" ) );
-    return panel;
-  }
-
   public static JButton createInfoButton( String drinkName )
   {
     JButton button = new JButton( new InfoIcon() )

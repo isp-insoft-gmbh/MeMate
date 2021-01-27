@@ -101,15 +101,15 @@ class Dashboard extends JPanel
       if ( (int) value != 0 )
       {
 
-      final int result =
-          JOptionPane.showConfirmDialog( Dashboard.this, description,
-              title, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE );
-      if ( result == JOptionPane.YES_OPTION )
-      {
-        final ServerCommunication sc = ServerCommunication.getInstance();
-        sc.addBalance( (int) value );
-        ServerCommunication.getInstance().getBalance();
-        GUIObjects.mainframe.setUndoButtonEnabled( true );
+        final int result =
+            JOptionPane.showConfirmDialog( Dashboard.this, description,
+                title, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE );
+        if ( result == JOptionPane.YES_OPTION )
+        {
+          final ServerCommunication sc = ServerCommunication.getInstance();
+          sc.addBalance( (int) value );
+          ServerCommunication.getInstance().getBalance();
+          GUIObjects.mainframe.setUndoButtonEnabled( true );
         }
       }
     } );
@@ -192,7 +192,7 @@ class Dashboard extends JPanel
       {
         newImage = image.getScaledInstance( 70, 220, Image.SCALE_SMOOTH );
       }
-      final DrinkConsumptionButton button = new DrinkConsumptionButton( mainFrame, drinkPrice, drinkName, new ImageIcon( newImage ) );
+      final DrinkConsumptionButton button = new DrinkConsumptionButton( drinkPrice, drinkName, new ImageIcon( newImage ) );
       buttonList.add( button );
       panel.add( button );
     }
@@ -255,26 +255,21 @@ class Dashboard extends JPanel
   /**
    * Resetet alle drinkButtons, dies tritt nur auf wenn man bereits ein
    * Getränk angeklickt hat und nun ein weiteres anklicken möchte.
+   * 
+   * @param doNotChange
    */
-  void resetAllDrinkButtons()
+  void resetAllDrinkButtons( DrinkConsumptionButton doNotChange )
   {
     for ( final DrinkConsumptionButton drinkConsumptionButton : buttonList )
     {
-      if ( drinkConsumptionButton.askWhetherToReallyConsumeLabelIsActive )
+      if ( STATE.BUY.equals( drinkConsumptionButton.getCURRENT_STATE() ) )
       {
-        drinkConsumptionButton.reset();
+        if ( !drinkConsumptionButton.equals( doNotChange ) )
+        {
+          drinkConsumptionButton.switchState( STATE.DEFAULT );
+          drinkConsumptionButton.setBackground( UIManager.getColor( "Button.background" ) );
+        }
       }
-    }
-  }
-
-  /**
-   * Updated die Infoicons der buttons
-   */
-  public void updateAllDrinkButtonIcons()
-  {
-    for ( final DrinkConsumptionButton drinkConsumptionButton : buttonList )
-    {
-      drinkConsumptionButton.getInfoButton().setIcon( new InfoIcon() );
     }
   }
 }
