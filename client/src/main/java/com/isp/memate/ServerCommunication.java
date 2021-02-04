@@ -184,11 +184,11 @@ public class ServerCommunication
               getBalance();
               break;
             case PRICE_CHANGED:
-              GUIObjects.mainframe.getDashboard().showPriceChangedDialog( shared.drinkPrice.name,
+              GUIObjects.dashboard.showPriceChangedDialog( shared.drinkPrice.name,
                   shared.drinkPrice.price );
               break;
             case NO_MORE_DRINKS_AVAIBLE:
-              GUIObjects.mainframe.getDashboard().showNoMoreDrinksDialog( shared.consumedDrink );
+              GUIObjects.dashboard.showNoMoreDrinksDialog( shared.consumedDrink );
               break;
             case PIGGYBANK_BALANCE:
               cache.setPiggyBankBalance( shared.userBalance );

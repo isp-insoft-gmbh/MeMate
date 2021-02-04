@@ -44,46 +44,39 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class Mainframe extends JFrame
 {
-  Cache                         cache            = Cache.getInstance();
-  private final Dashboard       dashboard;
-  private final Color           color            = UIManager.getColor( "AppColor" );
-  private final JPanel          contentPanel     = new JPanel()
-                                                 {
-                                                   @Override
-                                                   public Component add( Component comp )
-                                                   {
-                                                     super.add( comp );
-                                                     repaint();
-                                                     revalidate();
-                                                     return comp;
-                                                   }
-                                                 };
-  private final JLabel          helloUserLabel   = new JLabel( "Hallo User" );
-  private final ConsumptionRate consumptionRate  = new ConsumptionRate();
-  private final CreditHistory   creditHistory    = new CreditHistory();
-  private final Drinkmanager    drinkManager     = new Drinkmanager();
-  private final Adminview       adminView        = new Adminview();
-  private final Social          social           = new Social();
-  private final JLabel          balanceLabel     = new JLabel();
-  public final JPanel           headerPanel      = new JPanel();
+  Cache                         cache           = Cache.getInstance();
+  private final Color           color           = UIManager.getColor( "AppColor" );
+  private final JPanel          contentPanel    = new JPanel()
+                                                {
+                                                  @Override
+                                                  public Component add( Component comp )
+                                                  {
+                                                    super.add( comp );
+                                                    repaint();
+                                                    revalidate();
+                                                    return comp;
+                                                  }
+                                                };
+  private final JLabel          helloUserLabel  = new JLabel( "Hallo User" );
+  private final ConsumptionRate consumptionRate = new ConsumptionRate();
+  private final Drinkmanager    drinkManager    = new Drinkmanager();
+  private final Adminview       adminView       = new Adminview();
+  private final Social          social          = new Social();
+  private final JLabel          balanceLabel    = new JLabel();
+  public final JPanel           headerPanel     = new JPanel();
   public JPanel                 burgerButton;
   private MeMateActionBarButton dashboardButton;
   private MeMateActionBarButton logoutButton;
   public MeMateActionBarButton  settingsButton;
   private MeMateActionBarButton undoButton;
   public MeMateActionBar        bar;
-  public static Image           frameImage       =
+  public static Image           frameImage      =
       Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue.png" ) );
 
 
   public Drinkmanager getDrinkManager()
   {
     return drinkManager;
-  }
-
-  public Dashboard getDashboard()
-  {
-    return dashboard;
   }
 
   /**
@@ -93,9 +86,8 @@ public class Mainframe extends JFrame
   public Mainframe()
   {
     GUIObjects.mainframe = this;
-    dashboard = new Dashboard( this );
     contentPanel.setLayout( new BorderLayout() );
-    contentPanel.add( dashboard );
+    contentPanel.add( new Dashboard() );
 
     deriveFontsAndSetLayout();
     setIconImage(
@@ -107,7 +99,6 @@ public class Mainframe extends JFrame
     setLocationRelativeTo( null );
     add( contentPanel, BorderLayout.CENTER );
     add( headerPanel, BorderLayout.NORTH );
-    MeMateUIManager.setUISettings();
     setHelloLabel( cache.getDisplayname() );
   }
 
@@ -183,27 +174,22 @@ public class Mainframe extends JFrame
         "Dashboard", "Dashboard öffnen", color, () ->
         {
           contentPanel.removeAll();
-          dashboard.updateButtonpanel();
           contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
-          contentPanel.add( dashboard );
+          contentPanel.add( new Dashboard() );
         } );
     bar.addActionButton( UIManager.getIcon( "history.icon.black" ), UIManager.getIcon( "history.icon.white" ), "Historie",
         "Historie öffnen", color, () ->
         {
           contentPanel.removeAll();
-          if ( GUIObjects.history == null )
-          {
-            new History();
-          }
-          contentPanel.add( GUIObjects.history );
+          contentPanel.add( new History() );
+          contentPanel.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
         } );
     bar.addActionButton( UIManager.getIcon( "consumption.icon.black" ), UIManager.getIcon( "consumption.icon.white" ), "Verbrauchsrate",
         "Hier können sie ihren durchschnittlichen Konsum sehen", color, () ->
         {
           contentPanel.removeAll();
           consumptionRate.addGraph();
-          MeMateUIManager.setUISettings();
-          contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
+          contentPanel.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
           contentPanel.add( consumptionRate );
         } );
     bar.addActionButton( UIManager.getIcon( "creditHistory.icon.black" ), UIManager.getIcon( "creditHistory.icon.white" ),
@@ -211,17 +197,14 @@ public class Mainframe extends JFrame
         "Hier können sie den Verlauf ihres Guthabens betrachten", color, () ->
         {
           contentPanel.removeAll();
-          creditHistory.addChart();
-          MeMateUIManager.setUISettings();
-          contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
-          contentPanel.add( creditHistory );
+          contentPanel.setBorder( new EmptyBorder( 4, 0, 4, 0 ) );
+          contentPanel.add( new CreditHistory() );
         } );
     bar.addActionButton( UIManager.getIcon( "social.icon.black" ), UIManager.getIcon( "social.icon.white" ), "Scoreboard", "Scoreboard",
         color, () ->
         {
           contentPanel.removeAll();
           social.update();
-          MeMateUIManager.setUISettings();
           contentPanel.add( social );
         } );
   }
@@ -265,7 +248,6 @@ public class Mainframe extends JFrame
         {
           ServerCommunication.getInstance().undoLastAction();
           undoButton.setBackground( bar.getBackground() );
-          updateDashboard();
         } );
     undoButton.setEnabled( false );
   }
@@ -280,7 +262,6 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             drinkManager.updateList();
-            MeMateUIManager.setUISettings();
             contentPanel.add( drinkManager );
             contentPanel.setBorder( new EmptyBorder( 0, 0, 5, 5 ) );
             contentPanel.repaint();
@@ -291,7 +272,6 @@ public class Mainframe extends JFrame
           {
             contentPanel.removeAll();
             adminView.updateDrinkAmounts();
-            MeMateUIManager.setUISettings();
             contentPanel.add( adminView );
             contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
@@ -360,23 +340,5 @@ public class Mainframe extends JFrame
   public void setUndoButtonEnabled( final boolean state )
   {
     undoButton.setEnabled( state );
-  }
-
-  void updateDashboard()
-  {
-    final Component[] comp = contentPanel.getComponents();
-    for ( final Component component : comp )
-    {
-      if ( component instanceof Dashboard )
-      {
-        contentPanel.removeAll();
-        dashboard.updateButtonpanel();
-        contentPanel.add( dashboard );
-      }
-      else
-      {
-        dashboard.updateButtonpanel();
-      }
-    }
   }
 }

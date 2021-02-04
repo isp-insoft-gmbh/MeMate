@@ -24,7 +24,6 @@ import javax.swing.border.MatteBorder;
 
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
-import com.isp.memate.util.InfoIcon;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
 
@@ -42,38 +41,34 @@ import net.miginfocom.swing.MigLayout;
  * @author nwe
  * @since 15.10.2019
  */
-class Dashboard extends JPanel
+public class Dashboard extends JPanel
 {
-  private final Mainframe                         mainFrame;
-  private final ImageIcon                         infoIcon      =
-      new ImageIcon( getClass().getClassLoader().getResource( "infoicon.png" ) );
-  private final ImageIcon                         infoIconWhite =
-      new ImageIcon( getClass().getClassLoader().getResource( "infoicon_white.png" ) );
-  private final JLabel                            infoIconLabel = new JLabel( infoIcon );
-  private final JScrollPane                       scrollpane;
-  private final ArrayList<DrinkConsumptionButton> buttonList    = new ArrayList<>();
-  Cache                                           cache         = Cache.getInstance();
+  private JScrollPane                             scrollpane;
+  private final ArrayList<DrinkConsumptionButton> buttonList = new ArrayList<>();
+  Cache                                           cache      = Cache.getInstance();
 
   /**
    * Passt Layout, Hintergrund und Borders an.
    *
-   * @param mainFrame Parent-Mainframe für Statuszugriff/updates
    */
-  Dashboard( final Mainframe mainFrame )
+  Dashboard()
   {
-    this.mainFrame = mainFrame;
-    scrollpane = new JScrollPane( createDrinkButtonPanel() );
-    scrollpane.getVerticalScrollBar().setUnitIncrement( 16 );
-    scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
-    scrollpane.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER );
+    GUIObjects.dashboard = this;
+    initScrollPane();
 
     setLayout( new BorderLayout() );
     add( scrollpane, BorderLayout.CENTER );
     add( createLowerPanel(), BorderLayout.SOUTH );
-    MeMateUIManager.registerIconLabel( infoIconLabel, infoIcon, infoIconWhite );
-    MeMateUIManager.registerPanel( "default", this );
-    MeMateUIManager.registerScrollPane( "scroll", scrollpane );
   }
+
+  private void initScrollPane()
+  {
+    scrollpane = new JScrollPane( createDrinkButtonPanel() );
+    scrollpane.getVerticalScrollBar().setUnitIncrement( 16 );
+    scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+    scrollpane.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER );
+  }
+
 
   /**
    * Erstellt das lowerPanel und setzt das Layout.
@@ -125,6 +120,9 @@ class Dashboard extends JPanel
     infoTextLabel1.setText( infoText1 );
     infoTextLabel2.setText( infoText2 );
 
+    JLabel infoIconLabel = new JLabel();
+    infoIconLabel
+        .setIcon( MeMateUIManager.getDarkModeState() ? UIManager.getIcon( "info.icon.white" ) : UIManager.getIcon( "info.icon.black" ) );
     infoIconLabel.setBorder( new MatteBorder( 0, 20, 0, 0, UIManager.getColor( "separator.background" ) ) );
 
     final String infoTextToolTip = "<html>" + infoText1 + "<br>" + infoText2 + "</html>";
@@ -206,7 +204,6 @@ class Dashboard extends JPanel
     try
     {
       scrollpane.setViewportView( createDrinkButtonPanel() );
-      MeMateUIManager.setUISettings();
     }
     catch ( final Exception exception )
     {
@@ -227,7 +224,7 @@ class Dashboard extends JPanel
   void showPriceChangedDialog( final String name, final Float price )
   {
 
-    final int result = JOptionPane.showConfirmDialog( mainFrame,
+    final int result = JOptionPane.showConfirmDialog( Dashboard.this,
         String.format(
             "<html>Der Preis von <b>" + name + "</b> hat sich auf <b>%.2f€</b> geändert.\nWollen Sie das Getränk trotzdem kaufen?",
             price ),
@@ -247,24 +244,25 @@ class Dashboard extends JPanel
    */
   void showNoMoreDrinksDialog( final String name )
   {
-    JOptionPane.showMessageDialog( mainFrame, "<html><b>" + name + " </b>ist leider nicht mehr verfügbar</html>", "Getränk nicht verfügbar",
+    JOptionPane.showMessageDialog( Dashboard.this, "<html><b>" + name + " </b>ist leider nicht mehr verfügbar</html>",
+        "Getränk nicht verfügbar",
         JOptionPane.ERROR_MESSAGE, null );
   }
 
 
   /**
-   * Resetet alle drinkButtons, dies tritt nur auf wenn man bereits ein
-   * Getränk angeklickt hat und nun ein weiteres anklicken möchte.
+   * All DrinkConsumptionButtons are being set to default State, in order to only show the buy state in one
+   * button at the time.
    * 
-   * @param doNotChange
+   * @param source the {@link DrinkConsumptionButton} that should not get reseted.
    */
-  void resetAllDrinkButtons( DrinkConsumptionButton doNotChange )
+  void resetAllDrinkButtons( DrinkConsumptionButton source )
   {
     for ( final DrinkConsumptionButton drinkConsumptionButton : buttonList )
     {
       if ( STATE.BUY.equals( drinkConsumptionButton.getCURRENT_STATE() ) )
       {
-        if ( !drinkConsumptionButton.equals( doNotChange ) )
+        if ( !drinkConsumptionButton.equals( source ) )
         {
           drinkConsumptionButton.switchState( STATE.DEFAULT );
           drinkConsumptionButton.setBackground( UIManager.getColor( "Button.background" ) );

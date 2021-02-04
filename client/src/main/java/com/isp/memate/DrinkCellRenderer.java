@@ -3,7 +3,6 @@
  */
 package com.isp.memate;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -13,16 +12,12 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.text.NumberFormat;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
-
-import com.isp.memate.util.MeMateUIManager;
 
 /**
  * Der DrinkCellRenderer erweitert die ListCellRenderer-Klasse, damit im Drinkmanager die
@@ -34,9 +29,6 @@ import com.isp.memate.util.MeMateUIManager;
  */
 class DrinkCellRenderer implements ListCellRenderer<Object>
 {
-  private final Border DEFAULT_BORDER  = BorderFactory.createEmptyBorder( 2, 2, 2, 2 );
-  private final Border FOCUS_BORDER    = BorderFactory.createCompoundBorder( BorderFactory.createEmptyBorder( 1, 1, 1, 1 ),
-      BorderFactory.createDashedBorder( Color.WHITE, 1, 1 ) );
   private final JPanel renderComponent = new JPanel();
   private final JLabel drinkNameLabel  = new JLabel();
   private final JLabel priceLabel      = new JLabel();
@@ -115,34 +107,13 @@ class DrinkCellRenderer implements ListCellRenderer<Object>
     }
     pictureLabel.setPreferredSize( new Dimension( 200, 140 ) );
     drinkNameLabel.setText( value.toString() );
-    if ( cellHasFocus )
-    {
-      renderComponent.setBorder( FOCUS_BORDER );
-    }
-    else
-    {
-      renderComponent.setBorder( DEFAULT_BORDER );
-    }
     if ( isSelected )
     {
-      renderComponent.setBackground( UIManager.getColor( "AppColor" ) );
-      priceLabel.setForeground( UIManager.getColor( "Table.selectionForeground" ) );
-      drinkNameLabel.setForeground( UIManager.getColor( "Table.selectionForeground" ) );
+      renderComponent.setBackground( UIManager.getColor( "Table.selectionBackground" ) );
     }
     else
     {
-      if ( MeMateUIManager.getDarkModeState() )
-      {
-        renderComponent.setBackground( MeMateUIManager.getBackground( "default" ).getDarkColor() );
-        priceLabel.setForeground( MeMateUIManager.getForeground( "default" ).getDarkColor() );
-        drinkNameLabel.setForeground( MeMateUIManager.getForeground( "default" ).getDarkColor() );
-      }
-      else
-      {
-        renderComponent.setBackground( MeMateUIManager.getBackground( "default" ).getDayColor() );
-        priceLabel.setForeground( MeMateUIManager.getForeground( "default" ).getDayColor() );
-        drinkNameLabel.setForeground( MeMateUIManager.getForeground( "default" ).getDayColor() );
-      }
+      renderComponent.setBackground( UIManager.getColor( "Panel.background" ) );
     }
     return renderComponent;
   }

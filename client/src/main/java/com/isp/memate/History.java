@@ -4,6 +4,7 @@
 package com.isp.memate;
 
 import java.awt.BorderLayout;
+
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,7 +16,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import com.isp.memate.ServerCommunication.dateType;
-import com.isp.memate.util.GUIObjects;
 
 /**
  * In der Historie soll der Nutzer alle bisherigen Buchungen sehen, egal ob er etwas
@@ -36,7 +36,6 @@ public class History extends JPanel
 
   public History()
   {
-    GUIObjects.history = this;
     initComponents();
     setLayout( new BorderLayout() );
     add( scrollPane, BorderLayout.CENTER );

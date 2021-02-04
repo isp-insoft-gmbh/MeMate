@@ -436,7 +436,6 @@ class Settings extends JPanel
 
   private void addColorThemePicker()
   {
-    MeMateUIManager.registerComboBox( colorThemeComboBox );
     final JLabel pickThemeLabel = new JLabel();
     pickThemeLabel.setText( "Color Scheme auswählen" );
     pickThemeLabel.setFont( pickThemeLabel.getFont().deriveFont( 18f ) );
@@ -561,8 +560,6 @@ class Settings extends JPanel
     UIManager.put( "FocusBorder",
         BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( appColor ),
             BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
-    MeMateUIManager.installDefaults();
-    MeMateUIManager.setUISettings();
     GUIObjects.mainframe.headerPanel.setBackground( appColor );
     GUIObjects.mainframe.settingsButton.selected();
     if ( MeMateUIManager.getDarkModeState() )

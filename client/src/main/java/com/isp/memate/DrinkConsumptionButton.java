@@ -368,7 +368,7 @@ class DrinkConsumptionButton extends JPanel
           break;
         case BUY:
           add( buyPanel );
-          GUIObjects.mainframe.getDashboard().resetAllDrinkButtons( this );
+          GUIObjects.dashboard.resetAllDrinkButtons( this );
           acceptButton.requestFocus();
           setBackground( UIManager.getColor( "Button.hoverBackground" ) );
           break;

@@ -107,7 +107,6 @@ class Adminview extends JPanel
     scrollpane.getVerticalScrollBar().setUnitIncrement( 12 );
     scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
     scrollpane.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER );
-    MeMateUIManager.registerScrollPane( "scroll", scrollpane );
     add( scrollpane, BorderLayout.CENTER );
   }
 
@@ -178,7 +177,7 @@ class Adminview extends JPanel
       final JButton abortButton = new JButton( "Abbrechen" );
       final JLabel userLabel = new JLabel( "Nutzer auswählen" );
       final JLabel newPassword = new JLabel( "Neues Passwort:  " );
-      final JTextField passwordField = MeMateUIManager.createJTextField();
+      final JTextField passwordField = new JTextField();
       final JComboBox<String> userComboBox = new JComboBox<>( user );
       passwordPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
 

@@ -249,7 +249,7 @@ public class Cache
       if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap )
           || !byteImageList.equals( oldByteImageList ) || !amountMap.equals( oldAmountMap ) )
       {
-        GUIObjects.mainframe.updateDashboard();
+        GUIObjects.dashboard.updateButtonpanel();
       }
       GUIObjects.mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
     }

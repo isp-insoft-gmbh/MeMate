@@ -27,7 +27,6 @@ import javax.swing.JPanel;
 
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
-import com.isp.memate.util.MeMateUIManager;
 
 /**
  * Im Social Panel kann man ein wöchentliches Scoreboard, ein Overall Scoreboard und wer grade
@@ -146,7 +145,6 @@ public class Social extends JPanel
               panelConstraints.gridx = 0;
               panelConstraints.gridy = ypos;
               panelConstraints.insets = new Insets( 5, 5, 5, 5 );
-              MeMateUIManager.registerPanel( "adminButton", panel );
               activityPanel.add( panel, panelConstraints );
               ypos++;
             }

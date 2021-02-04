@@ -15,8 +15,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import com.isp.memate.util.MeMateUIManager;
-
 /**
  * Im Getränkemanager kann der Admin einstellen, welche Getränke es gibt.
  * Man kann neue Getränke hinzufügen, Getränke entfernen
@@ -30,10 +28,10 @@ class Drinkmanager extends JPanel
 {
   Cache                     cache             = Cache.getInstance();
   private String[]          data              = new String[cache.getDrinkNames().size()];
-  private final JButton     addButton         = MeMateUIManager.createButton( "button" );
-  private final JButton     editButton        = MeMateUIManager.createButton( "button" );
-  private final JButton     removeButton      = MeMateUIManager.createButton( "button" );
-  private final JButton     ingredientsButton = MeMateUIManager.createButton( "button" );
+  private final JButton     addButton         = new JButton();
+  private final JButton     editButton        = new JButton();
+  private final JButton     removeButton      = new JButton();
+  private final JButton     ingredientsButton = new JButton();
   private JList<String>     drinkList         = new JList<>( data );
   private final JScrollPane scrollpane        = new JScrollPane();
   private int               currentSelection;
@@ -58,7 +56,6 @@ class Drinkmanager extends JPanel
     drinkList.setFixedCellHeight( 150 );
     drinkList.setFont( drinkList.getFont().deriveFont( 20f ) );
     scrollpane.setViewportView( drinkList );
-    MeMateUIManager.registerScrollPane( "scroll", scrollpane );
 
     if ( data.length == 0 )
     {
@@ -72,7 +69,6 @@ class Drinkmanager extends JPanel
       removeButton.setEnabled( true );
     }
     drinkList.addListSelectionListener( e -> currentSelection = drinkList.getSelectedIndex() );
-    MeMateUIManager.registerPanel( "default", this );
   }
 
   /**
@@ -144,7 +140,6 @@ class Drinkmanager extends JPanel
     drinkList.setCellRenderer( new DrinkCellRenderer() );
     drinkList.setFixedCellHeight( 150 );
     drinkList.setFont( drinkList.getFont().deriveFont( 20f ) );
-    MeMateUIManager.registerList( "default", drinkList );
     scrollpane.setViewportView( drinkList );
     scrollpane.repaint();
 

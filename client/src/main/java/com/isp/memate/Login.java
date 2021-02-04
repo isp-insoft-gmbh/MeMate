@@ -147,7 +147,7 @@ public class Login extends JFrame
       public void focusGained( final FocusEvent e )
       {
         hyperlink.setText(
-            generateHTMLText( UIManager.getColor( "AppColor" ), text ) );
+            generateHTMLText( UIManager.getColor( "Component.linkColor" ), text ) );
       }
     } );
   }

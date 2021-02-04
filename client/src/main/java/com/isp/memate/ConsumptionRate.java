@@ -42,7 +42,6 @@ import org.jfree.data.xy.XYDataset;
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
-import com.isp.memate.util.MeMateUIManager;
 
 
 /**
@@ -175,7 +174,8 @@ class ConsumptionRate extends JPanel
     plot.setDomainAxis( dateAxis );
     freeChart.getXYPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
     freeChart.getXYPlot().getRangeAxis().setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
-    MeMateUIManager.registerFreeChart( freeChart );
+    //FIXME(nwe | 27.01.2021): 
+    //    MeMateUIManager.registerFreeChart( freeChart );
     return freeChart;
   }
 
@@ -199,7 +199,7 @@ class ConsumptionRate extends JPanel
     final GridBagConstraints selectedDrinkComboboxConstraints = getSelectedDrinkComboboxConstraits();
     add( selectDrinkComboBox, selectedDrinkComboboxConstraints );
 
-    final JLabel averageConsumption = MeMateUIManager.createJLabel();
+    final JLabel averageConsumption = new JLabel();
     averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
     final GridBagConstraints averageConsumptionConstraints = getAverageConsumptionConstraints();
     add( averageConsumption, averageConsumptionConstraints );
@@ -214,11 +214,9 @@ class ConsumptionRate extends JPanel
       chartPanel.setChart( chart );
       averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage(), String.valueOf( e.getItem() ) ) );
       add( chartPanel, chartPanelConstraits );
-      MeMateUIManager.updateGraphs();
       repaint();
       revalidate();
     } );
-    MeMateUIManager.registerPanel( "default", this );
   }
 
   /**
@@ -265,7 +263,6 @@ class ConsumptionRate extends JPanel
     selectDrinkComboBox.setPrototypeDisplayValue( "This is my maximal lenght" );
     selectDrinkComboBox.addItem( "Alle" );
     selectDrinkComboBox.setSelectedItem( "Alle" );
-    MeMateUIManager.registerComboBox( selectDrinkComboBox );
     for ( final String string : consumedDrinks )
     {
       selectDrinkComboBox.addItem( string );
