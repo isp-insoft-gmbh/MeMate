@@ -178,42 +178,6 @@ public class MeMateUIManager
     return darkModeState;
   }
 
-  //    updateGraphs();
-
-
-  //  public static void updateGraphs()
-  //  {
-  //    if ( freeChart != null )
-  //    {
-  //      freeChart.setBackgroundPaint( darkModeState ? MeMateUIManager.getBackground( "default" ).getDarkColor()
-  //          : MeMateUIManager.getBackground( "default" ).getDayColor() );
-  //      freeChart.getTitle().setPaint( darkModeState ? Color.white : Color.black );
-  //      freeChart.getXYPlot()
-  //          .setBackgroundPaint( darkModeState ? UIManager.getColor( "Panel.badkground" ).brighter() : new Color( 192, 192, 192 ) );
-  //      freeChart.getXYPlot().getDomainAxis().setTickLabelPaint( darkModeState ? Color.white : Color.black );
-  //      freeChart.getXYPlot().getRangeAxis().setTickLabelPaint( darkModeState ? Color.white : Color.black );
-  //      freeChart.getXYPlot().getDomainAxis().setLabelPaint( darkModeState ? Color.white : Color.black );
-  //      freeChart.getXYPlot().getRangeAxis().setLabelPaint( darkModeState ? Color.white : Color.black );
-  //      freeChart.getXYPlot().setDomainGridlinesVisible( false );
-  //      freeChart.getXYPlot().setRangeGridlinesVisible( false );
-  //    }
-  //    if ( lineChart != null )
-  //    {
-  //      lineChart.setBackgroundPaint( darkModeState ? MeMateUIManager.getBackground( "default" ).getDarkColor()
-  //          : MeMateUIManager.getBackground( "default" ).getDayColor() );
-  //      lineChart.getCategoryPlot()
-  //          .setBackgroundPaint( darkModeState ? UIManager.getColor( "Panel.background" ).brighter() : new Color( 192, 192, 192 ) );
-  //      lineChart.getTitle().setPaint( darkModeState ? Color.white : Color.black );
-  //      lineChart.getCategoryPlot().getDomainAxis().setTickLabelPaint( darkModeState ? Color.white : Color.black );
-  //      lineChart.getCategoryPlot().getRangeAxis().setTickLabelPaint( darkModeState ? Color.white : Color.black );
-  //      lineChart.getCategoryPlot().getDomainAxis().setLabelPaint( darkModeState ? Color.white : Color.black );
-  //      lineChart.getCategoryPlot().getRangeAxis().setLabelPaint( darkModeState ? Color.white : Color.black );
-  //      lineChart.getCategoryPlot().setDomainGridlinesVisible( false );
-  //      lineChart.getCategoryPlot().setRangeGridlinesVisible( false );
-  //    }
-  //  }
-
-
   public static void applyTheme()
   {
     //TODO(nwe | 09.12.2020): Was für on und off digga ? mach doch einfach true false

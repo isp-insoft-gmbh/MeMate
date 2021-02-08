@@ -44,33 +44,31 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class Mainframe extends JFrame
 {
-  Cache                         cache           = Cache.getInstance();
-  private final Color           color           = UIManager.getColor( "AppColor" );
-  private final JPanel          contentPanel    = new JPanel()
-                                                {
-                                                  @Override
-                                                  public Component add( Component comp )
-                                                  {
-                                                    super.add( comp );
-                                                    repaint();
-                                                    revalidate();
-                                                    return comp;
-                                                  }
-                                                };
-  private final JLabel          helloUserLabel  = new JLabel( "Hallo User" );
-  private final ConsumptionRate consumptionRate = new ConsumptionRate();
-  private final Drinkmanager    drinkManager    = new Drinkmanager();
-  private final Adminview       adminView       = new Adminview();
-  private final Social          social          = new Social();
-  private final JLabel          balanceLabel    = new JLabel();
-  public final JPanel           headerPanel     = new JPanel();
+  Cache                         cache          = Cache.getInstance();
+  private final Color           color          = UIManager.getColor( "AppColor" );
+  private final JPanel          contentPanel   = new JPanel()
+                                               {
+                                                 @Override
+                                                 public Component add( Component comp )
+                                                 {
+                                                   super.add( comp );
+                                                   repaint();
+                                                   revalidate();
+                                                   return comp;
+                                                 }
+                                               };
+  private final JLabel          helloUserLabel = new JLabel( "Hallo User" );
+  private final Drinkmanager    drinkManager   = new Drinkmanager();
+  private final Adminview       adminView      = new Adminview();
+  private final JLabel          balanceLabel   = new JLabel();
+  public final JPanel           headerPanel    = new JPanel();
   public JPanel                 burgerButton;
   private MeMateActionBarButton dashboardButton;
   private MeMateActionBarButton logoutButton;
   public MeMateActionBarButton  settingsButton;
   private MeMateActionBarButton undoButton;
   public MeMateActionBar        bar;
-  public static Image           frameImage      =
+  public static Image           frameImage     =
       Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue.png" ) );
 
 
@@ -181,16 +179,15 @@ public class Mainframe extends JFrame
         "Historie öffnen", color, () ->
         {
           contentPanel.removeAll();
-          contentPanel.add( new History() );
           contentPanel.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+          contentPanel.add( new History() );
         } );
     bar.addActionButton( UIManager.getIcon( "consumption.icon.black" ), UIManager.getIcon( "consumption.icon.white" ), "Verbrauchsrate",
         "Hier können sie ihren durchschnittlichen Konsum sehen", color, () ->
         {
           contentPanel.removeAll();
-          consumptionRate.addGraph();
-          contentPanel.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
-          contentPanel.add( consumptionRate );
+          contentPanel.setBorder( new EmptyBorder( 4, 0, 4, 0 ) );
+          contentPanel.add( new ConsumptionRate() );
         } );
     bar.addActionButton( UIManager.getIcon( "creditHistory.icon.black" ), UIManager.getIcon( "creditHistory.icon.white" ),
         "Guthabenverlauf",
@@ -204,8 +201,8 @@ public class Mainframe extends JFrame
         color, () ->
         {
           contentPanel.removeAll();
-          social.update();
-          contentPanel.add( social );
+          contentPanel.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+          contentPanel.add( new Social() );
         } );
   }
 

@@ -26,7 +26,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.isp.memate.util.ClientLog;
-import com.isp.memate.util.GUIObjects;
 
 /**
  * Im Social Panel kann man ein wöchentliches Scoreboard, ein Overall Scoreboard und wer grade
@@ -37,129 +36,100 @@ import com.isp.memate.util.GUIObjects;
  */
 public class Social extends JPanel
 {
-  private static JPanel     mainPanel, scoreBoardPanel, weeklyScoreBoardPanel, activityPanel;
-  static Cache              cache            = Cache.getInstance();
+  static Cache cache = Cache.getInstance();
 
   public Social()
   {
-    GUIObjects.social = this;
-    initComponents();
     setLayout( new BorderLayout() );
-    mainPanel.setLayout( new GridBagLayout() );
-    add( mainPanel, BorderLayout.CENTER );
+    add( getMainPanel(), BorderLayout.CENTER );
   }
 
-  private void initComponents()
+  private JPanel getMainPanel()
   {
-    mainPanel = new JPanel();
-    scoreBoardPanel = new JPanel();
-    weeklyScoreBoardPanel = new JPanel();
-    activityPanel = new JPanel();
+    JPanel mainPanel = new JPanel();
+
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.gridx = GridBagConstraints.RELATIVE;
+    mainPanel.add( getWeeklyScoreBoardPanel(), constraints );
+    mainPanel.add( getActivityPanel(), constraints );
+    mainPanel.add( getScoreBoardPanel(), constraints );
+
+    return mainPanel;
   }
 
-  void update()
+  private JPanel getWeeklyScoreBoardPanel()
   {
-    mainPanel.removeAll();
-    scoreBoardPanel.removeAll();
-    activityPanel.removeAll();
-    weeklyScoreBoardPanel.removeAll();
-    loadScoreBoardSettings();
-    loadActivityPanelSettings();
-    loadWeeklyScoreBoardSettings();
-    GridBagConstraints scoreBoardPaneLConstraints = new GridBagConstraints();
-    scoreBoardPaneLConstraints.gridx = 2;
-    scoreBoardPaneLConstraints.gridy = 0;
-    GridBagConstraints weeklyScoreBoardPaneLConstraints = new GridBagConstraints();
-    weeklyScoreBoardPaneLConstraints.gridx = 0;
-    weeklyScoreBoardPaneLConstraints.gridy = 0;
-    GridBagConstraints activityConstraints = new GridBagConstraints();
-    activityConstraints.gridx = 1;
-    activityConstraints.gridy = 0;
-    mainPanel.add( scoreBoardPanel, scoreBoardPaneLConstraints );
-    mainPanel.add( activityPanel, activityConstraints );
-    mainPanel.add( weeklyScoreBoardPanel, weeklyScoreBoardPaneLConstraints );
-    mainPanel.revalidate();
-    mainPanel.repaint();
-  }
-
-
-  /**
-   * Schaut sich die letzen 5 Einträge der History an und wenn dabei Einträge von einem Getränkekauf sind
-   * so wird dafür ein kleiner Panel generiert.
-   */
-  private static void loadActivityPanelSettings()
-  {
-    activityPanel.setLayout( new GridBagLayout() );
-    int ypos = 0;
-    String[][] history = cache.getShortHistory();
+    JPanel weeklyScoreBoardPanel = new JPanel();
+    final String[] userNames = cache.getDisplayNamesArray();
+    final Map<String, Integer> scoreMap = new HashMap<>();
+    for ( String username : userNames )
+    {
+      scoreMap.put( username, 0 );
+    }
+    ServerCommunication.getInstance().lock.lock();
+    String[][] history = Cache.getInstance().getScoreboard();
     if ( history != null )
     {
       ZonedDateTime today = ZonedDateTime.now();
-      ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );
+      DayOfWeek day = today.getDayOfWeek();
+      ZonedDateTime xDaysAgo = today;
+      switch ( day )
+      {
+        case MONDAY:
+          xDaysAgo = today.minusDays( 1 );
+          break;
+        case TUESDAY:
+          xDaysAgo = today.minusDays( 2 );
+          break;
+        case WEDNESDAY:
+          xDaysAgo = today.minusDays( 3 );
+          break;
+        case THURSDAY:
+          xDaysAgo = today.minusDays( 4 );
+          break;
+        case FRIDAY:
+          xDaysAgo = today.minusDays( 5 );
+          break;
+        case SATURDAY:
+          xDaysAgo = today.minusDays( 6 );
+          break;
+        case SUNDAY:
+          xDaysAgo = today.minusDays( 7 );
+          break;
+      }
       for ( String[] data : history )
       {
-        String action = data[ 0 ];
-        String consumer = data[ 1 ];
-        String date = data[ 2 ];
-        String drinkname = action.substring( 0, action.length() - 10 );
-        if ( action.contains( "getrunken" ) )
+        String date = data[ 2 ].substring( 0, 10 );
+        try
         {
-          try
+          Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
+          if ( !eventDate.toInstant().isBefore( xDaysAgo.toInstant() ) )
           {
-            Date eventDate = new SimpleDateFormat( "yyyy-MM-dd HH:mm" ).parse( date );
-            if ( !eventDate.toInstant().isBefore( twentyMinutesAgo.toInstant() ) )
-            {
-              JPanel panel = new JPanel();
-              panel.setPreferredSize( new Dimension( 240, 70 ) );
-              panel.setLayout( new GridBagLayout() );
-              JLabel nameLabel = new JLabel();
-              nameLabel.setText( consumer + " trinkt gerade" );
-              nameLabel.setFont( nameLabel.getFont().deriveFont( 20f ) );
-              GridBagConstraints nameLabelConstraints = new GridBagConstraints();
-              nameLabelConstraints.gridx = 0;
-              nameLabelConstraints.gridy = 0;
-              nameLabelConstraints.insets = new Insets( 5, 5, 5, 0 );
-              nameLabelConstraints.weightx = 1;
-              nameLabelConstraints.anchor = GridBagConstraints.LINE_START;
-              panel.add( nameLabel, nameLabelConstraints );
-              JLabel drinkNameLabel = new JLabel();
-              drinkNameLabel.setText( drinkname );
-              drinkNameLabel.setFont( nameLabel.getFont().deriveFont( 20f ) );
-              GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
-              drinkNameLabelConstraints.gridx = 0;
-              drinkNameLabelConstraints.gridy = 1;
-              drinkNameLabelConstraints.insets = new Insets( 5, 5, 5, 0 );
-              drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
-              panel.add( drinkNameLabel, drinkNameLabelConstraints );
-              JLabel dateLabel = new JLabel();
-              dateLabel.setText( date.substring( date.length() - 6, date.length() ) );
-              dateLabel.setFont( nameLabel.getFont().deriveFont( 11f ) );
-              GridBagConstraints dateLabelConstraints = new GridBagConstraints();
-              dateLabelConstraints.gridx = 1;
-              dateLabelConstraints.gridy = 1;
-              dateLabelConstraints.insets = new Insets( 0, 5, 2, 2 );
-              dateLabelConstraints.anchor = GridBagConstraints.LAST_LINE_END;
-              panel.add( dateLabel, dateLabelConstraints );
-
-              GridBagConstraints panelConstraints = new GridBagConstraints();
-              panelConstraints.gridx = 0;
-              panelConstraints.gridy = ypos;
-              panelConstraints.insets = new Insets( 5, 5, 5, 5 );
-              activityPanel.add( panel, panelConstraints );
-              ypos++;
-            }
+            scoreMap.put( data[ 1 ], scoreMap.get( data[ 1 ] ) + 1 );
           }
-          catch ( ParseException exception )
-          {
-            ClientLog.newLog( "Das Datum ist out of range." + exception );
-          }
+        }
+        catch ( ParseException exception )
+        {
+          ClientLog.newLog( "Das Datum ist out of range." + exception );
         }
       }
     }
+    List<Score> scoreList = new ArrayList<>();
+    for ( String name : scoreMap.keySet() )
+    {
+      scoreList.add( new Score( name, scoreMap.get( name ) ) );
+    }
+    Collections.sort( scoreList, Comparator.comparing( Score::getScore ) );
+    Collections.reverse( scoreList );
+    ServerCommunication.getInstance().lock.unlock();
+    loadScoreBoard( scoreList, weeklyScoreBoardPanel, "weekly" );
+    return weeklyScoreBoardPanel;
   }
 
-  private static void loadScoreBoardSettings()
+
+  private JPanel getScoreBoardPanel()
   {
+    JPanel scoreBoardPanel = new JPanel();
     final String[] userNames = cache.getDisplayNamesArray();
     final Map<String, Integer> scoreMap = new HashMap<>();
     for ( String username : userNames )
@@ -184,6 +154,7 @@ public class Social extends JPanel
     Collections.reverse( scoreList );
     ServerCommunication.getInstance().lock.unlock();
     loadScoreBoard( scoreList, scoreBoardPanel, "overall" );
+    return scoreBoardPanel;
   }
 
   private static void loadScoreBoard( List<Score> scoreList, JPanel panel, String title )
@@ -255,87 +226,97 @@ public class Social extends JPanel
     panel.add( fifthPlaceLabel, constraints );
   }
 
-  private static void loadWeeklyScoreBoardSettings()
+  /**
+   * Schaut sich die letzen 5 Einträge der History an und wenn dabei Einträge von einem Getränkekauf sind
+   * so wird dafür ein kleiner Panel generiert.
+   */
+  private JPanel getActivityPanel()
   {
-    final String[] userNames = cache.getDisplayNamesArray();
-    final Map<String, Integer> scoreMap = new HashMap<>();
-    for ( String username : userNames )
-    {
-      scoreMap.put( username, 0 );
-    }
-    ServerCommunication.getInstance().lock.lock();
-    String[][] history = Cache.getInstance().getScoreboard();
+    JPanel activityPanel = new JPanel();
+    activityPanel.setLayout( new GridBagLayout() );
+    int ypos = 0;
+    String[][] history = cache.getShortHistory();
     if ( history != null )
     {
       ZonedDateTime today = ZonedDateTime.now();
-      DayOfWeek day = today.getDayOfWeek();
-      ZonedDateTime xDaysAgo = today;
-      switch ( day )
-      {
-        case MONDAY:
-          xDaysAgo = today.minusDays( 1 );
-          break;
-        case TUESDAY:
-          xDaysAgo = today.minusDays( 2 );
-          break;
-        case WEDNESDAY:
-          xDaysAgo = today.minusDays( 3 );
-          break;
-        case THURSDAY:
-          xDaysAgo = today.minusDays( 4 );
-          break;
-        case FRIDAY:
-          xDaysAgo = today.minusDays( 5 );
-          break;
-        case SATURDAY:
-          xDaysAgo = today.minusDays( 6 );
-          break;
-        case SUNDAY:
-          xDaysAgo = today.minusDays( 7 );
-          break;
-      }
+      ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );
       for ( String[] data : history )
       {
-        String date = data[ 2 ].substring( 0, 10 );
-        try
+        String action = data[ 0 ];
+        String consumer = data[ 1 ];
+        String date = data[ 2 ];
+        String drinkname = action.substring( 0, action.length() - 10 );
+        if ( action.contains( "getrunken" ) )
         {
-          Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
-          if ( !eventDate.toInstant().isBefore( xDaysAgo.toInstant() ) )
+          try
           {
-            scoreMap.put( data[ 1 ], scoreMap.get( data[ 1 ] ) + 1 );
+            Date eventDate = new SimpleDateFormat( "yyyy-MM-dd HH:mm" ).parse( date );
+            if ( !eventDate.toInstant().isBefore( twentyMinutesAgo.toInstant() ) )
+            {
+              JPanel panel = new JPanel();
+              panel.setPreferredSize( new Dimension( 240, 70 ) );
+              panel.setLayout( new GridBagLayout() );
+              JLabel nameLabel = new JLabel();
+              nameLabel.setText( consumer + " trinkt gerade" );
+              nameLabel.setFont( nameLabel.getFont().deriveFont( 20f ) );
+              GridBagConstraints nameLabelConstraints = new GridBagConstraints();
+              nameLabelConstraints.gridx = 0;
+              nameLabelConstraints.gridy = 0;
+              nameLabelConstraints.insets = new Insets( 5, 5, 5, 0 );
+              nameLabelConstraints.weightx = 1;
+              nameLabelConstraints.anchor = GridBagConstraints.LINE_START;
+              panel.add( nameLabel, nameLabelConstraints );
+              JLabel drinkNameLabel = new JLabel();
+              drinkNameLabel.setText( drinkname );
+              drinkNameLabel.setFont( nameLabel.getFont().deriveFont( 20f ) );
+              GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
+              drinkNameLabelConstraints.gridx = 0;
+              drinkNameLabelConstraints.gridy = 1;
+              drinkNameLabelConstraints.insets = new Insets( 5, 5, 5, 0 );
+              drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
+              panel.add( drinkNameLabel, drinkNameLabelConstraints );
+              JLabel dateLabel = new JLabel();
+              dateLabel.setText( date.substring( date.length() - 6, date.length() ) );
+              dateLabel.setFont( nameLabel.getFont().deriveFont( 11f ) );
+              GridBagConstraints dateLabelConstraints = new GridBagConstraints();
+              dateLabelConstraints.gridx = 1;
+              dateLabelConstraints.gridy = 1;
+              dateLabelConstraints.insets = new Insets( 0, 5, 2, 2 );
+              dateLabelConstraints.anchor = GridBagConstraints.LAST_LINE_END;
+              panel.add( dateLabel, dateLabelConstraints );
+
+              GridBagConstraints panelConstraints = new GridBagConstraints();
+              panelConstraints.gridx = 0;
+              panelConstraints.gridy = ypos;
+              panelConstraints.insets = new Insets( 5, 5, 5, 5 );
+              activityPanel.add( panel, panelConstraints );
+              ypos++;
+            }
           }
-        }
-        catch ( ParseException exception )
-        {
-          ClientLog.newLog( "Das Datum ist out of range." + exception );
+          catch ( ParseException exception )
+          {
+            ClientLog.newLog( "Das Datum ist out of range." + exception );
+          }
         }
       }
     }
-    List<Score> scoreList = new ArrayList<>();
-    for ( String name : scoreMap.keySet() )
+    return activityPanel;
+  }
+
+  class Score
+  {
+    String name;
+    int    score;
+
+    public Score( String name, int score )
     {
-      scoreList.add( new Score( name, scoreMap.get( name ) ) );
+      this.name = name;
+      this.score = score;
     }
-    Collections.sort( scoreList, Comparator.comparing( Score::getScore ) );
-    Collections.reverse( scoreList );
-    ServerCommunication.getInstance().lock.unlock();
-    loadScoreBoard( scoreList, weeklyScoreBoardPanel, "weekly" );
-  }
-}
 
-class Score
-{
-  String name;
-  int    score;
-
-  public Score( String name, int score )
-  {
-    this.name = name;
-    this.score = score;
-  }
-
-  public int getScore()
-  {
-    return score;
+    public int getScore()
+    {
+      return score;
+    }
   }
 }
