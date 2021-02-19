@@ -27,6 +27,10 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import com.formdev.flatlaf.ui.FlatColorChooserUI;
+import com.formdev.flatlaf.util.ColorFunctions;
+import com.formdev.flatlaf.util.ColorFunctions.HSLIncreaseDecrease;
+
 import com.isp.memate.actionbar.MeMateActionBar;
 import com.isp.memate.actionbar.MeMateActionBarButton;
 import com.isp.memate.util.ClientLog;
@@ -240,7 +244,7 @@ public class Mainframe extends JFrame
   private void addUndoButton()
   {
     bar.addVariableGlue();
-    undoButton = bar.addActionButton( UIManager.getIcon( "undo.icon.black" ), UIManager.getIcon( "creditHistory.icon.white" ), "Rückgänig",
+    undoButton = bar.addActionButton( UIManager.getIcon( "undo.icon.black" ), UIManager.getIcon( "undo.icon.white" ), "Rückgänig",
         "Letzte Aktion rückgängig machen", () ->
         {
           ServerCommunication.getInstance().undoLastAction();
