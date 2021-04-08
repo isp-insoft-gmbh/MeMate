@@ -9,21 +9,21 @@ import java.io.Serializable;
  * @author nwe
  * @since 06.01.2020
  */
-class DrinkIngredients implements Serializable
+public class DrinkIngredients implements Serializable
 {
-  int    drinkID;
-  String ingredients;
-  int    energy_kJ;
-  int    energy_kcal;
-  double fat;
-  double fatty_acids;
-  double carbs;
-  double sugar;
-  double protein;
-  double salt;
-  double amount;
+  private final int    drinkID;
+  private final String ingredients;
+  private final int    energy_kJ;
+  private final int    energy_kcal;
+  private final double fat;
+  private final double fatty_acids;
+  private final double carbs;
+  private final double sugar;
+  private final double protein;
+  private final double salt;
+  private final double amount;
 
-  DrinkIngredients( final int drinkID, final String ingredients, final int energy_kJ, final int energy_kcal, final double fat,
+  public DrinkIngredients( final int drinkID, final String ingredients, final int energy_kJ, final int energy_kcal, final double fat,
                     final double fatty_acids, final double carbs,
                     final double sugar, final double protein, final double salt, final double amount )
   {
@@ -38,5 +38,60 @@ class DrinkIngredients implements Serializable
     this.protein = protein;
     this.salt = salt;
     this.amount = amount;
+  }
+
+  public int getDrinkID()
+  {
+    return drinkID;
+  }
+
+  public String getIngredients()
+  {
+    return ingredients;
+  }
+
+  public int getEnergy_kJ()
+  {
+    return energy_kJ;
+  }
+
+  public int getEnergy_kcal()
+  {
+    return energy_kcal;
+  }
+
+  public double getFat()
+  {
+    return fat;
+  }
+
+  public double getFatty_acids()
+  {
+    return fatty_acids;
+  }
+
+  public double getCarbs()
+  {
+    return carbs;
+  }
+
+  public double getSugar()
+  {
+    return sugar;
+  }
+
+  public double getProtein()
+  {
+    return protein;
+  }
+
+  public double getSalt()
+  {
+    return salt;
+  }
+
+  public double getAmount()
+  {
+    return amount;
   }
 }

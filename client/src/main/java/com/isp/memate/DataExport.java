@@ -4,6 +4,7 @@
 package com.isp.memate;
 
 import java.io.File;
+import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,7 +30,7 @@ import com.isp.memate.util.ClientLog;
  * @since 23.01.2020
  *
  */
-class DataExport
+public class DataExport
 {
   private final String path           = System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator;
   private final String userXMLPath    = path + "users.xml";
@@ -102,7 +103,7 @@ class DataExport
    */
   private void drinksExport()
   {
-    Drink[] drinks = Cache.getInstance().getDrinkArray();
+    HashMap<Integer, Drink> drinks = Cache.getInstance().getDrinks();
     try
     {
       DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
@@ -110,52 +111,52 @@ class DataExport
       Document document = documentBuilder.newDocument();
       Element root = document.createElement( "Getränke" );
       document.appendChild( root );
-      for ( Drink drink : drinks )
+      for ( Drink drink : drinks.values() )
       {
         Element drinkElement = document.createElement( "Getränk" );
         root.appendChild( drinkElement );
         Element id = document.createElement( "ID" );
-        id.appendChild( document.createTextNode( String.valueOf( drink.id ) ) );
+        id.appendChild( document.createTextNode( String.valueOf( drink.getId() ) ) );
         drinkElement.appendChild( id );
         Element name = document.createElement( "Name" );
-        name.appendChild( document.createTextNode( drink.name ) );
+        name.appendChild( document.createTextNode( drink.getName() ) );
         drinkElement.appendChild( name );
         Element price = document.createElement( "Preis" );
-        price.appendChild( document.createTextNode( String.valueOf( drink.price ) ) );
+        price.appendChild( document.createTextNode( String.valueOf( drink.getPrice() ) ) );
         drinkElement.appendChild( price );
         Element amount = document.createElement( "Anzahl" );
-        amount.appendChild( document.createTextNode( String.valueOf( drink.amount ) ) );
+        amount.appendChild( document.createTextNode( String.valueOf( drink.getAmount() ) ) );
         drinkElement.appendChild( amount );
-        if ( drink.ingredients )
+        if ( drink.isIngredients() )
         {
           Element hasIngredients = document.createElement( "Zutatenangabe" );
           drinkElement.appendChild( hasIngredients );
           Element ingredients = document.createElement( "Zutaten" );
-          ingredients.appendChild( document.createTextNode( drink.drinkIngredients.ingredients ) );
+          ingredients.appendChild( document.createTextNode( drink.getDrinkIngredients().getIngredients() ) );
           hasIngredients.appendChild( ingredients );
           Element kJ = document.createElement( "kJ" );
-          kJ.appendChild( document.createTextNode( String.valueOf( drink.drinkIngredients.energy_kJ ) ) );
+          kJ.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getEnergy_kJ() ) ) );
           hasIngredients.appendChild( kJ );
           Element kcal = document.createElement( "kcal" );
-          kcal.appendChild( document.createTextNode( String.valueOf( drink.drinkIngredients.energy_kcal ) ) );
+          kcal.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getEnergy_kcal() ) ) );
           hasIngredients.appendChild( kcal );
           Element fat = document.createElement( "Fett" );
-          fat.appendChild( document.createTextNode( String.valueOf( drink.drinkIngredients.fat ) ) );
+          fat.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getFat() ) ) );
           hasIngredients.appendChild( fat );
           Element fatty_acids = document.createElement( "gesättigteFettsäuren" );
-          fatty_acids.appendChild( document.createTextNode( String.valueOf( drink.drinkIngredients.fatty_acids ) ) );
+          fatty_acids.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getFatty_acids() ) ) );
           hasIngredients.appendChild( fatty_acids );
           Element carbs = document.createElement( "Kohlenhydrate" );
-          carbs.appendChild( document.createTextNode( String.valueOf( drink.drinkIngredients.carbs ) ) );
+          carbs.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getCarbs() ) ) );
           hasIngredients.appendChild( carbs );
           Element sugar = document.createElement( "Zucker" );
-          sugar.appendChild( document.createTextNode( String.valueOf( drink.drinkIngredients.protein ) ) );
+          sugar.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getProtein() ) ) );
           hasIngredients.appendChild( sugar );
           Element protein = document.createElement( "Eiweiß" );
-          protein.appendChild( document.createTextNode( String.valueOf( drink.drinkIngredients.protein ) ) );
+          protein.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getProtein() ) ) );
           hasIngredients.appendChild( protein );
           Element salt = document.createElement( "Salz" );
-          salt.appendChild( document.createTextNode( String.valueOf( drink.drinkIngredients.salt ) ) );
+          salt.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getSalt() ) ) );
           hasIngredients.appendChild( salt );
         }
       }

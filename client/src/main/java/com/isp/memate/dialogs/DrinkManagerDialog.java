@@ -1,7 +1,7 @@
 /**
  * © 2019 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.dialogs;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -44,9 +45,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.isp.memate.Shared.Operation;
+import com.isp.memate.Cache;
+import com.isp.memate.Drink;
+import com.isp.memate.DrinkIngredients;
+import com.isp.memate.ServerCommunication;
 import com.isp.memate.util.ClientLog;
-import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 
 /**
@@ -58,30 +61,33 @@ import com.isp.memate.util.MeMateUIManager;
  * @author nwe
  * @since 18.10.2019
  */
-class DrinkManagerDialog
+public class DrinkManagerDialog
 {
-  private final SpinnerNumberModel spinnerModel      = new SpinnerNumberModel( 0, 0, 1000, 0.10 );
-  private final JPanel             layout            = new JPanel( new GridBagLayout() );
-  private final JSpinner           drinkPriceSpinner = new JSpinner( spinnerModel );
-  private final JButton            cancelButton      = new JButton( "Abbrechen" );
-  private final JFileChooser       fileChooser       = new JFileChooser();
-  private final JTextField         drinkNameField    = new JTextField();
-  private final JButton            confirmButton     = new JButton();
-  private final JLabel             pictureLabel      = new JLabel();
-  private String                   drinkPicturePath  = null;
+  private final SpinnerNumberModel priceSpinnerModel  = new SpinnerNumberModel( 0, 0, 1000, 0.10 );
+  private final SpinnerNumberModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 1000, 1 );
+  private final JPanel             layout             = new JPanel( new GridBagLayout() );
+  private final JSpinner           drinkPriceSpinner  = new JSpinner( priceSpinnerModel );
+  private final JSpinner           drinkAmountSpinner = new JSpinner( amountSpinnerModel );
+  private final JButton            cancelButton       = new JButton( "Abbrechen" );
+  private final JFileChooser       fileChooser        = new JFileChooser();
+  private final JTextField         drinkNameField     = new JTextField();
+  private final JButton            confirmButton      = new JButton();
+  private final JLabel             pictureLabel       = new JLabel();
+  private String                   drinkPicturePath   = null;
   private ImageIcon                currentImage;
   private JDialog                  dialog;
-  Cache                            cache             = Cache.getInstance();
+  Cache                            cache              = Cache.getInstance();
 
   /**
    * Erzeugt den Frame und setzt das Layout der vorhandenen Kompnenten.
    *
    * @param owner Parent für den aufzurufenden Dialog
    */
-  DrinkManagerDialog( final Window owner )
+  public DrinkManagerDialog( final Window owner )
   {
     final JLabel drinkName = new JLabel( "Name" );
     final JLabel drinkPrice = new JLabel( "Preis" );
+    final JLabel drinkAmount = new JLabel( "Anzahl" );
     layout.setBorder( new EmptyBorder( 5, 10, 5, 10 ) );
 
     fileChooser.setFileFilter( new FileNameExtensionFilter( "Bilder", "jpg", "png", "gif" ) );
@@ -110,11 +116,26 @@ class DrinkManagerDialog
     final GridBagConstraints drinkPriceSpinnerConstraints = new GridBagConstraints();
     drinkPriceSpinnerConstraints.gridx = 1;
     drinkPriceSpinnerConstraints.gridy = 3;
-    drinkPriceSpinnerConstraints.gridwidth = 2;
+    drinkPriceSpinnerConstraints.gridwidth = 1;
     drinkPriceSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
     drinkPriceSpinnerConstraints.fill = GridBagConstraints.HORIZONTAL;
-    drinkPriceSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
+    drinkPriceSpinnerConstraints.insets = new Insets( 5, 0, 0, 10 );
     layout.add( drinkPriceSpinner, drinkPriceSpinnerConstraints );
+
+    final GridBagConstraints drinkAmountConstraints = new GridBagConstraints();
+    drinkAmountConstraints.gridx = 2;
+    drinkAmountConstraints.gridy = 2;
+    drinkAmountConstraints.anchor = GridBagConstraints.LINE_START;
+    drinkAmountConstraints.insets = new Insets( 15, 0, 0, 0 );
+    layout.add( drinkAmount, drinkAmountConstraints );
+    final GridBagConstraints drinkAmountSpinnerConstraints = new GridBagConstraints();
+    drinkAmountSpinnerConstraints.gridx = 2;
+    drinkAmountSpinnerConstraints.gridy = 3;
+    drinkAmountSpinnerConstraints.gridwidth = 1;
+    drinkAmountSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
+    drinkAmountSpinnerConstraints.fill = GridBagConstraints.HORIZONTAL;
+    drinkAmountSpinnerConstraints.insets = new Insets( 5, 0, 0, 0 );
+    layout.add( drinkAmountSpinner, drinkAmountSpinnerConstraints );
 
     final GridBagConstraints drinkPicturePreviewConstraints = new GridBagConstraints();
     drinkPicturePreviewConstraints.gridx = 0;
@@ -268,106 +289,11 @@ class DrinkManagerDialog
   }
 
   /**
-   * Zeigt einen Dialog zum Bearbeiten der Getränke an. Wenn man die Änderungen speichern
-   * möchte, werden alle Eingaben auf ihre Gültigkeit geprüft und anschließend an
-   * {@link ServerCommunication} geschickt.
-   *
-   * @param drink ausgewähltes Getränk
-   */
-  void showEditDialog( final String drink )
-  {
-    dialog.setTitle( "Getränk bearbeiten" );
-    confirmButton.setText( "Speichern" );
-    final String oldName = drink;
-    final Float oldPrice = cache.getPrice( drink );
-    drinkNameField.setText( oldName );
-    drinkPriceSpinner.setValue( oldPrice );
-
-
-    final ImageIcon drinkIcon = cache.getIcon( drink );
-    final Image drinkImage = drinkIcon.getImage();
-    Image scaledImage;
-
-    if ( drinkIcon.getIconHeight() > 140 || drinkIcon.getIconWidth() > 150 )
-    {
-      final double scale = 140.0 / drinkIcon.getIconHeight();
-      final int height = 140;
-      int width = (int) (drinkIcon.getIconWidth() * scale);
-      if ( width > 150 )
-      {
-        width = 150;
-      }
-      scaledImage = drinkImage.getScaledInstance( width, height, Image.SCALE_SMOOTH );
-      pictureLabel.setIcon( new ImageIcon( scaledImage ) );
-    }
-    else
-    {
-      pictureLabel.setIcon( new ImageIcon(
-          cache.getIcon( drink ).getImage().getScaledInstance( 42, 132, Image.SCALE_SMOOTH ) ) );
-    }
-
-
-    confirmButton.addActionListener( e ->
-    {
-      final String newName = drinkNameField.getText();
-      final String newPicture = drinkPicturePath;
-      final String newPriceAsString = String.valueOf( drinkPriceSpinner.getValue() );
-      final Float newPrice = Float.valueOf( newPriceAsString );
-
-      if ( newName.isEmpty() || newName.trim().length() == 0 )
-      {
-        JOptionPane.showMessageDialog( dialog, "Bitte Getränkenamen eingeben.", "Getränk bearbeiten fehlgeschlagen",
-            JOptionPane.ERROR_MESSAGE, null );
-      }
-      else if ( newPrice.equals( 0f ) )
-      {
-        JOptionPane.showMessageDialog( dialog, "Bitte gültigen Preis für das Getränk angeben.", "Getränk bearbeiten fehlgeschlagen",
-            JOptionPane.ERROR_MESSAGE, null );
-      }
-      else
-      {
-        final Integer id = cache.getID( oldName );
-        if ( drinkPicturePath != null )
-        {
-          BufferedImage bImage;
-          final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-          try
-          {
-            bImage = ImageIO.read( new File( newPicture ) );
-            ImageIO.write( bImage, "png", bos );
-          }
-          catch ( final IOException exception )
-          {
-            ClientLog.newLog( "Das ausgewählte Bild konnte nicht gespeichert werden." );
-            ClientLog.newLog( exception.getMessage() );
-          }
-          final byte[] bytes = bos.toByteArray();
-          ServerCommunication.getInstance().updateDrinkInformations( id, Operation.UPDATE_DRINKPICTURE, bytes );
-        }
-        if ( !newPrice.equals( oldPrice ) )
-        {
-          ServerCommunication.getInstance().updateDrinkInformations( id, Operation.UPDATE_DRINKPRICE, newPrice );
-        }
-        if ( !newName.equals( oldName ) )
-        {
-          ServerCommunication.getInstance().updateDrinkInformations( id, Operation.UPDATE_DRINKNAME, newName );
-        }
-        dialog.dispose();
-        GUIObjects.mainframe.getDrinkManager().updateList();
-      }
-    } );
-    final Dimension oldPreferredSize = dialog.getPreferredSize();
-    dialog.setSize( new Dimension( oldPreferredSize.width + 150, oldPreferredSize.height ) );
-    dialog.setLocationRelativeTo( dialog.getOwner() );
-    dialog.setVisible( true );
-  }
-
-  /**
    * Zeigt einen Dialog an, in welchem man ein neues Getränk registrieren kann.
    * Es wird ein Name, Preis und Bild als Eingabe gefordert.
    * Sind die Eingaben korrekt, so werden diese an der Server weitergeleitet.
    */
-  void showNewDialog()
+  public void showNewDialog()
   {
     if ( MeMateUIManager.getDarkModeState() )
     {
@@ -386,6 +312,11 @@ class DrinkManagerDialog
       final String name = drinkNameField.getText();
       final String priceAsString = String.valueOf( drinkPriceSpinner.getValue() );
       final Float price = Float.valueOf( priceAsString );
+      ArrayList<String> drinkNames = new ArrayList<>();
+      for ( Drink drink : cache.getDrinks().values() )
+      {
+        drinkNames.add( drink.getName() );
+      }
 
       if ( name.isEmpty() || name.trim().length() == 0 )
       {
@@ -402,7 +333,7 @@ class DrinkManagerDialog
         JOptionPane.showMessageDialog( dialog, "Bitte gültigen Preis für das Getränk angeben.", "Getränk hinzufügen fehlgeschlagen",
             JOptionPane.ERROR_MESSAGE, null );
       }
-      else if ( cache.getDrinkNames().contains( name ) )
+      else if ( drinkNames.contains( name ) )
       {
         JOptionPane.showMessageDialog( dialog, "Dieser Getränkenamen ist bereits vergeben.", "Getränk hinzufügen fehlgeschlagen",
             JOptionPane.ERROR_MESSAGE, null );
@@ -423,9 +354,8 @@ class DrinkManagerDialog
         }
         final byte[] bytes = bos.toByteArray();
         ServerCommunication.getInstance()
-            .registerNewDrink( new Drink( name, price, drinkPicturePath, -1, bytes, 0, false, null ) );
+            .registerNewDrink( new Drink( name, price, -1, bytes, (int) drinkAmountSpinner.getValue(), false, null ) );
         dialog.dispose();
-        GUIObjects.mainframe.getDrinkManager().updateList();
       }
     } );
     final Dimension oldPreferredSize = dialog.getPreferredSize();
@@ -438,7 +368,7 @@ class DrinkManagerDialog
    * Zeigt einen Dialog an, um Informationen über das Getränk zu ergänzen.
    * Beispielsweise Zutatenliste, Fettgehalt oder Zuckergehalt.
    */
-  void showIngredientsDialog( final int DrinkID )
+  public void showIngredientsDialog( final int drinkID )
   {
     layout.removeAll();
     dialog.setTitle( "Inhaltsstoffe hinzufügen" );
@@ -610,20 +540,20 @@ class DrinkManagerDialog
       confirmButton.removeActionListener( actionListener );
     }
     //Get Data from Server, if ingredients are already existing
-    final DrinkIngredients ingredients =
-        cache.getIngredients( cache.getDrinkName( DrinkID ) );
+    final DrinkIngredients ingredients = cache.getDrinks().get( drinkID ).getDrinkIngredients();
+
     if ( ingredients != null )
     {
-      ingredientsField.setText( ingredients.ingredients );
-      energykJSpinner.setValue( ingredients.energy_kJ );
-      energykCALSpinner.setValue( ingredients.energy_kcal );
-      fatSpinner.setValue( ingredients.fat );
-      fattyAcidsSpinner.setValue( ingredients.fatty_acids );
-      carbsSpinner.setValue( ingredients.carbs );
-      sugarSpinner.setValue( ingredients.sugar );
-      proteinSpinner.setValue( ingredients.protein );
-      saltSpinner.setValue( ingredients.salt );
-      amountSpinner.setValue( ingredients.amount );
+      ingredientsField.setText( ingredients.getIngredients() );
+      energykJSpinner.setValue( ingredients.getEnergy_kJ() );
+      energykCALSpinner.setValue( ingredients.getEnergy_kcal() );
+      fatSpinner.setValue( ingredients.getFat() );
+      fattyAcidsSpinner.setValue( ingredients.getFatty_acids() );
+      carbsSpinner.setValue( ingredients.getCarbs() );
+      sugarSpinner.setValue( ingredients.getSugar() );
+      proteinSpinner.setValue( ingredients.getProtein() );
+      saltSpinner.setValue( ingredients.getSalt() );
+      amountSpinner.setValue( ingredients.getAmount() );
     }
 
     confirmButton.addActionListener( e ->
@@ -636,7 +566,7 @@ class DrinkManagerDialog
           || proteinSpinner.getValue() instanceof Number || saltSpinner.getValue() instanceof Number
           || amountSpinner.getValue() instanceof Number )
       {
-        ServerCommunication.getInstance().registerIngredients( new DrinkIngredients( DrinkID,
+        ServerCommunication.getInstance().registerIngredients( new DrinkIngredients( drinkID,
             ingredientsField.getText(), (int) energykJSpinner.getValue(), (int) energykCALSpinner.getValue(),
             (Double) fatSpinner.getValue(),
             (Double) fattyAcidsSpinner.getValue(),

@@ -1,5 +1,6 @@
 package com.isp.memate.util;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,9 +52,35 @@ public class PropertyHelper
     return null;
   }
 
+  public static Color getAppColorProperty()
+  {
+    String appColor = PropertyHelper.getProperty( "AppColor" );
+    //Default-Value falls die Property nicht gefunden wurde
+    if ( appColor == null )
+    {
+      return Color.CYAN;
+    }
+    int rgb = Integer.valueOf( appColor );
+    return new Color( rgb );
+  }
+
+  public static boolean getDarkModeProperty()
+  {
+    String darkmode = PropertyHelper.getProperty( "Darkmode" );
+    //Default-Value falls die Property nicht gefunden wurde
+    if ( darkmode == null )
+    {
+      return false;
+    }
+    if ( darkmode.equals( "true" ) || darkmode.equals( "on" ) )
+    {
+      return true;
+    }
+    return false;
+  }
+
   public static boolean isSessionIDValid()
   {
-    ServerCommunication serverCommunication = ServerCommunication.getInstance();
     Cache cache = Cache.getInstance();
 
     String sessionID = getProperty( "SessionID" );
@@ -61,15 +88,15 @@ public class PropertyHelper
     {
       return false;
     }
-    serverCommunication.checkLoginForSessionID( sessionID );
+    ServerCommunication.getInstance().checkLoginForSessionID( sessionID );
 
     //This synchronized Thread will take care of blocking further executions 
     //until the client has received the username.
-    synchronized ( cache.usernameSync )
+    synchronized ( cache.sessionIDSync )
     {
       try
       {
-        cache.usernameSync.wait();
+        cache.sessionIDSync.wait();
       }
       catch ( InterruptedException e )
       {

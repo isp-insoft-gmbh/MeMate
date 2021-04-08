@@ -1,4 +1,4 @@
-package com.isp.memate;
+package com.isp.memate.dialogs;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -14,25 +14,24 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.isp.memate.ServerCommunication;
+import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.Util;
 
-public class RegistrationDialog extends JDialog
+public class ChangePasswordDialog extends JDialog
 {
   private JPanel            mainPanel;
-  private JTextField        usernameTextField;
-  private JLabel            usernameLabel, passwordLabel, repeatPasswordLabel, passwordCompareLabel;
+  private JLabel            passwordLabel, repeatPasswordLabel, passwordCompareLabel;
   private JPasswordField    passwordField, repeatPasswordField;
-  private JButton           registrationButton, abortButton;
+  private JButton           saveButton, abortButton;
 
-  public RegistrationDialog()
+  public ChangePasswordDialog()
   {
-    GUIObjects.registrationFrame = this;
     initComponents();
     addComponents();
     addActionListener();
@@ -43,18 +42,15 @@ public class RegistrationDialog extends JDialog
   private void initComponents()
   {
     mainPanel = new JPanel( new GridBagLayout() );
-    usernameLabel = new JLabel( "Benutzername:" );
     passwordLabel = new JLabel( "Passwort:" );
     repeatPasswordLabel = new JLabel( "Passwort wiederholen:" );
     passwordCompareLabel = new JLabel();
-    usernameTextField = new JTextField();
     passwordField = new JPasswordField();
     repeatPasswordField = new JPasswordField();
-    registrationButton = new JButton( "Registrieren" );
+    saveButton = new JButton( "Speichern" );
     abortButton = new JButton( "Abbrechen" );
 
-    final int prefHeight = usernameTextField.getPreferredSize().height;
-    usernameTextField.setPreferredSize( new Dimension( 220, prefHeight ) );
+    final int prefHeight = passwordField.getPreferredSize().height;
     passwordField.setPreferredSize( new Dimension( 220, prefHeight ) );
     repeatPasswordField.setPreferredSize( new Dimension( 220, prefHeight ) );
     passwordCompareLabel.setPreferredSize( new Dimension( 220, prefHeight ) );
@@ -62,98 +58,43 @@ public class RegistrationDialog extends JDialog
 
   private void addComponents()
   {
-    final GridBagConstraints usernameLabelConstraints = new GridBagConstraints();
-    usernameLabelConstraints.gridx = 0;
-    usernameLabelConstraints.gridy = 0;
-    usernameLabelConstraints.anchor = GridBagConstraints.LINE_START;
-    mainPanel.add( usernameLabel, usernameLabelConstraints );
-    final GridBagConstraints usernameTextFieldConstraints = new GridBagConstraints();
-    usernameTextFieldConstraints.gridx = 1;
-    usernameTextFieldConstraints.gridy = 0;
-    usernameTextFieldConstraints.insets = new Insets( 0, 5, 0, 0 );
-    mainPanel.add( usernameTextField, usernameTextFieldConstraints );
     final GridBagConstraints passwordLabelConstraints = new GridBagConstraints();
     passwordLabelConstraints.gridx = 0;
-    passwordLabelConstraints.gridy = 1;
+    passwordLabelConstraints.gridy = 0;
     passwordLabelConstraints.insets = new Insets( 10, 0, 10, 0 );
     passwordLabelConstraints.anchor = GridBagConstraints.LINE_START;
     mainPanel.add( passwordLabel, passwordLabelConstraints );
     final GridBagConstraints passwordFieldConstraints = new GridBagConstraints();
     passwordFieldConstraints.gridx = 1;
-    passwordFieldConstraints.gridy = 1;
+    passwordFieldConstraints.gridy = 0;
     passwordFieldConstraints.insets = new Insets( 10, 5, 10, 0 );
     mainPanel.add( passwordField, passwordFieldConstraints );
     final GridBagConstraints repeatPasswordLabelConstraints = new GridBagConstraints();
     repeatPasswordLabelConstraints.gridx = 0;
-    repeatPasswordLabelConstraints.gridy = 2;
+    repeatPasswordLabelConstraints.gridy = 1;
     repeatPasswordLabelConstraints.insets = new Insets( 0, 0, 10, 0 );
     repeatPasswordLabelConstraints.anchor = GridBagConstraints.LINE_START;
     mainPanel.add( repeatPasswordLabel, repeatPasswordLabelConstraints );
     final GridBagConstraints repeatPasswordFieldConstraints = new GridBagConstraints();
     repeatPasswordFieldConstraints.gridx = 1;
-    repeatPasswordFieldConstraints.gridy = 2;
+    repeatPasswordFieldConstraints.gridy = 1;
     repeatPasswordFieldConstraints.insets = new Insets( 0, 5, 5, 0 );
     mainPanel.add( repeatPasswordField, repeatPasswordFieldConstraints );
     final GridBagConstraints passwordCompareLabelConstraints = new GridBagConstraints();
     passwordCompareLabelConstraints.gridx = 1;
-    passwordCompareLabelConstraints.gridy = 3;
+    passwordCompareLabelConstraints.gridy = 2;
     passwordCompareLabelConstraints.anchor = GridBagConstraints.LINE_START;
     passwordCompareLabelConstraints.insets = new Insets( 0, 5, 5, 0 );
     mainPanel.add( passwordCompareLabel, passwordCompareLabelConstraints );
     final JPanel buttonPanel = new JPanel( new FlowLayout() );
-    buttonPanel.add( registrationButton );
+    buttonPanel.add( saveButton );
     buttonPanel.add( abortButton );
-    final GridBagConstraints buttonPanelConstraints = new GridBagConstraints();
-    buttonPanelConstraints.gridx = 0;
-    buttonPanelConstraints.gridy = 4;
-    buttonPanelConstraints.gridwidth = 2;
-    mainPanel.add( buttonPanel, buttonPanelConstraints );
+    final GridBagConstraints buttonpanelConstraints = new GridBagConstraints();
+    buttonpanelConstraints.gridx = 0;
+    buttonpanelConstraints.gridy = 3;
+    buttonpanelConstraints.gridwidth = 2;
+    mainPanel.add( buttonPanel, buttonpanelConstraints );
     add( mainPanel );
-  }
-
-  private void addActionListener()
-  {
-    abortButton.addActionListener( e ->
-    {
-      GUIObjects.registrationFrame = null;
-      dispose();
-    } );
-
-    registrationButton.addActionListener( e ->
-    {
-      final boolean isPasswordOrUserNameIncorrect = passwordField.getPassword() == null
-          || passwordField.getPassword().length == 0
-          || repeatPasswordField.getPassword() == null
-          || repeatPasswordField.getPassword().length == 0
-          || usernameTextField.getText() == null || usernameTextField.getText().isEmpty()
-          || usernameTextField.getText().trim().length() == 0;
-
-      if ( isPasswordOrUserNameIncorrect )
-      {
-        JOptionPane.showMessageDialog( this,
-            "Passwort oder Benutzername sind nicht zulässig.", "Registrieren",
-            JOptionPane.WARNING_MESSAGE );
-      }
-      else if ( !String.valueOf( passwordField.getPassword() )
-          .equals( String.valueOf( repeatPasswordField.getPassword() ) ) )
-      {
-        JOptionPane.showMessageDialog( this, "Die Passwörter stimmen nicht überein.",
-            "Registrieren", JOptionPane.WARNING_MESSAGE );
-      }
-      else
-      {
-        final String username = usernameTextField.getText();
-        final char[] password = passwordField.getPassword();
-        final int reply = JOptionPane.showConfirmDialog( this,
-            "Wollen Sie wirklich einen neuen Benutzer anlegen?", "Registrieren",
-            JOptionPane.INFORMATION_MESSAGE );
-        if ( reply == JOptionPane.YES_OPTION )
-        {
-          ServerCommunication.getInstance().registerNewUser( username,
-              Util.getHash( String.valueOf( password ) ) );
-        }
-      }
-    } );
   }
 
   private void addDocumentListener()
@@ -181,14 +122,59 @@ public class RegistrationDialog extends JDialog
     repeatPasswordField.getDocument().addDocumentListener( documentListener );
   }
 
+  private void addActionListener()
+  {
+    abortButton.addActionListener( e ->
+    {
+      dispose();
+      if ( GUIObjects.loginFrame != null )
+      {
+        GUIObjects.loginFrame.validateLoginResult( LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD );
+      }
+    } );
+
+    saveButton.addActionListener( e ->
+    {
+      final boolean isPasswordFieldEmpty = passwordField.getPassword() == null
+          || passwordField.getPassword().length == 0 || repeatPasswordField.getPassword() == null
+          || repeatPasswordField.getPassword().length == 0;
+
+      if ( isPasswordFieldEmpty )
+      {
+        JOptionPane.showMessageDialog( this, "Beide Passwort-Felder müssen gefüllt sein.",
+            "Passwort ändern", JOptionPane.WARNING_MESSAGE );
+      }
+      else if ( !String.valueOf( passwordField.getPassword() )
+          .equals( String.valueOf( repeatPasswordField.getPassword() ) ) )
+      {
+        JOptionPane.showMessageDialog( this, "Die Passwörter stimmen nicht überein.",
+            "Passwort ändern", JOptionPane.WARNING_MESSAGE );
+      }
+      else
+      {
+        final char[] password = passwordField.getPassword();
+        final int reply = JOptionPane.showConfirmDialog( this,
+            "Wollen Sie wirklich das neue Passwort speichern?", "Passwort ändern",
+            JOptionPane.INFORMATION_MESSAGE );
+        if ( reply == JOptionPane.YES_OPTION )
+        {
+          ServerCommunication.getInstance().changePassword( Util.getHash( String.valueOf( password ) ) );
+          if ( GUIObjects.loginFrame != null )
+          {
+            GUIObjects.loginFrame.newPasswordHasBeenSet();
+          }
+          dispose();
+        }
+      }
+    } );
+  }
+
   private void compare()
   {
     if ( passwordField.getPassword() == null || passwordField.getPassword().length == 0
-        || repeatPasswordField.getPassword() == null
-        || repeatPasswordField.getPassword().length == 0 )
+        || repeatPasswordField.getPassword() == null || repeatPasswordField.getPassword().length == 0 )
     {
       passwordCompareLabel.setText( "" );
-      passwordCompareLabel.setForeground( UIManager.getColor( "Label.foreground" ) );
     }
     else
     {
@@ -208,35 +194,15 @@ public class RegistrationDialog extends JDialog
 
   private void applyFrameSettings()
   {
-    setTitle( "Konto erstellen" );
+    setTitle( "Passwort ändern" );
     setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-    getRootPane().setDefaultButton( registrationButton );
+    getRootPane().setDefaultButton( saveButton );
+    setModal( true );
     pack();
     setResizable( false );
-    setSize( getPreferredSize().width + 40, getPreferredSize().height + 20 );
+    setSize( getWidth() + 30, getHeight() + 20 );
     setLocationRelativeTo( GUIObjects.loginFrame );
     setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
     setVisible( true );
-  }
-
-  /**
-   * Wenn bei der Registrierung ein Fehler aufgetreten ist, so wird dieser dem
-   * Nutzer angezeigt.
-   *
-   * @param registrationResult Die Antwort des Servers auf die Registrierung.
-   */
-  public void validateRegistartionResult( final String registrationResult )
-  {
-    if ( !registrationResult.equals( "Registrierung erfolgreich." ) )
-    {
-      JOptionPane.showMessageDialog( this, registrationResult, "Registrierung fehlgeschlagen", JOptionPane.ERROR_MESSAGE, null );
-    }
-    else
-    {
-      JOptionPane.showMessageDialog( this, "Registrierung erfolgreich!", "Registrierung erfolgreich", JOptionPane.INFORMATION_MESSAGE,
-          null );
-      GUIObjects.registrationFrame = null;
-      dispose();
-    }
   }
 }

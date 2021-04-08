@@ -1,15 +1,14 @@
 /**
  * © 2019 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.panels;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Image;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -22,10 +21,15 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import com.isp.memate.Cache;
+import com.isp.memate.Drink;
+import com.isp.memate.ServerCommunication;
+import com.isp.memate.components.DrinkConsumptionButton;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.SwingUtil;
+import com.isp.memate.util.WrapLayout;
 
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
@@ -43,17 +47,17 @@ import net.miginfocom.swing.MigLayout;
  */
 public class Dashboard extends JPanel
 {
-  private JScrollPane                             scrollpane;
-  private final ArrayList<DrinkConsumptionButton> buttonList = new ArrayList<>();
-  Cache                                           cache      = Cache.getInstance();
+  private JScrollPane                                scrollpane;
+  private final Map<Integer, DrinkConsumptionButton> buttonMap = new HashMap<>();
+  Cache                                              cache     = Cache.getInstance();
 
   /**
    * Passt Layout, Hintergrund und Borders an.
    *
    */
-  Dashboard()
+  public Dashboard()
   {
-    GUIObjects.dashboard = this;
+    GUIObjects.currentPanel = this;
     initScrollPane();
 
     setLayout( new BorderLayout() );
@@ -103,7 +107,6 @@ public class Dashboard extends JPanel
         {
           final ServerCommunication sc = ServerCommunication.getInstance();
           sc.addBalance( (int) value );
-          ServerCommunication.getInstance().getBalance();
           GUIObjects.mainframe.setUndoButtonEnabled( true );
         }
       }
@@ -159,45 +162,24 @@ public class Dashboard extends JPanel
    */
   private JPanel createDrinkButtonPanel()
   {
-    buttonList.clear();
+    buttonMap.clear();
     final JPanel panel = new JPanel();
     panel.setLayout( new WrapLayout( FlowLayout.LEFT ) );
 
-    for ( final String drink : cache.getDrinkNames() )
+    for ( final Drink drink : cache.getDrinks().values() )
     {
-      if ( cache.getAmount( drink ) == 0 )
+      if ( drink.getAmount() == 0 )
       {
         continue;
       }
-      final String drinkName = drink;
-      final Float drinkPriceAsFloat = cache.getPrice( drink );
-      final String drinkPrice = String.valueOf( drinkPriceAsFloat );
-      final ImageIcon drinkIcon = cache.getIcon( drink );
-      final Image image = drinkIcon.getImage();
-      Image newImage;
-      if ( drinkIcon.getIconHeight() > 220 || drinkIcon.getIconWidth() > 250 )
-      {
-        final double scale = 220.0 / drinkIcon.getIconHeight();
-        final int height = 220;
-        int width = (int) (drinkIcon.getIconWidth() * scale);
-        if ( width > 250 )
-        {
-          width = 250;
-        }
-        newImage = image.getScaledInstance( width, height, Image.SCALE_SMOOTH );
-      }
-      else
-      {
-        newImage = image.getScaledInstance( 70, 220, Image.SCALE_SMOOTH );
-      }
-      final DrinkConsumptionButton button = new DrinkConsumptionButton( drinkPrice, drinkName, new ImageIcon( newImage ) );
-      buttonList.add( button );
+      final DrinkConsumptionButton button = new DrinkConsumptionButton( drink );
+      buttonMap.put( drink.getId(), button );
       panel.add( button );
     }
     return panel;
   }
 
-  void updateButtonpanel()
+  public void updateButtonpanel()
   {
     final ReentrantLock lock = ServerCommunication.getInstance().lock;
     lock.lock();
@@ -216,23 +198,22 @@ public class Dashboard extends JPanel
   }
 
   /**
-   * Zeigt einen neuen Dialog an, falls der Preis des Clients und des Servers nicht übereinstimmen sollten.
+   * Shows a dialog, if the drinkprice of the client differs from the one on the sever.
    *
-   * @param name Name des Geträmnks
-   * @param price Preis des Getränks
+   * @param drink the matching drinkObject
    */
-  void showPriceChangedDialog( final String name, final Float price )
+  public void showPriceChangedDialog( final Drink drink )
   {
 
     final int result = JOptionPane.showConfirmDialog( Dashboard.this,
         String.format(
-            "<html>Der Preis von <b>" + name + "</b> hat sich auf <b>%.2f€</b> geändert.\nWollen Sie das Getränk trotzdem kaufen?",
-            price ),
+            "<html>Der Preis von <b>" + drink.getName()
+                + "</b> hat sich auf <b>%.2f€</b> geändert.\nWollen Sie das Getränk trotzdem kaufen?",
+            drink.getPrice() ),
         "Getränkepreis hat sich geändert", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
     if ( result == JOptionPane.YES_OPTION )
     {
-      ServerCommunication.getInstance().consumeDrink( name );
-      ServerCommunication.getInstance().getBalance();
+      ServerCommunication.getInstance().consumeDrink( drink );
     }
   }
 
@@ -242,7 +223,7 @@ public class Dashboard extends JPanel
    *
    * @param name Getränkenaame
    */
-  void showNoMoreDrinksDialog( final String name )
+  public void showNoMoreDrinksDialog( final String name )
   {
     JOptionPane.showMessageDialog( Dashboard.this, "<html><b>" + name + " </b>ist leider nicht mehr verfügbar</html>",
         "Getränk nicht verfügbar",
@@ -256,15 +237,15 @@ public class Dashboard extends JPanel
    * 
    * @param source the {@link DrinkConsumptionButton} that should not get reseted.
    */
-  void resetAllDrinkButtons( DrinkConsumptionButton source )
+  public void resetAllDrinkButtons( DrinkConsumptionButton source )
   {
-    for ( final DrinkConsumptionButton drinkConsumptionButton : buttonList )
+    for ( final DrinkConsumptionButton drinkConsumptionButton : buttonMap.values() )
     {
-      if ( STATE.BUY.equals( drinkConsumptionButton.getCURRENT_STATE() ) )
+      if ( DrinkConsumptionButton.STATE.BUY.equals( drinkConsumptionButton.getCURRENT_STATE() ) )
       {
         if ( !drinkConsumptionButton.equals( source ) )
         {
-          drinkConsumptionButton.switchState( STATE.DEFAULT );
+          drinkConsumptionButton.switchState( DrinkConsumptionButton.STATE.DEFAULT );
           drinkConsumptionButton.setBackground( UIManager.getColor( "Button.background" ) );
         }
       }

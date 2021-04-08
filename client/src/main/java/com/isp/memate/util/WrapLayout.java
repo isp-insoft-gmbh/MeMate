@@ -1,4 +1,4 @@
-package com.isp.memate;
+package com.isp.memate.util;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
  * 
  * @author Rob Camick
  */
-class WrapLayout extends FlowLayout
+public class WrapLayout extends FlowLayout
 {
 
   /**
@@ -40,7 +40,7 @@ class WrapLayout extends FlowLayout
    * 
    * @param align the alignment value
    */
-  WrapLayout( int align )
+  public WrapLayout( int align )
   {
     super( align );
   }

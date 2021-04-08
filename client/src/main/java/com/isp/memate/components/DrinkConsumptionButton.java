@@ -1,7 +1,7 @@
 /**
  * © 2019 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.components;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +25,7 @@ import java.text.NumberFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,6 +36,9 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.ui.FlatBorder;
 
+import com.isp.memate.Drink;
+import com.isp.memate.ServerCommunication;
+import com.isp.memate.panels.Dashboard;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
@@ -50,28 +55,24 @@ import com.isp.memate.util.MeMateUIManager;
  * @author nwe
  * @since 18.10.2019
  */
-class DrinkConsumptionButton extends JPanel
+public class DrinkConsumptionButton extends JPanel
 {
   private JPanel  defaultPanel;
   private JPanel  buyPanel;
   private JButton acceptButton;
-  private String  name;
-  private String  price;
+  private Drink   drink;
 
   private STATE CURRENT_STATE = null;
 
   /**
    * Initializes all the GUI-components, applies the needed listener and sets the state to {@link STATE#DEFAULT}
    * 
-   * @param price Price of the drink
-   * @param name Name of the drink
-   * @param icon Picture of the drink
+   * @param drink the drinkObject that the button should display
    */
-  DrinkConsumptionButton( String price, final String name, final Icon icon )
+  public DrinkConsumptionButton( Drink drink )
   {
-    this.name = name;
-    this.price = price;
-    init( icon );
+    this.drink = drink;
+    init();
     applyListener();
 
     switchState( STATE.DEFAULT );
@@ -79,9 +80,9 @@ class DrinkConsumptionButton extends JPanel
   }
 
 
-  private void init( Icon icon )
+  private void init()
   {
-    initDefaultPanel( icon );
+    initDefaultPanel();
     initBuyPanel();
 
     setLayout( new BorderLayout() );
@@ -90,11 +91,11 @@ class DrinkConsumptionButton extends JPanel
     setPreferredSize( new Dimension( 270, 270 ) );
   }
 
-  private void initDefaultPanel( Icon icon )
+  private void initDefaultPanel()
   {
     JPanel headerPanel = createHeaderPanel();
     JPanel footerPanel = createFooterPanel();
-    JLabel iconLabel = new JLabel( icon );
+    JLabel iconLabel = new JLabel( getIcon() );
 
     defaultPanel = new JPanel( new BorderLayout() )
     {
@@ -112,6 +113,30 @@ class DrinkConsumptionButton extends JPanel
     defaultPanel.add( footerPanel, BorderLayout.SOUTH );
   }
 
+  private Icon getIcon()
+  {
+    final ImageIcon drinkIcon = drink.getIcon();
+    final Image image = drink.getIcon().getImage();
+    Image newImage;
+    if ( drinkIcon.getIconHeight() > 220 || drinkIcon.getIconWidth() > 250 )
+    {
+      final double scale = 220.0 / drinkIcon.getIconHeight();
+      final int height = 220;
+      int width = (int) (drinkIcon.getIconWidth() * scale);
+      if ( width > 250 )
+      {
+        width = 250;
+      }
+      newImage = image.getScaledInstance( width, height, Image.SCALE_SMOOTH );
+    }
+    else
+    {
+      newImage = image.getScaledInstance( 70, 220, Image.SCALE_SMOOTH );
+    }
+    return new ImageIcon( newImage );
+  }
+
+
   private JPanel createHeaderPanel()
   {
     JPanel fillPanel = new JPanel();
@@ -127,7 +152,7 @@ class DrinkConsumptionButton extends JPanel
 
     JLabel nameLabel = new JLabel();
     headerPanel.setLayout( new GridBagLayout() );
-    nameLabel.setText( name );
+    nameLabel.setText( drink.getName() );
     nameLabel.setFont( nameLabel.getFont().deriveFont( 14f ) );
     nameLabel.setHorizontalAlignment( SwingConstants.CENTER );
     final GridBagConstraints nameLabelConstraints = new GridBagConstraints();
@@ -137,7 +162,7 @@ class DrinkConsumptionButton extends JPanel
     nameLabelConstraints.weightx = 1;
     headerPanel.add( nameLabel, nameLabelConstraints );
 
-    JButton infoButton = MeMateUIManager.createInfoButton( name );
+    JButton infoButton = MeMateUIManager.createInfoButton( drink.getId() );
     infoButton.addComponentListener( new ComponentAdapter()
     {
       @Override
@@ -152,7 +177,7 @@ class DrinkConsumptionButton extends JPanel
       }
     } );
 
-    if ( Cache.getInstance().hasIngredients( name ) )
+    if ( drink.isIngredients() )
     {
       final GridBagConstraints infoButtonConstraints = new GridBagConstraints();
       infoButtonConstraints.gridx = 2;
@@ -179,7 +204,7 @@ class DrinkConsumptionButton extends JPanel
     JPanel footerPanel = new JPanel();
     footerPanel.setLayout( new GridBagLayout() );
 
-    price = price.replace( "€", "" );
+    String price = String.valueOf( drink.getPrice() ).replace( "€", "" );
     final Float priceAsFloat = Float.valueOf( price );
     final NumberFormat formatter = NumberFormat.getCurrencyInstance();
     final String format = formatter.format( priceAsFloat.doubleValue() );
@@ -187,7 +212,7 @@ class DrinkConsumptionButton extends JPanel
     JLabel priceLabel = new JLabel();
     JLabel amountLabel = new JLabel();
     priceLabel.setText( format );
-    amountLabel.setText( String.format( "Noch %d Stück", Cache.getInstance().getAmount( name ) ) );
+    amountLabel.setText( String.format( "Noch %d Stück", drink.getAmount() ) );
     priceLabel.setFont( priceLabel.getFont().deriveFont( 14f ) );
     priceLabel.setHorizontalAlignment( SwingConstants.CENTER );
     amountLabel.setFont( priceLabel.getFont().deriveFont( 14f ) );
@@ -244,8 +269,7 @@ class DrinkConsumptionButton extends JPanel
         lock.lock();
         try
         {
-          ServerCommunication.getInstance().consumeDrink( name );
-          ServerCommunication.getInstance().getBalance();
+          ServerCommunication.getInstance().consumeDrink( drink );
           GUIObjects.mainframe.setUndoButtonEnabled( true );
           switchState( STATE.DEFAULT );
         }
@@ -368,7 +392,7 @@ class DrinkConsumptionButton extends JPanel
           break;
         case BUY:
           add( buyPanel );
-          GUIObjects.dashboard.resetAllDrinkButtons( this );
+          ((Dashboard) GUIObjects.currentPanel).resetAllDrinkButtons( this );
           acceptButton.requestFocus();
           setBackground( UIManager.getColor( "Button.hoverBackground" ) );
           break;
@@ -394,10 +418,10 @@ class DrinkConsumptionButton extends JPanel
   {
     return CURRENT_STATE;
   }
-}
 
-enum STATE
-{
-  DEFAULT,
-  BUY;
+  public enum STATE
+  {
+    DEFAULT,
+    BUY;
+  }
 }

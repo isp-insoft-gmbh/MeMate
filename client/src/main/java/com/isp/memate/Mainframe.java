@@ -6,15 +6,16 @@ package com.isp.memate;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -27,15 +28,19 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.formdev.flatlaf.ui.FlatColorChooserUI;
-import com.formdev.flatlaf.util.ColorFunctions;
-import com.formdev.flatlaf.util.ColorFunctions.HSLIncreaseDecrease;
-
 import com.isp.memate.actionbar.MeMateActionBar;
 import com.isp.memate.actionbar.MeMateActionBarButton;
+import com.isp.memate.panels.Adminview;
+import com.isp.memate.panels.ConsumptionRate;
+import com.isp.memate.panels.CreditHistory;
+import com.isp.memate.panels.Dashboard;
+import com.isp.memate.panels.DrinkManager;
+import com.isp.memate.panels.History;
+import com.isp.memate.panels.Settings;
+import com.isp.memate.panels.Social;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
-import com.isp.memate.util.MeMateUIManager;
+import com.isp.memate.util.PropertyHelper;
 
 /**
  * Der Mainframe bildet das Gerüst für Dashboard, Historie und den Getränkemanager.
@@ -62,8 +67,6 @@ public class Mainframe extends JFrame
                                                  }
                                                };
   private final JLabel          helloUserLabel = new JLabel( "Hallo User" );
-  private final Drinkmanager    drinkManager   = new Drinkmanager();
-  private final Adminview       adminView      = new Adminview();
   private final JLabel          balanceLabel   = new JLabel();
   public final JPanel           headerPanel    = new JPanel();
   public JPanel                 burgerButton;
@@ -72,14 +75,6 @@ public class Mainframe extends JFrame
   public MeMateActionBarButton  settingsButton;
   private MeMateActionBarButton undoButton;
   public MeMateActionBar        bar;
-  public static Image           frameImage     =
-      Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue.png" ) );
-
-
-  public Drinkmanager getDrinkManager()
-  {
-    return drinkManager;
-  }
 
   /**
    * Setzt das Layout und nimmt einige Änderungen an den Komponenten vor.
@@ -92,8 +87,7 @@ public class Mainframe extends JFrame
     contentPanel.add( new Dashboard() );
 
     deriveFontsAndSetLayout();
-    setIconImage(
-        Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+    setIconImages( (List<? extends Image>) UIManager.get( "frame.icons" ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
     setMinimumSize( new Dimension( 380, 550 ) );
@@ -102,6 +96,10 @@ public class Mainframe extends JFrame
     add( contentPanel, BorderLayout.CENTER );
     add( headerPanel, BorderLayout.NORTH );
     setHelloLabel( cache.getDisplayname() );
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
+    setVisible( true );
+    addActionBar();
+    requestFocus();
   }
 
   /**
@@ -131,29 +129,9 @@ public class Mainframe extends JFrame
 
     bar.selectButton( "Dashboard" );
     dashboardButton.getRunnable().run();
-    try
+    if ( PropertyHelper.getDarkModeProperty() )
     {
-      final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      final InputStream input = new FileInputStream( file );
-      final Properties userProperties = new Properties();
-      userProperties.load( input );
-
-      if ( userProperties.getProperty( "Darkmode" ) != null && userProperties.getProperty( "Darkmode" ).equals( "on" ) )
-      {
-        bar.showDarkmode();
-        bar.setBackground( UIManager.getColor( "App.Actionbar" ) );
-        burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
-        MeMateUIManager.showDarkMode();
-      }
-      else
-      {
-        MeMateUIManager.showDayMode();
-      }
-    }
-    catch ( final IOException exception )
-    {
-      ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
-      ClientLog.newLog( exception.getMessage() );
+      bar.showDarkmode();
     }
     add( bar, BorderLayout.WEST );
   }
@@ -161,7 +139,7 @@ public class Mainframe extends JFrame
   private void addSettingsButton()
   {
     settingsButton =
-        bar.addActionButton( UIManager.getIcon( "adminview.icon.black" ), UIManager.getIcon( "adminview.icon.white" ), "Settings",
+        bar.addActionButton( UIManager.getIcon( "settings.icon.black" ), UIManager.getIcon( "settings.icon.white" ), "Settings",
             "Öffnet die Einstellungen", color, () ->
             {
               contentPanel.removeAll();
@@ -262,8 +240,7 @@ public class Mainframe extends JFrame
           "Getränkemanager öffnen", color, () ->
           {
             contentPanel.removeAll();
-            drinkManager.updateList();
-            contentPanel.add( drinkManager );
+            contentPanel.add( new DrinkManager() );
             contentPanel.setBorder( new EmptyBorder( 0, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
@@ -272,8 +249,7 @@ public class Mainframe extends JFrame
           "Adminansicht öffnen", color, () ->
           {
             contentPanel.removeAll();
-            adminView.updateDrinkAmounts();
-            contentPanel.add( adminView );
+            contentPanel.add( new Adminview() );
             contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();

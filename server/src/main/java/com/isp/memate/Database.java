@@ -17,13 +17,18 @@ import java.sql.Statement;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import com.isp.memate.ServerLog.logType;
 import com.isp.memate.Shared.LoginResult;
@@ -408,6 +413,9 @@ class Database
       case UPDATE_DRINKPRICE:
         sql = "UPDATE drink SET preis=? WHERE ID=?";
         break;
+      case UPDATE_DRINKAMOUNT:
+        sql = "UPDATE drink SET amount=? WHERE ID=?";
+        break;
       default :
         break;
     }
@@ -426,6 +434,9 @@ class Database
         case UPDATE_DRINKPRICE:
           pstmt.setFloat( 1, (float) updatedInformation );
           break;
+        case UPDATE_DRINKAMOUNT:
+          pstmt.setInt( 1, (int) updatedInformation );
+          break;
         default :
           break;
       }
@@ -441,16 +452,15 @@ class Database
     }
   }
 
-
   /**
    * Liest alle Getränke aus der Datenbank und
    * erstellt ein Array aus Drink-Objekten.
    *
    * @return das Drink-Objekt-Array
    */
-  public Drink[] getDrinkInformations()
+  public Map<Integer, Drink> getDrinks()
   {
-    final ArrayList<Drink> drinkInfos = new ArrayList<>();
+    final HashMap<Integer, Drink> drinks = new HashMap<>();
 
     final String sql = "SELECT ID,name,preis,picture,amount,ingredients FROM drink";
     try ( Statement stmt = conn.createStatement();
@@ -458,18 +468,20 @@ class Database
     {
       while ( rs.next() )
       {
-        if ( rs.getBoolean( "ingredients" ) )
+        int id = rs.getInt( "ID" );
+        String name = rs.getString( "name" );
+        float price = rs.getFloat( "preis" );
+        byte[] picture = rs.getBytes( "picture" );
+        int amount = rs.getInt( "amount" );
+        boolean containsIngredients = rs.getBoolean( "ingredients" );
+
+        if ( containsIngredients )
         {
-          drinkInfos
-              .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
-                  rs.getBytes( "picture" ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ),
-                  getIngredients( rs.getInt( "ID" ) ) ) );
+          drinks.put( id, new Drink( name, price, id, picture, amount, containsIngredients, getIngredients( id ) ) );
         }
         else
         {
-          drinkInfos
-              .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
-                  rs.getBytes( "picture" ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ), null ) );
+          drinks.put( id, new Drink( name, price, id, picture, amount, containsIngredients, null ) );
         }
       }
     }
@@ -477,7 +489,7 @@ class Database
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
-    return drinkInfos.toArray( new Drink[drinkInfos.size()] );
+    return drinks;
   }
 
   /**
@@ -709,17 +721,17 @@ class Database
   }
 
   /**
-   * Gibt den Getränkepreis zurück.
+   * Returns the drinkPrice for the given drinkID
    *
-   * @param consumedDrink Name des gakuften Getränks
-   * @return den Preis für das gewählte Getränk
+   * @param drinkID ID of the drink
+   * @return price of the drink or null if nothing has been found
    */
-  Float getDrinkPrice( final String consumedDrink )
+  Float getDrinkPrice( final int drinkID )
   {
-    final String sql = "SELECT preis FROM drink WHERE name = ?";
+    final String sql = "SELECT preis FROM drink WHERE id = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, consumedDrink );
+      pstmt.setInt( 1, drinkID );
       final ResultSet rs = pstmt.executeQuery();
       return rs.getFloat( "preis" );
     }
@@ -796,11 +808,16 @@ class Database
   }
 
   /**
-   * @return die Daten für das Scoreboard
+   * @return data for the scoreboard
    */
-  public String[][] getScoreboard()
+  public Map<String, Integer> getScoreboard( final boolean getWeeklyScoreboard )
   {
-    final ArrayList<String[]> history = new ArrayList<>();
+    Map<String, Integer> scoreMap = new HashMap<>();
+    for ( String displayName : getDisplayNames() )
+    {
+      scoreMap.put( displayName, 0 );
+    }
+
     final String sql = "SELECT action,consumer,undo,date FROM historie_log";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
@@ -811,8 +828,29 @@ class Database
         {
           if ( !rs.getBoolean( "undo" ) )
           {
-            final String[] log = { rs.getString( "action" ), getDisplayName( rs.getString( "consumer" ) ), rs.getString( "date" ) };
-            history.add( log );
+            String displayName = getDisplayName( rs.getString( "consumer" ) );
+            if ( getWeeklyScoreboard )
+            {
+              try
+              {
+                Instant date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( rs.getString( "date" ) ).toInstant();
+                Instant now = Instant.now();
+                Instant weekAgo = now.minus( 7, ChronoUnit.DAYS );
+                Boolean withinWeek = (!date.isBefore( weekAgo )) && date.isBefore( now );
+                if ( withinWeek )
+                {
+                  scoreMap.put( displayName, scoreMap.get( displayName ) + 1 );
+                }
+              }
+              catch ( ParseException __ )
+              {
+                __.printStackTrace();
+              }
+            }
+            else
+            {
+              scoreMap.put( displayName, scoreMap.get( displayName ) + 1 );
+            }
           }
         }
       }
@@ -821,8 +859,14 @@ class Database
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
-    final String[][] historyAsArray = history.toArray( new String[history.size()][] );
-    return historyAsArray;
+    Map<String, Integer> scoreBoard =
+        scoreMap.entrySet().stream()
+            .sorted( Map.Entry.comparingByValue( Comparator.reverseOrder() ) )
+            .limit( 5 )
+            .collect( Collectors.toMap(
+                Map.Entry::getKey, Map.Entry::getValue, ( e1, e2 ) -> e1, LinkedHashMap::new ) );
+    return scoreBoard;
+
   }
 
   /**
@@ -925,15 +969,15 @@ class Database
   }
 
   /**
-   * @param name Name des Getränks.
-   * @return Anzahl des Getränks
+   * @param drinkID ID of the drink.
+   * @return amount of the drink or -1 if nothing has been found
    */
-  int getDrinkAmount( final String name )
+  int getDrinkAmount( final int drinkID )
   {
-    final String sql = "SELECT amount FROM drink WHERE name =?";
+    final String sql = "SELECT amount FROM drink WHERE id =?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, name );
+      pstmt.setInt( 1, drinkID );
       final ResultSet rs = pstmt.executeQuery();
       return rs.getInt( "amount" );
     }
@@ -945,17 +989,17 @@ class Database
   }
 
   /**
-   * Wenn ein Getränk gekauft wird, wird hier die Anzahl um 1 verringert.
+   * If a drink gets purchased, the amount will decrease by 1
    *
-   * @param name Name des Getränks
+   * @param drinkID ID of the drink
    */
-  void decreaseAmountOfDrinks( final String name )
+  void decreaseAmountOfDrinks( final int drinkID )
   {
     lock.lock();
-    final String sql = "UPDATE drink SET amount = amount -1 WHERE name = ?";
+    final String sql = "UPDATE drink SET amount = amount -1 WHERE id = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, name );
+      pstmt.setInt( 1, drinkID );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )
@@ -969,43 +1013,17 @@ class Database
   }
 
   /**
-   * Wenn ein Getränkekauf rückgängig gmeacht wird, wird hier die Anzahl um 1 erhöht.
+   * If a user undo the purchase of a drink, the amount will increase by 1.
    *
-   * @param name Name des Getränks
+   * @param drinkID ID of the drink
    */
-  void increaseAmountOfDrinks( final String name )
+  void increaseAmountOfDrinks( final int drinkID )
   {
     lock.lock();
-    final String sql = "UPDATE drink SET amount = amount +1 WHERE name = ?";
+    final String sql = "UPDATE drink SET amount = amount +1 WHERE id = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, name );
-      pstmt.executeUpdate();
-    }
-    catch ( final SQLException e )
-    {
-      ServerLog.newLog( logType.SQL, e.getMessage() );
-    }
-    finally
-    {
-      lock.unlock();
-    }
-  }
-
-  /**
-   * Setz die Anzahl der Getränke.
-   *
-   * @param name Name des Getränks
-   * @param amount Anzahl des Getränks
-   */
-  void setAmountOfDrinks( final String name, final int amount )
-  {
-    lock.lock();
-    final String sql = "UPDATE drink SET amount = ? WHERE name = ?";
-    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
-    {
-      pstmt.setInt( 1, amount );
-      pstmt.setString( 2, name );
+      pstmt.setInt( 1, drinkID );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )
@@ -1118,8 +1136,8 @@ class Database
   }
 
   /**
-   * @param drinkID ID des Getränks
-   * @return Inhaltsstoffe etc. des Getränks
+   * @param drinkID ID of the drink
+   * @return ingredients of the drink or null if nothing has been found
    */
   private DrinkIngredients getIngredients( final int drinkID )
   {

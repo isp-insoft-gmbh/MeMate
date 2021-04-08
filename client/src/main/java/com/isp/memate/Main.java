@@ -1,23 +1,21 @@
 package com.isp.memate;
 
-import java.awt.Cursor;
 import com.isp.memate.util.Compare;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.PropertyHelper;
 
 /**
- * Die Mainklasse setzt das Look and Feel und öffnet den LoginFrame, wenn es keine SessionID gibt oder sie
- * abgelaufen ist.
+ * Initializes the folder structure and UIManager. It then checks whether there is a valid SessionID and
+ * depending on this, the login or mainframe is established.
  *
  * @author nwe
  * @since 15.10.2019
  */
 class Main
 {
-  private final static ServerCommunication serverCommunication = ServerCommunication.getInstance();
-
   public static void main( final String[] args )
   {
+    ServerCommunication.getInstance();
     PropertyHelper.createPropFile();
     MeMateUIManager.init();
 
@@ -33,14 +31,8 @@ class Main
 
   private static void showMainframe()
   {
-    final Mainframe mainframe = new Mainframe();
-    mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
-    mainframe.setVisible( true );
-    mainframe.addActionBar();
-    serverCommunication.startDrinkInfoTimer();
-    serverCommunication.tellServerToSendHistoryData();
+    new Mainframe();
     Compare.checkVersion();
-    mainframe.requestFocus();
   }
 
   private static void showLogin()

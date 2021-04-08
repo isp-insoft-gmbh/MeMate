@@ -162,6 +162,6 @@ Drinkmanager
 
 ## Credits
 Application icon by [Stefania Servidio](https://www.graficheria.it/), with some modifications.
-
+AdminView icon by [WishForgeGames](www.wishforge.games)
 All Charts are created with JFreeChart (http://www.jfree.org/jfreechart/)
 

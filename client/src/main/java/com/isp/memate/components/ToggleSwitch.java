@@ -1,7 +1,7 @@
 /**
  * © 2020 isp-insoft GmbH
  */
-package com.isp.memate.util;
+package com.isp.memate.components;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -19,7 +19,6 @@ import javax.swing.UIManager;
  * 
  * @author nwe
  * @since 06.03.2020
- *
  */
 
 public class ToggleSwitch extends JPanel

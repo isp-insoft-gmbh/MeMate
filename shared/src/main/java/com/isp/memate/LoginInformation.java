@@ -8,7 +8,6 @@ import java.io.Serializable;
 /**
  * @author nwe
  * @since 29.11.2019
- *
  */
 class LoginInformation implements Serializable
 {

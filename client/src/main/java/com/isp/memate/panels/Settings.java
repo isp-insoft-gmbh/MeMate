@@ -1,15 +1,15 @@
 /**
  * © 2020 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.panels;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -20,19 +20,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+
+import com.isp.memate.ServerCommunication;
+import com.isp.memate.components.ToggleSwitch;
+import com.isp.memate.dialogs.ChangePasswordDialog;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
-import com.isp.memate.util.ToggleSwitch;
+import com.isp.memate.util.PropertyHelper;
 
 /**
  * Auf dem Settings Panel kann sein gewünschtes Color Scheme auswählen, den Darkmodestate verändern und
@@ -41,14 +45,15 @@ import com.isp.memate.util.ToggleSwitch;
  * @author nwe
  * @since 05.03.2020
  */
-class Settings extends JPanel
+public class Settings extends JPanel
 {
-  private JComboBox<String> colorThemeComboBox;
-  private JRadioButton      lightmodeButton;
-  private JRadioButton      darkmodeButton;
+  private JColorChooser colorChooser;
+  private JRadioButton  lightmodeButton;
+  private JRadioButton  darkmodeButton;
 
   public Settings()
   {
+    GUIObjects.currentPanel = this;
     initComponents();
     setLayout( new GridBagLayout() );
     addComponents();
@@ -56,14 +61,14 @@ class Settings extends JPanel
 
   private void initComponents()
   {
-    colorThemeComboBox = new JComboBox<>();
+    colorChooser = new JColorChooser();
     lightmodeButton = new JRadioButton( "Hell" );
     darkmodeButton = new JRadioButton( "Dunkel" );
   }
 
   private void addComponents()
   {
-    addColorThemePicker();
+    addColorChooser();
     addDarkmodeSettings();
     addMeetingNotification();
     addConsumptionNotification();
@@ -164,14 +169,17 @@ class Settings extends JPanel
     if ( answer == JOptionPane.YES_OPTION )
     {
       final String username = nameField.getText();
-      if ( username == null || username.length() == 0 )
+      if ( username == null || username.trim().isEmpty() )
       {
         JOptionPane.showMessageDialog( this, "Der Anzeigename darf nicht leer sein.", title, JOptionPane.WARNING_MESSAGE );
+        showDisplayNameChangeDialog();
       }
       else if ( username.length() > 10 )
       {
+        //TODO(nwe | 08.04.2021): why ?
         JOptionPane.showMessageDialog( this, "Der Anzeigename darf nicht länger als 10 Zeichen sein.", title,
             JOptionPane.WARNING_MESSAGE );
+        showDisplayNameChangeDialog();
       }
       else
       {
@@ -350,7 +358,7 @@ class Settings extends JPanel
           final InputStream input1 = new FileInputStream( file1 );
           final Properties userProperties1 = new Properties();
           userProperties1.load( input1 );
-          userProperties1.setProperty( "Darkmode", "on" );
+          userProperties1.setProperty( "Darkmode", "true" );
           final OutputStream output1 = new FileOutputStream( file1 );
           userProperties1.store( output1, "" );
         }
@@ -374,7 +382,7 @@ class Settings extends JPanel
           final InputStream input2 = new FileInputStream( file2 );
           final Properties userProperties2 = new Properties();
           userProperties2.load( input2 );
-          userProperties2.setProperty( "Darkmode", "off" );
+          userProperties2.setProperty( "Darkmode", "false" );
           final OutputStream output2 = new FileOutputStream( file2 );
           userProperties2.store( output2, "" );
         }
@@ -407,24 +415,7 @@ class Settings extends JPanel
 
   private void getPrefsAndSelectButton()
   {
-    String state = "null";
-    try ( InputStream input =
-        new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
-    {
-      final Properties userProperties = new Properties();
-      userProperties.load( input );
-      state = userProperties.getProperty( "Darkmode" );
-    }
-    catch ( final Exception exception )
-    {
-      ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
-      ClientLog.newLog( exception.getMessage() );
-    }
-    if ( state == null )
-    {
-      state = "off";
-    }
-    if ( state.equals( "on" ) )
+    if ( PropertyHelper.getDarkModeProperty() )
     {
       darkmodeButton.setSelected( true );
     }
@@ -434,10 +425,10 @@ class Settings extends JPanel
     }
   }
 
-  private void addColorThemePicker()
+  private void addColorChooser()
   {
     final JLabel pickThemeLabel = new JLabel();
-    pickThemeLabel.setText( "Color Scheme auswählen" );
+    pickThemeLabel.setText( "Akzentfarbe auswählen" );
     pickThemeLabel.setFont( pickThemeLabel.getFont().deriveFont( 18f ) );
     final GridBagConstraints pickThemeLabelConstraints = new GridBagConstraints();
     pickThemeLabelConstraints.gridx = 0;
@@ -447,14 +438,6 @@ class Settings extends JPanel
     pickThemeLabelConstraints.insets = new Insets( 10, 20, 0, 0 );
     add( pickThemeLabel, pickThemeLabelConstraints );
 
-    colorThemeComboBox.addItem( "Cyan" );
-    colorThemeComboBox.addItem( "Dark Blue" );
-    colorThemeComboBox.addItem( "Red" );
-    colorThemeComboBox.addItem( "Green" );
-    colorThemeComboBox.addItem( "Blue" );
-    colorThemeComboBox.addItem( "Orange" );
-    colorThemeComboBox.addItem( "Coral" );
-    colorThemeComboBox.addItem( "Tripple Green" );
     final GridBagConstraints colorThemeComboBoxConstraints = new GridBagConstraints();
     colorThemeComboBoxConstraints.gridx = 0;
     colorThemeComboBoxConstraints.gridy = 1;
@@ -462,118 +445,39 @@ class Settings extends JPanel
     colorThemeComboBoxConstraints.ipadx = 150;
     colorThemeComboBoxConstraints.ipady = 10;
     colorThemeComboBoxConstraints.insets = new Insets( 5, 20, 0, 0 );
-    getPrefsAndSelectItem();
-    add( colorThemeComboBox, colorThemeComboBoxConstraints );
-
-    colorThemeComboBox.addItemListener( e ->
+    colorChooser.setColor( PropertyHelper.getAppColorProperty() );
+    JButton colorButton = new JButton( "Farbe auswählen" );
+    add( colorButton, colorThemeComboBoxConstraints );
+    colorButton.addActionListener( new ActionListener()
     {
-      //Otherwise the event will trigger twice every time
-      if ( e.getStateChange() == ItemEvent.SELECTED )
+
+      @Override
+      public void actionPerformed( ActionEvent e )
       {
-        final String color = String.valueOf( colorThemeComboBox.getSelectedItem() );
-        switch ( color )
+        int choice = JOptionPane.showConfirmDialog( Settings.this, colorChooser, "Akzentfarbe auswählen", JOptionPane.YES_NO_OPTION,
+            JOptionPane.DEFAULT_OPTION, null );
+        if ( JOptionPane.YES_OPTION == choice )
         {
-          case "Dark Blue":
-            setColors( color, new Color( 0, 173, 181 ), new Color( 34, 40, 49 ), new Color( 57, 62, 70 ), new Color( 42, 51, 64 ) );
-            break;
-          case "Red":
-            setColors( color, new Color( 226, 62, 87 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
-            break;
-          case "Green":
-            setColors( color, new Color( 153, 180, 51 ), new Color( 48, 56, 65 ), new Color( 58, 71, 80 ), new Color( 57, 67, 77 ) );
-            break;
-          case "Blue":
-            setColors( color, new Color( 85, 172, 238 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-            break;
-          case "Orange":
-            setColors( color, new Color( 227, 162, 26 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-            break;
-          case "Coral":
-            setColors( color, new Color( 255, 111, 97 ), new Color( 41, 47, 51 ), new Color( 102, 117, 127 ), new Color( 49, 56, 60 ) );
-            break;
-          case "Tripple Green":
-            setColors( color, new Color( 153, 180, 51 ), new Color( 11, 40, 25 ), new Color( 30, 113, 69 ), new Color( 13, 48, 30 ) );
-            break;
-          default :
-            setColors( color, new Color( 29, 164, 165 ), new Color( 36, 43, 55 ), new Color( 52, 73, 94 ), new Color( 42, 51, 64 ) );
-            break;
+          setAppColor( colorChooser.getColor() );
         }
       }
     } );
   }
 
-
-  private void getPrefsAndSelectItem()
-  {
-    String color = "null";
-    try ( InputStream input =
-        new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
-    {
-      final Properties userProperties = new Properties();
-      userProperties.load( input );
-      color = userProperties.getProperty( "colorScheme" );
-    }
-    catch ( final Exception exception )
-    {
-      ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
-      ClientLog.newLog( exception.getMessage() );
-    }
-    if ( color == null )
-    {
-      color = "";
-    }
-    switch ( color )
-    {
-      case "Dark Blue":
-        colorThemeComboBox.setSelectedItem( "Dark Blue" );
-        break;
-      case "Red":
-        colorThemeComboBox.setSelectedItem( "Red" );
-        break;
-      case "Green":
-        colorThemeComboBox.setSelectedItem( "Green" );
-        break;
-      case "Blue":
-        colorThemeComboBox.setSelectedItem( "Blue" );
-        break;
-      case "Orange":
-        colorThemeComboBox.setSelectedItem( "Orange" );
-        break;
-      case "Coral":
-        colorThemeComboBox.setSelectedItem( "Coral" );
-        break;
-      case "Tripple Green":
-        colorThemeComboBox.setSelectedItem( "Green" );
-        break;
-      default :
-        colorThemeComboBox.setSelectedItem( "Cyan" );
-        break;
-    }
-  }
-
-  private void setColors( final String theme, final Color appColor, final Color background, final Color background2, final Color actionbar )
+  private void setAppColor( final Color appColor )
   {
     UIManager.put( "AppColor", appColor );
-    UIManager.put( "App.Background", background );
-    UIManager.put( "App.Secondary.Background", background2 );
-    UIManager.put( "App.Actionbar", actionbar );
-    UIManager.put( "FocusBorder",
-        BorderFactory.createCompoundBorder( BorderFactory.createLineBorder( appColor ),
-            BorderFactory.createEmptyBorder( 2, 5, 2, 5 ) ) );
     GUIObjects.mainframe.headerPanel.setBackground( appColor );
     GUIObjects.mainframe.settingsButton.selected();
-    if ( MeMateUIManager.getDarkModeState() )
-    {
-      GUIObjects.mainframe.bar.setBackground( actionbar );
-      GUIObjects.mainframe.burgerButton.setBackground( actionbar );
-    }
+    GUIObjects.mainframe.bar.setBackground( UIManager.getColor( "Panel.background" ) );
+    GUIObjects.mainframe.burgerButton.setBackground( UIManager.getColor( "Panel.background" ) );
     try
     {
       final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
       final InputStream input = new FileInputStream( file );
       final Properties userProperties = new Properties();
       userProperties.load( input );
-      userProperties.setProperty( "colorScheme", theme );
+      userProperties.setProperty( "AppColor", String.valueOf( appColor.getRGB() ) );
       final OutputStream output = new FileOutputStream( file );
       userProperties.store( output, "" );
     }
@@ -582,5 +486,6 @@ class Settings extends JPanel
       ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
       ClientLog.newLog( exception.getMessage() );
     }
+    Settings.this.repaint();
   }
 }

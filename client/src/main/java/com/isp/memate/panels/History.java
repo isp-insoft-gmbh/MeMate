@@ -1,7 +1,7 @@
 /**
  * © 2019 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.panels;
 
 import java.awt.BorderLayout;
 
@@ -15,7 +15,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import com.isp.memate.Cache;
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.util.GUIObjects;
+import com.isp.memate.util.HorizontalAlignmentHeaderRenderer;
 
 /**
  * In der Historie soll der Nutzer alle bisherigen Buchungen sehen, egal ob er etwas
@@ -36,6 +39,7 @@ public class History extends JPanel
 
   public History()
   {
+    GUIObjects.currentPanel = this;
     initComponents();
     setLayout( new BorderLayout() );
     add( scrollPane, BorderLayout.CENTER );
@@ -45,10 +49,9 @@ public class History extends JPanel
   {
     historyTable = new JTable();
     historyTable.setAutoCreateRowSorter( true );
-    historyTable.setShowGrid( false );
+    historyTable.setShowVerticalLines( true );
 
     JTableHeader header = historyTable.getTableHeader();
-    header.setOpaque( false );
     header.setReorderingAllowed( false );
     historyTable.setRowHeight( 30 );
 

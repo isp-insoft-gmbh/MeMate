@@ -1,21 +1,16 @@
 /**
  * © 2019 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
-import java.util.Date;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,20 +21,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.isp.memate.ServerCommunication.dateType;
-import com.isp.memate.util.ClientLog;
+import com.isp.memate.Cache;
+import com.isp.memate.DataExport;
+import com.isp.memate.ServerCommunication;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.Util;
+import com.isp.memate.util.WrapLayout;
 
 /**
  * In der Adminview kann man das Guthaben des Spaarschweins setzen/sehen,
@@ -47,9 +41,8 @@ import com.isp.memate.util.Util;
  *
  * @author nwe
  * @since 09.12.2019
- *
  */
-class Adminview extends JPanel
+public class Adminview extends JPanel
 {
   private final JButton    exportButton          =
       MeMateUIManager.createIconButton( new ImageIcon( getClass().getClassLoader().getResource( "export_white.png" ) ),
@@ -63,16 +56,15 @@ class Adminview extends JPanel
   private final JPanel     upperPanel            = new JPanel();
   private final JPanel     upperUpperPanel       = new JPanel();
   private final JPanel     centerPanel           = new JPanel();
-  private JPanel           drinkAmountPanel      = new JPanel( new FlowLayout() );
   private final JTextField balanceField          = new JTextField();
   Cache                    cache                 = Cache.getInstance();
-
 
   /**
    * Der Konstruktor lädt die Einstellungen für das Adminpanel.
    */
   public Adminview()
   {
+    GUIObjects.currentPanel = this;
     loadDefaultSettings();
   }
 
@@ -95,7 +87,6 @@ class Adminview extends JPanel
     loadExportPanelSettings( exportPanel );
 
     layoutHeaderComponents( pwChangePanel, piggyBankPanel, exportPanel );
-    addAllDrinks();
 
     loadExportButtonAction();
     loadResetPasswordButtonAction();
@@ -290,7 +281,7 @@ class Adminview extends JPanel
 
   private void loadPiggyBankPanelSettings( final JPanel piggyBankPanel )
   {
-    updatePiggybankBalanceLabel( Cache.getInstance().getPiggyBankBalance() );
+    setPiggybankBalance( Cache.getInstance().getPiggyBankBalance() );
     piggyBankPanel.setPreferredSize( new Dimension( 460, 90 ) );
     piggyBankPanel.setLayout( new GridBagLayout() );
     piggyBankLabel.setFont( piggyBankLabel.getFont().deriveFont( 25f ) );
@@ -342,149 +333,11 @@ class Adminview extends JPanel
   }
 
   /**
-   * Erzeugt für jeden vorhandenes Getränk ein eigens Panel mit Name, wann es in etwa leer sein wird
-   * und einem Spinner und Button zum Festlegen der Anzahl.
-   */
-  private void addAllDrinks()
-  {
-    for ( final String drink : cache.getDrinkNames() )
-    {
-      drinkAmountPanel = MeMateUIManager.createJPanelWithThinBorder();
-      drinkAmountPanel.setLayout( new GridBagLayout() );
-      final JLabel drinkNameLabel = new JLabel();
-      drinkNameLabel.setText( drink );
-      drinkNameLabel.setFont( drinkNameLabel.getFont().deriveFont( 20f ) );
-      final GridBagConstraints drinkNameLabelConstraints = new GridBagConstraints();
-      drinkNameLabelConstraints.gridy = 0;
-      drinkNameLabelConstraints.gridx = 0;
-      drinkNameLabelConstraints.gridwidth = 2;
-      drinkNameLabelConstraints.anchor = GridBagConstraints.LINE_START;
-      drinkNameLabelConstraints.insets = new Insets( 5, 10, 5, 0 );
-      drinkAmountPanel.add( drinkNameLabel, drinkNameLabelConstraints );
-      final JLabel daysLeftLabel = new JLabel();
-      daysLeftLabel.setText( String.format( "in etwa %.2f Tagen leer.", getDaysLeft( drink ) ) );
-      daysLeftLabel.setFont( daysLeftLabel.getFont().deriveFont( 15f ) );
-      final GridBagConstraints daysLeftLabelConstraints = new GridBagConstraints();
-      daysLeftLabelConstraints.gridx = 0;
-      daysLeftLabelConstraints.gridy = 1;
-      daysLeftLabelConstraints.gridwidth = 2;
-      daysLeftLabelConstraints.anchor = GridBagConstraints.LINE_START;
-      daysLeftLabelConstraints.insets = new Insets( 0, 10, 10, 0 );
-      drinkAmountPanel.add( daysLeftLabel, daysLeftLabelConstraints );
-      final SpinnerModel amountSpinnerModel = new SpinnerNumberModel( 0, 0, 1000, 1 );
-      final JSpinner amountSpinner = new JSpinner( amountSpinnerModel );
-      amountSpinner.setValue( cache.getAmount( drink ) );
-      final GridBagConstraints amountSpinnerConstraints = new GridBagConstraints();
-      amountSpinnerConstraints.gridx = 0;
-      amountSpinnerConstraints.gridy = 2;
-      amountSpinnerConstraints.weightx = 1;
-      amountSpinnerConstraints.weighty = 1;
-      amountSpinnerConstraints.anchor = GridBagConstraints.LINE_START;
-      amountSpinnerConstraints.insets = new Insets( 0, 10, 5, 5 );
-      drinkAmountPanel.add( amountSpinner, amountSpinnerConstraints );
-      final JButton setAmountButton = new JButton();
-      setAmountButton.setText( "Anzahl setzen" );
-      final GridBagConstraints setAmountButtonConstraints = new GridBagConstraints();
-      setAmountButtonConstraints.gridx = 1;
-      setAmountButtonConstraints.gridy = 2;
-      setAmountButtonConstraints.weightx = 1;
-      setAmountButtonConstraints.weighty = 1;
-      setAmountButtonConstraints.anchor = GridBagConstraints.LINE_END;
-      setAmountButtonConstraints.insets = new Insets( 0, 0, 5, 10 );
-      drinkAmountPanel.add( setAmountButton, setAmountButtonConstraints );
-
-      setAmountButton.addActionListener( new ActionListener()
-      {
-        @Override
-        public void actionPerformed( final ActionEvent e )
-        {
-          final String amount = String.valueOf( amountSpinner.getValue() );
-          if ( isInteger( amount ) )
-          {
-            ServerCommunication.getInstance().setDrinkAmount( drink, Integer.valueOf( amount ) );
-          }
-        }
-
-        private boolean isInteger( final String testValue )
-        {
-          try
-          {
-            Integer.parseInt( testValue );
-          }
-          catch ( final Exception exception )
-          {
-            return false;
-          }
-          return true;
-        }
-      } );
-      drinkAmountPanel.setPreferredSize( new Dimension( 260, 95 ) );
-      centerPanel.add( drinkAmountPanel );
-    }
-  }
-
-  /**
-   * Berechnet zuerst den Durchschnittswert der letzten Monats aus.
-   * Nun wird die Anzahl an noch vorhandenen Getränken durch den Wert geteilt.
-   */
-  private Float getDaysLeft( final String drink )
-  {
-    Float amount = 0f;
-    final String[][] historyData = Cache.getInstance().getHistory( dateType.LONG );
-    if ( historyData != null )
-    {
-      for ( final String[] data : historyData )
-      {
-        final String action = data[ 0 ];
-        if ( action.contains( "getrunken" ) )
-        {
-          if ( action.contains( drink ) )
-          {
-            final String dateAsString = data[ 4 ].substring( 0, 10 );
-            Date date;
-            try
-            {
-              date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
-              final ZonedDateTime now = ZonedDateTime.now();
-              final ZonedDateTime thirtyDaysAgo = now.minusDays( 30 );
-              if ( !date.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
-              {
-                if ( data[ 5 ].equals( "false" ) )
-                {
-                  amount++;
-                }
-              }
-            }
-            catch ( final ParseException exception )
-            {
-              ClientLog.newLog( "Das Datum für die Berechnung der noch übrigen Tage konnte nicht geparst werden" );
-              ClientLog.newLog( exception.getMessage() );
-            }
-          }
-        }
-      }
-    }
-    final Float averageConsumption = amount / 30f;
-    return cache.getAmount( drink ) / averageConsumption;
-  }
-
-  /**
-   * Generiert das AdminPanel neu
-   */
-  void updateDrinkAmounts()
-  {
-    removeAll();
-    loadDefaultSettings();
-    repaint();
-    revalidate();
-  }
-
-  /**
-   * Updated das Label für das Spaarschweinguthaben.
+   * Updates the label for the piggybankbalance
    *
-   * @param balance Guthaben
+   * @param balance new balance
    */
-  private void updatePiggybankBalanceLabel( final Float balance )
+  public void setPiggybankBalance( final Float balance )
   {
     piggyBankLabel.setText( String.format( "Im Sparschwein befinden sich %.2f€", balance ) );
   }

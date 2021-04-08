@@ -7,8 +7,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -37,7 +38,10 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+
 import com.isp.memate.Shared.LoginResult;
+import com.isp.memate.dialogs.ChangePasswordDialog;
+import com.isp.memate.dialogs.RegistrationDialog;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
@@ -279,8 +283,7 @@ public class Login extends JFrame
 
   private void applyFrameSettings()
   {
-    setIconImage(
-        Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+    setIconImages( (List<? extends Image>) UIManager.get( "frame.icons" ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
     pack();
@@ -294,23 +297,15 @@ public class Login extends JFrame
    *
    * @param loginResult Antwort des Servers
    */
-  void validateLoginResult( final LoginResult loginResult )
+  public void validateLoginResult( final LoginResult loginResult )
   {
     if ( loginResult == LoginResult.LOGIN_SUCCESSFULL )
     {
-      ServerCommunication.getInstance().startDrinkInfoTimer();
       cache.setUsername( currentUsername );
       generateSessionID( currentUsername );
       GUIObjects.loginFrame = null;
       dispose();
-      final Mainframe mainframe = new Mainframe();
-      mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
-      mainframe.addActionBar();
-      mainframe.setVisible( true );
-      ServerCommunication.getInstance().tellServerToSendDrinkInformations();
-      ServerCommunication.getInstance().getBalance();
-      ServerCommunication.getInstance().tellServerToSendHistoryData();
-      mainframe.requestFocus();
+      new Mainframe();
     }
     else if ( loginResult == LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD )
     {
@@ -374,9 +369,6 @@ public class Login extends JFrame
     final Mainframe mainframe = new Mainframe();
     mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
     mainframe.setVisible( true );
-    ServerCommunication.getInstance().tellServerToSendDrinkInformations();
-    ServerCommunication.getInstance().getBalance();
-    ServerCommunication.getInstance().tellServerToSendHistoryData();
     mainframe.requestFocus();
   }
 }

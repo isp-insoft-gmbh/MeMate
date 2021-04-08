@@ -1,11 +1,10 @@
 /**
  * © 2019 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -38,6 +37,7 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
+import com.isp.memate.Cache;
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
@@ -50,7 +50,7 @@ import com.isp.memate.util.GUIObjects;
  * @author nwe
  * @since 19.12.2019
  */
-class ConsumptionRate extends JPanel
+public class ConsumptionRate extends JPanel
 {
   private final Map<String, Integer> amountMap      = new HashMap<>();
   private ChartPanel                 chartPanel;
@@ -58,6 +58,7 @@ class ConsumptionRate extends JPanel
 
   public ConsumptionRate()
   {
+    GUIObjects.currentPanel = this;
     setLayout( new GridBagLayout() );
     addChartPanel();
     setDrawRange();

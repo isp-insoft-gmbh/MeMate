@@ -4,9 +4,14 @@
 package com.isp.memate.util;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -15,11 +20,14 @@ import javax.swing.JPanel;
 import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatUIDefaultsInspector;
-import com.isp.memate.DrinkDetailsToolTip;
+
+import com.isp.memate.components.DrinkDetailsToolTip;
+import com.isp.memate.components.InfoIcon;
 
 /**
  * Der {@link MeMateUIManager} enthält Listen von allen Komponenten den App und
@@ -44,6 +52,8 @@ public class MeMateUIManager
   {
     UIManager.put( "dashboard.icon.black", getIcon( "dashboard_black.png" ) );
     UIManager.put( "dashboard.icon.white", getIcon( "dashboard_white.png" ) );
+    UIManager.put( "settings.icon.black", getIcon( "settings_black.png" ) );
+    UIManager.put( "settings.icon.white", getIcon( "settings_white.png" ) );
     UIManager.put( "adminview.icon.black", getIcon( "adminview_black.png" ) );
     UIManager.put( "adminview.icon.white", getIcon( "adminview_white.png" ) );
     UIManager.put( "logout.icon.black", getIcon( "logout_black_24.png" ) );
@@ -62,6 +72,13 @@ public class MeMateUIManager
     UIManager.put( "creditHistory.icon.white", getIcon( "creditHistory_white.png" ) );
     UIManager.put( "info.icon.black", getIcon( "infoicon.png" ) );
     UIManager.put( "info.icon.white", getIcon( "infoicon_white.png" ) );
+
+    List<Image> frameIcons = new ArrayList<>();
+    frameIcons.add( Toolkit.getDefaultToolkit().getImage( classLoader.getResource( "frameicon128.png" ) ) );
+    frameIcons.add( Toolkit.getDefaultToolkit().getImage( classLoader.getResource( "frameicon64.png" ) ) );
+    frameIcons.add( Toolkit.getDefaultToolkit().getImage( classLoader.getResource( "frameicon32.png" ) ) );
+    frameIcons.add( Toolkit.getDefaultToolkit().getImage( classLoader.getResource( "frameicon16.png" ) ) );
+    UIManager.put( "frame.icons", frameIcons );
   }
 
   private static Icon getIcon( String string )
@@ -97,7 +114,7 @@ public class MeMateUIManager
     return panel;
   }
 
-  public static JButton createInfoButton( String drinkName )
+  public static JButton createInfoButton( int drinkID )
   {
     JButton button = new JButton( new InfoIcon() )
     {
@@ -108,7 +125,7 @@ public class MeMateUIManager
       {
         if ( tooltip == null )
         {
-          tooltip = new DrinkDetailsToolTip( drinkName );
+          tooltip = new DrinkDetailsToolTip( drinkID );
         }
         return tooltip;
       }
@@ -180,9 +197,7 @@ public class MeMateUIManager
 
   public static void applyTheme()
   {
-    //TODO(nwe | 09.12.2020): Was für on und off digga ? mach doch einfach true false
-    String darkmode = PropertyHelper.getProperty( "Darkmode" );
-    if ( darkmode != null && darkmode.equals( "on" ) )
+    if ( PropertyHelper.getDarkModeProperty() )
     {
       FlatDarkLaf.install();
       MeMateUIManager.setDarkModeState( true );
@@ -212,54 +227,9 @@ public class MeMateUIManager
     ToolTipManager.sharedInstance().setDismissDelay( 1000000 );
   }
 
-  /**
-   * Die Userconfig wird gelesen und das richtige Colortheme geladen.
-   */
-  public static void installColors()
-  {
-    String colorScheme = PropertyHelper.getProperty( "colorScheme" );
-    if ( colorScheme == null )
-    {
-      colorScheme = "";
-    }
-    switch ( colorScheme )
-    {
-      case "Dark Blue":
-        putColorsInUIManager( new Color( 0, 173, 181 ), new Color( 42, 51, 64 ) );
-        break;
-      case "Red":
-        putColorsInUIManager( new Color( 226, 62, 87 ), new Color( 57, 67, 77 ) );
-        break;
-      case "Green":
-        putColorsInUIManager( new Color( 153, 180, 51 ), new Color( 57, 67, 77 ) );
-        break;
-      case "Blue":
-        putColorsInUIManager( new Color( 85, 172, 238 ), new Color( 49, 56, 60 ) );
-        break;
-      case "Orange":
-        putColorsInUIManager( new Color( 227, 162, 26 ), new Color( 49, 56, 60 ) );
-        break;
-      case "Coral":
-        putColorsInUIManager( new Color( 255, 111, 97 ), new Color( 49, 56, 60 ) );
-        break;
-      case "Tripple Green":
-        putColorsInUIManager( new Color( 153, 180, 51 ), new Color( 13, 48, 30 ) );
-        break;
-      default :
-        putColorsInUIManager( new Color( 29, 164, 165 ), new Color( 42, 51, 64 ) );
-        break;
-    }
-  }
-
-  private static void putColorsInUIManager( final Color appColor, final Color actionbar )
-  {
-    UIManager.put( "AppColor", appColor );
-    UIManager.put( "App.Actionbar", actionbar );
-  }
-
   public static void init()
   {
-    installColors();
+    UIManager.put( "AppColor", PropertyHelper.getAppColorProperty() );
     putIconsInUIManager();
     applyTheme();
     setUIDefaults();

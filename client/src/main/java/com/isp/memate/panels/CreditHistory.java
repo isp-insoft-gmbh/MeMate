@@ -1,7 +1,7 @@
 /**
  * © 2020 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -23,6 +23,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import com.isp.memate.Cache;
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
@@ -33,12 +34,13 @@ import com.isp.memate.util.GUIObjects;
  * @author nwe
  * @since 28.01.2020
  */
-class CreditHistory extends JPanel
+public class CreditHistory extends JPanel
 {
   ChartPanel chartPanel;
 
   public CreditHistory()
   {
+    GUIObjects.currentPanel = this;
     setLayout( new BorderLayout() );
     addChartPanel();
     setDrawRange();

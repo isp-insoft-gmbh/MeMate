@@ -1,7 +1,7 @@
 /**
  * © 2020 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,20 +12,16 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.isp.memate.Cache;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
 
 /**
  * Im Social Panel kann man ein wöchentliches Scoreboard, ein Overall Scoreboard und wer grade
@@ -40,6 +36,7 @@ public class Social extends JPanel
 
   public Social()
   {
+    GUIObjects.currentPanel = this;
     setLayout( new BorderLayout() );
     add( getMainPanel(), BorderLayout.CENTER );
   }
@@ -60,69 +57,7 @@ public class Social extends JPanel
   private JPanel getWeeklyScoreBoardPanel()
   {
     JPanel weeklyScoreBoardPanel = new JPanel();
-    final String[] userNames = cache.getDisplayNamesArray();
-    final Map<String, Integer> scoreMap = new HashMap<>();
-    for ( String username : userNames )
-    {
-      scoreMap.put( username, 0 );
-    }
-    ServerCommunication.getInstance().lock.lock();
-    String[][] history = Cache.getInstance().getScoreboard();
-    if ( history != null )
-    {
-      ZonedDateTime today = ZonedDateTime.now();
-      DayOfWeek day = today.getDayOfWeek();
-      ZonedDateTime xDaysAgo = today;
-      switch ( day )
-      {
-        case MONDAY:
-          xDaysAgo = today.minusDays( 1 );
-          break;
-        case TUESDAY:
-          xDaysAgo = today.minusDays( 2 );
-          break;
-        case WEDNESDAY:
-          xDaysAgo = today.minusDays( 3 );
-          break;
-        case THURSDAY:
-          xDaysAgo = today.minusDays( 4 );
-          break;
-        case FRIDAY:
-          xDaysAgo = today.minusDays( 5 );
-          break;
-        case SATURDAY:
-          xDaysAgo = today.minusDays( 6 );
-          break;
-        case SUNDAY:
-          xDaysAgo = today.minusDays( 7 );
-          break;
-      }
-      for ( String[] data : history )
-      {
-        String date = data[ 2 ].substring( 0, 10 );
-        try
-        {
-          Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
-          if ( !eventDate.toInstant().isBefore( xDaysAgo.toInstant() ) )
-          {
-            scoreMap.put( data[ 1 ], scoreMap.get( data[ 1 ] ) + 1 );
-          }
-        }
-        catch ( ParseException exception )
-        {
-          ClientLog.newLog( "Das Datum ist out of range." + exception );
-        }
-      }
-    }
-    List<Score> scoreList = new ArrayList<>();
-    for ( String name : scoreMap.keySet() )
-    {
-      scoreList.add( new Score( name, scoreMap.get( name ) ) );
-    }
-    Collections.sort( scoreList, Comparator.comparing( Score::getScore ) );
-    Collections.reverse( scoreList );
-    ServerCommunication.getInstance().lock.unlock();
-    loadScoreBoard( scoreList, weeklyScoreBoardPanel, "weekly" );
+    loadScoreBoard( cache.getWeeklyScoreboard(), weeklyScoreBoardPanel, "weekly" );
     return weeklyScoreBoardPanel;
   }
 
@@ -130,34 +65,11 @@ public class Social extends JPanel
   private JPanel getScoreBoardPanel()
   {
     JPanel scoreBoardPanel = new JPanel();
-    final String[] userNames = cache.getDisplayNamesArray();
-    final Map<String, Integer> scoreMap = new HashMap<>();
-    for ( String username : userNames )
-    {
-      scoreMap.put( username, 0 );
-    }
-    ServerCommunication.getInstance().lock.lock();
-    String[][] history = Cache.getInstance().getScoreboard();
-    if ( history != null )
-    {
-      for ( String[] data : history )
-      {
-        scoreMap.put( data[ 1 ], scoreMap.get( data[ 1 ] ) + 1 );
-      }
-    }
-    List<Score> scoreList = new ArrayList<>();
-    for ( String name : scoreMap.keySet() )
-    {
-      scoreList.add( new Score( name, scoreMap.get( name ) ) );
-    }
-    Collections.sort( scoreList, Comparator.comparing( Score::getScore ) );
-    Collections.reverse( scoreList );
-    ServerCommunication.getInstance().lock.unlock();
-    loadScoreBoard( scoreList, scoreBoardPanel, "overall" );
+    loadScoreBoard( cache.getScoreboard(), scoreBoardPanel, "overall" );
     return scoreBoardPanel;
   }
 
-  private static void loadScoreBoard( List<Score> scoreList, JPanel panel, String title )
+  private static void loadScoreBoard( Map<String, Integer> map, JPanel panel, String title )
   {
     panel.setLayout( new GridBagLayout() );
     JLabel scoreBoardLabel = new JLabel();
@@ -169,25 +81,26 @@ public class Social extends JPanel
     JLabel fifthPlaceLabel = new JLabel();
     scoreBoardLabel.setText( " - Scoreboard - " );
     overallLabel.setText( title );
-    if ( scoreList.size() >= 1 )
+    Object[] names = (Object[]) map.keySet().toArray();
+    if ( map.size() >= 1 )
     {
-      firstPlaceLabel.setText( "1. " + scoreList.get( 0 ).name + " - " + scoreList.get( 0 ).score );
+      firstPlaceLabel.setText( "1. " + names[ 0 ] + " - " + map.get( names[ 0 ] ) );
     }
-    if ( scoreList.size() >= 2 )
+    if ( map.size() >= 2 )
     {
-      secondPlaceLabel.setText( "2. " + scoreList.get( 1 ).name + " - " + scoreList.get( 1 ).score );
+      secondPlaceLabel.setText( "2. " + names[ 1 ] + " - " + map.get( names[ 1 ] ) );
     }
-    if ( scoreList.size() >= 3 )
+    if ( map.size() >= 3 )
     {
-      thirdPlaceLabel.setText( "3. " + scoreList.get( 2 ).name + " - " + scoreList.get( 2 ).score );
+      thirdPlaceLabel.setText( "3. " + names[ 2 ] + " - " + map.get( names[ 2 ] ) );
     }
-    if ( scoreList.size() >= 4 )
+    if ( map.size() >= 4 )
     {
-      fourthPlaceLabel.setText( "4. " + scoreList.get( 3 ).name + " - " + scoreList.get( 3 ).score );
+      fourthPlaceLabel.setText( "4. " + names[ 3 ] + " - " + map.get( names[ 3 ] ) );
     }
-    if ( scoreList.size() >= 5 )
+    if ( map.size() >= 5 )
     {
-      fifthPlaceLabel.setText( "5. " + scoreList.get( 4 ).name + " - " + scoreList.get( 4 ).score );
+      fifthPlaceLabel.setText( "5. " + names[ 4 ] + " - " + map.get( names[ 4 ] ) );
     }
     scoreBoardLabel.setFont( new Font( "Courier New", Font.BOLD, 30 ) );
     overallLabel.setFont( new Font( "Courier New", Font.BOLD, 19 ) );

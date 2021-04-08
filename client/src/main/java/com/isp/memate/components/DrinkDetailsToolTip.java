@@ -1,4 +1,4 @@
-package com.isp.memate;
+package com.isp.memate.components;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -13,6 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JToolTip;
 import javax.swing.SwingConstants;
 
+import com.isp.memate.Cache;
+import com.isp.memate.DrinkIngredients;
 import com.isp.memate.util.MeMateUIManager;
 
 
@@ -20,7 +22,7 @@ public class DrinkDetailsToolTip extends JToolTip
 {
   JPanel infoPanel = MeMateUIManager.createJPanelWithToolTipBackground();
 
-  public DrinkDetailsToolTip( String drinkName )
+  public DrinkDetailsToolTip( int drinkID )
   {
     {
       super.createToolTip();
@@ -30,7 +32,7 @@ public class DrinkDetailsToolTip extends JToolTip
       constraints.gridx = 1;
       constraints.gridy = 1;
       constraints.fill = GridBagConstraints.BOTH;
-      fillInfoPanel( drinkName );
+      fillInfoPanel( drinkID );
       panel.add( infoPanel, constraints );
       setLayout( new BorderLayout() );
       final Insets insets = getInsets();
@@ -42,12 +44,12 @@ public class DrinkDetailsToolTip extends JToolTip
     }
   }
 
-  private void fillInfoPanel( String drinkName )
+  private void fillInfoPanel( int drinkID )
   {
     JLabel textLabel = new JLabel();
     infoPanel.setLayout( new GridBagLayout() );
-    final DrinkIngredients ingredients = Cache.getInstance().getIngredients( drinkName );
-    final String[] ingredientsArray = ingredients.ingredients.trim().split( "," );
+    final DrinkIngredients ingredients = Cache.getInstance().getDrinks().get( drinkID ).getDrinkIngredients();
+    final String[] ingredientsArray = ingredients.getIngredients().trim().split( "," );
     int maxLength = 40;
     for ( final String string : ingredientsArray )
     {
@@ -70,9 +72,9 @@ public class DrinkDetailsToolTip extends JToolTip
       listBuilder.append( element ).append( ", " );
     }
     String amountString = "";
-    if ( ingredients.amount != 0 )
+    if ( ingredients.getAmount() != 0 )
     {
-      amountString = "<br><br><b>Menge:</b> " + String.format( "%.2f", ingredients.amount ) + " Liter";
+      amountString = "<br><br><b>Menge:</b> " + String.format( "%.2f", ingredients.getAmount() ) + " Liter";
     }
     textLabel.setText( listBuilder.toString().substring( 0, listBuilder.length() - 2 )
         + amountString + "<br><br><b>Durchschnittlicher Gehalt je 100ml</b><br>" );
@@ -134,25 +136,25 @@ public class DrinkDetailsToolTip extends JToolTip
     switch ( ingredient )
     {
       case "Salz":
-        amountLabel.setText( String.format( " %.2fg", ingredients.salt ) );
+        amountLabel.setText( String.format( " %.2fg", ingredients.getSalt() ) );
         break;
       case "Eiweiß":
-        amountLabel.setText( String.format( " %.1fg", ingredients.protein ) );
+        amountLabel.setText( String.format( " %.1fg", ingredients.getProtein() ) );
         break;
       case "Energie":
-        amountLabel.setText( " " + ingredients.energy_kJ + " kJ (" + ingredients.energy_kcal + " kcal)" );
+        amountLabel.setText( " " + ingredients.getEnergy_kJ() + " kJ (" + ingredients.getEnergy_kcal() + " kcal)" );
         break;
       case "Fett":
-        amountLabel.setText( String.format( " %.1fg", ingredients.fat ) );
+        amountLabel.setText( String.format( " %.1fg", ingredients.getFat() ) );
         break;
       case "davon gesättigte Fettsäuren":
-        amountLabel.setText( String.format( " %.1fg", ingredients.fatty_acids ) );
+        amountLabel.setText( String.format( " %.1fg", ingredients.getFatty_acids() ) );
         break;
       case "Kohlenhydrate":
-        amountLabel.setText( String.format( " %.1fg", ingredients.carbs ) );
+        amountLabel.setText( String.format( " %.1fg", ingredients.getCarbs() ) );
         break;
       case "Zucker":
-        amountLabel.setText( String.format( " %.1fg", ingredients.sugar ) );
+        amountLabel.setText( String.format( " %.1fg", ingredients.getSugar() ) );
       default :
         break;
     }

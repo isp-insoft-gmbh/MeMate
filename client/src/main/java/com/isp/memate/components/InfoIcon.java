@@ -1,7 +1,7 @@
 /**
  * © 2020 isp-insoft GmbH
  */
-package com.isp.memate.util;
+package com.isp.memate.components;
 
 import java.awt.Color;
 import java.awt.Component;

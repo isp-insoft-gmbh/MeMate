@@ -1,7 +1,7 @@
 /**
  * © 2020 isp-insoft GmbH
  */
-package com.isp.memate;
+package com.isp.memate.util;
 
 import java.awt.Component;
 
@@ -17,11 +17,11 @@ import javax.swing.table.TableCellRenderer;
  * @since 29.01.2020
  *
  */
-class HorizontalAlignmentHeaderRenderer implements TableCellRenderer
+public class HorizontalAlignmentHeaderRenderer implements TableCellRenderer
 {
   private int horizontalAlignment = SwingConstants.LEFT;
 
-  HorizontalAlignmentHeaderRenderer( int horizontalAlignment )
+  public HorizontalAlignmentHeaderRenderer( int horizontalAlignment )
   {
     this.horizontalAlignment = horizontalAlignment;
   }

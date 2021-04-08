@@ -507,8 +507,8 @@ public class MeMateActionBar extends JPanel
    */
   public void showDarkmode()
   {
-    setBackground( UIManager.getColor( "App.Actionbar" ) );
-    burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
+    setBackground( UIManager.getColor( "Panel.background" ) );
+    burgerButton.setBackground( UIManager.getColor( "Panel.background" ) );
     allButtons.forEach( btn ->
     {
       Icon icon = btn.getPressedIcon();
@@ -529,8 +529,8 @@ public class MeMateActionBar extends JPanel
    */
   public void showDaymode()
   {
-    setBackground( new Color( 225, 225, 225 ) );
-    burgerButton.setBackground( new Color( 225, 225, 225 ) );
+    setBackground( UIManager.getColor( "Panel.background" ) );
+    burgerButton.setBackground( UIManager.getColor( "Panel.background" ) );
     allButtons.forEach( btn ->
     {
       Icon icon = btn.getIcon();
