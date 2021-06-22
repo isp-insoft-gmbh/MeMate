@@ -5,10 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,16 +18,17 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.isp.memate.ServerCommunication;
+import com.isp.memate.components.MeMateDialog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.Util;
 
-public class RegistrationDialog extends JDialog
+public class RegistrationDialog extends MeMateDialog
 {
-  private JPanel            mainPanel;
-  private JTextField        usernameTextField;
-  private JLabel            usernameLabel, passwordLabel, repeatPasswordLabel, passwordCompareLabel;
-  private JPasswordField    passwordField, repeatPasswordField;
-  private JButton           registrationButton, abortButton;
+  private JPanel         mainPanel;
+  private JTextField     usernameTextField;
+  private JLabel         usernameLabel, passwordLabel, repeatPasswordLabel, passwordCompareLabel;
+  private JPasswordField passwordField, repeatPasswordField;
+  private JButton        registrationButton, abortButton;
 
   public RegistrationDialog()
   {
@@ -216,7 +215,7 @@ public class RegistrationDialog extends JDialog
     setResizable( false );
     setSize( getPreferredSize().width + 40, getPreferredSize().height + 20 );
     setLocationRelativeTo( GUIObjects.loginFrame );
-    setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+    setIconImage( GUIObjects.loginFrame.getIconImage() );
     setVisible( true );
   }
 

@@ -5,10 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,18 +18,21 @@ import javax.swing.event.DocumentListener;
 
 import com.isp.memate.ServerCommunication;
 import com.isp.memate.Shared.LoginResult;
+import com.isp.memate.components.MeMateDialog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.Util;
 
-public class ChangePasswordDialog extends JDialog
+public class ChangePasswordDialog extends MeMateDialog
 {
-  private JPanel            mainPanel;
-  private JLabel            passwordLabel, repeatPasswordLabel, passwordCompareLabel;
-  private JPasswordField    passwordField, repeatPasswordField;
-  private JButton           saveButton, abortButton;
+  private JPanel         mainPanel;
+  private JLabel         passwordLabel, repeatPasswordLabel, passwordCompareLabel;
+  private JPasswordField passwordField, repeatPasswordField;
+  private JButton        saveButton, abortButton;
+  private final JFrame   owner;
 
-  public ChangePasswordDialog()
+  public ChangePasswordDialog( final JFrame owner )
   {
+    this.owner = owner;
     initComponents();
     addComponents();
     addActionListener();
@@ -201,8 +202,8 @@ public class ChangePasswordDialog extends JDialog
     pack();
     setResizable( false );
     setSize( getWidth() + 30, getHeight() + 20 );
-    setLocationRelativeTo( GUIObjects.loginFrame );
-    setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+    setLocationRelativeTo( owner);
+    setIconImage( owner.getIconImage() );
     setVisible( true );
   }
 }

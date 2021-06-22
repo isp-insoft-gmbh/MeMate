@@ -309,7 +309,7 @@ public class Login extends JFrame
     }
     else if ( loginResult == LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD )
     {
-      new ChangePasswordDialog();
+      new ChangePasswordDialog( GUIObjects.loginFrame );
     }
     else
     {

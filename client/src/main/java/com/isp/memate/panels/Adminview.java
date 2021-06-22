@@ -160,8 +160,7 @@ public class Adminview extends JPanel
     resetPasswordButton.addActionListener( e ->
     {
       passwordFrame.setTitle( "Passwort zurücksetzen" );
-      passwordFrame
-          .setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+      passwordFrame.setIconImage( GUIObjects.mainframe.getIconImage() );
       final String[] user = Cache.getInstance().getUserArray();
       final JPanel passwordPanel = new JPanel( new GridBagLayout() );
       final JButton saveButton = new JButton( "Speichern" );

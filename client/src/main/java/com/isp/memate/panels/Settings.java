@@ -5,6 +5,7 @@ package com.isp.memate.panels;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -93,7 +94,7 @@ public class Settings extends JPanel
   private void addChangePasswordHyperlink()
   {
     final JLabel hyperlink = new JLabel();
-    hyperlink.setText( "Passwort ändern" );
+    hyperlink.setText( "<html><u>Passwort ändern</u></html>" );
     hyperlink.setFont( hyperlink.getFont().deriveFont( 18f ) );
     hyperlink.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
     hyperlink.addMouseListener( new MouseAdapter()
@@ -101,19 +102,7 @@ public class Settings extends JPanel
       @Override
       public void mouseClicked( final MouseEvent e )
       {
-        new ChangePasswordDialog();
-      }
-
-      @Override
-      public void mouseEntered( final MouseEvent e )
-      {
-        hyperlink.setText( "<html><u>Passwort ändern</u></html>" );
-      }
-
-      @Override
-      public void mouseExited( final MouseEvent e )
-      {
-        hyperlink.setText( "Passwort ändern" );
+        new ChangePasswordDialog( GUIObjects.mainframe );
       }
     } );
     final GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
@@ -127,7 +116,7 @@ public class Settings extends JPanel
   private void addChangeDisplayNameHyperlink()
   {
     final JLabel hyperlink = new JLabel();
-    hyperlink.setText( "Anzeigenamen ändern" );
+    hyperlink.setText( "<html><u>Anzeigenamen ändern</u></html>" );
     hyperlink.setFont( hyperlink.getFont().deriveFont( 18f ) );
     hyperlink.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
     hyperlink.addMouseListener( new MouseAdapter()
@@ -136,18 +125,6 @@ public class Settings extends JPanel
       public void mouseClicked( final MouseEvent e )
       {
         showDisplayNameChangeDialog();
-      }
-
-      @Override
-      public void mouseEntered( final MouseEvent e )
-      {
-        hyperlink.setText( "<html><u>Anzeigenamen ändern</u></html>" );
-      }
-
-      @Override
-      public void mouseExited( final MouseEvent e )
-      {
-        hyperlink.setText( "Anzeigenamen ändern" );
       }
     } );
     final GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
