@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import com.isp.memate.Cache;
 import com.isp.memate.util.ClientLog;
@@ -43,7 +44,7 @@ public class Social extends JPanel
 
   private JPanel getMainPanel()
   {
-    JPanel mainPanel = new JPanel();
+    JPanel mainPanel = new JPanel(new GridBagLayout());
 
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = GridBagConstraints.RELATIVE;
@@ -169,6 +170,7 @@ public class Social extends JPanel
               JPanel panel = new JPanel();
               panel.setPreferredSize( new Dimension( 240, 70 ) );
               panel.setLayout( new GridBagLayout() );
+              panel.setBackground( UIManager.getColor( "Button.background" ) );
               JLabel nameLabel = new JLabel();
               nameLabel.setText( consumer + " trinkt gerade" );
               nameLabel.setFont( nameLabel.getFont().deriveFont( 20f ) );
