@@ -45,6 +45,7 @@ import com.isp.memate.dialogs.RegistrationDialog;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
+import com.isp.memate.util.PropertyHelper;
 import com.isp.memate.util.SwingUtil;
 import com.isp.memate.util.Util;
 
@@ -341,22 +342,7 @@ public class Login extends JFrame
     ServerCommunication.getInstance().connectSessionIDToUser( uuid.toString() );
     if ( stayLoggedInCheckBox.isSelected() )
     {
-      try
-      {
-        final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator
-            + "userconfig.properties" );
-        final InputStream input = new FileInputStream( file );
-        final Properties userProperties = new Properties();
-        userProperties.load( input );
-        userProperties.setProperty( "SessionID", uuid.toString() );
-        final OutputStream output = new FileOutputStream( file );
-        userProperties.store( output, "" );
-      }
-      catch ( final IOException exception )
-      {
-        ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
-        ClientLog.newLog( exception.getMessage() );
-      }
+      PropertyHelper.setProperty( "SessionID", uuid.toString() );
     }
   }
 

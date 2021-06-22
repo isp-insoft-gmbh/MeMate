@@ -5,6 +5,7 @@ package com.isp.memate.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.FileHandler;
@@ -36,7 +37,7 @@ public class ClientLog
     System.out.println( "[" + date + "] " + message );
 
 
-    File logFile = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "ClientLog.log" );
+    File logFile = new File( PropertyHelper.MAIN_FOLDER + File.separator + "ClientLog.log" );
     Logger logger = Logger.getLogger( "ClientLog" );
     try
     {

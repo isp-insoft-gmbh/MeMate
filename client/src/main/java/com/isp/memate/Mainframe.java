@@ -196,21 +196,8 @@ public class Mainframe extends JFrame
           cache.setUsername( null );
           ServerCommunication.getInstance().logout();
           setUndoButtonEnabled( false );
-          try
-          {
-            final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-            final InputStream input = new FileInputStream( file );
-            final Properties userProperties = new Properties();
-            userProperties.load( input );
-            userProperties.setProperty( "SessionID", "null" );
-            final OutputStream output = new FileOutputStream( file );
-            userProperties.store( output, "" );
-          }
-          catch ( final IOException exception )
-          {
-            ClientLog.newLog( "Die SessionID konnte nicht resetet werden." );
-            ClientLog.newLog( exception.getMessage() );
-          }
+          //Resetting the sessionID
+          PropertyHelper.setProperty( "SessionID", "null" );
           dispose();
           final Login login = new Login();
           login.setVisible( true );

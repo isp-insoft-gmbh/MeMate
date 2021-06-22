@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 
 import com.isp.memate.ServerCommunication.dateType;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.PropertyHelper;
 
 /**
  * Die Klasse wird nur aufgerufen sobald der Admin den Export Button im AdminPanel drückt.
@@ -32,7 +33,7 @@ import com.isp.memate.util.ClientLog;
  */
 public class DataExport
 {
-  private final String path           = System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator;
+  private final String path           = System.getenv( PropertyHelper.MAIN_FOLDER + File.separator );
   private final String userXMLPath    = path + "users.xml";
   private final String drinksXMLPath  = path + "drinks.xml";
   private final String historyXMLPath = path + "history.xml";

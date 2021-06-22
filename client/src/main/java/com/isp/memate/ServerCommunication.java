@@ -9,10 +9,7 @@ import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -23,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,6 +30,7 @@ import com.isp.memate.Shared.Operation;
 import com.isp.memate.panels.Dashboard;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
+import com.isp.memate.util.PropertyHelper;
 
 /**
  * Die Klasse ServerCommunication kommuniziert mit dem Server und schickt
@@ -203,7 +200,7 @@ public class ServerCommunication
         final String date = dtf.format( now );
         if ( date.equals( "12:19" ) )
         {
-          if ( showNotifications( "MeetingNotification" ) )
+          if ( PropertyHelper.getBooleanProperty( "MeetingNotification" ) )
           {
             if ( SystemTray.isSupported() )
             {
@@ -238,32 +235,6 @@ public class ServerCommunication
     }
   }
 
-  /*
-   * Gibt zurück ob die gegebene Property enabled ist oder nicht.
-   */
-  private boolean showNotifications( final String property )
-  {
-    String state = null;
-    try ( InputStream input = new FileInputStream(
-        System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
-    {
-      final Properties userProperties = new Properties();
-      userProperties.load( input );
-      state = userProperties.getProperty( property );
-    }
-    catch ( final Exception exception )
-    {
-      ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
-      ClientLog.newLog( exception.getMessage() );
-    }
-    if ( state == null || state.equals( "false" ) )
-    {
-      return false;
-    }
-    return true;
-  }
-
-
   /**
    * Sollte es Änderungen der History geben, so wird geprüft, ob jemand etwas
    * getrunken hat. Wenn dies der Fall ist, popt eine Benachrichtigung auf, sollte
@@ -272,7 +243,7 @@ public class ServerCommunication
   private void checkForChanges()
   {
     final String[][] history = cache.getShortHistory();
-    if ( history != null && cache.getUsername() != null && showNotifications( "ConsumptionNotification" ) )
+    if ( history != null && cache.getUsername() != null && PropertyHelper.getBooleanProperty( "ConsumptionNotification" ) )
     {
       final ZonedDateTime today = ZonedDateTime.now();
       final ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );

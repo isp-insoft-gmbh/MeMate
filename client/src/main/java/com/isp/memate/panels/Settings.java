@@ -48,8 +48,8 @@ import com.isp.memate.util.PropertyHelper;
  */
 public class Settings extends JPanel
 {
-  private JRadioButton  lightmodeButton;
-  private JRadioButton  darkmodeButton;
+  private JRadioButton lightmodeButton;
+  private JRadioButton darkmodeButton;
 
   public Settings()
   {
@@ -189,60 +189,15 @@ public class Settings extends JPanel
     consumptionSwitch.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseReleased( final MouseEvent arg0 )
+      public void mouseReleased( final MouseEvent __ )
       {
         consumptionSwitch.activated = !consumptionSwitch.activated;
         consumptionSwitch.repaint();
-        try
-        {
-          final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-          final InputStream input = new FileInputStream( file );
-          final Properties userProperties = new Properties();
-          userProperties.load( input );
-          String state = "false";
-          if ( consumptionSwitch.activated )
-          {
-            state = "true";
-          }
-          userProperties.setProperty( "ConsumptionNotification", state );
-          final OutputStream output = new FileOutputStream( file );
-          userProperties.store( output, "" );
-        }
-        catch ( final IOException exception )
-        {
-          ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
-          ClientLog.newLog( exception.getMessage() );
-        }
+        PropertyHelper.setProperty( "ConsumptionNotification", consumptionSwitch.activated ? "true" : "false" );
       }
     } );
-    if ( loadPrefAndSetState( "ConsumptionNotification" ) )
-    {
-      consumptionSwitch.setActivated( true );
-    }
+    consumptionSwitch.setActivated( PropertyHelper.getBooleanProperty( "ConsumptionNotification" ) );
   }
-
-  private boolean loadPrefAndSetState( final String propertry )
-  {
-    String state = null;
-    try ( InputStream input =
-        new FileInputStream( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" ) )
-    {
-      final Properties userProperties = new Properties();
-      userProperties.load( input );
-      state = userProperties.getProperty( propertry );
-    }
-    catch ( final Exception exception )
-    {
-      ClientLog.newLog( "Die userconfig-Properties konnten nicht geladen werden" );
-      ClientLog.newLog( exception.getMessage() );
-    }
-    if ( state == null || state.equals( "false" ) )
-    {
-      return false;
-    }
-    return true;
-  }
-
 
   private void addMeetingNotification()
   {
@@ -269,36 +224,14 @@ public class Settings extends JPanel
     meetingSwitch.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseReleased( final MouseEvent arg0 )
+      public void mouseReleased( final MouseEvent __ )
       {
         meetingSwitch.activated = !meetingSwitch.activated;
         meetingSwitch.repaint();
-        try
-        {
-          final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-          final InputStream input = new FileInputStream( file );
-          final Properties userProperties = new Properties();
-          userProperties.load( input );
-          String state = "false";
-          if ( meetingSwitch.activated )
-          {
-            state = "true";
-          }
-          userProperties.setProperty( "MeetingNotification", state );
-          final OutputStream output = new FileOutputStream( file );
-          userProperties.store( output, "" );
-        }
-        catch ( final IOException exception )
-        {
-          ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
-          ClientLog.newLog( exception.getMessage() );
-        }
+        PropertyHelper.setProperty( "MeetingNotification", meetingSwitch.activated ? "true" : "false" );
       }
     } );
-    if ( loadPrefAndSetState( "MeetingNotification" ) )
-    {
-      meetingSwitch.setActivated( true );
-    }
+      meetingSwitch.setActivated( PropertyHelper.getBooleanProperty( "MeetingNotification" ) );
   }
 
   private void addDarkmodeSettings()
@@ -327,21 +260,7 @@ public class Settings extends JPanel
           return;
         }
         MeMateUIManager.showDarkMode();
-        try
-        {
-          final File file1 = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-          final InputStream input1 = new FileInputStream( file1 );
-          final Properties userProperties1 = new Properties();
-          userProperties1.load( input1 );
-          userProperties1.setProperty( "Darkmode", "true" );
-          final OutputStream output1 = new FileOutputStream( file1 );
-          userProperties1.store( output1, "" );
-        }
-        catch ( final IOException exception1 )
-        {
-          ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
-          ClientLog.newLog( exception1.getMessage() );
-        }
+        PropertyHelper.setProperty( "Darkmode", "true" );
         GUIObjects.mainframe.bar.showDarkmode();
       }
       else
@@ -351,21 +270,7 @@ public class Settings extends JPanel
           return;
         }
         MeMateUIManager.showDayMode();
-        try
-        {
-          final File file2 = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-          final InputStream input2 = new FileInputStream( file2 );
-          final Properties userProperties2 = new Properties();
-          userProperties2.load( input2 );
-          userProperties2.setProperty( "Darkmode", "false" );
-          final OutputStream output2 = new FileOutputStream( file2 );
-          userProperties2.store( output2, "" );
-        }
-        catch ( final IOException exception2 )
-        {
-          ClientLog.newLog( "Der Darkmodestatus konnte nicht gespeichert werden." );
-          ClientLog.newLog( exception2.getMessage() );
-        }
+        PropertyHelper.setProperty( "Darkmode", "false" );
         GUIObjects.mainframe.bar.showDaymode();
       }
     };
@@ -446,21 +351,7 @@ public class Settings extends JPanel
     GUIObjects.mainframe.settingsButton.selected();
     GUIObjects.mainframe.bar.setBackground( UIManager.getColor( "Panel.background" ) );
     GUIObjects.mainframe.burgerButton.setBackground( UIManager.getColor( "Panel.background" ) );
-    try
-    {
-      final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      final InputStream input = new FileInputStream( file );
-      final Properties userProperties = new Properties();
-      userProperties.load( input );
-      userProperties.setProperty( "AppColor", String.valueOf( appColor.getRGB() ) );
-      final OutputStream output = new FileOutputStream( file );
-      userProperties.store( output, "" );
-    }
-    catch ( final IOException exception )
-    {
-      ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
-      ClientLog.newLog( exception.getMessage() );
-    }
+    PropertyHelper.setProperty( "AppColor", String.valueOf( appColor.getRGB() ) );
     Settings.this.repaint();
   }
 }

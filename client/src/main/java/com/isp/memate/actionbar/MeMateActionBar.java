@@ -31,6 +31,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.PropertyHelper;
 
 
 /**
@@ -268,33 +269,14 @@ public class MeMateActionBar extends JPanel
 
         } ) );
 
-    checkUserConfig();
+    if ( PropertyHelper.getBooleanProperty( "Expand" ) )
+    {
+      changeLabelVisibleState();
+    }
 
     return burgerButton;
   }
 
-  /**
-   * 
-   */
-  private void checkUserConfig()
-  {
-    try
-    {
-      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      InputStream input = new FileInputStream( file );
-      Properties userProperties = new Properties();
-      userProperties.load( input );
-      if ( userProperties.getProperty( "Expand" ) != null && userProperties.getProperty( "Expand" ).equals( "true" ) )
-      {
-        changeLabelVisibleState();
-      }
-
-    }
-    catch ( IOException exception )
-    {
-      ClientLog.newLog( "Der Ausklappstatus konnte nicht gespeichert werden." + exception );
-    }
-  }
 
   @SuppressWarnings( "javadoc" )
   public MeMateActionBarButton addActionButton( final Icon iconBlack, final Icon iconWhite, final String title, final String tooltip,
@@ -357,20 +339,7 @@ public class MeMateActionBar extends JPanel
   private void changeLabelVisibleState()
   {
     setLabelsVisible( !labelsVisible );
-    try
-    {
-      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      InputStream input = new FileInputStream( file );
-      Properties userProperties = new Properties();
-      userProperties.load( input );
-      userProperties.setProperty( "Expand", String.valueOf( labelsVisible ) );
-      OutputStream output = new FileOutputStream( file );
-      userProperties.store( output, "" );
-    }
-    catch ( IOException exception )
-    {
-      ClientLog.newLog( "Der Ausklappstatus konnte nicht gespeichert werden." + exception );
-    }
+    PropertyHelper.setProperty( "Expand", String.valueOf( labelsVisible ) );
   }
 
   /**
