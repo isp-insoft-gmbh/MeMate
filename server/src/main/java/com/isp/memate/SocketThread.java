@@ -205,6 +205,7 @@ class SocketThread extends Thread
     catch ( final IOException exception )
     {
       ServerLog.newLog( logType.INFO, "Die Verbindung zu " + currentUser + " wurde getrennt." );
+      SocketPool.removeSocket( this );
     }
   }
 

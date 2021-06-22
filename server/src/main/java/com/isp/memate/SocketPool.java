@@ -11,6 +11,10 @@ public class SocketPool
   {
     sockets.add( socketThread );
   }
+  public static void removeSocket( SocketThread socketThread )
+  {
+    sockets.remove( socketThread );
+  }
 
   public static void notifyAllSocketsToSendDrinks()
   {
