@@ -48,7 +48,6 @@ import com.isp.memate.util.PropertyHelper;
  */
 public class Settings extends JPanel
 {
-  private JColorChooser colorChooser;
   private JRadioButton  lightmodeButton;
   private JRadioButton  darkmodeButton;
 
@@ -62,7 +61,6 @@ public class Settings extends JPanel
 
   private void initComponents()
   {
-    colorChooser = new JColorChooser();
     lightmodeButton = new JRadioButton( "Hell" );
     darkmodeButton = new JRadioButton( "Dunkel" );
   }
@@ -422,15 +420,15 @@ public class Settings extends JPanel
     colorThemeComboBoxConstraints.ipadx = 150;
     colorThemeComboBoxConstraints.ipady = 10;
     colorThemeComboBoxConstraints.insets = new Insets( 5, 20, 0, 0 );
-    colorChooser.setColor( PropertyHelper.getAppColorProperty() );
     JButton colorButton = new JButton( "Farbe auswählen" );
     add( colorButton, colorThemeComboBoxConstraints );
     colorButton.addActionListener( new ActionListener()
     {
-
       @Override
       public void actionPerformed( ActionEvent e )
       {
+        JColorChooser colorChooser = new JColorChooser();
+        colorChooser.setColor( PropertyHelper.getAppColorProperty() );
         int choice = JOptionPane.showConfirmDialog( Settings.this, colorChooser, "Akzentfarbe auswählen", JOptionPane.YES_NO_OPTION,
             JOptionPane.DEFAULT_OPTION, null );
         if ( JOptionPane.YES_OPTION == choice )
