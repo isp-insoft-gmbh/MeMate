@@ -158,6 +158,7 @@ class SocketThread extends Thread
 
             case CONSUM_DRINK:
               consumeDrink( shared.drink );
+              SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case SET_PIGGYBANK_BALANCE:
@@ -260,6 +261,7 @@ class SocketThread extends Thread
       database.increaseAmountOfDrinks( lastDrinkID );
       sendHistoryData();
       sendBalance();
+      SocketPool.notifyAllSocketsToSendDrinks();
 
       //For Undo
       lastActionDeposit = false;
@@ -426,8 +428,6 @@ class SocketThread extends Thread
     database.decreaseAmountOfDrinks( consumedDrink.getId() );
     sendHistoryData();
     sendBalance();
-    SocketPool.notifyAllSocketsToSendDrinks();
-
     //For Undo
     lastActionDeposit = false;
     lastTransaction = actualPrice;
