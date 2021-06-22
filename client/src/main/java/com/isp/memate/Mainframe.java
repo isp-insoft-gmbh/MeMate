@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Properties;
 
@@ -292,14 +293,15 @@ public class Mainframe extends JFrame
   }
 
   /**
-   * Aktualisiert die UI-Komponente für den Kontostand.
+   * Updates the balancesLabel (red indicates negative balance).
    *
-   * @param newBalance der Kontostand
+   * @param newBalance the updated balance.
    */
   void updateBalanceLabel( final Float newBalance )
   {
-    balanceLabel.setText( String.format( "Kontostand: %.2f €", newBalance ) );
-    if ( newBalance.floatValue() >= 0 )
+    float rounded = (float) Math.round( newBalance * 100 ) / 100;
+    balanceLabel.setText( String.format( "Kontostand: %.2f €", rounded ) );
+    if ( rounded >= 0.0 )
     {
       balanceLabel.setForeground( Color.white );
     }
