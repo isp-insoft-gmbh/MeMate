@@ -18,18 +18,18 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 
 import com.isp.memate.ServerCommunication;
-import com.isp.memate.dialogs.DrinkManagerDialog;
-import com.isp.memate.util.TableSpinnerCellEditor;
+import com.isp.memate.dialogs.CreateDrinkDialog;
+import com.isp.memate.dialogs.IngredientsDialog;
 import com.isp.memate.util.DrinkManagerTableModel;
 import com.isp.memate.util.DrinkPictureCellEditor;
 import com.isp.memate.util.DrinkPriceCellRenderer;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.HorizontalAlignmentHeaderRenderer;
+import com.isp.memate.util.TableSpinnerCellEditor;
 
 /**
  * TODO Javadoc
@@ -58,7 +58,7 @@ public class DrinkManager extends JPanel
     table.setAutoCreateRowSorter( true );
     table.setShowVerticalLines( true );
 
-    JTableHeader header = table.getTableHeader();
+    final JTableHeader header = table.getTableHeader();
     header.setReorderingAllowed( false );
     table.setRowHeight( 150 );
 
@@ -72,8 +72,8 @@ public class DrinkManager extends JPanel
       public void mousePressed( MouseEvent event )
       {
         // selects the row at which point the mouse is clicked
-        Point point = event.getPoint();
-        int currentRow = table.rowAtPoint( point );
+        final Point point = event.getPoint();
+        final int currentRow = table.rowAtPoint( point );
         table.setRowSelectionInterval( currentRow, currentRow );
       }
     } );
@@ -84,16 +84,15 @@ public class DrinkManager extends JPanel
 
   private void addTablePopUpMenu()
   {
-    JPopupMenu popupMenu = new JPopupMenu();
-    JMenuItem newDrink = new JMenuItem( "Getränk hinzufügen" );
-    JMenuItem changeIngredients = new JMenuItem( "Inhaltsstoffe bearbeiten" );
-    JMenuItem deleteDrink = new JMenuItem( "Getränk löschen" );
+    final JPopupMenu popupMenu = new JPopupMenu();
+    final JMenuItem newDrink = new JMenuItem( "Getränk hinzufügen" );
+    final JMenuItem changeIngredients = new JMenuItem( "Inhaltsstoffe bearbeiten" );
+    final JMenuItem deleteDrink = new JMenuItem( "Getränk löschen" );
 
     newDrink.addActionListener( e ->
     {
-      final DrinkManagerDialog addDrinkDialog =
-          new DrinkManagerDialog( SwingUtilities.getWindowAncestor( DrinkManager.this ) );
-      addDrinkDialog.showNewDialog();
+      final CreateDrinkDialog dialog = new CreateDrinkDialog( GUIObjects.mainframe );
+      dialog.showDialog();
     } );
     deleteDrink.addActionListener( e ->
     {
@@ -107,8 +106,8 @@ public class DrinkManager extends JPanel
     } );
     changeIngredients.addActionListener( e ->
     {
-      final DrinkManagerDialog ingredientsDialog = new DrinkManagerDialog( SwingUtilities.getWindowAncestor( DrinkManager.this ) );
-      ingredientsDialog.showIngredientsDialog( model.getDrinkAt( table.getSelectedRow() ).getId() );
+      final IngredientsDialog dialog = new IngredientsDialog( model.getDrinkAt( table.getSelectedRow() ).getId(), GUIObjects.mainframe );
+      dialog.showDialog();
     } );
 
     popupMenu.add( newDrink );
@@ -120,17 +119,17 @@ public class DrinkManager extends JPanel
   private void applyCellRenderer()
   {
     table.getColumnModel().getColumn( 0 ).setHeaderRenderer( new HorizontalAlignmentHeaderRenderer( SwingConstants.CENTER ) );
-    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
     centerRenderer.setHorizontalAlignment( JLabel.CENTER );
     table.getColumnModel().getColumn( 0 ).setCellEditor( new DrinkPictureCellEditor() );
     table.getColumnModel().getColumn( 1 ).setCellRenderer( centerRenderer );
     table.getColumnModel().getColumn( 2 ).setCellRenderer( centerRenderer );
     table.getColumnModel().getColumn( 2 ).setCellEditor( new DefaultCellEditor( new JTextField() ) );
     table.getColumnModel().getColumn( 3 ).setCellRenderer( centerRenderer );
-    SpinnerModel amountModel = new SpinnerNumberModel( 0, 0, Integer.MAX_VALUE, 1 );
+    final SpinnerModel amountModel = new SpinnerNumberModel( 0, 0, Integer.MAX_VALUE, 1 );
     table.getColumnModel().getColumn( 3 ).setCellEditor( new TableSpinnerCellEditor( amountModel ) );
     table.getColumnModel().getColumn( 4 ).setCellRenderer( new DrinkPriceCellRenderer() );
-    SpinnerModel priceModel = new SpinnerNumberModel( 0.0, 0.0, Double.MAX_VALUE, 0.1 );
+    final SpinnerModel priceModel = new SpinnerNumberModel( 0.0, 0.0, Double.MAX_VALUE, 0.1 );
     table.getColumnModel().getColumn( 4 ).setCellEditor( new TableSpinnerCellEditor( priceModel ) );
   }
 }

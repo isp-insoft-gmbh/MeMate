@@ -2,9 +2,11 @@ package com.isp.memate.dialogs;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,13 +30,12 @@ public class ChangePasswordDialog extends MeMateDialog
   private JLabel         passwordLabel, repeatPasswordLabel, passwordCompareLabel;
   private JPasswordField passwordField, repeatPasswordField;
   private JButton        saveButton, abortButton;
-  private final JFrame   owner;
 
-  public ChangePasswordDialog( final JFrame owner )
+  public ChangePasswordDialog( final Window owner )
   {
-    this.owner = owner;
+    super( owner );
     initComponents();
-    addComponents();
+    layoutComponents();
     addActionListener();
     addDocumentListener();
     applyFrameSettings();
@@ -57,7 +58,8 @@ public class ChangePasswordDialog extends MeMateDialog
     passwordCompareLabel.setPreferredSize( new Dimension( 220, prefHeight ) );
   }
 
-  private void addComponents()
+  @Override
+  public void layoutComponents()
   {
     final GridBagConstraints passwordLabelConstraints = new GridBagConstraints();
     passwordLabelConstraints.gridx = 0;
@@ -202,8 +204,8 @@ public class ChangePasswordDialog extends MeMateDialog
     pack();
     setResizable( false );
     setSize( getWidth() + 30, getHeight() + 20 );
-    setLocationRelativeTo( owner);
-    setIconImage( owner.getIconImage() );
+    setLocationRelativeTo( getOwner());
+    setIconImage( ((Frame) getOwner()).getIconImage() );
     setVisible( true );
   }
 }

@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,11 +31,12 @@ public class RegistrationDialog extends MeMateDialog
   private JPasswordField passwordField, repeatPasswordField;
   private JButton        registrationButton, abortButton;
 
-  public RegistrationDialog()
+  public RegistrationDialog( final Window owner )
   {
+    super( owner );
     GUIObjects.registrationFrame = this;
     initComponents();
-    addComponents();
+    layoutComponents();
     addActionListener();
     addDocumentListener();
     applyFrameSettings();
@@ -60,7 +62,9 @@ public class RegistrationDialog extends MeMateDialog
     passwordCompareLabel.setPreferredSize( new Dimension( 220, prefHeight ) );
   }
 
-  private void addComponents()
+
+  @Override
+  public void layoutComponents()
   {
     final GridBagConstraints usernameLabelConstraints = new GridBagConstraints();
     usernameLabelConstraints.gridx = 0;

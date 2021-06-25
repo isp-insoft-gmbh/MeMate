@@ -15,17 +15,18 @@ public class DrinkIngredients implements Serializable
   private final String ingredients;
   private final int    energy_kJ;
   private final int    energy_kcal;
-  private final double fat;
-  private final double fatty_acids;
-  private final double carbs;
-  private final double sugar;
-  private final double protein;
-  private final double salt;
-  private final double amount;
+  private final float  fat;
+  private final float  fatty_acids;
+  private final float  carbs;
+  private final float  sugar;
+  private final float  protein;
+  private final float  salt;
+  private final float  amount;
 
-  public DrinkIngredients( final int drinkID, final String ingredients, final int energy_kJ, final int energy_kcal, final double fat,
-                    final double fatty_acids, final double carbs,
-                    final double sugar, final double protein, final double salt, final double amount )
+  public DrinkIngredients( final int drinkID, final String ingredients, final int energy_kJ,
+                           final int energy_kcal, final float fat, final float fatty_acids,
+                           final float carbs, final float sugar, final float protein,
+                           final float salt, final float amount )
   {
     this.drinkID = drinkID;
     this.ingredients = ingredients;
@@ -38,6 +39,21 @@ public class DrinkIngredients implements Serializable
     this.protein = protein;
     this.salt = salt;
     this.amount = amount;
+  }
+
+  public DrinkIngredients( final int drinkID, final DrinkIngredients ingredients )
+  {
+    this.drinkID = drinkID;
+    this.ingredients = ingredients.getIngredients();
+    this.energy_kJ = ingredients.getEnergy_kJ();
+    this.energy_kcal = ingredients.getEnergy_kcal();
+    this.fat = ingredients.getFat();
+    this.fatty_acids = ingredients.getFatty_acids();
+    this.carbs = ingredients.getCarbs();
+    this.sugar = ingredients.getSugar();
+    this.protein = ingredients.getProtein();
+    this.salt = ingredients.getSalt();
+    this.amount = ingredients.getAmount();
   }
 
   public int getDrinkID()
@@ -60,37 +76,37 @@ public class DrinkIngredients implements Serializable
     return energy_kcal;
   }
 
-  public double getFat()
+  public float getFat()
   {
     return fat;
   }
 
-  public double getFatty_acids()
+  public float getFatty_acids()
   {
     return fatty_acids;
   }
 
-  public double getCarbs()
+  public float getCarbs()
   {
     return carbs;
   }
 
-  public double getSugar()
+  public float getSugar()
   {
     return sugar;
   }
 
-  public double getProtein()
+  public float getProtein()
   {
     return protein;
   }
 
-  public double getSalt()
+  public float getSalt()
   {
     return salt;
   }
 
-  public double getAmount()
+  public float getAmount()
   {
     return amount;
   }

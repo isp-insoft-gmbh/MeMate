@@ -211,10 +211,7 @@ class SocketThread extends Thread
 
   private void registerIngredients( final DrinkIngredients drinkIngredients )
   {
-    database.addIngredients( drinkIngredients.getDrinkID(), drinkIngredients.getIngredients(), drinkIngredients.getEnergy_kJ(),
-        drinkIngredients.getEnergy_kcal(), drinkIngredients.getFat(), drinkIngredients.getFatty_acids(), drinkIngredients.getCarbs(),
-        drinkIngredients.getSugar(),
-        drinkIngredients.getProtein(), drinkIngredients.getSalt(), drinkIngredients.getAmount() );
+    database.addIngredients( drinkIngredients );
   }
 
   /**
@@ -587,13 +584,11 @@ class SocketThread extends Thread
    */
   private void registerDrink( final Drink drink )
   {
-    final String name = drink.getName();
-    final Float price = drink.getPrice();
-    final byte[] picture = drink.getPictureInBytes();
-    database.registerNewDrink( name, price, picture );
+    final int drinkID = database.registerNewDrink( drink );
+    database.addIngredients( new DrinkIngredients( drinkID, drink.getDrinkIngredients() ) );
     ServerLog.newLog( logType.INFO, "Ein neues Getränk wurde registriert." );
-    ServerLog.newLog( logType.INFO, "Name: " + name );
-    ServerLog.newLog( logType.INFO, "Preis: " + price + "€" );
+    ServerLog.newLog( logType.INFO, "Name: " + drink.getName() );
+    ServerLog.newLog( logType.INFO, "Preis: " + drink.getPrice() + "€" );
   }
 
   /**

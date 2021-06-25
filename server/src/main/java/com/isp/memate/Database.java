@@ -35,7 +35,7 @@ import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.Shared.Operation;
 
 /**
- * Stellt die Verbindung zwischen Server und der Datenbank her.
+ * Creates an SQLITE Database-Connection
  *
  * @author nwe
  * @since 24.10.2019
@@ -82,6 +82,11 @@ class Database
     try
     {
       conn = DriverManager.getConnection( "jdbc:sqlite:" + dataBasePath );
+
+      //Cuz SQLite is kinda retarted, we have to enable FKs.
+      final Statement stmt = conn.createStatement();
+      final String sql = "PRAGMA foreign_keys = ON";
+      stmt.execute( sql );
     }
     catch ( final SQLException e )
     {
@@ -104,6 +109,7 @@ class Database
   {
     final String sql = "CREATE TABLE IF NOT EXISTS drink ("
         + "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+        + "barcode string NOT NULL UNIQUE,"
         + "name string NOT NULL UNIQUE,"
         + "preis double NOT NULL CHECK (Preis != 0),"
         + "picture blob NOT NULL,"
@@ -206,17 +212,17 @@ class Database
   private void addIngredientsTable()
   {
     final String sql = "CREATE TABLE IF NOT EXISTS ingredients ("
-        + "drink REFERENCES drink(ID),"
+        + "drink integer REFERENCES drink(ID) ON DELETE CASCADE,"
         + "ingredients string NOT NULL,"
         + "energy_kJ integer NOT NULL,"
         + "energy_kcal integer NOT NULL,"
-        + "fat double NOT NULL,"
-        + "fatty_acids double NOT NULL,"
-        + "carbs double NOT NULL,"
-        + "sugar double NOT NULL,"
-        + "protein double NOT NULL,"
-        + "salt double NOT NULL,"
-        + "amount double NOT NULL"
+        + "fat REAL NOT NULL,"
+        + "fatty_acids REAL NOT NULL,"
+        + "carbs REAL NOT NULL,"
+        + "sugar REAL NOT NULL,"
+        + "protein REAL NOT NULL,"
+        + "salt REAL NOT NULL,"
+        + "amount REAL NOT NULL"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -462,26 +468,27 @@ class Database
   {
     final HashMap<Integer, Drink> drinks = new HashMap<>();
 
-    final String sql = "SELECT ID,name,preis,picture,amount,ingredients FROM drink";
+    final String sql = "SELECT ID,barcode,name,preis,picture,amount,ingredients FROM drink";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
       while ( rs.next() )
       {
-        int id = rs.getInt( "ID" );
-        String name = rs.getString( "name" );
-        float price = rs.getFloat( "preis" );
-        byte[] picture = rs.getBytes( "picture" );
-        int amount = rs.getInt( "amount" );
-        boolean containsIngredients = rs.getBoolean( "ingredients" );
+        final int id = rs.getInt( "ID" );
+        final String name = rs.getString( "name" );
+        final String barcode = rs.getString( "barcode" );
+        final float price = rs.getFloat( "preis" );
+        final byte[] picture = rs.getBytes( "picture" );
+        final int amount = rs.getInt( "amount" );
+        final boolean containsIngredients = rs.getBoolean( "ingredients" );
 
         if ( containsIngredients )
         {
-          drinks.put( id, new Drink( name, price, id, picture, amount, containsIngredients, getIngredients( id ) ) );
+          drinks.put( id, new Drink( barcode, name, price, id, picture, amount, containsIngredients, getIngredients( id ) ) );
         }
         else
         {
-          drinks.put( id, new Drink( name, price, id, picture, amount, containsIngredients, null ) );
+          drinks.put( id, new Drink( barcode, name, price, id, picture, amount, containsIngredients, null ) );
         }
       }
     }
@@ -499,16 +506,21 @@ class Database
    * @param price Preis des Getränks
    * @param picture Bild des Getränks
    */
-  void registerNewDrink( final String name, final Float price, final byte[] picture )
+  int registerNewDrink( final Drink drink )
   {
     lock.lock();
-    final String sql = "INSERT INTO drink(name,preis,picture) VALUES(?,?,?)";
+    int drinkID = -1;
+    final String sql = "INSERT INTO drink(barcode,name,preis,picture,amount,ingredients) VALUES(?,?,?,?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, name );
-      pstmt.setFloat( 2, price );
-      pstmt.setBytes( 3, picture );
+      pstmt.setString( 1, drink.getBarcode() );
+      pstmt.setString( 2, drink.getName() );
+      pstmt.setFloat( 3, drink.getPrice() );
+      pstmt.setBytes( 4, drink.getPictureInBytes() );
+      pstmt.setInt( 5, drink.getAmount() );
+      pstmt.setBoolean( 6, drink.isIngredients() );
       pstmt.executeUpdate();
+      drinkID = pstmt.getGeneratedKeys().getInt( 1 );
     }
     catch ( final SQLException e )
     {
@@ -518,6 +530,7 @@ class Database
     {
       lock.unlock();
     }
+    return drinkID;
   }
 
   /**
@@ -812,8 +825,8 @@ class Database
    */
   public Map<String, Integer> getScoreboard( final boolean getWeeklyScoreboard )
   {
-    Map<String, Integer> scoreMap = new HashMap<>();
-    for ( String displayName : getDisplayNames() )
+    final Map<String, Integer> scoreMap = new HashMap<>();
+    for ( final String displayName : getDisplayNames() )
     {
       scoreMap.put( displayName, 0 );
     }
@@ -828,21 +841,21 @@ class Database
         {
           if ( !rs.getBoolean( "undo" ) )
           {
-            String displayName = getDisplayName( rs.getString( "consumer" ) );
+            final String displayName = getDisplayName( rs.getString( "consumer" ) );
             if ( getWeeklyScoreboard )
             {
               try
               {
-                Instant date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( rs.getString( "date" ) ).toInstant();
-                Instant now = Instant.now();
-                Instant weekAgo = now.minus( 7, ChronoUnit.DAYS );
-                Boolean withinWeek = (!date.isBefore( weekAgo )) && date.isBefore( now );
+                final Instant date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( rs.getString( "date" ) ).toInstant();
+                final Instant now = Instant.now();
+                final Instant weekAgo = now.minus( 7, ChronoUnit.DAYS );
+                final Boolean withinWeek = (!date.isBefore( weekAgo )) && date.isBefore( now );
                 if ( withinWeek )
                 {
                   scoreMap.put( displayName, scoreMap.get( displayName ) + 1 );
                 }
               }
-              catch ( ParseException __ )
+              catch ( final ParseException __ )
               {
                 __.printStackTrace();
               }
@@ -859,7 +872,7 @@ class Database
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
-    Map<String, Integer> scoreBoard =
+    final Map<String, Integer> scoreBoard =
         scoreMap.entrySet().stream()
             .sorted( Map.Entry.comparingByValue( Comparator.reverseOrder() ) )
             .limit( 5 )
@@ -1051,12 +1064,10 @@ class Database
    * @param protein Eiweiß
    * @param salt Salz
    */
-  void addIngredients( final int DrinkID, final String ingredients, final int energy_kJ, final int energy_kcal, final double fat,
-                       final double fattyAcids,
-                       final double carbs, final double sugar, final double protein, final double salt, final double amount )
+  void addIngredients( DrinkIngredients ingredients )
   {
     String sql;
-    final boolean hasDrinkIngredients = getIngredients( DrinkID ) == null ? false : true;
+    final boolean hasDrinkIngredients = getIngredients( ingredients.getDrinkID() ) == null ? false : true;
     //If the drink already has ingredients, update them.
     if ( hasDrinkIngredients )
     {
@@ -1084,31 +1095,31 @@ class Database
     {
       if ( hasDrinkIngredients )
       {
-        pstmt.setString( 1, ingredients );
-        pstmt.setInt( 2, energy_kJ );
-        pstmt.setInt( 3, energy_kcal );
-        pstmt.setDouble( 4, fat );
-        pstmt.setDouble( 5, fattyAcids );
-        pstmt.setDouble( 6, carbs );
-        pstmt.setDouble( 7, sugar );
-        pstmt.setDouble( 8, protein );
-        pstmt.setDouble( 9, salt );
-        pstmt.setDouble( 10, amount );
-        pstmt.setInt( 11, DrinkID );
+        pstmt.setString( 1, ingredients.getIngredients() );
+        pstmt.setInt( 2, ingredients.getEnergy_kJ() );
+        pstmt.setInt( 3, ingredients.getEnergy_kcal() );
+        pstmt.setFloat( 4, ingredients.getFat() );
+        pstmt.setFloat( 5, ingredients.getFatty_acids() );
+        pstmt.setFloat( 6, ingredients.getCarbs() );
+        pstmt.setFloat( 7, ingredients.getSugar() );
+        pstmt.setFloat( 8, ingredients.getProtein() );
+        pstmt.setFloat( 9, ingredients.getSalt() );
+        pstmt.setFloat( 10, ingredients.getAmount() );
+        pstmt.setInt( 11, ingredients.getDrinkID() );
       }
       else
       {
-        pstmt.setInt( 1, DrinkID );
-        pstmt.setString( 2, ingredients );
-        pstmt.setInt( 3, energy_kJ );
-        pstmt.setInt( 4, energy_kcal );
-        pstmt.setDouble( 5, fat );
-        pstmt.setDouble( 6, fattyAcids );
-        pstmt.setDouble( 7, carbs );
-        pstmt.setDouble( 8, sugar );
-        pstmt.setDouble( 9, protein );
-        pstmt.setDouble( 10, salt );
-        pstmt.setDouble( 11, amount );
+        pstmt.setInt( 1, ingredients.getDrinkID() );
+        pstmt.setString( 2, ingredients.getIngredients() );
+        pstmt.setInt( 3, ingredients.getEnergy_kJ() );
+        pstmt.setInt( 4, ingredients.getEnergy_kcal() );
+        pstmt.setFloat( 5, ingredients.getFat() );
+        pstmt.setFloat( 6, ingredients.getFatty_acids() );
+        pstmt.setFloat( 7, ingredients.getCarbs() );
+        pstmt.setFloat( 8, ingredients.getSugar() );
+        pstmt.setFloat( 9, ingredients.getProtein() );
+        pstmt.setFloat( 10, ingredients.getSalt() );
+        pstmt.setFloat( 11, ingredients.getAmount() );
       }
       pstmt.executeUpdate();
     }
@@ -1121,7 +1132,7 @@ class Database
     try ( PreparedStatement pstmt = conn.prepareStatement( enableIngredients ) )
     {
       pstmt.setBoolean( 1, true );
-      pstmt.setInt( 2, DrinkID );
+      pstmt.setInt( 2, ingredients.getDrinkID() );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )
@@ -1132,7 +1143,6 @@ class Database
     {
       lock.unlock();
     }
-
   }
 
   /**
@@ -1148,8 +1158,8 @@ class Database
       final ResultSet rs = pstmt.executeQuery();
       return new DrinkIngredients( rs.getInt( "drink" ), rs.getString( "ingredients" ), rs.getInt( "energy_kJ" ),
           rs.getInt( "energy_kcal" ),
-          rs.getDouble( "fat" ), rs.getDouble( "fatty_acids" ), rs.getDouble( "carbs" ), rs.getDouble( "sugar" ), rs.getDouble( "protein" ),
-          rs.getDouble( "salt" ), rs.getDouble( "amount" ) );
+          rs.getFloat( "fat" ), rs.getFloat( "fatty_acids" ), rs.getFloat( "carbs" ), rs.getFloat( "sugar" ), rs.getFloat( "protein" ),
+          rs.getFloat( "salt" ), rs.getFloat( "amount" ) );
     }
     catch ( final SQLException e )
     {

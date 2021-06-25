@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 public class Drink implements Serializable
 {
   private final int        id;
+  private String           barcode;
   private String           name;
   private Float            price;
   private byte[]           pictureInBytes;
@@ -24,10 +25,12 @@ public class Drink implements Serializable
   private ImageIcon        icon;
   private ImageIcon        scaledIconForCellRenderer;
 
-  public Drink( String name, Float price, int id, byte[] pictureInBytes, int amount, boolean ingredients,
-                DrinkIngredients drinkIngredients )
+  public Drink( final String barcode, final String name, final Float price, final int id, final byte[] pictureInBytes, final int amount,
+                final boolean ingredients,
+                final DrinkIngredients drinkIngredients )
   {
     this.id = id;
+    this.setBarcode( barcode );
     this.setName( name );
     this.setPrice( price );
     this.setAmount( amount );
@@ -40,6 +43,18 @@ public class Drink implements Serializable
   public int getId()
   {
     return id;
+  }
+
+
+  public String getBarcode()
+  {
+    return barcode;
+  }
+
+
+  public void setBarcode( String barcode )
+  {
+    this.barcode = barcode;
   }
 
 
@@ -133,14 +148,14 @@ public class Drink implements Serializable
   {
     if ( icon.getIconHeight() > 140 || icon.getIconHeight() > 150 )
     {
-      double scale = 140.0 / icon.getIconHeight();
-      int height = 140;
+      final double scale = 140.0 / icon.getIconHeight();
+      final int height = 140;
       int width = (int) (icon.getIconWidth() * scale);
       if ( width > 150 )
       {
         width = 150;
       }
-      Image scaledImage = icon.getImage().getScaledInstance( width, height, Image.SCALE_SMOOTH );
+      final Image scaledImage = icon.getImage().getScaledInstance( width, height, Image.SCALE_SMOOTH );
       this.scaledIconForCellRenderer = new ImageIcon( scaledImage );
     }
     else

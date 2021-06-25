@@ -72,6 +72,8 @@ public class MeMateUIManager
     UIManager.put( "creditHistory.icon.white", getIcon( "creditHistory_white.png" ) );
     UIManager.put( "info.icon.black", getIcon( "infoicon.png" ) );
     UIManager.put( "info.icon.white", getIcon( "infoicon_white.png" ) );
+    UIManager.put( "wand.icon.black", getIcon( "wand_black.png" ) );
+    UIManager.put( "wand.icon.white", getIcon( "wand_white.png" ) );
 
     List<Image> frameIcons = new ArrayList<>();
     frameIcons.add( Toolkit.getDefaultToolkit().getImage( classLoader.getResource( "frameicon128.png" ) ) );

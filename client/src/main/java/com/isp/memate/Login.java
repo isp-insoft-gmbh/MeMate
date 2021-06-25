@@ -195,7 +195,7 @@ public class Login extends JFrame
       @Override
       public void mouseClicked( final MouseEvent e )
       {
-        new RegistrationDialog();
+        new RegistrationDialog( Login.this );
       }
     } );
   }
