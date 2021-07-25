@@ -10,11 +10,12 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import com.isp.memate.Cache;
+import com.isp.memate.Config;
 import com.isp.memate.ServerCommunication;
 
 public class PropertyHelper
 {
-  public final static String MAIN_FOLDER  = System.getenv( "APPDATA" ) + File.separator + "MeMate";
+  public final static String MAIN_FOLDER  = Config.getConfigDir("MeMate");
   private final static File   userPropFile = new File( MAIN_FOLDER + File.separator + "userconfig.properties" );
 
   /**

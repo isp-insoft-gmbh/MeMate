@@ -50,14 +50,7 @@ class Database
    */
   static Path getTargetFolder()
   {
-    if ( System.getProperty( "os.name" ).toLowerCase().contains( "windows" ) )
-    {
-      return Paths.get( System.getenv( "APPDATA" ), "MeMate" );
-    }
-    else
-    {
-      return Paths.get( System.getProperty( "user.home" ), ".config", "MeMate" );
-    }
+    return Paths.get(Config.getConfigDir("memate-server"));
   }
 
   /**
