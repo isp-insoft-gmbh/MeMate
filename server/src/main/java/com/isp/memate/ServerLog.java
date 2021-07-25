@@ -66,7 +66,7 @@ class ServerLog
     }
     catch ( SecurityException | IOException exception )
     {
-      newLog( ServerLog.logType.ERROR, exception.getMessage() );
+      exception.printStackTrace();
     }
   }
 
