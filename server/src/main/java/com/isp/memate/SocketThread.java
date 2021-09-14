@@ -143,6 +143,11 @@ class SocketThread extends Thread
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
+            case UPDATE_BARCODE:
+              updateDrinkBarcode( shared.drinkChange );
+              SocketPool.notifyAllSocketsToSendDrinks();
+              break;
+
             case CONNECT_SESSION_ID:
               connectSessionID( shared.sessionID );
               break;
@@ -544,6 +549,18 @@ class SocketThread extends Thread
   {
     database.updateDrinkInformation( amount.drinkID, Operation.UPDATE_DRINKAMOUNT, amount.change );
     ServerLog.newLog( logType.INFO, "Das Anzahl des Getränks mit der ID " + amount.drinkID + " wurde auf " + amount.change + " gesetzt." );
+  }
+
+  /**
+   * Updates the barcode of the drink
+   *
+   * @param barcode the barcode to set
+   */
+  private void updateDrinkBarcode( final DrinkChangeObject barcode )
+  {
+    database.updateDrinkInformation( barcode.drinkID, Operation.UPDATE_BARCODE, barcode.change );
+    ServerLog.newLog( logType.INFO,
+        "Der Barcode des Getränks mit der ID " + barcode.drinkID + " wurde auf " + barcode.change + " gesetzt." );
   }
 
 

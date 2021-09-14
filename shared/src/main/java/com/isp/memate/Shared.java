@@ -87,6 +87,7 @@ public class Shared implements Serializable
       case UPDATE_DRINKPRICE:
       case UPDATE_DRINKPICTURE:
       case UPDATE_DRINKAMOUNT:
+      case UPDATE_BARCODE:
         drinkChange = (DrinkChangeObject) object;
         break;
       case CONNECT_SESSION_ID:
@@ -179,6 +180,7 @@ public class Shared implements Serializable
     UPDATE_DRINKPRICE,
     UPDATE_DRINKPICTURE,
     UPDATE_DRINKAMOUNT,
+    UPDATE_BARCODE,
     CONNECT_SESSION_ID,
     GET_USERNAME_FOR_SESSION_ID,
     GET_USERNAME_FOR_SESSION_ID_RESULT,

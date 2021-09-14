@@ -218,8 +218,8 @@ public class ServerCommunication
   {
     if ( SystemTray.isSupported() )
     {
-      SystemTray tray = SystemTray.getSystemTray();
-      Image trayImage = Toolkit.getDefaultToolkit()
+      final SystemTray tray = SystemTray.getSystemTray();
+      final Image trayImage = Toolkit.getDefaultToolkit()
           .getImage( ServerCommunication.class.getClassLoader().getResource( "trayicon.png" ) );
       trayIcon = new TrayIcon( trayImage );
       trayIcon.setImageAutoSize( true );
@@ -407,19 +407,23 @@ public class ServerCommunication
       {
         case UPDATE_DRINKNAME:
           outStream.writeObject(
-              new Shared( Operation.UPDATE_DRINKNAME, new DrinkChangeObject( id, (String) updatedInformation ) ) );
+              new Shared( Operation.UPDATE_DRINKNAME, new DrinkChangeObject( id, updatedInformation ) ) );
           break;
         case UPDATE_DRINKPRICE:
           outStream.writeObject(
-              new Shared( Operation.UPDATE_DRINKPRICE, new DrinkChangeObject( id, (Float) updatedInformation ) ) );
+              new Shared( Operation.UPDATE_DRINKPRICE, new DrinkChangeObject( id, updatedInformation ) ) );
           break;
         case UPDATE_DRINKPICTURE:
           outStream.writeObject(
-              new Shared( Operation.UPDATE_DRINKPICTURE, new DrinkChangeObject( id, (byte[]) updatedInformation ) ) );
+              new Shared( Operation.UPDATE_DRINKPICTURE, new DrinkChangeObject( id, updatedInformation ) ) );
           break;
         case UPDATE_DRINKAMOUNT:
           outStream.writeObject(
               new Shared( Operation.UPDATE_DRINKAMOUNT, new DrinkChangeObject( id, (int) updatedInformation ) ) );
+          break;
+        case UPDATE_BARCODE:
+          outStream.writeObject(
+              new Shared( Operation.UPDATE_BARCODE, new DrinkChangeObject( id, updatedInformation ) ) );
           break;
         default :
           break;

@@ -50,7 +50,7 @@ class Database
    */
   static Path getTargetFolder()
   {
-    return Paths.get(Config.getConfigDir("memate-server"));
+    return Paths.get( Config.getConfigDir( "memate-server" ) );
   }
 
   /**
@@ -415,6 +415,9 @@ class Database
       case UPDATE_DRINKAMOUNT:
         sql = "UPDATE drink SET amount=? WHERE ID=?";
         break;
+      case UPDATE_BARCODE:
+        sql = "UPDATE drink SET barcode=? WHERE ID=?";
+        break;
       default :
         break;
     }
@@ -425,6 +428,7 @@ class Database
       switch ( operation )
       {
         case UPDATE_DRINKNAME:
+        case UPDATE_BARCODE:
           pstmt.setString( 1, (String) updatedInformation );
           break;
         case UPDATE_DRINKPICTURE:
