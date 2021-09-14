@@ -95,19 +95,19 @@ public class CreateDrinkDialog extends MeMateDialog
     textField.getDocument().addDocumentListener( new DocumentListener()
     {
       @Override
-      public void removeUpdate( DocumentEvent e )
+      public void removeUpdate( DocumentEvent __ )
       {
         setMagicButtonState();
       }
 
       @Override
-      public void insertUpdate( DocumentEvent e )
+      public void insertUpdate( DocumentEvent __ )
       {
         setMagicButtonState();
       }
 
       @Override
-      public void changedUpdate( DocumentEvent e )
+      public void changedUpdate( DocumentEvent __ )
       {
         setMagicButtonState();
       }
@@ -363,7 +363,7 @@ public class CreateDrinkDialog extends MeMateDialog
         if ( product == null )
         {
           JOptionPane.showConfirmDialog( CreateDrinkDialog.this, "Für den Barcode wurde leider kein Produkt gefunden", getTitle(),
-              JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE );
+              JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE );
           return;
         }
         nameField.setText( product.getProductName() );
@@ -391,7 +391,7 @@ public class CreateDrinkDialog extends MeMateDialog
     return spinner;
   }
 
-  private Product getProductFor( final String barcode )
+  public static Product getProductFor( final String barcode )
   {
     final OpenFoodFactsWrapper wrapper = new OpenFoodFactsWrapperImpl();
     final ProductResponse productResponse = wrapper.fetchProductByCode( barcode );

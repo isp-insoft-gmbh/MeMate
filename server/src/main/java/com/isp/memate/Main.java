@@ -65,7 +65,7 @@ public class Main
         ServerLog.newLog( logType.ERROR, "Es konnte keine Verbindung zwischen Client und Server aufgebaut werden" );
         e.printStackTrace();
       }
-      SocketThread socketThread = new SocketThread( socket, database );
+      final SocketThread socketThread = new SocketThread( socket, database );
       SocketPool.addSocket( socketThread );
       socketThread.start();
     }

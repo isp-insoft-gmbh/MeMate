@@ -13,14 +13,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -42,7 +35,6 @@ import javax.swing.border.EmptyBorder;
 import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.dialogs.ChangePasswordDialog;
 import com.isp.memate.dialogs.RegistrationDialog;
-import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.PropertyHelper;
@@ -284,7 +276,7 @@ public class Login extends JFrame
 
   private void applyFrameSettings()
   {
-    setIconImages( (List<? extends Image>) UIManager.get( "frame.icons" ) );
+    setIconImages( (List<Image>) UIManager.get( "frame.icons" ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
     pack();

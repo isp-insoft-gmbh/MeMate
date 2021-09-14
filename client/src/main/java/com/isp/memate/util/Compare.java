@@ -1,6 +1,5 @@
 package com.isp.memate.util;
 
-import javax.swing.FocusManager;
 import javax.swing.JOptionPane;
 
 import com.isp.memate.Cache;
@@ -8,26 +7,24 @@ import com.isp.memate.Cache;
 public class Compare
 {
   /**
-   * Überprüft Server- und Clientversion, wenn diese nicht übereinstimmen folgt
-   * ein Dialog.
-   *
-   * @param clientVersion Version des Clients
+   * Compares sever and client version. If these are different the user will see an update-Dialog and the
+   * application gets close.
    */
   public static void checkVersion()
   {
-    Cache cache = Cache.getInstance();
-    String serverVersion = cache.getServerVersion();
-    String clientVersion = cache.getClientVersion();
+    final Cache cache = Cache.getInstance();
+    final String serverVersion = cache.getServerVersion();
+    final String clientVersion = cache.getClientVersion();
     ClientLog.newLog( "CHECK VERSION" );
     ClientLog.newLog( "Server: " + serverVersion );
     ClientLog.newLog( "Client: " + clientVersion );
-    if ( !serverVersion.equals( clientVersion ) )
+    if ( serverVersion == null || !serverVersion.equals( clientVersion ) )
     {
       JOptionPane
-          .showMessageDialog( FocusManager.getCurrentManager().getActiveWindow(),
-              "Es sind Updates verfügbar.\nInstallierte Produkt-Version: " + clientVersion
-                  + "\nServer-Version: " + serverVersion,
-              "Update", JOptionPane.ERROR_MESSAGE, null );
+          .showMessageDialog( GUIObjects.loginFrame,
+              "Die Client-Version entspricht nicht der Version des Servers.\nBitte auf den neusten Client updaten.",
+              "Update", JOptionPane.WARNING_MESSAGE, null );
+      System.exit( 0 );
     }
   }
 }
