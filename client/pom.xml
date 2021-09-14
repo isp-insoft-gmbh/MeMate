@@ -140,8 +140,7 @@
                   </classPath>
                   <icon>MeMate.ico</icon>
                   <jre>
-                    <minVersion>1.8.0_0</minVersion>
-                    <maxVersion>1.8.0_999</maxVersion>
+                    <minVersion>14</minVersion>
                     <path>${jre_FolderName_Win64}</path>
                     <jdkPreference>preferJre</jdkPreference>
                   </jre>
