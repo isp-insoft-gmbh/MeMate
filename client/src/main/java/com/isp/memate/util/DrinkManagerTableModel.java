@@ -3,6 +3,7 @@ package com.isp.memate.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
@@ -24,9 +25,9 @@ public class DrinkManagerTableModel extends AbstractTableModel
   public DrinkManagerTableModel()
   {
     int counter = 0;
-    Collection<Drink> values = Cache.getInstance().getDrinks().values();
+    final Collection<Drink> values = Cache.getInstance().getDrinks().values();
     drinks = new Drink[values.size()];
-    for ( Drink drink : values )
+    for ( final Drink drink : values )
     {
       drinks[ counter ] = drink;
       counter++;
@@ -91,22 +92,22 @@ public class DrinkManagerTableModel extends AbstractTableModel
       case 0:
         if ( aValue != null )
         {
-          if ( !(drinks[ rowIndex ].getPictureInBytes().equals( aValue )) )
+          if ( !Arrays.equals( drinks[ rowIndex ].getPictureInBytes(), (byte[]) aValue ) )
           {
             drinks[ rowIndex ].setPictureInBytes( (byte[]) aValue );
             ServerCommunication.getInstance().updateDrinkInformations( drinks[ rowIndex ].getId(), Operation.UPDATE_DRINKPICTURE,
-                (byte[]) aValue );
+                aValue );
           }
         }
         break;
       case 2:
         break;
       case 1:
-        if ( !(drinks[ rowIndex ].getName().equals( (String) aValue )) )
+        if ( !(drinks[ rowIndex ].getName().equals( aValue )) )
         {
           drinks[ rowIndex ].setName( (String) aValue );
           ServerCommunication.getInstance().updateDrinkInformations( drinks[ rowIndex ].getId(), Operation.UPDATE_DRINKNAME,
-              (String) aValue );
+              aValue );
         }
         break;
       case 3:
@@ -123,8 +124,8 @@ public class DrinkManagerTableModel extends AbstractTableModel
       case 4:
         if ( aValue instanceof Number )
         {
-          Double valueAsDouble = (Double) aValue;
-          Float value = valueAsDouble.floatValue();
+          final Double valueAsDouble = (Double) aValue;
+          final Float value = valueAsDouble.floatValue();
           if ( !(drinks[ rowIndex ].getPrice().equals( value )) )
           {
             drinks[ rowIndex ].setPrice( value );
@@ -198,6 +199,6 @@ public class DrinkManagerTableModel extends AbstractTableModel
       }
     }
     final Float averageConsumption = amount / 30f;
-    return (int) Math.round( drink.getAmount() / averageConsumption );
+    return Math.round( drink.getAmount() / averageConsumption );
   }
 }

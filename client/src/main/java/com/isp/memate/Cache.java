@@ -19,21 +19,21 @@ import com.isp.memate.util.ValueListener;
 
 public class Cache
 {
-  private static final Cache     instance          = new Cache();
-  public Object                  sessionIDSync     = new Object();
-  private String                 serverVersion     = null;
-  private String                 clientVersion     = null;
-  private String                 username          = null;
-  private String[]               userArray         = null;
-  private String[]               displayNamesArray = null;
-  private User[]                 fullUserArray     = null;
-  private String[][]             history;
-  private String[][]             shortHistory      = null;
-  private String                 displayname       = null;
-  private Map<String, Integer>   scoreboard;
-  private Map<String, Integer>   weeklyScoreboard;
-  private ObservableValue<Float> piggyBankBalance  = new ObservableValue<Float>( 0f );
-  private ObservableValue<Float> userBalance       = new ObservableValue<Float>( 0f );
+  private static final Cache           instance          = new Cache();
+  public Object                        sessionIDSync     = new Object();
+  private String                       serverVersion     = null;
+  private String                       clientVersion     = null;
+  private String                       username          = null;
+  private String[]                     userArray         = null;
+  private String[]                     displayNamesArray = null;
+  private User[]                       fullUserArray     = null;
+  private String[][]                   history;
+  private String[][]                   shortHistory      = null;
+  private String                       displayname       = null;
+  private Map<String, Integer>         scoreboard;
+  private Map<String, Integer>         weeklyScoreboard;
+  private final ObservableValue<Float> piggyBankBalance  = new ObservableValue<Float>( 0f );
+  private final ObservableValue<Float> userBalance       = new ObservableValue<Float>( 0f );
 
   private HashMap<Integer, Drink> drinks = new HashMap<>();
 

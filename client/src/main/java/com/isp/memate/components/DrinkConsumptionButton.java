@@ -57,10 +57,10 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class DrinkConsumptionButton extends JPanel
 {
-  private JPanel  defaultPanel;
-  private JPanel  buyPanel;
-  private JButton acceptButton;
-  private Drink   drink;
+  private JPanel      defaultPanel;
+  private JPanel      buyPanel;
+  private JButton     acceptButton;
+  private final Drink drink;
 
   private STATE CURRENT_STATE = null;
 
@@ -93,9 +93,9 @@ public class DrinkConsumptionButton extends JPanel
 
   private void initDefaultPanel()
   {
-    JPanel headerPanel = createHeaderPanel();
-    JPanel footerPanel = createFooterPanel();
-    JLabel iconLabel = new JLabel( getIcon() );
+    final JPanel headerPanel = createHeaderPanel();
+    final JPanel footerPanel = createFooterPanel();
+    final JLabel iconLabel = new JLabel( getIcon() );
 
     defaultPanel = new JPanel( new BorderLayout() )
     {
@@ -139,8 +139,8 @@ public class DrinkConsumptionButton extends JPanel
 
   private JPanel createHeaderPanel()
   {
-    JPanel fillPanel = new JPanel();
-    JPanel headerPanel = new JPanel()
+    final JPanel fillPanel = new JPanel();
+    final JPanel headerPanel = new JPanel()
     {
       @Override
       public void setBackground( Color bg )
@@ -150,7 +150,7 @@ public class DrinkConsumptionButton extends JPanel
       }
     };
 
-    JLabel nameLabel = new JLabel();
+    final JLabel nameLabel = new JLabel();
     headerPanel.setLayout( new GridBagLayout() );
     nameLabel.setText( drink.getName() );
     nameLabel.setFont( nameLabel.getFont().deriveFont( 14f ) );
@@ -162,7 +162,7 @@ public class DrinkConsumptionButton extends JPanel
     nameLabelConstraints.weightx = 1;
     headerPanel.add( nameLabel, nameLabelConstraints );
 
-    JButton infoButton = MeMateUIManager.createInfoButton( drink.getId() );
+    final JButton infoButton = MeMateUIManager.createInfoButton( drink.getId() );
     infoButton.addComponentListener( new ComponentAdapter()
     {
       @Override
@@ -201,16 +201,16 @@ public class DrinkConsumptionButton extends JPanel
 
   private JPanel createFooterPanel()
   {
-    JPanel footerPanel = new JPanel();
+    final JPanel footerPanel = new JPanel();
     footerPanel.setLayout( new GridBagLayout() );
 
-    String price = String.valueOf( drink.getPrice() ).replace( "€", "" );
+    final String price = String.valueOf( drink.getPrice() ).replace( "€", "" );
     final Float priceAsFloat = Float.valueOf( price );
     final NumberFormat formatter = NumberFormat.getCurrencyInstance();
     final String format = formatter.format( priceAsFloat.doubleValue() );
 
-    JLabel priceLabel = new JLabel();
-    JLabel amountLabel = new JLabel();
+    final JLabel priceLabel = new JLabel();
+    final JLabel amountLabel = new JLabel();
     priceLabel.setText( format );
     amountLabel.setText( String.format( "Noch %d Stück", drink.getAmount() ) );
     priceLabel.setFont( priceLabel.getFont().deriveFont( 14f ) );
@@ -242,12 +242,12 @@ public class DrinkConsumptionButton extends JPanel
   {
     buyPanel = new JPanel();
     acceptButton = new JButton();
-    JButton abortButton = new JButton();
-    JLabel askWhetherToReallyConsumeLabel = new JLabel();
+    final JButton abortButton = new JButton();
+    final JLabel askWhetherToReallyConsumeLabel = new JLabel();
 
     acceptButton.setText( "Ja" );
     abortButton.setText( "Nein" );
-    askWhetherToReallyConsumeLabel.setText( "Wirklich konsumieren?" );
+    askWhetherToReallyConsumeLabel.setText( "Wirklich kaufen?" );
     askWhetherToReallyConsumeLabel.setHorizontalAlignment( SwingConstants.CENTER );
     askWhetherToReallyConsumeLabel.setBorder( new EmptyBorder( 40, 0, 30, 0 ) );
     askWhetherToReallyConsumeLabel.setFont( askWhetherToReallyConsumeLabel.getFont().deriveFont( 16f ) );

@@ -708,7 +708,6 @@ class SocketThread extends Thread
 
   public boolean isUserAdmin()
   {
-    //TODO(nwe | 08.04.2021): NICHT SO!
-    return "admin".equals( currentUser );
+    return database.isAdmin( currentUser );
   }
 }

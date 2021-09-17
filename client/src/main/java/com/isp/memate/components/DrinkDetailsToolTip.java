@@ -46,10 +46,10 @@ public class DrinkDetailsToolTip extends JToolTip
 
   private void fillInfoPanel( int drinkID )
   {
-    JLabel textLabel = new JLabel();
+    final JLabel textLabel = new JLabel();
     infoPanel.setLayout( new GridBagLayout() );
     final DrinkIngredients ingredients = Cache.getInstance().getDrinks().get( drinkID ).getDrinkIngredients();
-    final String[] ingredientsArray = ingredients.getIngredients().trim().split( "," );
+    final String[] ingredientsArray = ingredients.getIngredients().trim().split( ", " );
     int maxLength = 40;
     for ( final String string : ingredientsArray )
     {

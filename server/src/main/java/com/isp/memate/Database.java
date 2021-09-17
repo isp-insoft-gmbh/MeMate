@@ -91,6 +91,7 @@ class Database
     addHistoryTable();
     addPiggyBankTable();
     addIngredientsTable();
+    migrateDataBaseIfNeeded();
     cleanSessionIDTable();
   }
 
@@ -155,7 +156,8 @@ class Database
         + "username string UNIQUE NOT NULL,"
         + "password string NOT NULL,"
         + "requestNewPassword boolean DEFAULT (false),"
-        + "DisplayName string UNIQUE"
+        + "DisplayName string UNIQUE,"
+        + "admin BOOLEAN DEFAULT (false)"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -258,6 +260,40 @@ class Database
     }
   }
 
+  private void migrateDataBaseIfNeeded()
+  {
+    final String sql = "SELECT admin FROM user";
+    try ( Statement stmt = conn.createStatement() )
+    {
+      stmt.execute( sql );
+    }
+    catch ( final SQLException __ )
+    {
+      ServerLog.newLog( logType.SQL, "Starte Migration der Admin-Column" );
+      //If this Exception occurs, we know the admin column is not existing, so we have to add it.
+      final String createColumnSQL = "ALTER TABLE user ADD COLUMN admin BOOLEAN DEFAULT (false)";
+      try ( Statement stmt = conn.createStatement() )
+      {
+        stmt.execute( createColumnSQL );
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Erstellen der Admin-Column ist fehlgeschlagen" );
+      }
+      final String updateAdminSQL = "UPDATE user SET admin = ? WHERE username = ?";
+      try ( PreparedStatement pstmt = conn.prepareStatement( updateAdminSQL ) )
+      {
+        pstmt.setBoolean( 1, true );
+        pstmt.setString( 2, "admin" );
+        pstmt.executeUpdate();
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Setzen des initialen Admins ist fehlgeschlagen" );
+      }
+    }
+  }
+
   /**
    * Der Guthaben-wert aus dem user-table,welcher zu der gegebenen User-ID gehört wird zurück gegeben.
    *
@@ -302,6 +338,22 @@ class Database
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return displayname;
+  }
+
+  public Boolean isAdmin( final String username )
+  {
+    final String sql = "SELECT admin FROM user WHERE username= ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ); )
+    {
+      pstmt.setString( 1, username );
+      final ResultSet rs = pstmt.executeQuery();
+      return rs.getBoolean( "admin" );
+    }
+    catch ( final SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+      return false;
+    }
   }
 
 
