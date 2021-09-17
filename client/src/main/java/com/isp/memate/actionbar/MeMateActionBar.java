@@ -31,6 +31,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.PropertyHelper;
 
 
 /**
@@ -268,57 +269,38 @@ public class MeMateActionBar extends JPanel
 
         } ) );
 
-    checkUserConfig();
+    if ( PropertyHelper.getBooleanProperty( "Expand" ) )
+    {
+      changeLabelVisibleState();
+    }
 
     return burgerButton;
   }
 
-  /**
-   * 
-   */
-  private void checkUserConfig()
-  {
-    try
-    {
-      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      InputStream input = new FileInputStream( file );
-      Properties userProperties = new Properties();
-      userProperties.load( input );
-      if ( userProperties.getProperty( "Expand" ) != null && userProperties.getProperty( "Expand" ).equals( "true" ) )
-      {
-        changeLabelVisibleState();
-      }
-
-    }
-    catch ( IOException exception )
-    {
-      ClientLog.newLog( "Der Ausklappstatus konnte nicht gespeichert werden." + exception );
-    }
-  }
 
   @SuppressWarnings( "javadoc" )
-  public MeMateActionBarButton addActionButton( final Icon icon, final Icon pressedIcon, final String title, final String tooltip,
+  public MeMateActionBarButton addActionButton( final Icon iconBlack, final Icon iconWhite, final String title, final String tooltip,
                                                 final Runnable runnable )
   {
-    return addActionButton( icon, pressedIcon, title, tooltip, null, runnable );
+    return addActionButton( iconBlack, iconWhite, title, tooltip, null, runnable );
   }
 
   /**
    * Fügt der Actionbar einen neuen Button hinzu.
    * 
-   * @param icon Icon
-   * @param pressedIcon pressed Icon
+   * @param iconBlack Icon
+   * @param iconWhite pressed Icon
    * @param title Title
    * @param tooltip ToolTip
    * @param markerColor MarkerColor
    * @param runnable Action, welche der Button ausführen soll.
    * @return button
    */
-  public MeMateActionBarButton addActionButton( final Icon icon, final Icon pressedIcon, final String title, final String tooltip,
+  public MeMateActionBarButton addActionButton( final Icon iconBlack, final Icon iconWhite, final String title, final String tooltip,
                                                 final Color markerColor, final Runnable runnable )
   {
     final MeMateActionBarButton button =
-        new MeMateActionBarButton( title, tooltip, icon, pressedIcon, backgroundColor, foregoundColor, markerColor, runnable );
+        new MeMateActionBarButton( title, tooltip, iconBlack, iconWhite, backgroundColor, foregoundColor, markerColor, runnable );
 
     button.addMouseListener( new MeMateActionBarListener( button,
         () -> button.setBackground( backgroundColor ),
@@ -357,20 +339,7 @@ public class MeMateActionBar extends JPanel
   private void changeLabelVisibleState()
   {
     setLabelsVisible( !labelsVisible );
-    try
-    {
-      File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      InputStream input = new FileInputStream( file );
-      Properties userProperties = new Properties();
-      userProperties.load( input );
-      userProperties.setProperty( "Expand", String.valueOf( labelsVisible ) );
-      OutputStream output = new FileOutputStream( file );
-      userProperties.store( output, "" );
-    }
-    catch ( IOException exception )
-    {
-      ClientLog.newLog( "Der Ausklappstatus konnte nicht gespeichert werden." + exception );
-    }
+    PropertyHelper.setProperty( "Expand", String.valueOf( labelsVisible ) );
   }
 
   /**
@@ -507,8 +476,8 @@ public class MeMateActionBar extends JPanel
    */
   public void showDarkmode()
   {
-    setBackground( UIManager.getColor( "App.Actionbar" ) );
-    burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
+    setBackground( UIManager.getColor( "Panel.background" ) );
+    burgerButton.setBackground( UIManager.getColor( "Panel.background" ) );
     allButtons.forEach( btn ->
     {
       Icon icon = btn.getPressedIcon();
@@ -529,8 +498,8 @@ public class MeMateActionBar extends JPanel
    */
   public void showDaymode()
   {
-    setBackground( new Color( 225, 225, 225 ) );
-    burgerButton.setBackground( new Color( 225, 225, 225 ) );
+    setBackground( UIManager.getColor( "Panel.background" ) );
+    burgerButton.setBackground( UIManager.getColor( "Panel.background" ) );
     allButtons.forEach( btn ->
     {
       Icon icon = btn.getIcon();

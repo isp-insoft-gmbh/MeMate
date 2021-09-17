@@ -6,22 +6,21 @@ package com.isp.memate;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,8 +30,17 @@ import javax.swing.border.EmptyBorder;
 
 import com.isp.memate.actionbar.MeMateActionBar;
 import com.isp.memate.actionbar.MeMateActionBarButton;
+import com.isp.memate.panels.Adminview;
+import com.isp.memate.panels.ConsumptionRate;
+import com.isp.memate.panels.CreditHistory;
+import com.isp.memate.panels.Dashboard;
+import com.isp.memate.panels.DrinkManager;
+import com.isp.memate.panels.History;
+import com.isp.memate.panels.Settings;
+import com.isp.memate.panels.Social;
 import com.isp.memate.util.ClientLog;
-import com.isp.memate.util.MeMateUIManager;
+import com.isp.memate.util.GUIObjects;
+import com.isp.memate.util.PropertyHelper;
 
 /**
  * Der Mainframe bildet das Gerüst für Dashboard, Historie und den Getränkemanager.
@@ -45,70 +53,28 @@ import com.isp.memate.util.MeMateUIManager;
  */
 public class Mainframe extends JFrame
 {
-  private static final Mainframe instance               = new Mainframe();
-  Cache                          cache                  = Cache.getInstance();
-  private final Dashboard        dashboard              = new Dashboard( instance );
-  private final Icon             dashboardIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_black.png" ) );
-  private final Icon             dashboardIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "dashboard_white.png" ) );
-  private final Icon             adminViewIconBlack     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_black.png" ) );
-  private final Icon             adminViewIconWhite     = new ImageIcon( getClass().getClassLoader().getResource( "adminview_white.png" ) );
-  private final Icon             logoutIconBlack        = new ImageIcon( getClass().getClassLoader().getResource( "logout_black_24.png" ) );
-  private final Icon             logoutIconWhite        = new ImageIcon( getClass().getClassLoader().getResource( "logout_white_24.png" ) );
-  private final Icon             historyIconBlack       = new ImageIcon( getClass().getClassLoader().getResource( "history_black.png" ) );
-  private final Icon             historyIconWhite       = new ImageIcon( getClass().getClassLoader().getResource( "history_white.png" ) );
-  private final Icon             socialBlackIcon        = new ImageIcon( getClass().getClassLoader().getResource( "social_black.png" ) );
-  private final Icon             socialWhiteIcon        = new ImageIcon( getClass().getClassLoader().getResource( "social_white.png" ) );
-  private final Icon             undoBlackIcon          = new ImageIcon( getClass().getClassLoader().getResource( "back_black.png" ) );
-  private final Icon             undoWhiteIcon          = new ImageIcon( getClass().getClassLoader().getResource( "back_white.png" ) );
-  private final Icon             drinkManagerIconBlack  =
-      new ImageIcon( getClass().getClassLoader().getResource( "drinkmanager_black.png" ) );
-  private final Icon             drinkManagerIconWhite  =
-      new ImageIcon( getClass().getClassLoader().getResource( "drinkmanager_white.png" ) );
-  private final Icon             consumptionIconBlack   =
-      new ImageIcon( getClass().getClassLoader().getResource( "consumption_black.png" ) );
-  private final Icon             consumptionIconWhite   =
-      new ImageIcon( getClass().getClassLoader().getResource( "consumption_white.png" ) );
-  private final Icon             creditHistoryIconBlack =
-      new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_black.png" ) );
-  private final Icon             creditHistoryIconWhite =
-      new ImageIcon( getClass().getClassLoader().getResource( "creditHistory_white.png" ) );
-  private final Color            color                  = UIManager.getColor( "AppColor" );
-  private final JPanel           contentPanel           = MeMateUIManager.createJPanel();
-  private final JLabel           helloUserLabel         = new JLabel( "Hallo User" );
-  private final ConsumptionRate  consumptionRate        = new ConsumptionRate();
-  private final CreditHistory    creditHistory          = new CreditHistory();
-  private final Drinkmanager     drinkManager           = new Drinkmanager();
-  private final Adminview        adminView              = new Adminview();
-  private final History          history                = new History();
-  private final Social           social                 = new Social();
-  private final JLabel           balanceLabel           = new JLabel();
-  public final JPanel            headerPanel            = new JPanel();
-  public JPanel                  burgerButton;
-  private MeMateActionBarButton  dashboardButton;
-  private MeMateActionBarButton  logoutButton;
-  public MeMateActionBarButton   settingsButton;
-  private MeMateActionBarButton  undoButton;
-  public MeMateActionBar         bar;
-  public static Image            frameImage             =
-      Toolkit.getDefaultToolkit().getImage( Mainframe.class.getClassLoader().getResource( "frameiconblue.png" ) );
-
-  /**
-   * @return the static instance of {@link ServerCommunication}
-   */
-  static Mainframe getInstance()
-  {
-    return instance;
-  }
-
-  public Drinkmanager getDrinkManager()
-  {
-    return drinkManager;
-  }
-
-  public Dashboard getDashboard()
-  {
-    return dashboard;
-  }
+  Cache                         cache          = Cache.getInstance();
+  private final Color           color          = UIManager.getColor( "AppColor" );
+  private final JPanel          contentPanel   = new JPanel()
+                                               {
+                                                 @Override
+                                                 public Component add( Component comp )
+                                                 {
+                                                   super.add( comp );
+                                                   repaint();
+                                                   revalidate();
+                                                   return comp;
+                                                 }
+                                               };
+  private final JLabel          helloUserLabel = new JLabel( "Hallo User" );
+  private final JLabel          balanceLabel   = new JLabel();
+  public final JPanel           headerPanel    = new JPanel();
+  public JPanel                 burgerButton;
+  private MeMateActionBarButton dashboardButton;
+  private MeMateActionBarButton logoutButton;
+  public MeMateActionBarButton  settingsButton;
+  private MeMateActionBarButton undoButton;
+  public MeMateActionBar        bar;
 
   /**
    * Setzt das Layout und nimmt einige Änderungen an den Komponenten vor.
@@ -116,12 +82,12 @@ public class Mainframe extends JFrame
    */
   public Mainframe()
   {
+    GUIObjects.mainframe = this;
     contentPanel.setLayout( new BorderLayout() );
-    contentPanel.add( dashboard );
+    contentPanel.add( new Dashboard() );
 
     deriveFontsAndSetLayout();
-    setIconImage(
-        Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "frameiconblue.png" ) ) );
+    setIconImages( (List<? extends Image>) UIManager.get( "frame.icons" ) );
     setTitle( "MeMate" );
     setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
     setMinimumSize( new Dimension( 380, 550 ) );
@@ -129,7 +95,11 @@ public class Mainframe extends JFrame
     setLocationRelativeTo( null );
     add( contentPanel, BorderLayout.CENTER );
     add( headerPanel, BorderLayout.NORTH );
-    MeMateUIManager.setUISettings();
+    setHelloLabel( cache.getDisplayname() );
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
+    setVisible( true );
+    addActionBar();
+    requestFocus();
   }
 
   /**
@@ -159,139 +129,92 @@ public class Mainframe extends JFrame
 
     bar.selectButton( "Dashboard" );
     dashboardButton.getRunnable().run();
-    try
+    if ( PropertyHelper.getDarkModeProperty() )
     {
-      final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-      final InputStream input = new FileInputStream( file );
-      final Properties userProperties = new Properties();
-      userProperties.load( input );
-
-      if ( userProperties.getProperty( "Darkmode" ) != null && userProperties.getProperty( "Darkmode" ).equals( "on" ) )
-      {
-        bar.showDarkmode();
-        bar.setBackground( UIManager.getColor( "App.Actionbar" ) );
-        burgerButton.setBackground( UIManager.getColor( "App.Actionbar" ) );
-        MeMateUIManager.showDarkMode();
-      }
-      else
-      {
-        MeMateUIManager.showDayMode();
-      }
-    }
-    catch ( final IOException exception )
-    {
-      ClientLog.newLog( "Die SessionID konnte nicht gespeichert werden." );
-      ClientLog.newLog( exception.getMessage() );
+      bar.showDarkmode();
     }
     add( bar, BorderLayout.WEST );
   }
 
   private void addSettingsButton()
   {
-    settingsButton = bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Settings",
-        "Öffnet die Einstellungen", color, () ->
-        {
-          contentPanel.removeAll();
-          contentPanel.add( new Settings() );
-          contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
-          contentPanel.repaint();
-          contentPanel.revalidate();
-        } );
+    settingsButton =
+        bar.addActionButton( UIManager.getIcon( "settings.icon.black" ), UIManager.getIcon( "settings.icon.white" ), "Settings",
+            "Öffnet die Einstellungen", color, () ->
+            {
+              contentPanel.removeAll();
+              contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
+              contentPanel.add( new Settings() );
+            } );
   }
 
   private void addDefaultButtons()
   {
-    dashboardButton = bar.addActionButton( dashboardIconBlack, dashboardIconWhite, "Dashboard", "Dashboard öffnen", color, () ->
-    {
-      contentPanel.removeAll();
-      dashboard.updateButtonpanel();
-      contentPanel.add( dashboard );
-      contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
-      contentPanel.repaint();
-      contentPanel.revalidate();
-    } );
-    bar.addActionButton( historyIconBlack, historyIconWhite, "Historie", "Historie öffnen", color, () ->
-    {
-      contentPanel.removeAll();
-      history.updateHistory();
-      MeMateUIManager.setUISettings();
-      contentPanel.add( history );
-      contentPanel.setBorder( new EmptyBorder( 0, 0, 5, 0 ) );
-      contentPanel.repaint();
-      contentPanel.revalidate();
-    } );
-    bar.addActionButton( consumptionIconBlack, consumptionIconWhite, "Verbrauchsrate",
+    dashboardButton = bar.addActionButton( UIManager.getIcon( "dashboard.icon.black" ), UIManager.getIcon( "dashboard.icon.white" ),
+        "Dashboard", "Dashboard öffnen", color, () ->
+        {
+          contentPanel.removeAll();
+          contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
+          contentPanel.add( new Dashboard() );
+        } );
+    bar.addActionButton( UIManager.getIcon( "history.icon.black" ), UIManager.getIcon( "history.icon.white" ), "Historie",
+        "Historie öffnen", color, () ->
+        {
+          contentPanel.removeAll();
+          contentPanel.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+          contentPanel.add( new History() );
+        } );
+    bar.addActionButton( UIManager.getIcon( "consumption.icon.black" ), UIManager.getIcon( "consumption.icon.white" ), "Verbrauchsrate",
         "Hier können sie ihren durchschnittlichen Konsum sehen", color, () ->
         {
           contentPanel.removeAll();
-          consumptionRate.addGraph();
-          MeMateUIManager.setUISettings();
-          contentPanel.add( consumptionRate );
-          contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
-          contentPanel.repaint();
-          contentPanel.revalidate();
+          contentPanel.setBorder( new EmptyBorder( 4, 0, 4, 0 ) );
+          contentPanel.add( new ConsumptionRate() );
         } );
-    bar.addActionButton( creditHistoryIconBlack, creditHistoryIconWhite, "Guthabenverlauf",
+    bar.addActionButton( UIManager.getIcon( "creditHistory.icon.black" ), UIManager.getIcon( "creditHistory.icon.white" ),
+        "Guthabenverlauf",
         "Hier können sie den Verlauf ihres Guthabens betrachten", color, () ->
         {
           contentPanel.removeAll();
-          creditHistory.addChart();
-          MeMateUIManager.setUISettings();
-          contentPanel.add( creditHistory );
-          contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
-          contentPanel.repaint();
-          contentPanel.revalidate();
+          contentPanel.setBorder( new EmptyBorder( 4, 0, 4, 0 ) );
+          contentPanel.add( new CreditHistory() );
         } );
-    bar.addActionButton( socialBlackIcon, socialWhiteIcon, "Scoreboard", "Scoreboard", color, () ->
-    {
-      contentPanel.removeAll();
-      social.update();
-      MeMateUIManager.setUISettings();
-      contentPanel.add( social );
-      contentPanel.repaint();
-      contentPanel.revalidate();
-    } );
+    bar.addActionButton( UIManager.getIcon( "social.icon.black" ), UIManager.getIcon( "social.icon.white" ), "Scoreboard", "Scoreboard",
+        color, () ->
+        {
+          contentPanel.removeAll();
+          contentPanel.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
+          contentPanel.add( new Social() );
+        } );
   }
 
   private void addLogoutButton()
   {
-    logoutButton = bar.addActionButton( logoutIconBlack, logoutIconWhite, "Logout", "Ausloggen", () ->
-    {
-      cache.setUsername( null );
-      ServerCommunication.getInstance().logout();
-      setUndoButtonEnabled( false );
-      try
-      {
-        final File file = new File( System.getenv( "APPDATA" ) + File.separator + "MeMate" + File.separator + "userconfig.properties" );
-        final InputStream input = new FileInputStream( file );
-        final Properties userProperties = new Properties();
-        userProperties.load( input );
-        userProperties.setProperty( "SessionID", "null" );
-        final OutputStream output = new FileOutputStream( file );
-        userProperties.store( output, "" );
-      }
-      catch ( final IOException exception )
-      {
-        ClientLog.newLog( "Die SessionID konnte nicht resetet werden." );
-        ClientLog.newLog( exception.getMessage() );
-      }
-      dispose();
-      final Login login = Login.getInstance();
-      login.setVisible( true );
-      logoutButton.setBackground( bar.getBackground() );
-    } );
+    logoutButton = bar.addActionButton( UIManager.getIcon( "logout.icon.black" ), UIManager.getIcon( "logout.icon.white" ), "Logout",
+        "Ausloggen", () ->
+        {
+          cache.setUsername( null );
+          ServerCommunication.getInstance().logout();
+          setUndoButtonEnabled( false );
+          //Resetting the sessionID
+          PropertyHelper.setProperty( "SessionID", "null" );
+          dispose();
+          final Login login = new Login();
+          login.setVisible( true );
+          logoutButton.setBackground( bar.getBackground() );
+        } );
   }
 
 
   private void addUndoButton()
   {
     bar.addVariableGlue();
-    undoButton = bar.addActionButton( undoBlackIcon, undoWhiteIcon, "Rückgänig", "Letzte Aktion rückgängig machen", () ->
-    {
-      ServerCommunication.getInstance().undoLastAction();
-      undoButton.setBackground( bar.getBackground() );
-      updateDashboard();
-    } );
+    undoButton = bar.addActionButton( UIManager.getIcon( "undo.icon.black" ), UIManager.getIcon( "undo.icon.white" ), "Rückgänig",
+        "Letzte Aktion rückgängig machen", () ->
+        {
+          ServerCommunication.getInstance().undoLastAction();
+          undoButton.setBackground( bar.getBackground() );
+        } );
     undoButton.setEnabled( false );
   }
 
@@ -299,24 +222,21 @@ public class Mainframe extends JFrame
   {
     if ( cache.getUsername().equals( "admin" ) )
     {
-      bar.addActionButton( drinkManagerIconBlack, drinkManagerIconWhite, "Getränkemanager",
+      bar.addActionButton( UIManager.getIcon( "drinkmanager.icon.black" ), UIManager.getIcon( "drinkmanager.icon.white" ),
+          "Getränkemanager",
           "Getränkemanager öffnen", color, () ->
           {
             contentPanel.removeAll();
-            drinkManager.updateList();
-            MeMateUIManager.setUISettings();
-            contentPanel.add( drinkManager );
+            contentPanel.add( new DrinkManager() );
             contentPanel.setBorder( new EmptyBorder( 0, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
           } );
-      bar.addActionButton( adminViewIconBlack, adminViewIconWhite, "Adminview",
+      bar.addActionButton( UIManager.getIcon( "adminview.icon.black" ), UIManager.getIcon( "adminview.icon.white" ), "Adminview",
           "Adminansicht öffnen", color, () ->
           {
             contentPanel.removeAll();
-            adminView.updateDrinkAmounts();
-            MeMateUIManager.setUISettings();
-            contentPanel.add( adminView );
+            contentPanel.add( new Adminview() );
             contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
             contentPanel.repaint();
             contentPanel.revalidate();
@@ -359,14 +279,15 @@ public class Mainframe extends JFrame
   }
 
   /**
-   * Aktualisiert die UI-Komponente für den Kontostand.
+   * Updates the balancesLabel (red indicates negative balance).
    *
-   * @param newBalance der Kontostand
+   * @param newBalance the updated balance.
    */
   void updateBalanceLabel( final Float newBalance )
   {
-    balanceLabel.setText( String.format( "Kontostand: %.2f €", newBalance ) );
-    if ( newBalance.floatValue() >= 0 )
+    float rounded = (float) Math.round( newBalance * 100 ) / 100;
+    balanceLabel.setText( String.format( "Kontostand: %.2f €", rounded ) );
+    if ( rounded >= 0.0 )
     {
       balanceLabel.setForeground( Color.white );
     }
@@ -384,23 +305,5 @@ public class Mainframe extends JFrame
   public void setUndoButtonEnabled( final boolean state )
   {
     undoButton.setEnabled( state );
-  }
-
-  void updateDashboard()
-  {
-    final Component[] comp = contentPanel.getComponents();
-    for ( final Component component : comp )
-    {
-      if ( component instanceof Dashboard )
-      {
-        contentPanel.removeAll();
-        dashboard.updateButtonpanel();
-        contentPanel.add( dashboard );
-      }
-      else
-      {
-        dashboard.updateButtonpanel();
-      }
-    }
   }
 }

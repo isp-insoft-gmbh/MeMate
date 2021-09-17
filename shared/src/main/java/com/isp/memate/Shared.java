@@ -1,6 +1,8 @@
 package com.isp.memate;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Erzeugt ein Objekt, welches der Client als auch der Server verwenden kann.
@@ -10,35 +12,34 @@ import java.io.Serializable;
  * @author nwe
  * @since 28.11.2019
  */
-class Shared implements Serializable
+public class Shared implements Serializable
 {
-  User             user             = null;
-  LoginInformation loginInformation = null;
-  Drink            drink            = null;
-  DrinkName        drinkName        = null;
-  DrinkPrice       drinkPrice       = null;
-  DrinkPicture     drinkPicture     = null;
-  DrinkAmount      drinkAmount      = null;
-  DrinkIngredients drinkIngredients = null;
-  Drink[]          drinkInfos       = null;
-  String[][]       history;
-  String[][]       shortHistory;
-  String[][]       scoreboard;
-  String[]         users;
-  String[]         displaynames;
-  User[]           fullUserArray;
-  Float            userBalance;
-  String           displayname;
-  String           consumedDrink;
-  String           registrationResult;
-  String           username;
-  String           userSessionID;
-  String           version;
-  String           sessionID;
-  String           pass;
-  int              balanceToAdd;
-  Operation        operation;
-  LoginResult      loginResult;
+  User                    user             = null;
+  LoginInformation        loginInformation = null;
+  Drink                   drink            = null;
+  DrinkChangeObject       drinkChange      = null;
+  DrinkIngredients        drinkIngredients = null;
+  HashMap<Integer, Drink> drinks;
+  String[][]              history;
+  String[][]              shortHistory;
+  Map<String, Integer>    scoreboard;
+  Map<String, Integer>    weeklyScoreboard;
+  String[]                users;
+  String[]                displaynames;
+  User[]                  fullUserArray;
+  Float                   userBalance;
+  String                  displayname;
+  String                  consumedDrink;
+  String                  registrationResult;
+  String                  username;
+  String                  userSessionID;
+  String                  version;
+  String                  sessionID;
+  String                  pass;
+  int                     balanceToAdd;
+  int                     drinkID;
+  Operation               operation;
+  LoginResult             loginResult;
 
   /**
    * @param operation der auszuführende Befehl
@@ -55,14 +56,11 @@ class Shared implements Serializable
       case CHECK_LOGIN:
         loginInformation = (LoginInformation) object;
         break;
-      case GET_BALANCE:
-        username = (String) object;
-        break;
-      case GET_BALANCE_RESULT:
+      case USER_BALANCE:
         userBalance = (Float) object;
         break;
-      case GET_DRINKINFO:
-        drinkInfos = (Drink[]) object;
+      case GET_DRINKS:
+        drinks = (HashMap<Integer, Drink>) object;
         break;
       case GET_HISTORY:
         history = (String[][]) object;
@@ -70,8 +68,11 @@ class Shared implements Serializable
       case GET_HISTORY_LAST_5:
         shortHistory = (String[][]) object;
         break;
-      case GET_SCOREBOARD:
-        scoreboard = (String[][]) object;
+      case SCOREBOARD:
+        scoreboard = (Map<String, Integer>) object;
+        break;
+      case WEEKLY_SCOREBOARD:
+        weeklyScoreboard = (Map<String, Integer>) object;
         break;
       case REGISTER_DRINK:
         drink = (Drink) object;
@@ -80,16 +81,14 @@ class Shared implements Serializable
         drinkIngredients = (DrinkIngredients) object;
         break;
       case REMOVE_DRINK:
-        drink = (Drink) object;
+        drinkID = (int) object;
         break;
       case UPDATE_DRINKNAME:
-        drinkName = (DrinkName) object;
-        break;
       case UPDATE_DRINKPRICE:
-        drinkPrice = (DrinkPrice) object;
-        break;
       case UPDATE_DRINKPICTURE:
-        drinkPicture = (DrinkPicture) object;
+      case UPDATE_DRINKAMOUNT:
+      case UPDATE_BARCODE:
+        drinkChange = (DrinkChangeObject) object;
         break;
       case CONNECT_SESSION_ID:
         sessionID = (String) object;
@@ -104,7 +103,7 @@ class Shared implements Serializable
         balanceToAdd = (int) object;
         break;
       case CONSUM_DRINK:
-        drinkPrice = (DrinkPrice) object;
+        drink = (Drink) object;
         break;
       case LOGIN_RESULT:
         loginResult = (LoginResult) object;
@@ -113,7 +112,7 @@ class Shared implements Serializable
         registrationResult = (String) object;
         break;
       case PRICE_CHANGED:
-        drinkPrice = (DrinkPrice) object;
+        drinkChange = (DrinkChangeObject) object;
         break;
       case SET_PIGGYBANK_BALANCE:
         userBalance = (Float) object;
@@ -123,9 +122,6 @@ class Shared implements Serializable
         break;
       case NO_MORE_DRINKS_AVAIBLE:
         consumedDrink = (String) object;
-        break;
-      case SET_DRINK_AMOUNT:
-        drinkAmount = (DrinkAmount) object;
         break;
       case UNDO:
         break;
@@ -139,7 +135,7 @@ class Shared implements Serializable
       case GET_USERS_DISPLAYNAMES:
         displaynames = (String[]) object;
         break;
-      case GET_DISPLAYNAME:
+      case USER_DISPLAYNAME:
         displayname = (String) object;
         break;
       case GET_FULLUSERS_RESULT:
@@ -162,16 +158,17 @@ class Shared implements Serializable
     }
   }
 
-  enum Operation
+  public enum Operation
   {
     REGISTER_USER,
     CHECK_LOGIN,
-    GET_BALANCE,
-    GET_BALANCE_RESULT,
+    USER_BALANCE,
+    USER_DISPLAYNAME,
     GET_HISTORY,
     GET_HISTORY_LAST_5,
-    GET_SCOREBOARD,
-    GET_DRINKINFO,
+    SCOREBOARD,
+    WEEKLY_SCOREBOARD,
+    GET_DRINKS,
     GET_USERS,
     GET_USERS_RESULT,
     GET_FULLUSERS_RESULT,
@@ -182,6 +179,8 @@ class Shared implements Serializable
     UPDATE_DRINKNAME,
     UPDATE_DRINKPRICE,
     UPDATE_DRINKPICTURE,
+    UPDATE_DRINKAMOUNT,
+    UPDATE_BARCODE,
     CONNECT_SESSION_ID,
     GET_USERNAME_FOR_SESSION_ID,
     GET_USERNAME_FOR_SESSION_ID_RESULT,
@@ -193,17 +192,15 @@ class Shared implements Serializable
     PIGGYBANK_BALANCE,
     PRICE_CHANGED,
     NO_MORE_DRINKS_AVAIBLE,
-    SET_DRINK_AMOUNT,
     UNDO,
     CHANGE_PASSWORD,
     LOGOUT,
     CHANGE_PASSWORD_USER,
     GET_USERS_DISPLAYNAMES,
-    GET_DISPLAYNAME,
     CHANGE_DISPLAYNAME;
   }
 
-  enum LoginResult
+  public enum LoginResult
   {
     LOGIN_SUCCESSFULL,
     USER_NOT_FOUND,

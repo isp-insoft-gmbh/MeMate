@@ -35,8 +35,8 @@ class ServerLog
    */
   static void newLog( logType logType, String message )
   {
-    LocalDateTime now = LocalDateTime.now();
-    String date = now.format( formatter );
+    final LocalDateTime now = LocalDateTime.now();
+    final String date = now.format( formatter );
     switch ( logType )
     {
       case SQL:
@@ -52,21 +52,22 @@ class ServerLog
         System.out.println( "[" + ANSI_CYAN + "INFO" + ANSI_RESET + "]   " + "[" + date + "] " + message );
         break;
     }
-    File logFile = new File( Database.getTargetFolder().toString() + File.separator + "ServerLog.log" );
-    Logger logger = Logger.getLogger( "ServerLog" );
+    final File logFile = new File( Database.getTargetFolder().toString() + File.separator + "ServerLog.log" );
+
+    final Logger logger = Logger.getLogger( "ServerLog" );
     try
     {
       logger.setUseParentHandlers( false );
-      FileHandler logFileHandler = new FileHandler( logFile.toString(), true );
+      final FileHandler logFileHandler = new FileHandler( logFile.toString(), true );
       logger.addHandler( logFileHandler );
-      SimpleFormatter formatter = new SimpleFormatter();
+      final SimpleFormatter formatter = new SimpleFormatter();
       logFileHandler.setFormatter( formatter );
       logger.info( message );
       logFileHandler.close();
     }
     catch ( SecurityException | IOException exception )
     {
-      newLog( ServerLog.logType.ERROR, exception.getMessage() );
+      exception.printStackTrace();
     }
   }
 

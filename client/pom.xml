@@ -9,8 +9,8 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>14</maven.compiler.source>
+		<maven.compiler.target>14</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -101,71 +101,90 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>com.akathist.maven.plugins.launch4j</groupId>
-				<artifactId>launch4j-maven-plugin</artifactId>
-				<version>1.7.25</version>
-				<executions>
-					<execution>
-						<id>l4j-clui</id>
-						<phase>package</phase>
-						<goals>
-							<goal>launch4j</goal>
-						</goals>
-						<configuration>
-							<headerType>gui</headerType>
-							<jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
-							<outfile>${project.build.directory}/memate.exe</outfile>
-							<classPath>
-								<mainClass>com.isp.memate.Main</mainClass>
-								<preCp>anything</preCp>
-							</classPath>
-							<icon>MeMate.ico</icon>
-							<jre>
-								<minVersion>1.8.0_0</minVersion>
-								<maxVersion>1.8.0_999</maxVersion>
-								<path>${jre_FolderName_Win64}</path>
-								<jdkPreference>preferJre</jdkPreference>
-							</jre>
-							<versionInfo>
-								<fileVersion>${build_version}</fileVersion>
-								<txtFileVersion>${build_version}</txtFileVersion>
-								<fileDescription>MeMate Client</fileDescription>
-								<copyright>ISP Insoft 2020</copyright>
-								<productVersion>${build_version}</productVersion>
-								<txtProductVersion>${build_version}</txtProductVersion>
-								<productName>MeMate</productName>
-								<companyName>Isp Insoft GmbH</companyName>
-								<internalName>MeMate</internalName>
-								<originalFilename>MeMateClient.exe</originalFilename>
-								<language>GERMAN</language>
-							</versionInfo>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.googlecode.maven-download-plugin</groupId>
-				<artifactId>download-maven-plugin</artifactId>
-				<version>1.5.0</version>
-				<executions>
-					<execution>
-						<id>install-jbpm</id>
-						<phase>package</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>${jre_URL_Win64}</url>
-							<unpack>true</unpack>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-							<sha256>${jre_SHA256_Signature_Win64}</sha256>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
+
+  <profiles>
+    <!-- 
+      this profile holds tasks that only make sense to execute on Windows.
+      this profile will activate automatically if the host is a windows machine.
+      to force the activation run: mvn -P windows ...
+    -->
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.akathist.maven.plugins.launch4j</groupId>
+            <artifactId>launch4j-maven-plugin</artifactId>
+            <version>1.7.25</version>
+            <executions>
+              <execution>
+                <id>l4j-clui</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>launch4j</goal>
+                </goals>
+                <configuration>
+                  <headerType>gui</headerType>
+                  <jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
+                  <outfile>${project.build.directory}/memate.exe</outfile>
+                  <classPath>
+                    <mainClass>com.isp.memate.Main</mainClass>
+                    <preCp>anything</preCp>
+                  </classPath>
+                  <icon>MeMate.ico</icon>
+                  <jre>
+                    <minVersion>14</minVersion>
+                    <path>${jre_FolderName_Win64}</path>
+                    <jdkPreference>preferJre</jdkPreference>
+                  </jre>
+                  <versionInfo>
+                    <fileVersion>${build_version}</fileVersion>
+                    <txtFileVersion>${build_version}</txtFileVersion>
+                    <fileDescription>MeMate Client</fileDescription>
+                    <copyright>ISP Insoft 2020</copyright>
+                    <productVersion>${build_version}</productVersion>
+                    <txtProductVersion>${build_version}</txtProductVersion>
+                    <productName>MeMate</productName>
+                    <companyName>Isp Insoft GmbH</companyName>
+                    <internalName>MeMate</internalName>
+                    <originalFilename>MeMateClient.exe</originalFilename>
+                    <language>GERMAN</language>
+                  </versionInfo>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <artifactId>download-maven-plugin</artifactId>
+            <version>1.5.0</version>
+            <executions>
+              <execution>
+                <id>install-jbpm</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
+                <configuration>
+                  <url>${jre_URL_Win64}</url>
+                  <unpack>true</unpack>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <sha256>${jre_SHA256_Signature_Win64}</sha256>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 	<dependencies>
 		<dependency>
@@ -176,17 +195,17 @@
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
-			<version>0.43</version>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf-intellij-themes</artifactId>
-			<version>0.43</version>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf-extras</artifactId>
-			<version>0.43</version>
+			<version>1.2</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.miglayout/miglayout-swing -->
 		<dependency>
@@ -206,11 +225,14 @@
 			<version>1.0-rc2</version>
 		</dependency>
 		<dependency>
+			<groupId>pl.coderion</groupId>
+			<artifactId>openfoodfacts-java-wrapper</artifactId>
+			<version>0.9.3</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-model</artifactId>
 			<version>3.3.9</version>
 		</dependency>
-
 	</dependencies>
-
 </project>

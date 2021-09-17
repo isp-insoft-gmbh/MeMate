@@ -17,20 +17,25 @@ import java.sql.Statement;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import com.isp.memate.ServerLog.logType;
 import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.Shared.Operation;
 
 /**
- * Stellt die Verbindung zwischen Server und der Datenbank her.
+ * Creates an SQLITE Database-Connection
  *
  * @author nwe
  * @since 24.10.2019
@@ -45,14 +50,7 @@ class Database
    */
   static Path getTargetFolder()
   {
-    if ( System.getProperty( "os.name" ).toLowerCase().contains( "windows" ) )
-    {
-      return Paths.get( System.getenv( "APPDATA" ), "MeMate" );
-    }
-    else
-    {
-      return Paths.get( System.getProperty( "user.home" ), ".config", "MeMate" );
-    }
+    return Paths.get( Config.getConfigDir( "memate-server" ) );
   }
 
   /**
@@ -77,6 +75,11 @@ class Database
     try
     {
       conn = DriverManager.getConnection( "jdbc:sqlite:" + dataBasePath );
+
+      //Cuz SQLite is kinda retarted, we have to enable FKs.
+      final Statement stmt = conn.createStatement();
+      final String sql = "PRAGMA foreign_keys = ON";
+      stmt.execute( sql );
     }
     catch ( final SQLException e )
     {
@@ -88,6 +91,7 @@ class Database
     addHistoryTable();
     addPiggyBankTable();
     addIngredientsTable();
+    migrateDataBaseIfNeeded();
     cleanSessionIDTable();
   }
 
@@ -99,6 +103,7 @@ class Database
   {
     final String sql = "CREATE TABLE IF NOT EXISTS drink ("
         + "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+        + "barcode string NOT NULL UNIQUE,"
         + "name string NOT NULL UNIQUE,"
         + "preis double NOT NULL CHECK (Preis != 0),"
         + "picture blob NOT NULL,"
@@ -151,7 +156,8 @@ class Database
         + "username string UNIQUE NOT NULL,"
         + "password string NOT NULL,"
         + "requestNewPassword boolean DEFAULT (false),"
-        + "DisplayName string UNIQUE"
+        + "DisplayName string UNIQUE,"
+        + "admin BOOLEAN DEFAULT (false)"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -201,17 +207,17 @@ class Database
   private void addIngredientsTable()
   {
     final String sql = "CREATE TABLE IF NOT EXISTS ingredients ("
-        + "drink REFERENCES drink(ID),"
+        + "drink integer REFERENCES drink(ID) ON DELETE CASCADE,"
         + "ingredients string NOT NULL,"
         + "energy_kJ integer NOT NULL,"
         + "energy_kcal integer NOT NULL,"
-        + "fat double NOT NULL,"
-        + "fatty_acids double NOT NULL,"
-        + "carbs double NOT NULL,"
-        + "sugar double NOT NULL,"
-        + "protein double NOT NULL,"
-        + "salt double NOT NULL,"
-        + "amount double NOT NULL"
+        + "fat REAL NOT NULL,"
+        + "fatty_acids REAL NOT NULL,"
+        + "carbs REAL NOT NULL,"
+        + "sugar REAL NOT NULL,"
+        + "protein REAL NOT NULL,"
+        + "salt REAL NOT NULL,"
+        + "amount REAL NOT NULL"
         + ");";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -250,6 +256,40 @@ class Database
       catch ( final SQLException e )
       {
         ServerLog.newLog( logType.SQL, e.getMessage() );
+      }
+    }
+  }
+
+  private void migrateDataBaseIfNeeded()
+  {
+    final String sql = "SELECT admin FROM user";
+    try ( Statement stmt = conn.createStatement() )
+    {
+      stmt.execute( sql );
+    }
+    catch ( final SQLException __ )
+    {
+      ServerLog.newLog( logType.SQL, "Starte Migration der Admin-Column" );
+      //If this Exception occurs, we know the admin column is not existing, so we have to add it.
+      final String createColumnSQL = "ALTER TABLE user ADD COLUMN admin BOOLEAN DEFAULT (false)";
+      try ( Statement stmt = conn.createStatement() )
+      {
+        stmt.execute( createColumnSQL );
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Erstellen der Admin-Column ist fehlgeschlagen" );
+      }
+      final String updateAdminSQL = "UPDATE user SET admin = ? WHERE username = ?";
+      try ( PreparedStatement pstmt = conn.prepareStatement( updateAdminSQL ) )
+      {
+        pstmt.setBoolean( 1, true );
+        pstmt.setString( 2, "admin" );
+        pstmt.executeUpdate();
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Setzen des initialen Admins ist fehlgeschlagen" );
       }
     }
   }
@@ -298,6 +338,22 @@ class Database
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return displayname;
+  }
+
+  public Boolean isAdmin( final String username )
+  {
+    final String sql = "SELECT admin FROM user WHERE username= ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ); )
+    {
+      pstmt.setString( 1, username );
+      final ResultSet rs = pstmt.executeQuery();
+      return rs.getBoolean( "admin" );
+    }
+    catch ( final SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+      return false;
+    }
   }
 
 
@@ -408,6 +464,12 @@ class Database
       case UPDATE_DRINKPRICE:
         sql = "UPDATE drink SET preis=? WHERE ID=?";
         break;
+      case UPDATE_DRINKAMOUNT:
+        sql = "UPDATE drink SET amount=? WHERE ID=?";
+        break;
+      case UPDATE_BARCODE:
+        sql = "UPDATE drink SET barcode=? WHERE ID=?";
+        break;
       default :
         break;
     }
@@ -418,6 +480,7 @@ class Database
       switch ( operation )
       {
         case UPDATE_DRINKNAME:
+        case UPDATE_BARCODE:
           pstmt.setString( 1, (String) updatedInformation );
           break;
         case UPDATE_DRINKPICTURE:
@@ -425,6 +488,9 @@ class Database
           break;
         case UPDATE_DRINKPRICE:
           pstmt.setFloat( 1, (float) updatedInformation );
+          break;
+        case UPDATE_DRINKAMOUNT:
+          pstmt.setInt( 1, (int) updatedInformation );
           break;
         default :
           break;
@@ -441,35 +507,37 @@ class Database
     }
   }
 
-
   /**
    * Liest alle Getränke aus der Datenbank und
    * erstellt ein Array aus Drink-Objekten.
    *
    * @return das Drink-Objekt-Array
    */
-  public Drink[] getDrinkInformations()
+  public Map<Integer, Drink> getDrinks()
   {
-    final ArrayList<Drink> drinkInfos = new ArrayList<>();
+    final HashMap<Integer, Drink> drinks = new HashMap<>();
 
-    final String sql = "SELECT ID,name,preis,picture,amount,ingredients FROM drink";
+    final String sql = "SELECT ID,barcode,name,preis,picture,amount,ingredients FROM drink";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
       while ( rs.next() )
       {
-        if ( rs.getBoolean( "ingredients" ) )
+        final int id = rs.getInt( "ID" );
+        final String name = rs.getString( "name" );
+        final String barcode = rs.getString( "barcode" );
+        final float price = rs.getFloat( "preis" );
+        final byte[] picture = rs.getBytes( "picture" );
+        final int amount = rs.getInt( "amount" );
+        final boolean containsIngredients = rs.getBoolean( "ingredients" );
+
+        if ( containsIngredients )
         {
-          drinkInfos
-              .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
-                  rs.getBytes( "picture" ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ),
-                  getIngredients( rs.getInt( "ID" ) ) ) );
+          drinks.put( id, new Drink( barcode, name, price, id, picture, amount, containsIngredients, getIngredients( id ) ) );
         }
         else
         {
-          drinkInfos
-              .add( new Drink( rs.getString( "name" ), rs.getFloat( "preis" ), null, rs.getInt( "ID" ),
-                  rs.getBytes( "picture" ), rs.getInt( "amount" ), rs.getBoolean( "ingredients" ), null ) );
+          drinks.put( id, new Drink( barcode, name, price, id, picture, amount, containsIngredients, null ) );
         }
       }
     }
@@ -477,7 +545,7 @@ class Database
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
-    return drinkInfos.toArray( new Drink[drinkInfos.size()] );
+    return drinks;
   }
 
   /**
@@ -487,16 +555,21 @@ class Database
    * @param price Preis des Getränks
    * @param picture Bild des Getränks
    */
-  void registerNewDrink( final String name, final Float price, final byte[] picture )
+  int registerNewDrink( final Drink drink )
   {
     lock.lock();
-    final String sql = "INSERT INTO drink(name,preis,picture) VALUES(?,?,?)";
+    int drinkID = -1;
+    final String sql = "INSERT INTO drink(barcode,name,preis,picture,amount,ingredients) VALUES(?,?,?,?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, name );
-      pstmt.setFloat( 2, price );
-      pstmt.setBytes( 3, picture );
+      pstmt.setString( 1, drink.getBarcode() );
+      pstmt.setString( 2, drink.getName() );
+      pstmt.setFloat( 3, drink.getPrice() );
+      pstmt.setBytes( 4, drink.getPictureInBytes() );
+      pstmt.setInt( 5, drink.getAmount() );
+      pstmt.setBoolean( 6, drink.isIngredients() );
       pstmt.executeUpdate();
+      drinkID = pstmt.getGeneratedKeys().getInt( 1 );
     }
     catch ( final SQLException e )
     {
@@ -506,6 +579,7 @@ class Database
     {
       lock.unlock();
     }
+    return drinkID;
   }
 
   /**
@@ -709,17 +783,17 @@ class Database
   }
 
   /**
-   * Gibt den Getränkepreis zurück.
+   * Returns the drinkPrice for the given drinkID
    *
-   * @param consumedDrink Name des gakuften Getränks
-   * @return den Preis für das gewählte Getränk
+   * @param drinkID ID of the drink
+   * @return price of the drink or null if nothing has been found
    */
-  Float getDrinkPrice( final String consumedDrink )
+  Float getDrinkPrice( final int drinkID )
   {
-    final String sql = "SELECT preis FROM drink WHERE name = ?";
+    final String sql = "SELECT preis FROM drink WHERE id = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, consumedDrink );
+      pstmt.setInt( 1, drinkID );
       final ResultSet rs = pstmt.executeQuery();
       return rs.getFloat( "preis" );
     }
@@ -796,11 +870,16 @@ class Database
   }
 
   /**
-   * @return die Daten für das Scoreboard
+   * @return data for the scoreboard
    */
-  public String[][] getScoreboard()
+  public Map<String, Integer> getScoreboard( final boolean getWeeklyScoreboard )
   {
-    final ArrayList<String[]> history = new ArrayList<>();
+    final Map<String, Integer> scoreMap = new HashMap<>();
+    for ( final String displayName : getDisplayNames() )
+    {
+      scoreMap.put( displayName, 0 );
+    }
+
     final String sql = "SELECT action,consumer,undo,date FROM historie_log";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
@@ -811,8 +890,29 @@ class Database
         {
           if ( !rs.getBoolean( "undo" ) )
           {
-            final String[] log = { rs.getString( "action" ), getDisplayName( rs.getString( "consumer" ) ), rs.getString( "date" ) };
-            history.add( log );
+            final String displayName = getDisplayName( rs.getString( "consumer" ) );
+            if ( getWeeklyScoreboard )
+            {
+              try
+              {
+                final Instant date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( rs.getString( "date" ) ).toInstant();
+                final Instant now = Instant.now();
+                final Instant weekAgo = now.minus( 7, ChronoUnit.DAYS );
+                final Boolean withinWeek = (!date.isBefore( weekAgo )) && date.isBefore( now );
+                if ( withinWeek )
+                {
+                  scoreMap.put( displayName, scoreMap.get( displayName ) + 1 );
+                }
+              }
+              catch ( final ParseException __ )
+              {
+                __.printStackTrace();
+              }
+            }
+            else
+            {
+              scoreMap.put( displayName, scoreMap.get( displayName ) + 1 );
+            }
           }
         }
       }
@@ -821,8 +921,14 @@ class Database
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
-    final String[][] historyAsArray = history.toArray( new String[history.size()][] );
-    return historyAsArray;
+    final Map<String, Integer> scoreBoard =
+        scoreMap.entrySet().stream()
+            .sorted( Map.Entry.comparingByValue( Comparator.reverseOrder() ) )
+            .limit( 5 )
+            .collect( Collectors.toMap(
+                Map.Entry::getKey, Map.Entry::getValue, ( e1, e2 ) -> e1, LinkedHashMap::new ) );
+    return scoreBoard;
+
   }
 
   /**
@@ -925,15 +1031,15 @@ class Database
   }
 
   /**
-   * @param name Name des Getränks.
-   * @return Anzahl des Getränks
+   * @param drinkID ID of the drink.
+   * @return amount of the drink or -1 if nothing has been found
    */
-  int getDrinkAmount( final String name )
+  int getDrinkAmount( final int drinkID )
   {
-    final String sql = "SELECT amount FROM drink WHERE name =?";
+    final String sql = "SELECT amount FROM drink WHERE id =?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, name );
+      pstmt.setInt( 1, drinkID );
       final ResultSet rs = pstmt.executeQuery();
       return rs.getInt( "amount" );
     }
@@ -945,17 +1051,17 @@ class Database
   }
 
   /**
-   * Wenn ein Getränk gekauft wird, wird hier die Anzahl um 1 verringert.
+   * If a drink gets purchased, the amount will decrease by 1
    *
-   * @param name Name des Getränks
+   * @param drinkID ID of the drink
    */
-  void decreaseAmountOfDrinks( final String name )
+  void decreaseAmountOfDrinks( final int drinkID )
   {
     lock.lock();
-    final String sql = "UPDATE drink SET amount = amount -1 WHERE name = ?";
+    final String sql = "UPDATE drink SET amount = amount -1 WHERE id = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, name );
+      pstmt.setInt( 1, drinkID );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )
@@ -969,43 +1075,17 @@ class Database
   }
 
   /**
-   * Wenn ein Getränkekauf rückgängig gmeacht wird, wird hier die Anzahl um 1 erhöht.
+   * If a user undo the purchase of a drink, the amount will increase by 1.
    *
-   * @param name Name des Getränks
+   * @param drinkID ID of the drink
    */
-  void increaseAmountOfDrinks( final String name )
+  void increaseAmountOfDrinks( final int drinkID )
   {
     lock.lock();
-    final String sql = "UPDATE drink SET amount = amount +1 WHERE name = ?";
+    final String sql = "UPDATE drink SET amount = amount +1 WHERE id = ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, name );
-      pstmt.executeUpdate();
-    }
-    catch ( final SQLException e )
-    {
-      ServerLog.newLog( logType.SQL, e.getMessage() );
-    }
-    finally
-    {
-      lock.unlock();
-    }
-  }
-
-  /**
-   * Setz die Anzahl der Getränke.
-   *
-   * @param name Name des Getränks
-   * @param amount Anzahl des Getränks
-   */
-  void setAmountOfDrinks( final String name, final int amount )
-  {
-    lock.lock();
-    final String sql = "UPDATE drink SET amount = ? WHERE name = ?";
-    try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
-    {
-      pstmt.setInt( 1, amount );
-      pstmt.setString( 2, name );
+      pstmt.setInt( 1, drinkID );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )
@@ -1033,12 +1113,10 @@ class Database
    * @param protein Eiweiß
    * @param salt Salz
    */
-  void addIngredients( final int DrinkID, final String ingredients, final int energy_kJ, final int energy_kcal, final double fat,
-                       final double fattyAcids,
-                       final double carbs, final double sugar, final double protein, final double salt, final double amount )
+  void addIngredients( DrinkIngredients ingredients )
   {
     String sql;
-    final boolean hasDrinkIngredients = getIngredients( DrinkID ) == null ? false : true;
+    final boolean hasDrinkIngredients = getIngredients( ingredients.getDrinkID() ) == null ? false : true;
     //If the drink already has ingredients, update them.
     if ( hasDrinkIngredients )
     {
@@ -1066,31 +1144,31 @@ class Database
     {
       if ( hasDrinkIngredients )
       {
-        pstmt.setString( 1, ingredients );
-        pstmt.setInt( 2, energy_kJ );
-        pstmt.setInt( 3, energy_kcal );
-        pstmt.setDouble( 4, fat );
-        pstmt.setDouble( 5, fattyAcids );
-        pstmt.setDouble( 6, carbs );
-        pstmt.setDouble( 7, sugar );
-        pstmt.setDouble( 8, protein );
-        pstmt.setDouble( 9, salt );
-        pstmt.setDouble( 10, amount );
-        pstmt.setInt( 11, DrinkID );
+        pstmt.setString( 1, ingredients.getIngredients() );
+        pstmt.setInt( 2, ingredients.getEnergy_kJ() );
+        pstmt.setInt( 3, ingredients.getEnergy_kcal() );
+        pstmt.setFloat( 4, ingredients.getFat() );
+        pstmt.setFloat( 5, ingredients.getFatty_acids() );
+        pstmt.setFloat( 6, ingredients.getCarbs() );
+        pstmt.setFloat( 7, ingredients.getSugar() );
+        pstmt.setFloat( 8, ingredients.getProtein() );
+        pstmt.setFloat( 9, ingredients.getSalt() );
+        pstmt.setFloat( 10, ingredients.getAmount() );
+        pstmt.setInt( 11, ingredients.getDrinkID() );
       }
       else
       {
-        pstmt.setInt( 1, DrinkID );
-        pstmt.setString( 2, ingredients );
-        pstmt.setInt( 3, energy_kJ );
-        pstmt.setInt( 4, energy_kcal );
-        pstmt.setDouble( 5, fat );
-        pstmt.setDouble( 6, fattyAcids );
-        pstmt.setDouble( 7, carbs );
-        pstmt.setDouble( 8, sugar );
-        pstmt.setDouble( 9, protein );
-        pstmt.setDouble( 10, salt );
-        pstmt.setDouble( 11, amount );
+        pstmt.setInt( 1, ingredients.getDrinkID() );
+        pstmt.setString( 2, ingredients.getIngredients() );
+        pstmt.setInt( 3, ingredients.getEnergy_kJ() );
+        pstmt.setInt( 4, ingredients.getEnergy_kcal() );
+        pstmt.setFloat( 5, ingredients.getFat() );
+        pstmt.setFloat( 6, ingredients.getFatty_acids() );
+        pstmt.setFloat( 7, ingredients.getCarbs() );
+        pstmt.setFloat( 8, ingredients.getSugar() );
+        pstmt.setFloat( 9, ingredients.getProtein() );
+        pstmt.setFloat( 10, ingredients.getSalt() );
+        pstmt.setFloat( 11, ingredients.getAmount() );
       }
       pstmt.executeUpdate();
     }
@@ -1103,7 +1181,7 @@ class Database
     try ( PreparedStatement pstmt = conn.prepareStatement( enableIngredients ) )
     {
       pstmt.setBoolean( 1, true );
-      pstmt.setInt( 2, DrinkID );
+      pstmt.setInt( 2, ingredients.getDrinkID() );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )
@@ -1114,12 +1192,11 @@ class Database
     {
       lock.unlock();
     }
-
   }
 
   /**
-   * @param drinkID ID des Getränks
-   * @return Inhaltsstoffe etc. des Getränks
+   * @param drinkID ID of the drink
+   * @return ingredients of the drink or null if nothing has been found
    */
   private DrinkIngredients getIngredients( final int drinkID )
   {
@@ -1130,8 +1207,8 @@ class Database
       final ResultSet rs = pstmt.executeQuery();
       return new DrinkIngredients( rs.getInt( "drink" ), rs.getString( "ingredients" ), rs.getInt( "energy_kJ" ),
           rs.getInt( "energy_kcal" ),
-          rs.getDouble( "fat" ), rs.getDouble( "fatty_acids" ), rs.getDouble( "carbs" ), rs.getDouble( "sugar" ), rs.getDouble( "protein" ),
-          rs.getDouble( "salt" ), rs.getDouble( "amount" ) );
+          rs.getFloat( "fat" ), rs.getFloat( "fatty_acids" ), rs.getFloat( "carbs" ), rs.getFloat( "sugar" ), rs.getFloat( "protein" ),
+          rs.getFloat( "salt" ), rs.getFloat( "amount" ) );
     }
     catch ( final SQLException e )
     {

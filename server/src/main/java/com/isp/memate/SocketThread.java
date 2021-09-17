@@ -38,7 +38,7 @@ class SocketThread extends Thread
   private final Socket         socket;
   //UNDO
   private boolean lastActionDeposit = false;
-  private String  lastDrinkName;
+  private int     lastDrinkID;
   private String  lastDate;
   private float   lastTransaction;
 
@@ -67,7 +67,7 @@ class SocketThread extends Thread
       ServerLog.newLog( logType.ERROR, "Die version.properties konnten nicht geladen werden" );
       ServerLog.newLog( logType.ERROR, exception.getMessage() );
     }
-    System.out.println( version );
+    ServerLog.newLog( logType.INFO, "Version des MeMateServers: " + version );
   }
 
   /**
@@ -82,6 +82,7 @@ class SocketThread extends Thread
     {
       objectInputStream = new ObjectInputStream( socket.getInputStream() );
       objectOutputStream = new ObjectOutputStream( socket.getOutputStream() );
+      sendVersion();
 
       while ( true )
       {
@@ -89,10 +90,7 @@ class SocketThread extends Thread
         {
           final Shared shared = (Shared) objectInputStream.readObject();
           final Operation operation = shared.operation;
-          if ( operation != Operation.GET_DRINKINFO && operation != Operation.PIGGYBANK_BALANCE && operation != Operation.GET_HISTORY )
-          {
-            ServerLog.newLog( logType.COMMAND, operation.toString() );
-          }
+          ServerLog.newLog( logType.COMMAND, operation.toString() );
           switch ( operation )
           {
             case REGISTER_USER:
@@ -103,14 +101,6 @@ class SocketThread extends Thread
               checkLogin( shared.loginInformation );
               break;
 
-            case GET_BALANCE:
-              getBalance();
-              break;
-
-            case GET_DRINKINFO:
-              getDrinkInfo();
-              break;
-
             case GET_HISTORY:
               sendHistoryData();
               break;
@@ -119,12 +109,9 @@ class SocketThread extends Thread
               sendUsers();
               break;
 
-            case GET_VERSION:
-              sendVersion();
-              break;
-
             case REGISTER_DRINK:
               registerDrink( shared.drink );
+              SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case REGISTER_INGREDIENTS:
@@ -132,19 +119,33 @@ class SocketThread extends Thread
               break;
 
             case REMOVE_DRINK:
-              removeDrink( shared.drink );
+              removeDrink( shared.drinkID );
+              SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case UPDATE_DRINKNAME:
-              updateDrinkName( shared.drinkName );
+              updateDrinkName( shared.drinkChange );
+              SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case UPDATE_DRINKPRICE:
-              updateDrinkPrice( shared.drinkPrice );
+              updateDrinkPrice( shared.drinkChange );
+              SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case UPDATE_DRINKPICTURE:
-              updateDrinkPicture( shared.drinkPicture );
+              updateDrinkPicture( shared.drinkChange );
+              SocketPool.notifyAllSocketsToSendDrinks();
+              break;
+
+            case UPDATE_DRINKAMOUNT:
+              updateDrinkAmount( shared.drinkChange );
+              SocketPool.notifyAllSocketsToSendDrinks();
+              break;
+
+            case UPDATE_BARCODE:
+              updateDrinkBarcode( shared.drinkChange );
+              SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case CONNECT_SESSION_ID:
@@ -161,7 +162,8 @@ class SocketThread extends Thread
               break;
 
             case CONSUM_DRINK:
-              removeBalance( shared.drinkPrice );
+              consumeDrink( shared.drink );
+              SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case SET_PIGGYBANK_BALANCE:
@@ -171,10 +173,6 @@ class SocketThread extends Thread
 
             case PIGGYBANK_BALANCE:
               sendPiggybankBalance();
-              break;
-
-            case SET_DRINK_AMOUNT:
-              database.setAmountOfDrinks( shared.drinkAmount.name, shared.drinkAmount.amount );
               break;
 
             case UNDO:
@@ -191,7 +189,7 @@ class SocketThread extends Thread
 
             case CHANGE_DISPLAYNAME:
               database.changeDisplayName( userIDMap.get( currentUser ), shared.displayname );
-              objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( currentUser ) ) );
+              objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( currentUser ) ) );
               sendHistoryData();
               break;
 
@@ -212,14 +210,13 @@ class SocketThread extends Thread
     catch ( final IOException exception )
     {
       ServerLog.newLog( logType.INFO, "Die Verbindung zu " + currentUser + " wurde getrennt." );
+      SocketPool.removeSocket( this );
     }
   }
 
   private void registerIngredients( final DrinkIngredients drinkIngredients )
   {
-    database.addIngredients( drinkIngredients.drinkID, drinkIngredients.ingredients, drinkIngredients.energy_kJ,
-        drinkIngredients.energy_kcal, drinkIngredients.fat, drinkIngredients.fatty_acids, drinkIngredients.carbs, drinkIngredients.sugar,
-        drinkIngredients.protein, drinkIngredients.salt, drinkIngredients.amount );
+    database.addIngredients( drinkIngredients );
   }
 
   /**
@@ -247,7 +244,7 @@ class SocketThread extends Thread
       database.disableLog( lastDate );
       ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
       sendHistoryData();
-      getBalance();
+      sendBalance();
 
       //For Admin-Balance
       final Float adminBalance = database.getPiggyBankBalance() - lastTransaction;
@@ -264,9 +261,10 @@ class SocketThread extends Thread
       database.addLog( "Letzte Aktion rückgängig", currentUser, lastTransaction, newBalance,
           LocalDateTime.now().toString() );
       database.disableLog( lastDate );
-      database.increaseAmountOfDrinks( lastDrinkName );
+      database.increaseAmountOfDrinks( lastDrinkID );
       sendHistoryData();
-      getBalance();
+      sendBalance();
+      SocketPool.notifyAllSocketsToSendDrinks();
 
       //For Undo
       lastActionDeposit = false;
@@ -336,11 +334,19 @@ class SocketThread extends Thread
     }
     try
     {
-      objectOutputStream.writeObject( new Shared( Operation.GET_SCOREBOARD, database.getScoreboard() ) );
+      objectOutputStream.writeObject( new Shared( Operation.SCOREBOARD, database.getScoreboard( false ) ) );
     }
     catch ( final IOException exception )
     {
       ServerLog.newLog( logType.ERROR, "Das Scoreboard konnte nicht geladen werden. " + exception );
+    }
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.WEEKLY_SCOREBOARD, database.getScoreboard( true ) ) );
+    }
+    catch ( final IOException exception )
+    {
+      ServerLog.newLog( logType.ERROR, "Das WeeklyScoreboard konnte nicht geladen werden. " + exception );
     }
   }
 
@@ -376,24 +382,25 @@ class SocketThread extends Thread
   }
 
   /**
-   * Enfernt das angegebene Getränk.
+   * Checks if the expectedPrice equals the actual price of the drink and if the drink is still available.
+   * If so the amount of the drink will lower by 1 and the balance will be removed.
    *
-   * @param consumedDrink
+   * @param consumedDrink the consumed drink
    */
-  private void removeBalance( final DrinkPrice consumedDrink )
+  private void consumeDrink( final Drink consumedDrink )
   {
-    final Float drinkPrice = database.getDrinkPrice( consumedDrink.name );
-    final Float expectedPrice = consumedDrink.price;
-    if ( drinkPrice == null )
+    final Float actualPrice = database.getDrinkPrice( consumedDrink.getId() );
+    final Float expectedPrice = consumedDrink.getPrice();
+    if ( actualPrice == null )
     {
       return;
     }
-    if ( database.getDrinkAmount( consumedDrink.name ) < 1 )
+    if ( database.getDrinkAmount( consumedDrink.getId() ) < 1 )
     {
-      getDrinkInfo();
+      sendDrinks();
       try
       {
-        objectOutputStream.writeObject( new Shared( Operation.NO_MORE_DRINKS_AVAIBLE, consumedDrink.name ) );
+        objectOutputStream.writeObject( new Shared( Operation.NO_MORE_DRINKS_AVAIBLE, consumedDrink.getName() ) );
       }
       catch ( final IOException exception )
       {
@@ -402,13 +409,14 @@ class SocketThread extends Thread
       return;
     }
     ServerLog.newLog( logType.INFO, "EXPECTED: " + expectedPrice );
-    ServerLog.newLog( logType.INFO, "REAL: " + drinkPrice );
-    if ( !expectedPrice.equals( drinkPrice ) )
+    ServerLog.newLog( logType.INFO, "REAL: " + actualPrice );
+    if ( !expectedPrice.equals( actualPrice ) )
     {
-      getDrinkInfo();
+      sendDrinks();
       try
       {
-        objectOutputStream.writeObject( new Shared( Operation.PRICE_CHANGED, new DrinkPrice( drinkPrice, -1, consumedDrink.name ) ) );
+        objectOutputStream
+            .writeObject( new Shared( Operation.PRICE_CHANGED, new DrinkChangeObject( consumedDrink.getId(), actualPrice ) ) );
       }
       catch ( final IOException exception )
       {
@@ -416,17 +424,17 @@ class SocketThread extends Thread
       }
       return;
     }
-    final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - drinkPrice;
+    final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - actualPrice;
     database.updateBalance( currentSessionID, newBalance );
     final String date = LocalDateTime.now().toString();
-    database.addLog( consumedDrink.name + " getrunken", currentUser, drinkPrice * -1, newBalance, date );
-    database.decreaseAmountOfDrinks( consumedDrink.name );
+    database.addLog( consumedDrink.getName() + " getrunken", currentUser, actualPrice * -1, newBalance, date );
+    database.decreaseAmountOfDrinks( consumedDrink.getId() );
     sendHistoryData();
-
+    sendBalance();
     //For Undo
     lastActionDeposit = false;
-    lastTransaction = drinkPrice;
-    lastDrinkName = consumedDrink.name;
+    lastTransaction = actualPrice;
+    lastDrinkID = consumedDrink.getId();
     lastDate = date;
   }
 
@@ -443,6 +451,7 @@ class SocketThread extends Thread
     database.addLog( "Guthaben aufgeladen", currentUser, Float.valueOf( balanceToAdd ), newBalance, date );
     ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
     sendHistoryData();
+    sendBalance();
 
     //For Admin-Balance
     final Float adminBalance = database.getPiggyBankBalance() + balanceToAdd;
@@ -467,8 +476,16 @@ class SocketThread extends Thread
     try
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_USERNAME_FOR_SESSION_ID_RESULT, username ) );
-      objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( username ) ) );
-      ServerLog.newLog( logType.INFO, "Der Nutzer " + username + " gehört zu der SessionID " + sessionID );
+      objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( username ) ) );
+      if ( username != null )
+      {
+        ServerLog.newLog( logType.INFO, "Der Nutzer " + username + " gehört zu der SessionID " + sessionID );
+        sendNecessaryInformations();
+      }
+      else
+      {
+        ServerLog.newLog( logType.ERROR, "Es konnte kein Nutzer für die gegebene Session gefunden werden (" + sessionID + ")" );
+      }
     }
     catch ( final IOException exception )
     {
@@ -493,10 +510,10 @@ class SocketThread extends Thread
    *
    * @param drinkPicture DrinkPicture-Objekt, welches die ID und das Bild in Bytes beinhaltet.
    */
-  private void updateDrinkPicture( final DrinkPicture drinkPicture )
+  private void updateDrinkPicture( final DrinkChangeObject drinkPicture )
   {
-    database.updateDrinkInformation( drinkPicture.id, Operation.UPDATE_DRINKPICTURE, drinkPicture.pictureAsBytes );
-    ServerLog.newLog( logType.INFO, "Das Bild des Getränk mit der ID " + drinkPicture.id + " wurde geändert." );
+    database.updateDrinkInformation( drinkPicture.drinkID, Operation.UPDATE_DRINKPICTURE, drinkPicture.change );
+    ServerLog.newLog( logType.INFO, "Das Bild des Getränk mit der ID " + drinkPicture.drinkID + " wurde geändert." );
   }
 
   /**
@@ -504,11 +521,11 @@ class SocketThread extends Thread
    *
    * @param drinkPrice DrinkPrice-Objekt, welches die ID und den neuen Preis enthält.
    */
-  private void updateDrinkPrice( final DrinkPrice drinkPrice )
+  private void updateDrinkPrice( final DrinkChangeObject drinkPrice )
   {
-    database.updateDrinkInformation( drinkPrice.id, Operation.UPDATE_DRINKPRICE, drinkPrice.price );
+    database.updateDrinkInformation( drinkPrice.drinkID, Operation.UPDATE_DRINKPRICE, drinkPrice.change );
     ServerLog.newLog( logType.INFO,
-        "Der Preis des Getränk mit der ID " + drinkPrice.id + " wurde auf " + drinkPrice.price + "€ geändert." );
+        "Der Preis des Getränk mit der ID " + drinkPrice.drinkID + " wurde auf " + drinkPrice.change + "€ geändert." );
   }
 
 
@@ -517,10 +534,33 @@ class SocketThread extends Thread
    *
    * @param drinkName DrinkName-Objekt, welches die ID und den neuen Namen enthält.
    */
-  private void updateDrinkName( final DrinkName drinkName )
+  private void updateDrinkName( final DrinkChangeObject drinkName )
   {
-    database.updateDrinkInformation( drinkName.id, Operation.UPDATE_DRINKNAME, drinkName.name );
-    ServerLog.newLog( logType.INFO, "Das Getränk mit der ID " + drinkName.id + " wurde zu " + drinkName.name + " umbenannt." );
+    database.updateDrinkInformation( drinkName.drinkID, Operation.UPDATE_DRINKNAME, drinkName.change );
+    ServerLog.newLog( logType.INFO, "Das Getränk mit der ID " + drinkName.drinkID + " wurde zu " + drinkName.change + " umbenannt." );
+  }
+
+  /**
+   * Updates the amount of the drink
+   *
+   * @param amount the amount to set
+   */
+  private void updateDrinkAmount( final DrinkChangeObject amount )
+  {
+    database.updateDrinkInformation( amount.drinkID, Operation.UPDATE_DRINKAMOUNT, amount.change );
+    ServerLog.newLog( logType.INFO, "Das Anzahl des Getränks mit der ID " + amount.drinkID + " wurde auf " + amount.change + " gesetzt." );
+  }
+
+  /**
+   * Updates the barcode of the drink
+   *
+   * @param barcode the barcode to set
+   */
+  private void updateDrinkBarcode( final DrinkChangeObject barcode )
+  {
+    database.updateDrinkInformation( barcode.drinkID, Operation.UPDATE_BARCODE, barcode.change );
+    ServerLog.newLog( logType.INFO,
+        "Der Barcode des Getränks mit der ID " + barcode.drinkID + " wurde auf " + barcode.change + " gesetzt." );
   }
 
 
@@ -529,22 +569,22 @@ class SocketThread extends Thread
    * geholt und anschließend der Datensatz für
    * die ID gelöscht.
    *
-   * @param drink Drink-Objekt, welches den Namen des Getränks enthält.
+   * @param drinkID Id of the drink
    */
-  private void removeDrink( final Drink drink )
+  private void removeDrink( final int drinkID )
   {
-    database.removeDrink( drink.id );
-    ServerLog.newLog( logType.INFO, drink.name + " wurde entfernt." );
+    database.removeDrink( drinkID );
+    ServerLog.newLog( logType.INFO, "Das Getränk mit der ID " + drinkID + " wurde entfernt." );
   }
 
   /**
    * Sendet ein Objekt, welches ein Array aus {@linkplain Drink}-Objekten enthält.
    */
-  private void getDrinkInfo()
+  public void sendDrinks()
   {
     try
     {
-      objectOutputStream.writeObject( new Shared( Operation.GET_DRINKINFO, database.getDrinkInformations() ) );
+      objectOutputStream.writeObject( new Shared( Operation.GET_DRINKS, database.getDrinks() ) );
       objectOutputStream.reset();
     }
     catch ( final IOException exception )
@@ -561,13 +601,11 @@ class SocketThread extends Thread
    */
   private void registerDrink( final Drink drink )
   {
-    final String name = drink.name;
-    final Float price = drink.price;
-    final byte[] picture = drink.pictureInBytes;
-    database.registerNewDrink( name, price, picture );
+    final int drinkID = database.registerNewDrink( drink );
+    database.addIngredients( new DrinkIngredients( drinkID, drink.getDrinkIngredients() ) );
     ServerLog.newLog( logType.INFO, "Ein neues Getränk wurde registriert." );
-    ServerLog.newLog( logType.INFO, "Name: " + name );
-    ServerLog.newLog( logType.INFO, "Preis: " + price + "€" );
+    ServerLog.newLog( logType.INFO, "Name: " + drink.getName() );
+    ServerLog.newLog( logType.INFO, "Preis: " + drink.getPrice() + "€" );
   }
 
   /**
@@ -575,16 +613,16 @@ class SocketThread extends Thread
    * mit dieser ID wird der Kontostand von der Datenbank
    * erfragt und zurück gegben.
    *
-   *
    */
-  private void getBalance()
+  private void sendBalance()
   {
+    //TODO(nwe | 08.04.2021): CHANGE do not save currentUser as String, just save the id!
     final Integer userID = userIDMap.get( currentUser );
     final Float balance = database.getBalance( userID );
     ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " beträgt " + balance + "€" );
     try
     {
-      objectOutputStream.writeObject( new Shared( Operation.GET_BALANCE_RESULT, balance ) );
+      objectOutputStream.writeObject( new Shared( Operation.USER_BALANCE, balance ) );
     }
     catch ( final IOException exception )
     {
@@ -613,7 +651,8 @@ class SocketThread extends Thread
         currentUser = username;
         ServerLog.newLog( logType.INFO, username + " hat sich erfolgreich eingeloggt." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
-        objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( username ) ) );
+        objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( username ) ) );
+        sendNecessaryInformations();
         break;
 
       case USER_NOT_FOUND:
@@ -631,9 +670,17 @@ class SocketThread extends Thread
         ServerLog.newLog( logType.INFO,
             username + " hat sich erfolgreich eingeloggt, wird aber aufgefordert ein neues Passwort zu erstellen." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
-        objectOutputStream.writeObject( new Shared( Operation.GET_DISPLAYNAME, database.getDisplayName( username ) ) );
+        objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( username ) ) );
+        sendNecessaryInformations();
         break;
     }
+  }
+
+  private void sendNecessaryInformations()
+  {
+    sendDrinks();
+    sendBalance();
+    sendHistoryData();
   }
 
   /**
@@ -657,5 +704,10 @@ class SocketThread extends Thread
     {
       ServerLog.newLog( logType.ERROR, "Der Benutzer konnte nicht angelegt werden." + exception );
     }
+  }
+
+  public boolean isUserAdmin()
+  {
+    return database.isAdmin( currentUser );
   }
 }

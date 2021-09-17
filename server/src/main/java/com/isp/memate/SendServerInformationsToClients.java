@@ -34,13 +34,14 @@ class SendServerInformationsToClients extends Thread
     {
       socket = new DatagramSocket( 3141 );
     }
-    catch ( SocketException exception )
+    catch ( final SocketException exception )
     {
       ServerLog.newLog( logType.ERROR, "Es konnte kein neuer DatagramSocket erstellt werden." );
       exception.printStackTrace();
     }
   }
 
+  @Override
   public void run()
   {
     while ( true )
@@ -51,14 +52,14 @@ class SendServerInformationsToClients extends Thread
       {
         socket.receive( clientPacket );
       }
-      catch ( IOException exception )
+      catch ( final IOException exception )
       {
-        ServerLog.newLog( logType.ERROR, "Das vom Client gesendete Packet konnte nicht richtig empfangen werden." );
+        // ServerLog.newLog( logType.ERROR, "Das vom Client gesendete Packet konnte nicht richtig empfangen werden." );
         exception.printStackTrace();
       }
-      InetAddress clientAddress = clientPacket.getAddress();
-      int clientPort = clientPacket.getPort();
-      String clientMessage = new String( clientPacket.getData(), 0, clientPacket.getLength() );
+      final InetAddress clientAddress = clientPacket.getAddress();
+      final int clientPort = clientPacket.getPort();
+      final String clientMessage = new String( clientPacket.getData(), 0, clientPacket.getLength() );
 
       System.out
           .println(
@@ -67,7 +68,7 @@ class SendServerInformationsToClients extends Thread
 
 
       //Sendet ein neues Paket an den Client zurück.
-      String broadcastMessage = "MateServer";
+      final String broadcastMessage = "MateServer";
       buf = broadcastMessage.getBytes();
       clientPacket = new DatagramPacket( buf, buf.length, clientAddress, clientPort );
       try
@@ -77,7 +78,7 @@ class SendServerInformationsToClients extends Thread
           socket.send( clientPacket );
         }
       }
-      catch ( IOException exception )
+      catch ( final IOException exception )
       {
         ServerLog.newLog( logType.ERROR, "Es konnte kein Paket den den Client zurück gesendet werden" );
         exception.printStackTrace();

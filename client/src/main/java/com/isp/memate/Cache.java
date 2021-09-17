@@ -2,7 +2,6 @@ package com.isp.memate;
 
 import java.awt.Cursor;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,39 +9,61 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.swing.ImageIcon;
-
 import com.isp.memate.ServerCommunication.dateType;
+import com.isp.memate.panels.Adminview;
+import com.isp.memate.panels.Dashboard;
 import com.isp.memate.util.ClientLog;
+import com.isp.memate.util.GUIObjects;
+import com.isp.memate.util.ObservableValue;
+import com.isp.memate.util.ValueListener;
 
 public class Cache
 {
-  private static final Cache                  instance            = new Cache();
-  Object                                      usernameSync        = new Object();
-  private String                              serverVersion       = null;
-  private String                              clientVersion       = null;
-  private String                              username            = null;
-  private String[]                            userArray           = null;
-  private String[]                            displayNamesArray   = null;
-  private User[]                              fullUserArray       = null;
-  private String[][]                          history;
-  private String[][]                          shortHistory        = null;
-  private String                              displayname         = null;
-  private Drink[]                             drinkArray          = null;
-  private String[][]                          scoreboard;
-  private Float                               piggyBankBalance;
-  private final List<String>                  drinkNames          = new ArrayList<>();
-  private final Map<String, Float>            priceMap            = new HashMap<>();
-  private final Map<String, ImageIcon>        imageMap            = new HashMap<>();
-  private final ArrayList<Byte>               byteImageList       = new ArrayList<>();
-  private final Map<String, Integer>          amountMap           = new HashMap<>();
-  private final Map<String, Integer>          drinkIDMap          = new HashMap<>();
-  private final Map<String, Boolean>          drinkIngredientsMap = new HashMap<>();
-  private final Map<String, DrinkIngredients> IngredientsMap      = new HashMap<>();
+  private static final Cache           instance          = new Cache();
+  public Object                        sessionIDSync     = new Object();
+  private String                       serverVersion     = null;
+  private String                       clientVersion     = null;
+  private String                       username          = null;
+  private String[]                     userArray         = null;
+  private String[]                     displayNamesArray = null;
+  private User[]                       fullUserArray     = null;
+  private String[][]                   history;
+  private String[][]                   shortHistory      = null;
+  private String                       displayname       = null;
+  private Map<String, Integer>         scoreboard;
+  private Map<String, Integer>         weeklyScoreboard;
+  private final ObservableValue<Float> piggyBankBalance  = new ObservableValue<Float>( 0f );
+  private final ObservableValue<Float> userBalance       = new ObservableValue<Float>( 0f );
+
+  private HashMap<Integer, Drink> drinks = new HashMap<>();
 
   private Cache()
   {
     loadClientVersion();
+    initValueListener();
+  }
+
+  private void initValueListener()
+  {
+    piggyBankBalance.addListener( new ValueListener<Float>()
+    {
+      @Override
+      public void valueChanged( Float oldValue, Float newValue )
+      {
+        if ( GUIObjects.currentPanel != null && GUIObjects.currentPanel instanceof Adminview )
+        {
+          ((Adminview) GUIObjects.currentPanel).setPiggybankBalance( newValue );
+        }
+      }
+    } );
+    userBalance.addListener( new ValueListener<Float>()
+    {
+      @Override
+      public void valueChanged( Float oldValue, Float newValue )
+      {
+        GUIObjects.mainframe.updateBalanceLabel( newValue );
+      }
+    } );
   }
 
   private void loadClientVersion()
@@ -90,9 +111,9 @@ public class Cache
   public void setUsername( String username )
   {
     this.username = username;
-    synchronized ( usernameSync )
+    synchronized ( sessionIDSync )
     {
-      usernameSync.notify();
+      sessionIDSync.notify();
     }
   }
 
@@ -128,12 +149,12 @@ public class Cache
 
   public Float getPiggyBankBalance()
   {
-    return piggyBankBalance;
+    return piggyBankBalance.getValue();
   }
 
   public void setPiggyBankBalance( Float piggyBankBalance )
   {
-    this.piggyBankBalance = piggyBankBalance;
+    this.piggyBankBalance.setValue( piggyBankBalance );
   }
 
   /**
@@ -143,7 +164,7 @@ public class Cache
    *
    * @return Die Historydaten als 2D Array
    */
-  String[][] getHistory( final dateType dateType )
+  public String[][] getHistory( final dateType dateType )
   {
     if ( history == null )
     {
@@ -200,82 +221,34 @@ public class Cache
     }
   }
 
-  /**
-   * Die Preismap, Bildermap und eine Liste von allen Namen der Getränke werden
-   * gefüllt. Diese Maps werden unter anderem von dem Dashboard oder dem
-   * Drinkmanager genutzt. Die Methode wird beim Start des Programms aufgerufen
-   * oder wenn Veränderungen an Getränken vorgenommen werden.
-   */
-  void updateMaps()
-  {
-    try
-    {
-      final List<String> oldDrinkNames = new ArrayList<>( drinkNames );
-      final Map<String, Float> oldPriceMap = new HashMap<>();
-      oldPriceMap.putAll( priceMap );
-      final Map<String, Integer> oldAmountMap = new HashMap<>();
-      oldAmountMap.putAll( amountMap );
-      final ArrayList<Byte> oldByteImageList = new ArrayList<>( byteImageList );
-
-      priceMap.clear();
-      amountMap.clear();
-      imageMap.clear();
-      drinkIDMap.clear();
-      drinkNames.clear();
-      drinkIngredientsMap.clear();
-      IngredientsMap.clear();
-      byteImageList.clear();
-      for ( final Drink drink : drinkArray )
-      {
-        final String name = drink.name;
-        final Float price = drink.price;
-        final int amount = drink.amount;
-        final byte[] pictureInBytes = drink.pictureInBytes;
-        final Integer id = drink.id;
-        final ImageIcon icon = new ImageIcon( pictureInBytes );
-        priceMap.put( name, price );
-        imageMap.put( name, icon );
-        amountMap.put( name, amount );
-        // FIXME Das muss besser werden
-        // Der 355. byte des Bildes wird in eine Liste hinzugefügt, welche anschließend
-        // mit der vorherigen Liste verglichen wird.
-        byteImageList.add( pictureInBytes[ 355 ] );
-        drinkIDMap.put( name, id );
-        drinkNames.add( name );
-        drinkIngredientsMap.put( name, drink.ingredients );
-        IngredientsMap.put( name, drink.drinkIngredients );
-      }
-      if ( !drinkNames.equals( oldDrinkNames ) || !priceMap.equals( oldPriceMap )
-          || !byteImageList.equals( oldByteImageList ) || !amountMap.equals( oldAmountMap ) )
-      {
-        Mainframe.getInstance().updateDashboard();
-      }
-      Mainframe.getInstance().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
-    }
-    catch ( final Exception exception )
-    {
-      ClientLog.newLog( exception.getMessage() );
-    }
-  }
-
   public void setShortHistory( String[][] shortHistory )
   {
     this.shortHistory = shortHistory;
   }
 
-  public String[][] getScoreboard()
+  public Map<String, Integer> getScoreboard()
   {
     return scoreboard;
   }
 
-  public void setScoreboard( String[][] scoreboard )
+  public void setScoreboard( Map<String, Integer> scoreboard )
   {
     this.scoreboard = scoreboard;
   }
 
+  public Map<String, Integer> getWeeklyScoreboard()
+  {
+    return weeklyScoreboard;
+  }
+
+  public void setWeeklyScoreboard( Map<String, Integer> weeklyScoreboard )
+  {
+    this.weeklyScoreboard = weeklyScoreboard;
+  }
+
   public String getDisplayname()
   {
-    return displayname;
+    return displayname == null ? username : displayname;
   }
 
   public void setDisplayname( String displayname )
@@ -283,67 +256,24 @@ public class Cache
     this.displayname = displayname;
   }
 
-  public Drink[] getDrinkArray()
+  public HashMap<Integer, Drink> getDrinks()
   {
-    return drinkArray;
+    return drinks;
   }
 
-  public void setDrinkArray( Drink[] drinkArray )
+  public void setDrinks( HashMap<Integer, Drink> drinks )
   {
-    this.drinkArray = drinkArray;
-  }
-
-  ImageIcon getIcon( final String name )
-  {
-    return imageMap.get( name );
-  }
-
-  Float getPrice( final String name )
-  {
-    return priceMap.get( name );
-  }
-
-  Integer getAmount( final String name )
-  {
-    return amountMap.get( name );
-  }
-
-  Integer getID( final String name )
-  {
-    return drinkIDMap.get( name );
-  }
-
-  Boolean hasIngredients( final String name )
-  {
-    return drinkIngredientsMap.get( name );
-  }
-
-  DrinkIngredients getIngredients( final String name )
-  {
-    return IngredientsMap.get( name );
-  }
-
-  String getDrinkName( final int id )
-  {
-    for ( final String string : drinkIDMap.keySet() )
+    this.drinks = drinks;
+    if ( GUIObjects.currentPanel != null && GUIObjects.currentPanel instanceof Dashboard )
     {
-      if ( id == drinkIDMap.get( string ) )
-      {
-        return string;
-      }
+      //TODO(nwe | 08.04.2021): Das muss besser werden. Es soll nicht alles geupdatet werden, nur die geänderte Information
+      ((Dashboard) GUIObjects.currentPanel).updateButtonpanel();
+      GUIObjects.mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
     }
-    return null;
   }
 
-  public List<String> getDrinkNames()
+  public void setUserBalance( Float userBalance )
   {
-    if ( drinkNames != null )
-    {
-      return new ArrayList<>( drinkNames );
-    }
-    else
-    {
-      return new ArrayList<>();
-    }
+    this.userBalance.setValue( userBalance );
   }
 }

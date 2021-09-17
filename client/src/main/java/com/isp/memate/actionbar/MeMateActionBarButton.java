@@ -26,12 +26,11 @@ import com.isp.memate.util.MeMateUIManager;
 /**
  * @author dtr
  * @since 29.01.2020
- *
  */
 public class MeMateActionBarButton
 {
-  private Icon icon;
-  private Icon pressedIcon;
+  private Icon iconBlack;
+  private Icon iconWhite;
 
   private String title;
   private String tooltip;
@@ -72,35 +71,37 @@ public class MeMateActionBarButton
 
 
   @SuppressWarnings( "javadoc" )
-  public MeMateActionBarButton( final Icon icon, final Icon pressedIcon, final Color background, final String iconOrientation )
+  public MeMateActionBarButton( final Icon iconBlack, final Icon iconWhite, final Color background, final String iconOrientation )
   {
-    this( null, null, icon, pressedIcon, background, null, null, null, iconOrientation );
+    this( null, null, iconBlack, iconWhite, background, null, null, null, iconOrientation );
   }
 
 
   @SuppressWarnings( "javadoc" )
-  public MeMateActionBarButton( final Icon icon, final Icon pressedIcon, final Color background, final Runnable runnable )
+  public MeMateActionBarButton( final Icon iconWhite, final Icon iconBlack, final Color background, final Runnable runnable )
   {
-    this( null, null, icon, pressedIcon, background, null, null, runnable, BorderLayout.WEST );
+    this( null, null, iconWhite, iconBlack, background, null, null, runnable, BorderLayout.WEST );
   }
 
 
   @SuppressWarnings( "javadoc" )
-  public MeMateActionBarButton( final String title, final String tooltip, final Icon icon, final Icon pressedIcon, final Color background,
+  public MeMateActionBarButton( final String title, final String tooltip, final Icon iconBlack, final Icon iconWhite,
+                                final Color background,
                                 final Color foreground, final Color marker, final Runnable runnable )
   {
-    this( title, tooltip, icon, pressedIcon, background, foreground, marker, runnable, BorderLayout.WEST );
+    this( title, tooltip, iconBlack, iconWhite, background, foreground, marker, runnable, BorderLayout.WEST );
   }
 
 
   @SuppressWarnings( "javadoc" )
-  public MeMateActionBarButton( final String title, final String tooltip, final Icon icon, final Icon pressedIcon, final Color background,
+  public MeMateActionBarButton( final String title, final String tooltip, final Icon iconBlack, final Icon iconWhite,
+                                final Color background,
                                 final Color foreground, final Color marker, final Runnable runnable, final String iconOrientation )
   {
     this.title = title;
     this.tooltip = tooltip;
-    this.icon = icon;
-    this.pressedIcon = pressedIcon;
+    this.iconBlack = iconBlack;
+    this.iconWhite = iconWhite;
     this.background = background;
     this.foreground = foreground;
     this.marker = marker;
@@ -126,7 +127,7 @@ public class MeMateActionBarButton
     {
       actionPanel.setToolTipText( tooltip );
     }
-    if ( icon != null )
+    if ( iconBlack != null )
     {
       if ( !isNullOrEmpty( title ) )
       {//nur wenn der Titel nicht leer ist muss ein Label gesetzt werden
@@ -181,7 +182,7 @@ public class MeMateActionBarButton
     if ( marker != null )
     {
       final JPanel markerPanel = new JPanel();
-      markerPanel.setPreferredSize( new Dimension( 5, icon.getIconHeight() ) );
+      markerPanel.setPreferredSize( new Dimension( 5, iconBlack.getIconHeight() ) );
       markerPanel.setBackground( background );
       markerPanels.add( markerPanel );
 
@@ -197,7 +198,7 @@ public class MeMateActionBarButton
     labelConstraints.anchor = GridBagConstraints.CENTER;
 
     //Das Icon
-    final JLabel label = new JLabel( icon );
+    final JLabel label = new JLabel( iconBlack );
     label.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
     label.setEnabled( enabled );
     iconPanel.add( label, labelConstraints );
@@ -291,11 +292,11 @@ public class MeMateActionBarButton
   {
     if ( MeMateUIManager.getDarkModeState() )
     {
-      changeButtonStyle( pressedIcon, background.brighter().brighter().brighter(), Color.black );
+      changeButtonStyle( iconWhite, background.brighter().brighter().brighter(), Color.black );
     }
     else
     {
-      changeButtonStyle( pressedIcon, background.darker(), Color.WHITE );
+      changeButtonStyle( iconWhite, background.darker(), Color.WHITE );
     }
   }
 
@@ -306,11 +307,11 @@ public class MeMateActionBarButton
   {
     if ( MeMateUIManager.getDarkModeState() )
     {
-      changeButtonStyle( icon, background, Color.white );
+      changeButtonStyle( iconBlack, background, Color.white );
     }
     else
     {
-      changeButtonStyle( icon, background, foreground );
+      changeButtonStyle( iconBlack, background, foreground );
     }
   }
 
@@ -385,7 +386,7 @@ public class MeMateActionBarButton
    */
   public Icon getIcon()
   {
-    return icon;
+    return iconBlack;
   }
 
   /**
@@ -395,7 +396,7 @@ public class MeMateActionBarButton
    */
   public void setIcon( final Icon icon )
   {
-    this.icon = icon;
+    this.iconBlack = icon;
 
     iconLabels.forEach( lable -> lable.setIcon( icon ) );
   }
@@ -405,7 +406,7 @@ public class MeMateActionBarButton
    */
   public Icon getPressedIcon()
   {
-    return pressedIcon;
+    return iconWhite;
   }
 
   /**
@@ -415,7 +416,7 @@ public class MeMateActionBarButton
    */
   public void setPressedIcon( final Icon pressedIcon )
   {
-    this.pressedIcon = pressedIcon;
+    this.iconWhite = pressedIcon;
   }
 
   /**

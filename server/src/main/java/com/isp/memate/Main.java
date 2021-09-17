@@ -12,7 +12,7 @@ import com.isp.memate.ServerLog.logType;
 
 
 /**
- * Die Mainklasse startet den Server und verbindet jeden User mit einem eigenen Socket.
+ * Starts the server and connects every user with its own socket.
  *
  * @author nwe
  * @since 23.10.2019
@@ -20,15 +20,13 @@ import com.isp.memate.ServerLog.logType;
 
 public class Main
 {
-  private final static boolean debug = false;
+  private final static boolean debug = true;
 
   /**
-   * @param args Pfad zur Datenbank
+   * @param args Path for the databse
    */
-  @SuppressWarnings( { "resource", "unused" } )
   public static void main( final String args[] )
   {
-    //For Debug commented out
     if ( !debug )
     {
       new SendServerInformationsToClients().start();
@@ -37,7 +35,7 @@ public class Main
     Socket socket = null;
     try
     {
-      serverSocket = new ServerSocket( debug  ? 3142 : 3141 ); //Default is 3141 - Debug is 3142
+      serverSocket = new ServerSocket( debug ? 3142 : 3141 ); //Default is 3141 - Debug is 3142
       ServerLog.newLog( logType.INFO, "Starte MateServer auf Port: " + serverSocket.getLocalPort() );
     }
     catch ( final IOException e )
@@ -67,7 +65,9 @@ public class Main
         ServerLog.newLog( logType.ERROR, "Es konnte keine Verbindung zwischen Client und Server aufgebaut werden" );
         e.printStackTrace();
       }
-      new SocketThread( socket, database ).start();
+      final SocketThread socketThread = new SocketThread( socket, database );
+      SocketPool.addSocket( socketThread );
+      socketThread.start();
     }
   }
 }
