@@ -19,21 +19,22 @@ import com.isp.memate.util.ValueListener;
 
 public class Cache
 {
-  private static final Cache           instance          = new Cache();
-  public Object                        sessionIDSync     = new Object();
-  private String                       serverVersion     = null;
-  private String                       clientVersion     = null;
-  private String                       username          = null;
-  private String[]                     userArray         = null;
-  private String[]                     displayNamesArray = null;
-  private User[]                       fullUserArray     = null;
-  private String[][]                   history;
-  private String[][]                   shortHistory      = null;
-  private String                       displayname       = null;
-  private Map<String, Integer>         scoreboard;
-  private Map<String, Integer>         weeklyScoreboard;
-  private final ObservableValue<Float> piggyBankBalance  = new ObservableValue<Float>( 0f );
-  private final ObservableValue<Float> userBalance       = new ObservableValue<Float>( 0f );
+  private static final Cache            instance                    = new Cache();
+  private final Object                  receivedAllInformationsSync = new Object();
+  private String                        serverVersion               = null;
+  private String                        clientVersion               = null;
+  private String[]                      userArray                   = null;
+  private String[]                      displayNamesArray           = null;
+  private User[]                        fullUserArray               = null;
+  private String[][]                    history;
+  private String[][]                    shortHistory                = null;
+  private Map<String, Integer>          scoreboard;
+  private Map<String, Integer>          weeklyScoreboard;
+  public boolean                        isAdmin                     = false;
+  public final ObservableValue<Boolean> isSessionIDValid            = new ObservableValue<Boolean>( false );
+  private final ObservableValue<Float>  piggyBankBalance            = new ObservableValue<Float>( 0f );
+  private final ObservableValue<Float>  userBalance                 = new ObservableValue<Float>( 0f );
+  private final ObservableValue<String> displayName                 = new ObservableValue<String>( "" );
 
   private HashMap<Integer, Drink> drinks = new HashMap<>();
 
@@ -43,12 +44,17 @@ public class Cache
     initValueListener();
   }
 
+  public static Cache getInstance()
+  {
+    return instance;
+  }
+
   private void initValueListener()
   {
     piggyBankBalance.addListener( new ValueListener<Float>()
     {
       @Override
-      public void valueChanged( Float oldValue, Float newValue )
+      public void valueChanged( final Float __, final Float newValue )
       {
         if ( GUIObjects.currentPanel != null && GUIObjects.currentPanel instanceof Adminview )
         {
@@ -59,9 +65,23 @@ public class Cache
     userBalance.addListener( new ValueListener<Float>()
     {
       @Override
-      public void valueChanged( Float oldValue, Float newValue )
+      public void valueChanged( final Float __, final Float newValue )
       {
-        GUIObjects.mainframe.updateBalanceLabel( newValue );
+        if ( GUIObjects.mainframe != null )
+        {
+          GUIObjects.mainframe.updateBalanceLabel( newValue );
+        }
+      }
+    } );
+    displayName.addListener( new ValueListener<String>()
+    {
+      @Override
+      public void valueChanged( final String __, final String newValue )
+      {
+        if ( GUIObjects.mainframe != null )
+        {
+          GUIObjects.mainframe.setHelloLabelText( newValue );
+        }
       }
     } );
   }
@@ -82,12 +102,6 @@ public class Cache
     System.out.println( "Version des Clients: " + this.clientVersion );
   }
 
-
-  public static Cache getInstance()
-  {
-    return instance;
-  }
-
   public String getServerVersion()
   {
     return serverVersion;
@@ -103,17 +117,42 @@ public class Cache
     return clientVersion;
   }
 
-  public String getUsername()
+  public String getDisplayname()
   {
-    return username;
+    return displayName.getValue();
   }
 
-  public void setUsername( String username )
+  public void setDisplayname( final String displayName )
   {
-    this.username = username;
-    synchronized ( sessionIDSync )
+    this.displayName.setValue( displayName );
+  }
+
+  public void setBalance( float userBalance )
+  {
+    this.userBalance.setValue( userBalance );
+  }
+
+  public float getBalance()
+  {
+    return userBalance.getValue();
+  }
+
+  public void setAdminUser( final boolean isAdmin )
+  {
+    this.isAdmin = isAdmin;
+  }
+
+  public boolean isUserAdmin()
+  {
+    return isAdmin;
+  }
+
+  public void setSessionIDValid( final boolean valid )
+  {
+    isSessionIDValid.setValue( valid );
+    synchronized ( isSessionIDValid )
     {
-      sessionIDSync.notify();
+      isSessionIDValid.notify();
     }
   }
 
@@ -244,16 +283,10 @@ public class Cache
   public void setWeeklyScoreboard( Map<String, Integer> weeklyScoreboard )
   {
     this.weeklyScoreboard = weeklyScoreboard;
-  }
-
-  public String getDisplayname()
-  {
-    return displayname == null ? username : displayname;
-  }
-
-  public void setDisplayname( String displayname )
-  {
-    this.displayname = displayname;
+    synchronized ( receivedAllInformationsSync )
+    {
+      receivedAllInformationsSync.notify();
+    }
   }
 
   public HashMap<Integer, Drink> getDrinks()
@@ -272,8 +305,8 @@ public class Cache
     }
   }
 
-  public void setUserBalance( Float userBalance )
+  public Object getReceivedAllInformationsSync()
   {
-    this.userBalance.setValue( userBalance );
+    return receivedAllInformationsSync;
   }
 }

@@ -300,9 +300,9 @@ class Database
    * @param id ID des Nutzers
    * @return Kontostand des Nutzers
    */
-  Float getBalance( final Integer id )
+  float getBalance( final Integer id )
   {
-    Float balance = 0f;
+    float balance = 0f;
     final String sql = "SELECT guthaben FROM user WHERE ID= ?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ); )
     {
@@ -809,7 +809,7 @@ class Database
    * @param currentUser derzeitiger Benutzer
    * @return Jede Kontoaufladung oder Getränkekauf.
    */
-  String[][] getHistory( final String currentUser )
+  String[][] getHistory( final String currentUser, final boolean isAdminUser )
   {
     final ArrayList<String[]> history = new ArrayList<>();
     final String sql = "SELECT action,consumer,transaction_price,balance,date,undo FROM historie_log";
@@ -822,7 +822,7 @@ class Database
         final String consumer = rs.getString( "consumer" );
         if ( currentUser != null )
         {
-          if ( consumer.equals( currentUser ) || currentUser.equals( "admin" ) )
+          if ( consumer.equals( currentUser ) || isAdminUser )
           {
             final String[] log = { rs.getString( "action" ), consumer,
                 NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString()

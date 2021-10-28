@@ -4,7 +4,6 @@
 package com.isp.memate;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -89,11 +88,11 @@ public class Login extends JFrame
 
     if ( MeMateUIManager.getDarkModeState() )
     {
-      icon = new ImageIcon( getClass().getClassLoader().getResource( "welcome_white.png" ) );
+      icon = (ImageIcon) UIManager.getIcon( "login.icon.welcome.white" );
     }
     else
     {
-      icon = new ImageIcon( getClass().getClassLoader().getResource( "welcome.png" ) );
+      icon = (ImageIcon) UIManager.getIcon( "login.icon.welcome.black" );
     }
 
     headerLabel = new JLabel( icon );
@@ -294,11 +293,14 @@ public class Login extends JFrame
   {
     if ( loginResult == LoginResult.LOGIN_SUCCESSFULL )
     {
-      cache.setUsername( currentUsername );
       generateSessionID( currentUsername );
       GUIObjects.loginFrame = null;
       dispose();
-      new Mainframe();
+      final Thread thread = new Thread( () ->
+      {
+        new Mainframe();
+      } );
+      thread.start();
     }
     else if ( loginResult == LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD )
     {
@@ -340,13 +342,13 @@ public class Login extends JFrame
 
   public void newPasswordHasBeenSet()
   {
-    cache.setUsername( currentUsername );
     generateSessionID( currentUsername );
     GUIObjects.loginFrame = null;
     dispose();
-    final Mainframe mainframe = new Mainframe();
-    mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
-    mainframe.setVisible( true );
-    mainframe.requestFocus();
+    final Thread thread = new Thread( () ->
+    {
+      new Mainframe();
+    } );
+    thread.start();
   }
 }

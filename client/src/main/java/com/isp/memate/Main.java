@@ -31,8 +31,12 @@ class Main
 
   private static void showMainframe()
   {
-    new Mainframe();
-    Compare.checkVersion();
+    final Thread thread = new Thread( () ->
+    {
+      new Mainframe();
+      Compare.checkVersion();
+    } );
+    thread.start();
   }
 
   private static void showLogin()

@@ -89,19 +89,23 @@ class SocketThread extends Thread
         try
         {
           final Shared shared = (Shared) objectInputStream.readObject();
-          final Operation operation = shared.operation;
+          final Operation operation = shared.getOperation();
           ServerLog.newLog( logType.COMMAND, operation.toString() );
           switch ( operation )
           {
             case REGISTER_USER:
-              registerUser( shared.user );
+              registerUser( (User) shared.getValue() );
               break;
 
             case CHECK_LOGIN:
-              checkLogin( shared.loginInformation );
+              checkLogin( (LoginInformation) shared.getValue() );
               break;
 
-            case GET_HISTORY:
+            case CHECK_LOGIN_WITH_SESSION_ID:
+              checkLoginWithSessionID( (String) shared.getValue() );
+              break;
+
+            case HISTORY_DATA:
               sendHistoryData();
               break;
 
@@ -110,64 +114,60 @@ class SocketThread extends Thread
               break;
 
             case REGISTER_DRINK:
-              registerDrink( shared.drink );
+              registerDrink( (Drink) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case REGISTER_INGREDIENTS:
-              registerIngredients( shared.drinkIngredients );
+              registerIngredients( (DrinkIngredients) shared.getValue() );
               break;
 
             case REMOVE_DRINK:
-              removeDrink( shared.drinkID );
+              removeDrink( (int) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case UPDATE_DRINKNAME:
-              updateDrinkName( shared.drinkChange );
+              updateDrinkName( (DrinkChangeObject) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case UPDATE_DRINKPRICE:
-              updateDrinkPrice( shared.drinkChange );
+              updateDrinkPrice( (DrinkChangeObject) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case UPDATE_DRINKPICTURE:
-              updateDrinkPicture( shared.drinkChange );
+              updateDrinkPicture( (DrinkChangeObject) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case UPDATE_DRINKAMOUNT:
-              updateDrinkAmount( shared.drinkChange );
+              updateDrinkAmount( (DrinkChangeObject) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case UPDATE_BARCODE:
-              updateDrinkBarcode( shared.drinkChange );
+              updateDrinkBarcode( (DrinkChangeObject) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case CONNECT_SESSION_ID:
-              connectSessionID( shared.sessionID );
-              break;
-
-            case GET_USERNAME_FOR_SESSION_ID:
-              sendUsernameForSessionID( shared.userSessionID );
+              connectSessionID( (String) shared.getValue() );
               break;
 
             case ADD_BALANCE:
-              addBalance( shared.balanceToAdd );
+              addBalance( (int) shared.getValue() );
               sendPiggybankBalance();
               break;
 
             case CONSUM_DRINK:
-              consumeDrink( shared.drink );
+              consumeDrink( (Drink) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
               break;
 
             case SET_PIGGYBANK_BALANCE:
-              database.setPiggyBankBalance( shared.userBalance );
+              database.setPiggyBankBalance( (Float) shared.getValue() );
               sendPiggybankBalance();
               break;
 
@@ -184,17 +184,18 @@ class SocketThread extends Thread
               break;
 
             case CHANGE_PASSWORD:
-              database.changePassword( shared.user.name, shared.user.password, true );
+              final User user = (User) shared.getValue();
+              database.changePassword( user.name, user.password, true );
               break;
 
             case CHANGE_DISPLAYNAME:
-              database.changeDisplayName( userIDMap.get( currentUser ), shared.displayname );
+              database.changeDisplayName( userIDMap.get( currentUser ), (String) shared.getValue() );
               objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( currentUser ) ) );
               sendHistoryData();
               break;
 
             case CHANGE_PASSWORD_USER:
-              database.changePassword( currentUser, shared.pass, false );
+              database.changePassword( currentUser, (String) shared.getValue(), false );
               break;
 
             default :
@@ -318,7 +319,7 @@ class SocketThread extends Thread
     }
     try
     {
-      objectOutputStream.writeObject( new Shared( Operation.GET_HISTORY, database.getHistory( currentUser ) ) );
+      objectOutputStream.writeObject( new Shared( Operation.HISTORY_DATA, database.getHistory( currentUser, isUserAdmin() ) ) );
     }
     catch ( final IOException exception )
     {
@@ -424,7 +425,7 @@ class SocketThread extends Thread
       }
       return;
     }
-    final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - actualPrice;
+    final float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - actualPrice;
     database.updateBalance( currentSessionID, newBalance );
     final String date = LocalDateTime.now().toString();
     database.addLog( consumedDrink.getName() + " getrunken", currentUser, actualPrice * -1, newBalance, date );
@@ -468,23 +469,23 @@ class SocketThread extends Thread
    *
    * @param sessionID
    */
-  private void sendUsernameForSessionID( final String sessionID )
+  private void checkLoginWithSessionID( final String sessionID )
   {
     final String username = database.getUsernameForSessionID( sessionID );
-    currentSessionID = sessionID;
-    currentUser = username;
     try
     {
-      objectOutputStream.writeObject( new Shared( Operation.GET_USERNAME_FOR_SESSION_ID_RESULT, username ) );
-      objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( username ) ) );
       if ( username != null )
       {
         ServerLog.newLog( logType.INFO, "Der Nutzer " + username + " gehört zu der SessionID " + sessionID );
+        currentSessionID = sessionID;
+        currentUser = username;
+        objectOutputStream.writeObject( new Shared( Operation.LOGIN_WITH_SESSION_ID_RESULT, true ) );
         sendNecessaryInformations();
       }
       else
       {
         ServerLog.newLog( logType.ERROR, "Es konnte kein Nutzer für die gegebene Session gefunden werden (" + sessionID + ")" );
+        objectOutputStream.writeObject( new Shared( Operation.LOGIN_WITH_SESSION_ID_RESULT, false ) );
       }
     }
     catch ( final IOException exception )
@@ -618,7 +619,7 @@ class SocketThread extends Thread
   {
     //TODO(nwe | 08.04.2021): CHANGE do not save currentUser as String, just save the id!
     final Integer userID = userIDMap.get( currentUser );
-    final Float balance = database.getBalance( userID );
+    final float balance = database.getBalance( userID );
     ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " beträgt " + balance + "€" );
     try
     {
@@ -651,7 +652,6 @@ class SocketThread extends Thread
         currentUser = username;
         ServerLog.newLog( logType.INFO, username + " hat sich erfolgreich eingeloggt." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
-        objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( username ) ) );
         sendNecessaryInformations();
         break;
 
@@ -670,7 +670,6 @@ class SocketThread extends Thread
         ServerLog.newLog( logType.INFO,
             username + " hat sich erfolgreich eingeloggt, wird aber aufgefordert ein neues Passwort zu erstellen." );
         objectOutputStream.writeObject( new Shared( Operation.LOGIN_RESULT, result ) );
-        objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( username ) ) );
         sendNecessaryInformations();
         break;
     }
@@ -678,6 +677,15 @@ class SocketThread extends Thread
 
   private void sendNecessaryInformations()
   {
+    try
+    {
+      objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( currentUser ) ) );
+      objectOutputStream.writeObject( new Shared( Operation.IS_ADMIN_USER, isUserAdmin() ) );
+    }
+    catch ( final IOException e )
+    {
+      // TODO(nwe|04.10.2021): Fehlerbehandlung muss noch implementiert werden!
+    }
     sendDrinks();
     sendBalance();
     sendHistoryData();

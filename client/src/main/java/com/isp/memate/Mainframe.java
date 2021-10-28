@@ -6,21 +6,14 @@ package com.isp.memate;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
-import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,7 +31,6 @@ import com.isp.memate.panels.DrinkManager;
 import com.isp.memate.panels.History;
 import com.isp.memate.panels.Settings;
 import com.isp.memate.panels.Social;
-import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.PropertyHelper;
 
@@ -82,6 +74,8 @@ public class Mainframe extends JFrame
    */
   public Mainframe()
   {
+    showLoadingDialogWhileReceivingData();
+
     GUIObjects.mainframe = this;
     contentPanel.setLayout( new BorderLayout() );
     contentPanel.add( new Dashboard() );
@@ -95,11 +89,39 @@ public class Mainframe extends JFrame
     setLocationRelativeTo( null );
     add( contentPanel, BorderLayout.CENTER );
     add( headerPanel, BorderLayout.NORTH );
-    setHelloLabel( cache.getDisplayname() );
-    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
-    setVisible( true );
+    setHelloLabelText( cache.getDisplayname() );
     addActionBar();
     requestFocus();
+    setVisible( true );
+  }
+
+  private void showLoadingDialogWhileReceivingData()
+  {
+    final JDialog loadingDialog = new JDialog();
+    final JPanel loadingPanel = new JPanel( new BorderLayout() );
+    loadingPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+    loadingPanel.add( new JLabel( UIManager.getIcon( "loading.icon" ) ), BorderLayout.NORTH );
+    final JLabel textLoadingLabel = new JLabel( "Receiving Data..." );
+    textLoadingLabel.setFont( textLoadingLabel.getFont().deriveFont( 20f ) );
+    textLoadingLabel.setForeground( new Color( 28, 205, 205 ) );
+    loadingPanel.add( textLoadingLabel, BorderLayout.CENTER );
+    loadingDialog.add( loadingPanel );
+    loadingDialog.setUndecorated( true );
+    loadingDialog.pack();
+    loadingDialog.setLocationRelativeTo( null );
+    loadingDialog.setVisible( true );
+    synchronized ( cache.getReceivedAllInformationsSync() )
+    {
+      try
+      {
+        cache.getReceivedAllInformationsSync().wait();
+      }
+      catch ( final InterruptedException e )
+      {
+        // Happens if someone interrupts this thread.
+      }
+    }
+    loadingDialog.dispose();
   }
 
   /**
@@ -193,7 +215,8 @@ public class Mainframe extends JFrame
     logoutButton = bar.addActionButton( UIManager.getIcon( "logout.icon.black" ), UIManager.getIcon( "logout.icon.white" ), "Logout",
         "Ausloggen", () ->
         {
-          cache.setUsername( null );
+          cache.setSessionIDValid( false );
+          cache.setAdminUser( false );
           ServerCommunication.getInstance().logout();
           setUndoButtonEnabled( false );
           //Resetting the sessionID
@@ -220,7 +243,7 @@ public class Mainframe extends JFrame
 
   private void toggleAdminButtons()
   {
-    if ( cache.getUsername().equals( "admin" ) )
+    if ( cache.isUserAdmin() )
     {
       bar.addActionButton( UIManager.getIcon( "drinkmanager.icon.black" ), UIManager.getIcon( "drinkmanager.icon.white" ),
           "Getränkemanager",
@@ -245,13 +268,13 @@ public class Mainframe extends JFrame
   }
 
   /**
-   * Setzt den Text Im Begrüßungslabel.
+   * Updates the text for the GreetingsLabel
    *
-   * @param username Benutzername
+   * @param displayName the users displayName
    */
-  public void setHelloLabel( final String username )
+  public void setHelloLabelText( final String displayName )
   {
-    helloUserLabel.setText( "Hallo " + username );
+    helloUserLabel.setText( "Hallo " + displayName );
   }
 
   /**
@@ -268,6 +291,8 @@ public class Mainframe extends JFrame
     titlePanel.setLayout( new BoxLayout( titlePanel, BoxLayout.X_AXIS ) );
     titlePanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 10 ) );
 
+    updateBalanceLabel( cache.getBalance() );
+
     setLayout( new BorderLayout() );
     headerPanel.setBackground( color );
     contentPanel.setBorder( new EmptyBorder( 5, 0, 5, 5 ) );
@@ -283,9 +308,9 @@ public class Mainframe extends JFrame
    *
    * @param newBalance the updated balance.
    */
-  void updateBalanceLabel( final Float newBalance )
+  void updateBalanceLabel( final float newBalance )
   {
-    float rounded = (float) Math.round( newBalance * 100 ) / 100;
+    final float rounded = (float) Math.round( newBalance * 100 ) / 100;
     balanceLabel.setText( String.format( "Kontostand: %.2f €", rounded ) );
     if ( rounded >= 0.0 )
     {

@@ -15,8 +15,8 @@ import com.isp.memate.ServerCommunication;
 
 public class PropertyHelper
 {
-  public final static String MAIN_FOLDER  = Config.getConfigDir("MeMate");
-  private final static File   userPropFile = new File( MAIN_FOLDER + File.separator + "userconfig.properties" );
+  public final static String MAIN_FOLDER  = Config.getConfigDir( "MeMate" );
+  private final static File  userPropFile = new File( MAIN_FOLDER + File.separator + "userconfig.properties" );
 
   /**
    * Erstellt den MeMate Ordner unter AppData und die Userconfig File.
@@ -93,19 +93,19 @@ public class PropertyHelper
 
   public static Color getAppColorProperty()
   {
-    String appColor = PropertyHelper.getProperty( "AppColor" );
+    final String appColor = PropertyHelper.getProperty( "AppColor" );
     //Default-Value falls die Property nicht gefunden wurde
     if ( appColor == null )
     {
       return Color.CYAN;
     }
-    int rgb = Integer.valueOf( appColor );
+    final int rgb = Integer.valueOf( appColor );
     return new Color( rgb );
   }
 
   public static boolean getDarkModeProperty()
   {
-    String darkmode = PropertyHelper.getProperty( "Darkmode" );
+    final String darkmode = PropertyHelper.getProperty( "Darkmode" );
     if ( darkmode == null )
     {
       return false;
@@ -120,29 +120,29 @@ public class PropertyHelper
 
   public static boolean isSessionIDValid()
   {
-    Cache cache = Cache.getInstance();
+    final Cache cache = Cache.getInstance();
 
-    String sessionID = getProperty( "SessionID" );
+    final String sessionID = getProperty( "SessionID" );
     if ( sessionID == null || sessionID.equals( "null" ) )
     {
       return false;
     }
-    ServerCommunication.getInstance().checkLoginForSessionID( sessionID );
+    ServerCommunication.getInstance().checkSessionID( sessionID );
 
     //This synchronized Thread will take care of blocking further executions 
     //until the client has received the username.
-    synchronized ( cache.sessionIDSync )
+    synchronized ( cache.isSessionIDValid )
     {
       try
       {
-        cache.sessionIDSync.wait();
+        cache.isSessionIDValid.wait();
       }
-      catch ( InterruptedException e )
+      catch ( final InterruptedException e )
       {
         // Happens if someone interrupts this thread.
       }
     }
-    if ( cache.getUsername() == null )
+    if ( cache.isSessionIDValid.getValue() == false )
     {
       ClientLog.newLog( "Es wurde kein Nutzer für die angegeben Session gefunden." );
       return false;

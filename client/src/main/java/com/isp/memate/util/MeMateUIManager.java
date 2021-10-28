@@ -50,6 +50,9 @@ public class MeMateUIManager
 
   public static void putIconsInUIManager()
   {
+    UIManager.put( "loading.icon", getIcon( "loading.gif" ) );
+    UIManager.put( "login.icon.welcome.black", getIcon( "welcome.png" ) );
+    UIManager.put( "login.icon.welcome.white", getIcon( "welcome_white.png" ) );
     UIManager.put( "dashboard.icon.black", getIcon( "dashboard_black.png" ) );
     UIManager.put( "dashboard.icon.white", getIcon( "dashboard_white.png" ) );
     UIManager.put( "settings.icon.black", getIcon( "settings_black.png" ) );
@@ -75,7 +78,7 @@ public class MeMateUIManager
     UIManager.put( "wand.icon.black", getIcon( "wand_black.png" ) );
     UIManager.put( "wand.icon.white", getIcon( "wand_white.png" ) );
 
-    List<Image> frameIcons = new ArrayList<>();
+    final List<Image> frameIcons = new ArrayList<>();
     frameIcons.add( Toolkit.getDefaultToolkit().getImage( classLoader.getResource( "frameicon128.png" ) ) );
     frameIcons.add( Toolkit.getDefaultToolkit().getImage( classLoader.getResource( "frameicon64.png" ) ) );
     frameIcons.add( Toolkit.getDefaultToolkit().getImage( classLoader.getResource( "frameicon32.png" ) ) );
@@ -91,14 +94,14 @@ public class MeMateUIManager
   public static void showDarkMode()
   {
     darkModeState = true;
-    FlatDarkLaf.install();
+    FlatDarkLaf.setup();
     FlatLaf.updateUI();
   }
 
   public static void showDayMode()
   {
     darkModeState = false;
-    FlatLightLaf.install();
+    FlatLightLaf.setup();
     FlatLaf.updateUI();
   }
 
@@ -118,7 +121,7 @@ public class MeMateUIManager
 
   public static JButton createInfoButton( int drinkID )
   {
-    JButton button = new JButton( new InfoIcon() )
+    final JButton button = new JButton( new InfoIcon() )
     {
       JToolTip tooltip;
 
@@ -201,19 +204,19 @@ public class MeMateUIManager
   {
     if ( PropertyHelper.getDarkModeProperty() )
     {
-      FlatDarkLaf.install();
+      FlatDarkLaf.setup();
       MeMateUIManager.setDarkModeState( true );
     }
     else
     {
-      FlatLightLaf.install();
+      FlatLightLaf.setup();
       MeMateUIManager.setDarkModeState( false );
     }
   }
 
   public static void setUIDefaults()
   {
-    Color mainColor = UIManager.getColor( "AppColor" );
+    final Color mainColor = UIManager.getColor( "AppColor" );
 
     //FIXME sobald FlatLaf komplett implemetiert ist, dann als focusFarbe AppColor setzte. AppColor muss also noch voher gesetzt werden.
     //    UIManager.put( "CheckBox.icon.focusedBorderColor", mainColor );
@@ -232,8 +235,8 @@ public class MeMateUIManager
   public static void init()
   {
     UIManager.put( "AppColor", PropertyHelper.getAppColorProperty() );
-    putIconsInUIManager();
     applyTheme();
+    putIconsInUIManager();
     setUIDefaults();
     FlatUIDefaultsInspector.install( "X" );
   }

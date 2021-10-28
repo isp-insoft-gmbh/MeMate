@@ -1,170 +1,51 @@
 package com.isp.memate;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Erzeugt ein Objekt, welches der Client als auch der Server verwenden kann.
- * Ein Shared-Objekt enthält immer erst den Befehl, welcher ausgeführt werden soll
- * und dahinter ein weiteres spezfisches Objekt.
+ * Creates an object that can be shared between client and server.
+ * A shared object always contains the command and the corresponding specific object.
  * 
  * @author nwe
  * @since 28.11.2019
  */
 public class Shared implements Serializable
 {
-  User                    user             = null;
-  LoginInformation        loginInformation = null;
-  Drink                   drink            = null;
-  DrinkChangeObject       drinkChange      = null;
-  DrinkIngredients        drinkIngredients = null;
-  HashMap<Integer, Drink> drinks;
-  String[][]              history;
-  String[][]              shortHistory;
-  Map<String, Integer>    scoreboard;
-  Map<String, Integer>    weeklyScoreboard;
-  String[]                users;
-  String[]                displaynames;
-  User[]                  fullUserArray;
-  Float                   userBalance;
-  String                  displayname;
-  String                  consumedDrink;
-  String                  registrationResult;
-  String                  username;
-  String                  userSessionID;
-  String                  version;
-  String                  sessionID;
-  String                  pass;
-  int                     balanceToAdd;
-  int                     drinkID;
-  Operation               operation;
-  LoginResult             loginResult;
+  private final Operation operation;
+  private final Object    value;
 
   /**
-   * @param operation der auszuführende Befehl
-   * @param object Kann Getränkename, Login-Informationen oder alles andere sein.
+   * @param operation the command to be executed
+   * @param value could be drinkName, LoginInformations or something else
    */
-  Shared( Operation operation, Object object )
+  Shared( final Operation operation, final Object value )
   {
     this.operation = operation;
-    switch ( operation )
-    {
-      case REGISTER_USER:
-        user = (User) object;
-        break;
-      case CHECK_LOGIN:
-        loginInformation = (LoginInformation) object;
-        break;
-      case USER_BALANCE:
-        userBalance = (Float) object;
-        break;
-      case GET_DRINKS:
-        drinks = (HashMap<Integer, Drink>) object;
-        break;
-      case GET_HISTORY:
-        history = (String[][]) object;
-        break;
-      case GET_HISTORY_LAST_5:
-        shortHistory = (String[][]) object;
-        break;
-      case SCOREBOARD:
-        scoreboard = (Map<String, Integer>) object;
-        break;
-      case WEEKLY_SCOREBOARD:
-        weeklyScoreboard = (Map<String, Integer>) object;
-        break;
-      case REGISTER_DRINK:
-        drink = (Drink) object;
-        break;
-      case REGISTER_INGREDIENTS:
-        drinkIngredients = (DrinkIngredients) object;
-        break;
-      case REMOVE_DRINK:
-        drinkID = (int) object;
-        break;
-      case UPDATE_DRINKNAME:
-      case UPDATE_DRINKPRICE:
-      case UPDATE_DRINKPICTURE:
-      case UPDATE_DRINKAMOUNT:
-      case UPDATE_BARCODE:
-        drinkChange = (DrinkChangeObject) object;
-        break;
-      case CONNECT_SESSION_ID:
-        sessionID = (String) object;
-        break;
-      case GET_USERNAME_FOR_SESSION_ID:
-        userSessionID = (String) object;
-        break;
-      case GET_USERNAME_FOR_SESSION_ID_RESULT:
-        username = (String) object;
-        break;
-      case ADD_BALANCE:
-        balanceToAdd = (int) object;
-        break;
-      case CONSUM_DRINK:
-        drink = (Drink) object;
-        break;
-      case LOGIN_RESULT:
-        loginResult = (LoginResult) object;
-        break;
-      case REGISTRATION_RESULT:
-        registrationResult = (String) object;
-        break;
-      case PRICE_CHANGED:
-        drinkChange = (DrinkChangeObject) object;
-        break;
-      case SET_PIGGYBANK_BALANCE:
-        userBalance = (Float) object;
-        break;
-      case PIGGYBANK_BALANCE:
-        userBalance = (Float) object;
-        break;
-      case NO_MORE_DRINKS_AVAIBLE:
-        consumedDrink = (String) object;
-        break;
-      case UNDO:
-        break;
-      case LOGOUT:
-        break;
-      case GET_USERS:
-        break;
-      case GET_USERS_RESULT:
-        users = (String[]) object;
-        break;
-      case GET_USERS_DISPLAYNAMES:
-        displaynames = (String[]) object;
-        break;
-      case USER_DISPLAYNAME:
-        displayname = (String) object;
-        break;
-      case GET_FULLUSERS_RESULT:
-        fullUserArray = (User[]) object;
-        break;
-      case CHANGE_PASSWORD:
-        user = (User) object;
-        break;
-      case CHANGE_PASSWORD_USER:
-        pass = (String) object;
-        break;
-      case CHANGE_DISPLAYNAME:
-        displayname = (String) object;
-        break;
-      case GET_VERSION:
-        version = (String) object;
-        break;
-      default :
-        break;
-    }
+    this.value = value;
+  }
+
+  public Operation getOperation()
+  {
+    return operation;
+  }
+
+  public Object getValue()
+  {
+    return value;
   }
 
   public enum Operation
   {
-    REGISTER_USER,
     CHECK_LOGIN,
-    USER_BALANCE,
+    CHECK_LOGIN_WITH_SESSION_ID,
+    REGISTER_USER,
+    LOGIN_RESULT,
+    LOGIN_WITH_SESSION_ID_RESULT,
+    REGISTRATION_RESULT,
     USER_DISPLAYNAME,
-    GET_HISTORY,
+    USER_BALANCE,
+    IS_ADMIN_USER,
+    HISTORY_DATA,
     GET_HISTORY_LAST_5,
     SCOREBOARD,
     WEEKLY_SCOREBOARD,
@@ -182,11 +63,7 @@ public class Shared implements Serializable
     UPDATE_DRINKAMOUNT,
     UPDATE_BARCODE,
     CONNECT_SESSION_ID,
-    GET_USERNAME_FOR_SESSION_ID,
-    GET_USERNAME_FOR_SESSION_ID_RESULT,
     ADD_BALANCE,
-    LOGIN_RESULT,
-    REGISTRATION_RESULT,
     CONSUM_DRINK,
     SET_PIGGYBANK_BALANCE,
     PIGGYBANK_BALANCE,

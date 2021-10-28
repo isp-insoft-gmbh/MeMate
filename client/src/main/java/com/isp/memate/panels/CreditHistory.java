@@ -49,7 +49,7 @@ public class CreditHistory extends JPanel
 
   private void addChartPanel()
   {
-    JFreeChart lineChart = createLineChart();
+    final JFreeChart lineChart = createLineChart();
     chartPanel = new ChartPanel( lineChart );
     chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
     chartPanel.setMouseZoomable( true, false );
@@ -58,7 +58,7 @@ public class CreditHistory extends JPanel
 
   private JFreeChart createLineChart()
   {
-    JFreeChart chart = ChartFactory.createLineChart( "Guthabenverlauf (in den letzen 30 Tagen)", "Datum", "Guthaben",
+    final JFreeChart chart = ChartFactory.createLineChart( "Guthabenverlauf (in den letzen 30 Tagen)", "Datum", "Guthaben",
         createBalanceDataset(), PlotOrientation.VERTICAL, false, true, false );
     applyColorToChart( chart );
     return chart;
@@ -66,7 +66,7 @@ public class CreditHistory extends JPanel
 
   private void applyColorToChart( JFreeChart lineChart )
   {
-    Color foreground = UIManager.getColor( "Label.foreground" );
+    final Color foreground = UIManager.getColor( "Label.foreground" );
     lineChart.getCategoryPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
     lineChart.setBackgroundPaint( UIManager.getColor( "Panel.background" ) );
     lineChart.getCategoryPlot().setBackgroundPaint( UIManager.getColor( "TextField.background" ) );
@@ -98,38 +98,35 @@ public class CreditHistory extends JPanel
       for ( final String[] data : historyData )
       {
         final String action = data[ 0 ];
-        if ( data[ 1 ].equals( Cache.getInstance().getUsername() ) )
+        if ( action.contains( "Guthaben" ) || action.contains( "getrunken" ) )
         {
-          if ( action.contains( "Guthaben" ) || action.contains( "getrunken" ) )
+          Date date = null;
+          final String dateAsString = data[ 4 ];
+          try
           {
-            Date date = null;
-            final String dateAsString = data[ 4 ];
-            try
+            date = oldFormat.parse( data[ 4 ] );
+          }
+          catch ( final ParseException exception )
+          {
+            ClientLog.newLog( "Das Datum konnte nicht formatiert werden." + exception );
+          }
+          final ZonedDateTime today = ZonedDateTime.now();
+          final ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
+          try
+          {
+            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
+            if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
             {
-              date = oldFormat.parse( data[ 4 ] );
-            }
-            catch ( final ParseException exception )
-            {
-              ClientLog.newLog( "Das Datum konnte nicht formatiert werden." + exception );
-            }
-            final ZonedDateTime today = ZonedDateTime.now();
-            final ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
-            try
-            {
-              final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
-              if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+              if ( data[ 5 ].equals( "false" ) )
               {
-                if ( data[ 5 ].equals( "false" ) )
-                {
-                  dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
-                      dateFormat.format( date ) );
-                }
+                dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
+                    dateFormat.format( date ) );
               }
             }
-            catch ( final ParseException exception )
-            {
-              ClientLog.newLog( "Das Datum ist out of range." + exception );
-            }
+          }
+          catch ( final ParseException exception )
+          {
+            ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
       }

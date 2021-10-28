@@ -20,12 +20,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
 
+import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.Shared.Operation;
 import com.isp.memate.panels.Dashboard;
 import com.isp.memate.util.ClientLog;
@@ -92,85 +93,89 @@ public class ServerCommunication
     }
     initTrayIcon();
 
-    initReceiverTask();
-    initMeetingNotificationTask();
+    startReceiverThread();
+    startMeetingNotificationThread();
   }
 
   /**
-   * The task checks every 100 milliseconds if the server has sended an object.
+   * The ReceiverThread constantly checks if the server has sent an object.
    * If so the object gets assigned and the corresponding task gets executed.
    */
-  private void initReceiverTask()
+  private void startReceiverThread()
   {
-    final TimerTask task = new TimerTask()
+    final Thread thread = new Thread( () ->
     {
-      @Override
-      public void run()
+      while ( true )
       {
         try
         {
           final Shared shared = (Shared) inStream.readObject();
-          final Operation operation = shared.operation;
+          final Operation operation = shared.getOperation();
           ClientLog.newLog( operation.toString() );
           switch ( operation )
           {
-            case GET_DRINKS:
-              cache.setDrinks( shared.drinks );
-              break;
             case LOGIN_RESULT:
-              GUIObjects.loginFrame.validateLoginResult( shared.loginResult );
+              GUIObjects.loginFrame.validateLoginResult( (LoginResult) shared.getValue() );
+              break;
+            case LOGIN_WITH_SESSION_ID_RESULT:
+              cache.setSessionIDValid( (boolean) shared.getValue() );
+              break;
+            case GET_DRINKS:
+              cache.setDrinks( (HashMap<Integer, Drink>) shared.getValue() );
               break;
             case USER_BALANCE:
-              cache.setUserBalance( shared.userBalance );
+              cache.setBalance( (float) shared.getValue() );
               break;
             case REGISTRATION_RESULT:
-              GUIObjects.registrationFrame.validateRegistartionResult( shared.registrationResult );
+              GUIObjects.registrationFrame.validateRegistartionResult( (String) shared.getValue() );
               break;
-            case GET_HISTORY:
-              cache.setHistory( shared.history );
+            case HISTORY_DATA:
+              cache.setHistory( (String[][]) shared.getValue() );
               break;
             case GET_HISTORY_LAST_5:
-              cache.setShortHistory( shared.shortHistory );
+              cache.setShortHistory( (String[][]) shared.getValue() );
               checkForChanges();
               break;
             case SCOREBOARD:
               lock.lock();
-              cache.setScoreboard( shared.scoreboard );
+              cache.setScoreboard( (Map<String, Integer>) shared.getValue() );
               lock.unlock();
               break;
             case WEEKLY_SCOREBOARD:
               lock.lock();
-              cache.setWeeklyScoreboard( shared.weeklyScoreboard );
+              cache.setWeeklyScoreboard( (Map<String, Integer>) shared.getValue() );
               lock.unlock();
               break;
-            case GET_USERNAME_FOR_SESSION_ID_RESULT:
-              cache.setUsername( shared.username );
+            case IS_ADMIN_USER:
+              cache.setAdminUser( (boolean) shared.getValue() );
               break;
             case PRICE_CHANGED:
               //Unsave cast
-              ((Dashboard) GUIObjects.currentPanel).showPriceChangedDialog( cache.getDrinks().get( shared.drinkChange.drinkID ) );
+              final DrinkChangeObject change = (DrinkChangeObject) shared.getValue();
+              ((Dashboard) GUIObjects.currentPanel)
+                  .showPriceChangedDialog( cache.getDrinks().get( change.drinkID ) );
               break;
             case NO_MORE_DRINKS_AVAIBLE:
               //Unsave cast
-              ((Dashboard) GUIObjects.currentPanel).showNoMoreDrinksDialog( shared.consumedDrink );
+              ((Dashboard) GUIObjects.currentPanel).showNoMoreDrinksDialog( (String) shared.getValue() );
               break;
             case PIGGYBANK_BALANCE:
-              cache.setPiggyBankBalance( shared.userBalance );
+              cache.setPiggyBankBalance( (Float) shared.getValue() );
               break;
             case GET_USERS_RESULT:
-              cache.setUserArray( shared.users );
+              cache.setUserArray( (String[]) shared.getValue() );
               break;
             case USER_DISPLAYNAME:
-              cache.setDisplayname( shared.displayname );
+              cache.setDisplayname( (String) shared.getValue() );
               break;
             case GET_USERS_DISPLAYNAMES:
-              cache.setDisplayNamesArray( shared.displaynames );
+              cache.setDisplayNamesArray( (String[]) shared.getValue() );
               break;
             case GET_FULLUSERS_RESULT:
-              cache.setFullUserArray( shared.fullUserArray );
+              cache.setFullUserArray( (User[]) shared.getValue() );
               break;
             case GET_VERSION:
-              cache.setServerVersion( shared.version );
+              cache.setServerVersion( (String) shared.getValue() );
               break;
             default :
               break;
@@ -181,21 +186,20 @@ public class ServerCommunication
           ClientLog.newLog( exception.getMessage() );
         }
       }
-    };
-    final Timer timer = new Timer();
-    timer.schedule( task, 0, 100 );
+    } );
+    thread.setName( "ReceiverThread" );
+    thread.start();
   }
 
   //Checks once every minute if the time is equal to 12:19
   //If so and notification are on the app will show an traymessage
-  private void initMeetingNotificationTask()
+  private void startMeetingNotificationThread()
   {
-    final TimerTask task = new TimerTask()
+    final DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "HH:mm" );
+    final Thread thread = new Thread( () ->
     {
-      @Override
-      public void run()
+      while ( true )
       {
-        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "HH:mm" );
         final LocalDateTime now = LocalDateTime.now();
         final String date = dtf.format( now );
         if ( date.equals( "12:19" ) )
@@ -205,13 +209,25 @@ public class ServerCommunication
             if ( SystemTray.isSupported() )
             {
               trayIcon.displayMessage( "MeMate", "Standup Meeting", MessageType.NONE );
+              break;
             }
           }
         }
+        else
+        {
+          try
+          {
+            Thread.sleep( 60000 );
+          }
+          catch ( final InterruptedException __ )
+          {
+            ClientLog.newLog( "No Sleep for the MeetingNotificationThread" );
+          }
+        }
       }
-    };
-    final Timer timer = new Timer();
-    timer.schedule( task, 0, 60000 );
+    } );
+    thread.setName( "MeetingNotificationThread" );
+    thread.start();
   }
 
   private void initTrayIcon()
@@ -230,7 +246,7 @@ public class ServerCommunication
       }
       catch ( final AWTException exception )
       {
-        ClientLog.newLog( "Es konnte kein WindowsDialog angezeigt werden" + exception );
+        ClientLog.newLog( "Failed to show trayIcon" + exception );
       }
     }
   }
@@ -243,7 +259,7 @@ public class ServerCommunication
   private void checkForChanges()
   {
     final String[][] history = cache.getShortHistory();
-    if ( history != null && cache.getUsername() != null && PropertyHelper.getBooleanProperty( "ConsumptionNotification" ) )
+    if ( history != null && PropertyHelper.getBooleanProperty( "ConsumptionNotification" ) )
     {
       final ZonedDateTime today = ZonedDateTime.now();
       final ZonedDateTime twentyMinutesAgo = today.minusMinutes( 20 );
@@ -279,22 +295,6 @@ public class ServerCommunication
       }
     }
   }
-
-  /**
-   * Teilt dem Server mit, dass er die Historie schicken soll.
-   */
-  void tellServerToSendHistoryData()
-  {
-    try
-    {
-      outStream.writeObject( new Shared( Operation.GET_HISTORY, new String[0][0] ) );
-    }
-    catch ( final IOException exception )
-    {
-      ClientLog.newLog( "Die Historie konnte nicht geladen werden. " + exception );
-    }
-  }
-
 
   /**
    * Teilt dem Server mit, dass die letzte Aktion rückgängig gemacht werden soll.
@@ -419,7 +419,7 @@ public class ServerCommunication
           break;
         case UPDATE_DRINKAMOUNT:
           outStream.writeObject(
-              new Shared( Operation.UPDATE_DRINKAMOUNT, new DrinkChangeObject( id, (int) updatedInformation ) ) );
+              new Shared( Operation.UPDATE_DRINKAMOUNT, new DrinkChangeObject( id, updatedInformation ) ) );
           break;
         case UPDATE_BARCODE:
           outStream.writeObject(
@@ -502,11 +502,11 @@ public class ServerCommunication
    *
    * @param sessionID SessionID
    */
-  public void checkLoginForSessionID( final String sessionID )
+  public void checkSessionID( final String sessionID )
   {
     try
     {
-      outStream.writeObject( new Shared( Operation.GET_USERNAME_FOR_SESSION_ID, sessionID ) );
+      outStream.writeObject( new Shared( Operation.CHECK_LOGIN_WITH_SESSION_ID, sessionID ) );
     }
     catch ( final IOException exception )
     {
