@@ -177,7 +177,7 @@ class Database
     catch ( final SQLException e )
     {
       ServerLog.newLog( logType.SQL, e.getMessage() );
-      registerNewUser( "admin", "8C6976E5B541415BDE98BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918" );
+      registerNewUser( "admin", "8C6976E5B541415BDE98BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918", true );
     }
   }
 
@@ -389,16 +389,17 @@ class Database
    * @return Wenn eine Exception auftritt so wird, die Nachricht "Benutzername bereits vergeben" zurückgegeben,
    *         ansonsten "Registrierung erfolgreich"
    */
-  String registerNewUser( final String username, final String password )
+  String registerNewUser( final String username, final String password, final boolean admin )
   {
     lock.lock();
-    final String sql = "INSERT INTO user(guthaben,username,password,DisplayName) VALUES(?,?,?,?)";
+    final String sql = "INSERT INTO user(guthaben,username,password,DisplayName,admin) VALUES(?,?,?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setFloat( 1, 0f );
       pstmt.setString( 2, username );
       pstmt.setString( 3, password );
       pstmt.setString( 4, username );
+      pstmt.setBoolean( 5, admin );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )

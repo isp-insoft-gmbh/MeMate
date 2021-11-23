@@ -85,16 +85,24 @@ public class IngredientsDialog extends MeMateDialog
 
     if ( ingredients != null )
     {
+      final double fat = ingredients.getFat();
+      final double fatty_acids = ingredients.getFatty_acids();
+      final double carbs = ingredients.getCarbs();
+      final double sugar = ingredients.getSugar();
+      final double protein = ingredients.getProtein();
+      final double salt = ingredients.getSalt();
+      final double amount = ingredients.getAmount();
+
       ingredientsField.setText( ingredients.getIngredients() );
       energykJSpinner.setValue( ingredients.getEnergy_kJ() );
       energykCALSpinner.setValue( ingredients.getEnergy_kcal() );
-      fatSpinner.setValue( ingredients.getFat() );
-      fattyAcidsSpinner.setValue( ingredients.getFatty_acids() );
-      carbsSpinner.setValue( ingredients.getCarbs() );
-      sugarSpinner.setValue( ingredients.getSugar() );
-      proteinSpinner.setValue( ingredients.getProtein() );
-      saltSpinner.setValue( ingredients.getSalt() );
-      amountSpinner.setValue( ingredients.getAmount() );
+      fatSpinner.setValue( fat );
+      fattyAcidsSpinner.setValue( fatty_acids );
+      carbsSpinner.setValue( carbs );
+      sugarSpinner.setValue( sugar );
+      proteinSpinner.setValue( protein );
+      saltSpinner.setValue( salt );
+      amountSpinner.setValue( amount );
     }
   }
 
@@ -281,12 +289,19 @@ public class IngredientsDialog extends MeMateDialog
             || proteinSpinner.getValue() instanceof Number || saltSpinner.getValue() instanceof Number
             || amountSpinner.getValue() instanceof Number )
         {
+          final Double fat = (Double) fatSpinner.getValue();
+          final Double fattyAcids = (Double) fattyAcidsSpinner.getValue();
+          final Double carbs = (Double) carbsSpinner.getValue();
+          final Double sugar = (Double) sugarSpinner.getValue();
+          final Double protein = (Double) proteinSpinner.getValue();
+          final Double salt = (Double) saltSpinner.getValue();
+          final Double amount = (Double) amountSpinner.getValue();
+
           ServerCommunication.getInstance().registerIngredients( new DrinkIngredients( drinkID,
               ingredientsField.getText(), (int) energykJSpinner.getValue(), (int) energykCALSpinner.getValue(),
-              (float) fatSpinner.getValue(),
-              (float) fattyAcidsSpinner.getValue(),
-              (float) carbsSpinner.getValue(), (float) sugarSpinner.getValue(),
-              (float) proteinSpinner.getValue(), (float) saltSpinner.getValue(), (float) amountSpinner.getValue() ) );
+              fat.floatValue(), fattyAcids.floatValue(),
+              carbs.floatValue(), sugar.floatValue(),
+              protein.floatValue(), salt.floatValue(), amount.floatValue() ) );
           if ( !barcodeField.getText().isBlank()
               && !barcodeField.getText().equals( Cache.getInstance().getDrinks().get( drinkID ).getBarcode() ) )
           {

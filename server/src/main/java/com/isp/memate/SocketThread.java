@@ -603,7 +603,10 @@ class SocketThread extends Thread
   private void registerDrink( final Drink drink )
   {
     final int drinkID = database.registerNewDrink( drink );
-    database.addIngredients( new DrinkIngredients( drinkID, drink.getDrinkIngredients() ) );
+    if ( drink.getDrinkIngredients() != null )
+    {
+      database.addIngredients( new DrinkIngredients( drinkID, drink.getDrinkIngredients() ) );
+    }
     ServerLog.newLog( logType.INFO, "Ein neues Getränk wurde registriert." );
     ServerLog.newLog( logType.INFO, "Name: " + drink.getName() );
     ServerLog.newLog( logType.INFO, "Preis: " + drink.getPrice() + "€" );
@@ -681,8 +684,11 @@ class SocketThread extends Thread
     {
       objectOutputStream.writeObject( new Shared( Operation.USER_DISPLAYNAME, database.getDisplayName( currentUser ) ) );
       objectOutputStream.writeObject( new Shared( Operation.IS_ADMIN_USER, isUserAdmin() ) );
+
+      // Is needed because otherwise the client hangs in an infinite loop when there is no data
+      Thread.sleep( 100 );
     }
-    catch ( final IOException e )
+    catch ( final IOException | InterruptedException e )
     {
       // TODO(nwe|04.10.2021): Fehlerbehandlung muss noch implementiert werden!
     }
@@ -700,7 +706,7 @@ class SocketThread extends Thread
   {
     final String username = user.name;
     final String password = user.password;
-    final String result = database.registerNewUser( username, password );
+    final String result = database.registerNewUser( username, password, false );
     ServerLog.newLog( logType.INFO, "Ein neuer Benutzer mit dem Namen " + username + " wurde registriert." );
     userIDMap.clear();
     userIDMap = database.getUserIDMap();
