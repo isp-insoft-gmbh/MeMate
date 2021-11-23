@@ -5,7 +5,6 @@ package com.isp.memate.panels;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -13,13 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Properties;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -34,7 +26,6 @@ import javax.swing.UIManager;
 import com.isp.memate.ServerCommunication;
 import com.isp.memate.components.ToggleSwitch;
 import com.isp.memate.dialogs.ChangePasswordDialog;
-import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.PropertyHelper;
@@ -98,10 +89,16 @@ public class Settings extends JPanel
     hyperlink.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseClicked( final MouseEvent e )
+      public void mouseReleased( MouseEvent e )
       {
-        new ChangePasswordDialog( GUIObjects.mainframe );
-      }
+        if ( e.getX() >= 0
+            && e.getX() <= hyperlink.getWidth()
+            && e.getY() >= 0
+            && e.getY() <= hyperlink.getHeight() )
+        {
+          new ChangePasswordDialog( GUIObjects.mainframe );
+        }
+      };
     } );
     final GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
     hyperlinkConstraints.gridx = 0;
@@ -120,10 +117,16 @@ public class Settings extends JPanel
     hyperlink.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseClicked( final MouseEvent e )
+      public void mouseReleased( MouseEvent e )
       {
-        showDisplayNameChangeDialog();
-      }
+        if ( e.getX() >= 0
+            && e.getX() <= hyperlink.getWidth()
+            && e.getY() >= 0
+            && e.getY() <= hyperlink.getHeight() )
+        {
+          showDisplayNameChangeDialog();
+        }
+      };
     } );
     final GridBagConstraints hyperlinkConstraints = new GridBagConstraints();
     hyperlinkConstraints.gridx = 0;
@@ -139,7 +142,7 @@ public class Settings extends JPanel
     final String title = "Anzeigenamen ändern";
     final Object[] buttonNames = { "Speichern", "Abbrechen" };
     final Object[] params = { title + ":", nameField };
-    int answer = JOptionPane.showOptionDialog( this, params, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+    final int answer = JOptionPane.showOptionDialog( this, params, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
         buttonNames, buttonNames[ 0 ] );
     if ( answer == JOptionPane.YES_OPTION )
     {
@@ -231,7 +234,7 @@ public class Settings extends JPanel
         PropertyHelper.setProperty( "MeetingNotification", meetingSwitch.activated ? "true" : "false" );
       }
     } );
-      meetingSwitch.setActivated( PropertyHelper.getBooleanProperty( "MeetingNotification" ) );
+    meetingSwitch.setActivated( PropertyHelper.getBooleanProperty( "MeetingNotification" ) );
   }
 
   private void addDarkmodeSettings()
@@ -325,16 +328,16 @@ public class Settings extends JPanel
     colorThemeComboBoxConstraints.ipadx = 150;
     colorThemeComboBoxConstraints.ipady = 10;
     colorThemeComboBoxConstraints.insets = new Insets( 5, 20, 0, 0 );
-    JButton colorButton = new JButton( "Farbe auswählen" );
+    final JButton colorButton = new JButton( "Farbe auswählen" );
     add( colorButton, colorThemeComboBoxConstraints );
     colorButton.addActionListener( new ActionListener()
     {
       @Override
       public void actionPerformed( ActionEvent e )
       {
-        JColorChooser colorChooser = new JColorChooser();
+        final JColorChooser colorChooser = new JColorChooser();
         colorChooser.setColor( PropertyHelper.getAppColorProperty() );
-        int choice = JOptionPane.showConfirmDialog( Settings.this, colorChooser, "Akzentfarbe auswählen", JOptionPane.YES_NO_OPTION,
+        final int choice = JOptionPane.showConfirmDialog( Settings.this, colorChooser, "Akzentfarbe auswählen", JOptionPane.YES_NO_OPTION,
             JOptionPane.DEFAULT_OPTION, null );
         if ( JOptionPane.YES_OPTION == choice )
         {

@@ -108,9 +108,11 @@ public class Login extends JFrame
 
     registerHyperLink.setEditable( false );
     registerHyperLink.setContentType( "text/html" );
+    registerHyperLink.setHighlighter( null );
     registerHyperLink.setText( generateHTMLText( UIManager.getColor( LABEL_FOREGROUND ), KONTO_ERSTELLEN ) );
     forgotPasswordHyperLink.setEditable( false );
     forgotPasswordHyperLink.setContentType( "text/html" );
+    forgotPasswordHyperLink.setHighlighter( null );
     forgotPasswordHyperLink.setText( generateHTMLText( UIManager.getColor( LABEL_FOREGROUND ), PASSWORT_VERGESSEN ) );
 
     addHyperlinkFocusListener( registerHyperLink, KONTO_ERSTELLEN );
@@ -174,19 +176,31 @@ public class Login extends JFrame
     forgotPasswordHyperLink.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseClicked( final MouseEvent e )
+      public void mouseReleased( MouseEvent e )
       {
-        JOptionPane.showMessageDialog( Login.this, "Bitte kontaktieren Sie ihren Admin.", "Passwort vergessen",
-            JOptionPane.WARNING_MESSAGE, null );
+        if ( e.getX() >= 0
+            && e.getX() <= forgotPasswordHyperLink.getWidth()
+            && e.getY() >= 0
+            && e.getY() <= forgotPasswordHyperLink.getHeight() )
+        {
+          JOptionPane.showMessageDialog( Login.this, "Bitte kontaktieren Sie ihren Admin.", "Passwort vergessen",
+              JOptionPane.WARNING_MESSAGE, null );
+        }
       }
     } );
 
     registerHyperLink.addMouseListener( new MouseAdapter()
     {
       @Override
-      public void mouseClicked( final MouseEvent e )
+      public void mouseReleased( MouseEvent e )
       {
-        new RegistrationDialog( Login.this );
+        if ( e.getX() >= 0
+            && e.getX() <= registerHyperLink.getWidth()
+            && e.getY() >= 0
+            && e.getY() <= registerHyperLink.getHeight() )
+        {
+          new RegistrationDialog( Login.this );
+        }
       }
     } );
   }
@@ -251,10 +265,11 @@ public class Login extends JFrame
     loginPanel.add( loginButton, loginButtonConstraints );
 
     final GridBagConstraints registrierenHyperlinkConstraints = new GridBagConstraints();
-    registrierenHyperlinkConstraints.gridx = 5;
+    registrierenHyperlinkConstraints.gridx = 0;
     registrierenHyperlinkConstraints.gridy = 6;
-    registrierenHyperlinkConstraints.fill = GridBagConstraints.HORIZONTAL;
-    registrierenHyperlinkConstraints.insets = new Insets( 0, 85, 0, 0 );
+    registrierenHyperlinkConstraints.gridwidth = 6;
+    registrierenHyperlinkConstraints.fill = GridBagConstraints.NONE;
+    registrierenHyperlinkConstraints.insets = new Insets( 0, 0, 0, 0 );
     loginPanel.add( registerHyperLink, registrierenHyperlinkConstraints );
 
     final GridBagConstraints forgotPasswordHyperlinkConstraints = new GridBagConstraints();
