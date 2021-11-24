@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -271,25 +269,18 @@ public class ServerCommunication
         final String drinkname = action.substring( 0, action.length() - 10 );
         if ( action.contains( "getrunken" ) )
         {
-          try
+          final Date eventDate = new Date( Long.valueOf( date ) );
+          if ( !eventDate.toInstant().isBefore( twentyMinutesAgo.toInstant() ) )
           {
-            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd HH:mm" ).parse( date );
-            if ( !eventDate.toInstant().isBefore( twentyMinutesAgo.toInstant() ) )
+            if ( !alreadyShownNotifications.contains( date ) )
             {
-              if ( !alreadyShownNotifications.contains( date ) )
+              alreadyShownNotifications.add( date );
+              if ( SystemTray.isSupported() )
               {
-                alreadyShownNotifications.add( date );
-                if ( SystemTray.isSupported() )
-                {
-                  trayIcon.displayMessage( "MeMate", consumer + " trinkt gerade " + drinkname,
-                      MessageType.NONE );
-                }
+                trayIcon.displayMessage( "MeMate", consumer + " trinkt gerade " + drinkname,
+                    MessageType.NONE );
               }
             }
-          }
-          catch ( final ParseException exception )
-          {
-            ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
       }

@@ -1,7 +1,5 @@
 package com.isp.memate.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -174,25 +172,15 @@ public class DrinkManagerTableModel extends AbstractTableModel
         {
           if ( action.contains( drink.getName() ) )
           {
-            final String dateAsString = data[ 4 ].substring( 0, 10 );
-            Date date;
-            try
+            final Date date = new Date( Long.valueOf( data[ 4 ] ) );
+            final ZonedDateTime now = ZonedDateTime.now();
+            final ZonedDateTime thirtyDaysAgo = now.minusDays( 30 );
+            if ( !date.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
             {
-              date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
-              final ZonedDateTime now = ZonedDateTime.now();
-              final ZonedDateTime thirtyDaysAgo = now.minusDays( 30 );
-              if ( !date.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+              if ( data[ 5 ].equals( "false" ) )
               {
-                if ( data[ 5 ].equals( "false" ) )
-                {
-                  amount++;
-                }
+                amount++;
               }
-            }
-            catch ( final ParseException exception )
-            {
-              ClientLog.newLog( "Das Datum für die Berechnung der noch übrigen Tage konnte nicht geparst werden" );
-              ClientLog.newLog( exception.getMessage() );
             }
           }
         }

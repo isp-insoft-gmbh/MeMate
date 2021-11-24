@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -39,7 +39,7 @@ class SocketThread extends Thread
   //UNDO
   private boolean lastActionDeposit = false;
   private int     lastDrinkID;
-  private String  lastDate;
+  private long    lastDate;
   private float   lastTransaction;
 
   /**
@@ -241,7 +241,7 @@ class SocketThread extends Thread
       final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - lastTransaction;
       database.updateBalance( currentSessionID, newBalance );
       database.addLog( "Letzte Aktion rückgängig", currentUser, Float.valueOf( lastTransaction ) * -1f, newBalance,
-          LocalDateTime.now().toString() );
+          new Date().getTime() );
       database.disableLog( lastDate );
       ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
       sendHistoryData();
@@ -260,7 +260,7 @@ class SocketThread extends Thread
       final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + lastTransaction;
       database.updateBalance( currentSessionID, newBalance );
       database.addLog( "Letzte Aktion rückgängig", currentUser, lastTransaction, newBalance,
-          LocalDateTime.now().toString() );
+          new Date().getTime() );
       database.disableLog( lastDate );
       database.increaseAmountOfDrinks( lastDrinkID );
       sendHistoryData();
@@ -270,7 +270,7 @@ class SocketThread extends Thread
       //For Undo
       lastActionDeposit = false;
       lastTransaction = 0;
-      lastDate = "null";
+      lastDate = -1;
     }
   }
 
@@ -427,7 +427,7 @@ class SocketThread extends Thread
     }
     final float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - actualPrice;
     database.updateBalance( currentSessionID, newBalance );
-    final String date = LocalDateTime.now().toString();
+    final long date = new Date().getTime();
     database.addLog( consumedDrink.getName() + " getrunken", currentUser, actualPrice * -1, newBalance, date );
     database.decreaseAmountOfDrinks( consumedDrink.getId() );
     sendHistoryData();
@@ -448,7 +448,7 @@ class SocketThread extends Thread
   {
     final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + balanceToAdd;
     database.updateBalance( currentSessionID, newBalance );
-    final String date = LocalDateTime.now().toString();
+    final long date = new Date().getTime();
     database.addLog( "Guthaben aufgeladen", currentUser, Float.valueOf( balanceToAdd ), newBalance, date );
     ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
     sendHistoryData();

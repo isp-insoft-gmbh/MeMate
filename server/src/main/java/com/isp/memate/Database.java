@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -131,7 +132,7 @@ class Database
         + "consumer REFERENCES user(username),"
         + "transaction_price double NOT NULL,"
         + "balance double NOT NULL,"
-        + "date string NOT NULL,"
+        + "timestamp INTEGER DEFAULT (0) NOT NULL,"
         + "undo BOOLEAN DEFAULT (false)"
         + ");";
     try ( Statement stmt = conn.createStatement() )
@@ -262,14 +263,14 @@ class Database
 
   private void migrateDataBaseIfNeeded()
   {
-    final String sql = "SELECT admin FROM user";
+    final String adminSQL = "SELECT admin FROM user";
     try ( Statement stmt = conn.createStatement() )
     {
-      stmt.execute( sql );
+      stmt.execute( adminSQL );
     }
     catch ( final SQLException __ )
     {
-      ServerLog.newLog( logType.SQL, "Starte Migration der Admin-Column" );
+      ServerLog.newLog( logType.SQL, "Starte Migration der Admin-Column..." );
       //If this Exception occurs, we know the admin column is not existing, so we have to add it.
       final String createColumnSQL = "ALTER TABLE user ADD COLUMN admin BOOLEAN DEFAULT (false)";
       try ( Statement stmt = conn.createStatement() )
@@ -291,6 +292,88 @@ class Database
       {
         ServerLog.newLog( logType.ERROR, "Das Setzen des initialen Admins ist fehlgeschlagen" );
       }
+      ServerLog.newLog( logType.SQL, "Migration abgeschlossen" );
+    }
+
+
+    final String timestampSQL = "SELECT timestamp FROM historie_log";
+    try ( Statement stmt = conn.createStatement() )
+    {
+      stmt.execute( timestampSQL );
+    }
+    catch ( final SQLException __ )
+    {
+      ServerLog.newLog( logType.SQL, "Starte Migration der Timestamp-Column..." );
+      //If this Exception occurs, we know the timestamp column is not existing, so we have to add it.
+      final String createColumnSQL = "ALTER TABLE  historie_log ADD COLUMN timestamp INTEGER DEFAULT (0) NOT NULL";
+      try ( Statement stmt = conn.createStatement() )
+      {
+        stmt.execute( createColumnSQL );
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Erstellen der timestamp-Column ist fehlgeschlagen" );
+      }
+      final String selectDateSQL = "SELECT date FROM historie_log";
+      try ( Statement stmt = conn.createStatement(); )
+      {
+        final ResultSet rs = stmt.executeQuery( selectDateSQL );
+        while ( rs.next() )
+        {
+          final String date = rs.getString( "date" );
+          String dateAsString = date;
+          DateFormat oldFormat = null;
+
+
+          if ( dateAsString.length() == 29 )
+          {
+            dateAsString = dateAsString.substring( 0, 23 );
+          }
+          if ( dateAsString.length() == 23 )
+          {
+            oldFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS" );
+          }
+          else if ( dateAsString.length() == 19 )
+          {
+            oldFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss" );
+          }
+          try
+          {
+            final Date d = oldFormat.parse( dateAsString );
+            final String updateTimestampSQL = "UPDATE historie_log SET timestamp = ? WHERE date = ?";
+            try ( PreparedStatement pstmt = conn.prepareStatement( updateTimestampSQL ) )
+            {
+              pstmt.setLong( 1, d.getTime() );
+              pstmt.setString( 2, date );
+              pstmt.executeUpdate();
+            }
+            catch ( final SQLException ___ )
+            {
+              ServerLog.newLog( logType.ERROR, "Beim Migrieren des Datums ist ein Fehler aufgetreten" );
+            }
+          }
+          catch ( final ParseException e )
+          {
+            ServerLog.newLog( logType.ERROR, "Das Parsen des Datums (" + date + ") ist fehlgeschlagen. Das Datum wird übersprungen." );
+            continue;
+          }
+        }
+        //Delete old date Column
+        final String deleteColumnSQL = "ALTER TABLE historie_log DROP COLUMN date;";
+        try ( Statement deleteStatement = conn.createStatement() )
+        {
+          deleteStatement.execute( deleteColumnSQL );
+        }
+        catch ( final SQLException e )
+        {
+          e.printStackTrace();
+        }
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Migrieren der date Column ist fehlgeschlagen" );
+      }
+      ServerLog.newLog( logType.SQL, "Migration abgeschlossen" );
     }
   }
 
@@ -813,7 +896,7 @@ class Database
   String[][] getHistory( final String currentUser, final boolean isAdminUser )
   {
     final ArrayList<String[]> history = new ArrayList<>();
-    final String sql = "SELECT action,consumer,transaction_price,balance,date,undo FROM historie_log";
+    final String sql = "SELECT action,consumer,transaction_price,balance,timestamp,undo FROM historie_log";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
@@ -828,7 +911,8 @@ class Database
             final String[] log = { rs.getString( "action" ), consumer,
                 NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString()
                     .replace( " ", "" ),
-                balance, rs.getString( "date" ), String.valueOf( rs.getBoolean( "undo" ) ), getDisplayName( consumer ) };
+                balance, String.valueOf( rs.getLong( "timestamp" ) ), String.valueOf( rs.getBoolean( "undo" ) ),
+                getDisplayName( consumer ) };
             history.add( log );
           }
         }
@@ -848,7 +932,7 @@ class Database
   public String[][] getLast5HistoryEntries()
   {
     final ArrayList<String[]> history = new ArrayList<>();
-    final String sql = "SELECT action,consumer,date,undo FROM historie_log ORDER BY date DESC LIMIT 5";
+    final String sql = "SELECT action,consumer,timestamp,undo FROM historie_log ORDER BY timestamp DESC LIMIT 5";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
@@ -856,7 +940,8 @@ class Database
       {
         if ( !rs.getBoolean( "undo" ) )
         {
-          final String[] log = { rs.getString( "action" ), getDisplayName( rs.getString( "consumer" ) ), rs.getString( "date" ) };
+          final String[] log =
+              { rs.getString( "action" ), getDisplayName( rs.getString( "consumer" ) ), String.valueOf( rs.getLong( "timestamp" ) ) };
           history.add( log );
         }
       }
@@ -881,7 +966,7 @@ class Database
       scoreMap.put( displayName, 0 );
     }
 
-    final String sql = "SELECT action,consumer,undo,date FROM historie_log";
+    final String sql = "SELECT action,consumer,undo,timestamp FROM historie_log";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
@@ -894,20 +979,13 @@ class Database
             final String displayName = getDisplayName( rs.getString( "consumer" ) );
             if ( getWeeklyScoreboard )
             {
-              try
+              final Instant date = new Date( rs.getLong( "timestamp" ) ).toInstant();
+              final Instant now = Instant.now();
+              final Instant weekAgo = now.minus( 7, ChronoUnit.DAYS );
+              final Boolean withinWeek = (!date.isBefore( weekAgo )) && date.isBefore( now );
+              if ( withinWeek )
               {
-                final Instant date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( rs.getString( "date" ) ).toInstant();
-                final Instant now = Instant.now();
-                final Instant weekAgo = now.minus( 7, ChronoUnit.DAYS );
-                final Boolean withinWeek = (!date.isBefore( weekAgo )) && date.isBefore( now );
-                if ( withinWeek )
-                {
-                  scoreMap.put( displayName, scoreMap.get( displayName ) + 1 );
-                }
-              }
-              catch ( final ParseException __ )
-              {
-                __.printStackTrace();
+                scoreMap.put( displayName, scoreMap.get( displayName ) + 1 );
               }
             }
             else
@@ -939,19 +1017,19 @@ class Database
    * @param username Nutzername
    * @param transaction Transaktionsmenge
    * @param newBalance neuer Kontostand
-   * @param date Datum
+   * @param timestamp Datum
    */
-  void addLog( final String action, final String username, final Float transaction, final Float newBalance, final String date )
+  void addLog( final String action, final String username, final Float transaction, final Float newBalance, final long timestamp )
   {
     lock.lock();
-    final String sql = "INSERT INTO historie_log(action,consumer,transaction_price,balance,date) VALUES(?,?,?,?,?)";
+    final String sql = "INSERT INTO historie_log(action,consumer,transaction_price,balance,timestamp) VALUES(?,?,?,?,?)";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setString( 1, action );
       pstmt.setString( 2, username );
       pstmt.setFloat( 3, transaction );
       pstmt.setFloat( 4, newBalance );
-      pstmt.setString( 5, date );
+      pstmt.setLong( 5, timestamp );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )
@@ -967,16 +1045,16 @@ class Database
   /**
    * Entfernt einen Log wenn die Aktion rückgängig gemacht wurde
    *
-   * @param date Datum des Ereignisses
+   * @param timestamp Datum des Ereignisses
    */
-  void disableLog( final String date )
+  void disableLog( final long timestamp )
   {
     lock.lock();
-    final String sql = "UPDATE historie_log SET undo=? WHERE date=?";
+    final String sql = "UPDATE historie_log SET undo=? WHERE timestamp=?";
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
       pstmt.setBoolean( 1, true );
-      pstmt.setString( 2, date );
+      pstmt.setLong( 2, timestamp );
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )

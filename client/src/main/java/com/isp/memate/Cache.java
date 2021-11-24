@@ -214,18 +214,10 @@ public class Cache
     {
       historyArray[ i ] = Arrays.copyOf( history[ i ], history[ i ].length );
     }
-    if ( dateType != null && dateType == com.isp.memate.ServerCommunication.dateType.SHORT )
+    if ( dateType != null && dateType == com.isp.memate.ServerCommunication.dateType.MIDDLE )
     {
       for ( int i = 0; i < historyArray.length; i++ )
       {
-        historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 10 );
-      }
-    }
-    else if ( dateType == com.isp.memate.ServerCommunication.dateType.MIDDLE )
-    {
-      for ( int i = 0; i < historyArray.length; i++ )
-      {
-        historyArray[ i ][ 4 ] = historyArray[ i ][ 4 ].substring( 0, 16 ).replace( "T", " " );
         historyArray[ i ][ 1 ] = historyArray[ i ][ 6 ];
       }
     }
@@ -251,10 +243,6 @@ public class Cache
       for ( int i = 0; i < shortHistory.length; i++ )
       {
         historyArray[ i ] = Arrays.copyOf( shortHistory[ i ], shortHistory[ i ].length );
-      }
-      for ( int i = 0; i < historyArray.length; i++ )
-      {
-        historyArray[ i ][ 2 ] = historyArray[ i ][ 2 ].substring( 0, 16 ).replace( "T", " " );
       }
       return historyArray;
     }

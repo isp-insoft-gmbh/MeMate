@@ -4,6 +4,9 @@
 package com.isp.memate.panels;
 
 import java.awt.BorderLayout;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -31,6 +34,7 @@ import com.isp.memate.util.HorizontalAlignmentHeaderRenderer;
  */
 public class History extends JPanel
 {
+  private final DateFormat  dateFormat  = new SimpleDateFormat( "dd.MM.yyyy HH:mm" );
   private final String[]    columnNames = { "Aktion", "Konsument", "Transakstionsmenge", "Neuer Kontostand", "Datum" };
   private JScrollPane       scrollPane;
   private DefaultTableModel tableModel;
@@ -51,7 +55,7 @@ public class History extends JPanel
     historyTable.setAutoCreateRowSorter( true );
     historyTable.setShowVerticalLines( true );
 
-    JTableHeader header = historyTable.getTableHeader();
+    final JTableHeader header = historyTable.getTableHeader();
     header.setReorderingAllowed( false );
     historyTable.setRowHeight( 30 );
 
@@ -59,7 +63,16 @@ public class History extends JPanel
     scrollPane.setBorder( BorderFactory.createEmptyBorder() );
     scrollPane.setViewportView( historyTable );
     historyData = Cache.getInstance().getHistory( dateType.MIDDLE );
+    changeDateFormatInData();
     applyTableModel();
+  }
+
+  private void changeDateFormatInData()
+  {
+    for ( int i = 0; i < historyData.length; i++ )
+    {
+      historyData[ i ][ 4 ] = dateFormat.format( new Date( Long.valueOf( historyData[ i ][ 4 ] ) ) );
+    }
   }
 
   private void applyTableModel()
@@ -79,7 +92,7 @@ public class History extends JPanel
   private void applyCellRenderer()
   {
     historyTable.getColumnModel().getColumn( 0 ).setHeaderRenderer( new HorizontalAlignmentHeaderRenderer( SwingConstants.CENTER ) );
-    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
     centerRenderer.setHorizontalAlignment( JLabel.CENTER );
     historyTable.getColumnModel().getColumn( 0 ).setCellRenderer( centerRenderer );
     historyTable.getColumnModel().getColumn( 1 ).setCellRenderer( centerRenderer );
@@ -92,6 +105,7 @@ public class History extends JPanel
   void updateTableModel( String[][] historyData )
   {
     this.historyData = historyData;
+    changeDateFormatInData();
     applyTableModel();
   }
 }

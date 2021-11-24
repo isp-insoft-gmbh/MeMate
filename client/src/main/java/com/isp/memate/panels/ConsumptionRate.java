@@ -10,7 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.text.ParseException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -39,7 +39,6 @@ import org.jfree.data.xy.XYDataset;
 
 import com.isp.memate.Cache;
 import com.isp.memate.ServerCommunication.dateType;
-import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 
 /**
@@ -52,9 +51,10 @@ import com.isp.memate.util.GUIObjects;
  */
 public class ConsumptionRate extends JPanel
 {
-  private final Map<String, Integer> amountMap      = new HashMap<>();
+  private final Map<String, Integer> amountMap        = new HashMap<>();
   private ChartPanel                 chartPanel;
-  private final HashSet<String>      consumedDrinks = new LinkedHashSet<>();
+  private final HashSet<String>      consumedDrinks   = new LinkedHashSet<>();
+  private final DateFormat           simpleDateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
 
   public ConsumptionRate()
   {
@@ -71,12 +71,12 @@ public class ConsumptionRate extends JPanel
    */
   void addChartPanel()
   {
-    JFreeChart chart = createChart( createDataset( "Alle" ) );
+    final JFreeChart chart = createChart( createDataset( "Alle" ) );
     chartPanel = new ChartPanel( chart );
     chartPanel.setPreferredSize( new Dimension( 760, 570 ) );
     chartPanel.setMouseZoomable( true, false );
 
-    JComboBox<String> selectDrinkComboBox = getSelectedDrinkComboBox();
+    final JComboBox<String> selectDrinkComboBox = getSelectedDrinkComboBox();
     final JLabel averageConsumption = new JLabel();
     averageConsumption.setText( String.format( "Ø %.2f Flaschen/Tag", getAverage() ) );
 
@@ -97,7 +97,7 @@ public class ConsumptionRate extends JPanel
 
   private JComboBox<String> getSelectedDrinkComboBox()
   {
-    JComboBox<String> selectDrinkComboBox = new JComboBox<>();
+    final JComboBox<String> selectDrinkComboBox = new JComboBox<>();
     //Needed because otherwise very long drinknames would cause a really wide ComboBox.
     selectDrinkComboBox.setPrototypeDisplayValue( "This is my maximal lenght" );
     selectDrinkComboBox.addItem( "Alle" );
@@ -139,20 +139,13 @@ public class ConsumptionRate extends JPanel
           final String date = data[ 4 ];
           final ZonedDateTime today = ZonedDateTime.now();
           final ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
-          try
+          final Date eventDate = new Date( Long.valueOf( date ) );
+          if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
           {
-            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
-            if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+            if ( data[ 5 ].equals( "false" ) )
             {
-              if ( data[ 5 ].equals( "false" ) )
-              {
-                amountMap.put( date, amountMap.get( date ) + 1 );
-              }
+              amountMap.put( simpleDateFormat.format( eventDate ), amountMap.get( simpleDateFormat.format( eventDate ) ) + 1 );
             }
-          }
-          catch ( final ParseException exception )
-          {
-            ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
         else if ( action.contains( drink ) )
@@ -160,20 +153,13 @@ public class ConsumptionRate extends JPanel
           final String date = data[ 4 ];
           final ZonedDateTime today = ZonedDateTime.now();
           final ZonedDateTime thirtyDaysAgo = today.minusDays( 31 );
-          try
+          final Date eventDate = new Date( Long.valueOf( date ) );
+          if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
           {
-            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( date );
-            if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+            if ( data[ 5 ].equals( "false" ) )
             {
-              if ( data[ 5 ].equals( "false" ) )
-              {
-                amountMap.put( date, amountMap.get( date ) + 1 );
-              }
+              amountMap.put( simpleDateFormat.format( eventDate ), amountMap.get( simpleDateFormat.format( eventDate ) ) + 1 );
             }
-          }
-          catch ( final ParseException exception )
-          {
-            ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
       }
@@ -221,7 +207,7 @@ public class ConsumptionRate extends JPanel
     chart.getXYPlot().getRenderer().setSeriesPaint( 0, UIManager.getColor( "AppColor" ) );
     chart.getXYPlot().getRangeAxis().setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
 
-    Color foreground = UIManager.getColor( "Label.foreground" );
+    final Color foreground = UIManager.getColor( "Label.foreground" );
     chart.setBackgroundPaint( UIManager.getColor( "Panel.background" ) );
     chart.getXYPlot().setBackgroundPaint( UIManager.getColor( "TextField.background" ) );
     chart.getTitle().setPaint( foreground );

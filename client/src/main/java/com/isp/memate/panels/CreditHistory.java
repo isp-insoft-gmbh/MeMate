@@ -9,7 +9,6 @@ import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -25,7 +24,6 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import com.isp.memate.Cache;
 import com.isp.memate.ServerCommunication.dateType;
-import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 
 /**
@@ -83,7 +81,6 @@ public class CreditHistory extends JPanel
   private DefaultCategoryDataset createBalanceDataset()
   {
     final DateFormat dateFormat = new SimpleDateFormat( "dd.MM HH:mm:ss" );
-    final DateFormat oldFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS" );
     final String[][] historyData = Cache.getInstance().getHistory( dateType.LONG );
     final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
     if ( historyData != null )
@@ -102,31 +99,17 @@ public class CreditHistory extends JPanel
         {
           Date date = null;
           final String dateAsString = data[ 4 ];
-          try
-          {
-            date = oldFormat.parse( data[ 4 ] );
-          }
-          catch ( final ParseException exception )
-          {
-            ClientLog.newLog( "Das Datum konnte nicht formatiert werden." + exception );
-          }
+          date = new Date( Long.valueOf( data[ 4 ] ) );
           final ZonedDateTime today = ZonedDateTime.now();
           final ZonedDateTime thirtyDaysAgo = today.minusDays( 30 );
-          try
+          final Date eventDate = new Date( Long.valueOf( dateAsString ) );
+          if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
           {
-            final Date eventDate = new SimpleDateFormat( "yyyy-MM-dd" ).parse( dateAsString );
-            if ( !eventDate.toInstant().isBefore( thirtyDaysAgo.toInstant() ) )
+            if ( data[ 5 ].equals( "false" ) && !Cache.getInstance().isUserAdmin() )
             {
-              if ( data[ 5 ].equals( "false" ) )
-              {
-                dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
-                    dateFormat.format( date ) );
-              }
+              dataset.addValue( Float.valueOf( data[ 3 ].replace( ",", "." ).substring( 0, data[ 3 ].length() - 1 ) ), "Guthaben",
+                  dateFormat.format( date ) );
             }
-          }
-          catch ( final ParseException exception )
-          {
-            ClientLog.newLog( "Das Datum ist out of range." + exception );
           }
         }
       }
