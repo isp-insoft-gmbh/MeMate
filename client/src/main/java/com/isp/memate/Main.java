@@ -15,6 +15,7 @@ class Main
 {
   public static void main( final String[] args )
   {
+    Cache.getInstance().setDebugMode( args.length == 2 && "-debug".equals( args[ 0 ] ) && "true".equals( args[ 1 ] ) );
     ServerCommunication.getInstance();
     PropertyHelper.createPropFile();
     MeMateUIManager.init();

@@ -20,13 +20,26 @@ import com.isp.memate.ServerLog.logType;
 
 public class Main
 {
-  private final static boolean debug = true;
-
   /**
    * @param args Path for the databse
    */
   public static void main( final String args[] )
   {
+    boolean debug = false;
+    String dataBasePath = Database.getTargetFolder().toFile().toString() + File.separator + "MeMate.db";
+    for ( int i = 0; i < args.length; i++ )
+    {
+      if ( "-debug".equals( args[ i ] ) && "true".equals( args[ i + 1 ] ) )
+      {
+        debug = true;
+        ServerLog.newLog( logType.INFO, "Debug-Mode activated" );
+      }
+      if ( "-dataDir".equals( args[ i ] ) )
+      {
+        dataBasePath = args[ i + 1 ];
+      }
+    }
+
     if ( !debug )
     {
       new SendServerInformationsToClients().start();
@@ -43,15 +56,7 @@ public class Main
       ServerLog.newLog( logType.ERROR, "Der Server konnte nicht gestartet werden" );
       e.printStackTrace();
     }
-    final String dataBasePath;
-    if ( args.length > 0 )
-    {
-      dataBasePath = args[ 0 ];
-    }
-    else
-    {
-      dataBasePath = Database.getTargetFolder().toFile().toString() + File.separator + "MeMate.db";
-    }
+
     ServerLog.newLog( logType.INFO, "Datenbankverbindung wird hergestellt...." );
     final Database database = new Database( dataBasePath );
     while ( true )

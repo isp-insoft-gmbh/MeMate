@@ -42,7 +42,6 @@ import com.isp.memate.util.PropertyHelper;
  */
 public class ServerCommunication
 {
-  private final boolean                    debug                     = true;
   private static final ServerCommunication instance                  = new ServerCommunication();
   Cache                                    cache                     = Cache.getInstance();
   public final ReentrantLock               lock                      = new ReentrantLock( true );
@@ -70,7 +69,7 @@ public class ServerCommunication
   {
     try
     {
-      if ( !debug )
+      if ( !cache.isDebugMode() )
       {
         socket = new Socket( FindServer.getServerAddress(), FindServer.getServerPort() );
       }

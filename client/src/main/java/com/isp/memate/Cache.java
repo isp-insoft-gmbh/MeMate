@@ -31,6 +31,7 @@ public class Cache
   private Map<String, Integer>          scoreboard;
   private Map<String, Integer>          weeklyScoreboard;
   public boolean                        isAdmin                     = false;
+  public boolean                        isDebug                     = false;
   public final ObservableValue<Boolean> isSessionIDValid            = new ObservableValue<Boolean>( false );
   private final ObservableValue<Float>  piggyBankBalance            = new ObservableValue<Float>( 0f );
   private final ObservableValue<Float>  userBalance                 = new ObservableValue<Float>( 0f );
@@ -296,5 +297,18 @@ public class Cache
   public Object getReceivedAllInformationsSync()
   {
     return receivedAllInformationsSync;
+  }
+
+  public void setDebugMode( boolean isDebug )
+  {
+    this.isDebug = isDebug;
+    if ( isDebug )
+    {
+      ClientLog.newLog( "Debug-Mode activated" );
+    }
+  }
+  
+  public boolean isDebugMode() {
+    return isDebug;
   }
 }
