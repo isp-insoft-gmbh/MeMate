@@ -240,8 +240,8 @@ class SocketThread extends Thread
     {
       final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - lastTransaction;
       database.updateBalance( currentSessionID, newBalance );
-      database.addLog( "Letzte Aktion rückgängig", currentUser, Float.valueOf( lastTransaction ) * -1f, newBalance,
-          new Date().getTime() );
+      database.addLog( HistoryEvents.UNDO, currentUser, Float.valueOf( lastTransaction ) * -1f, newBalance,
+          new Date().getTime(), null );
       database.disableLog( lastDate );
       ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
       sendHistoryData();
@@ -259,8 +259,8 @@ class SocketThread extends Thread
     {
       final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + lastTransaction;
       database.updateBalance( currentSessionID, newBalance );
-      database.addLog( "Letzte Aktion rückgängig", currentUser, lastTransaction, newBalance,
-          new Date().getTime() );
+      database.addLog( HistoryEvents.UNDO, currentUser, lastTransaction, newBalance,
+          new Date().getTime(), null );
       database.disableLog( lastDate );
       database.increaseAmountOfDrinks( lastDrinkID );
       sendHistoryData();
@@ -428,7 +428,7 @@ class SocketThread extends Thread
     final float newBalance = database.getBalance( userIDMap.get( currentUser ) ) - actualPrice;
     database.updateBalance( currentSessionID, newBalance );
     final long date = new Date().getTime();
-    database.addLog( consumedDrink.getName() + " getrunken", currentUser, actualPrice * -1, newBalance, date );
+    database.addLog( HistoryEvents.CONSUMED_DRINK, currentUser, actualPrice * -1, newBalance, date, consumedDrink.getId() );
     database.decreaseAmountOfDrinks( consumedDrink.getId() );
     sendHistoryData();
     sendBalance();
@@ -449,7 +449,8 @@ class SocketThread extends Thread
     final Float newBalance = database.getBalance( userIDMap.get( currentUser ) ) + balanceToAdd;
     database.updateBalance( currentSessionID, newBalance );
     final long date = new Date().getTime();
-    database.addLog( "Guthaben aufgeladen", currentUser, Float.valueOf( balanceToAdd ), newBalance, date );
+    database.addLog( balanceToAdd < 0 ? HistoryEvents.BALANCE_REMOVED : HistoryEvents.BALANCE_ADDED, currentUser,
+        Float.valueOf( balanceToAdd ), newBalance, date, null );
     ServerLog.newLog( logType.INFO, "Der Kontostand von " + currentUser + " wurde auf " + newBalance + "€ aktualisiert." );
     sendHistoryData();
     sendBalance();

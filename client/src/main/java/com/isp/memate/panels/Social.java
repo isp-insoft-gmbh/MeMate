@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import com.isp.memate.Cache;
+import com.isp.memate.HistoryEvents;
 import com.isp.memate.util.GUIObjects;
 
 /**
@@ -157,8 +158,8 @@ public class Social extends JPanel
         final String action = data[ 0 ];
         final String consumer = data[ 1 ];
         final String date = data[ 2 ];
-        final String drinkname = action.substring( 0, action.length() - 10 );
-        if ( action.contains( "getrunken" ) )
+        final String drinkname = data[ 3 ];
+        if ( HistoryEvents.CONSUMED_DRINK == HistoryEvents.valueOf( action ) )
         {
           final Date eventDate = new Date( Long.valueOf( date ) );
           if ( !eventDate.toInstant().isBefore( twentyMinutesAgo.toInstant() ) )

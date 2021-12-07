@@ -128,7 +128,8 @@ class Database
   private void addHistoryTable()
   {
     final String sql = "CREATE TABLE IF NOT EXISTS historie_log ("
-        + "action string NOT NULL,"
+        + "event string,"
+        + "drink REFERENCES drink(ID),"
         + "consumer REFERENCES user(username),"
         + "transaction_price double NOT NULL,"
         + "balance double NOT NULL,"
@@ -263,6 +264,158 @@ class Database
 
   private void migrateDataBaseIfNeeded()
   {
+    migrateAdminColumn();
+    migrateTimestampColumn();
+    migrateHistoryEventColumn();
+    migrateHistoryDrinkColumn();
+  }
+
+  private void migrateHistoryDrinkColumn()
+  {
+    final String sql = "SELECT drink FROM historie_log";
+    try ( Statement stmt = conn.createStatement() )
+    {
+      stmt.execute( sql );
+    }
+    catch ( final SQLException __ )
+    {
+      ServerLog.newLog( logType.SQL, "Starte Migration für Drink-Column in History-Table..." );
+      //If this Exception occurs, we know the drinkID column is not existing, so we have to add it.
+      final String createColumnSQL = "ALTER TABLE historie_log ADD COLUMN drink REFERENCES drink(ID)";
+      try ( Statement stmt = conn.createStatement() )
+      {
+        stmt.execute( createColumnSQL );
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Erstellen der drink-Column ist fehlgeschlagen" );
+      }
+      final String selectDateSQL = "SELECT action, timestamp FROM historie_log";
+      try ( Statement stmt = conn.createStatement(); )
+      {
+        final ResultSet rs = stmt.executeQuery( selectDateSQL );
+        while ( rs.next() )
+        {
+          final long timestamp = rs.getLong( "timestamp" );
+          final String action = rs.getString( "action" );
+          if ( !action.contains( "getrunken" ) )
+          {
+            continue;
+          }
+          final String drinkName = action.replace( " getrunken", "" );
+          final int drinkID = getDrinkIDByName( drinkName );
+          if ( drinkID == -1 )
+          {
+            continue;
+          }
+          final String updateSQL = "UPDATE historie_log SET drink = ? WHERE timestamp = ?";
+          try ( PreparedStatement pstmt = conn.prepareStatement( updateSQL ) )
+          {
+            pstmt.setInt( 1, drinkID );
+            pstmt.setLong( 2, timestamp );
+            pstmt.executeUpdate();
+          }
+          catch ( final SQLException ___ )
+          {
+            ServerLog.newLog( logType.ERROR, "Beim Migrieren der History-Tabelle ist ein Fehler aufgetreten" );
+          }
+        }
+        //Delete old action Column
+        final String deleteColumnSQL = "ALTER TABLE historie_log DROP COLUMN action;";
+        try ( Statement deleteStatement = conn.createStatement() )
+        {
+          deleteStatement.execute( deleteColumnSQL );
+        }
+        catch ( final SQLException e )
+        {
+          e.printStackTrace();
+        }
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Migrieren der History-Tabelle ist fehlgeschlagen" );
+      }
+      ServerLog.newLog( logType.SQL, "Migration abgeschlossen" );
+    }
+  }
+
+  private void migrateHistoryEventColumn()
+  {
+    final String sql = "SELECT event FROM historie_log";
+    try ( final Statement stmt = conn.createStatement() )
+    {
+      stmt.execute( sql );
+    }
+    catch ( final SQLException __ )
+    {
+      ServerLog.newLog( logType.SQL, "Starte Migration für Event-Column in History-Table..." );
+      //If this Exception occurs, we know the drinkID column is not existing, so we have to add it.
+      final String createColumnSQL = "ALTER TABLE historie_log ADD COLUMN event string";
+      try ( Statement stmt = conn.createStatement() )
+      {
+        stmt.execute( createColumnSQL );
+      }
+      catch ( final SQLException ___ )
+      {
+        ServerLog.newLog( logType.ERROR, "Das Erstellen der Event-Column ist fehlgeschlagen" );
+      }
+      final String selectDateSQL = "SELECT action,transaction_price, timestamp FROM historie_log";
+      try ( final Statement stmt = conn.createStatement(); )
+      {
+        final ResultSet rs = stmt.executeQuery( selectDateSQL );
+        while ( rs.next() )
+        {
+          final long timestamp = rs.getLong( "timestamp" );
+          final String action = rs.getString( "action" );
+          final HistoryEvents event;
+          if ( action.contains( "getrunken" ) )
+          {
+            event = HistoryEvents.CONSUMED_DRINK;
+          }
+          else if ( "Guthaben aufgeladen".equals( action ) )
+          {
+            if ( rs.getFloat( "transaction_price" ) < 0 )
+            {
+              event = HistoryEvents.BALANCE_REMOVED;
+            }
+            else
+            {
+              event = HistoryEvents.BALANCE_ADDED;
+            }
+          }
+          else if ( "Letzte Aktion rückgängig".equals( action ) )
+          {
+            event = HistoryEvents.UNDO;
+          }
+          else
+          {
+            event = HistoryEvents.ERROR;
+          }
+
+          final String updateSQL = "UPDATE historie_log SET event = ? WHERE timestamp = ?";
+          try ( PreparedStatement pstmt = conn.prepareStatement( updateSQL ) )
+          {
+            pstmt.setString( 1, event.toString() );
+            pstmt.setLong( 2, timestamp );
+            pstmt.executeUpdate();
+          }
+          catch ( final SQLException ___ )
+          {
+            ServerLog.newLog( logType.ERROR, "Beim Migrieren der History-Tabelle ist ein Fehler aufgetreten" );
+          }
+        }
+      }
+      catch ( final SQLException ___ )
+      {
+        ___.printStackTrace();
+        ServerLog.newLog( logType.ERROR, "Das Migrieren der History-Tabelle ist fehlgeschlagen" );
+      }
+      ServerLog.newLog( logType.SQL, "Migration abgeschlossen" );
+    }
+  }
+
+  private void migrateAdminColumn()
+  {
     final String adminSQL = "SELECT admin FROM user";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -294,8 +447,10 @@ class Database
       }
       ServerLog.newLog( logType.SQL, "Migration abgeschlossen" );
     }
+  }
 
-
+  private void migrateTimestampColumn()
+  {
     final String timestampSQL = "SELECT timestamp FROM historie_log";
     try ( Statement stmt = conn.createStatement() )
     {
@@ -398,6 +553,38 @@ class Database
       ServerLog.newLog( logType.SQL, e.getMessage() );
     }
     return balance;
+  }
+
+  private int getDrinkIDByName( final String drinkName )
+  {
+    final String sql = "SELECT ID FROM drink WHERE name= ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ); )
+    {
+      pstmt.setString( 1, drinkName );
+      final ResultSet rs = pstmt.executeQuery();
+      return rs.getInt( "ID" );
+    }
+    catch ( final SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    return -1;
+  }
+
+  private String getDrinkNameByID( final int id )
+  {
+    final String sql = "SELECT name FROM drink WHERE ID= ?";
+    try ( PreparedStatement pstmt = conn.prepareStatement( sql ); )
+    {
+      pstmt.setInt( 1, id );
+      final ResultSet rs = pstmt.executeQuery();
+      return rs.getString( "name" );
+    }
+    catch ( final SQLException e )
+    {
+      ServerLog.newLog( logType.SQL, e.getMessage() );
+    }
+    return "[Gelöscht]";
   }
 
   /**
@@ -896,7 +1083,7 @@ class Database
   String[][] getHistory( final String currentUser, final boolean isAdminUser )
   {
     final ArrayList<String[]> history = new ArrayList<>();
-    final String sql = "SELECT action,consumer,transaction_price,balance,timestamp,undo FROM historie_log";
+    final String sql = "SELECT event,drink,consumer,transaction_price,balance,timestamp,undo FROM historie_log";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
@@ -908,7 +1095,19 @@ class Database
         {
           if ( consumer.equals( currentUser ) || isAdminUser )
           {
-            final String[] log = { rs.getString( "action" ), consumer,
+            final HistoryEvents event = HistoryEvents.valueOf( rs.getString( "event" ) );
+            final String eventString;
+            switch ( event )
+            {
+              case CONSUMED_DRINK:
+                final int drinkID = rs.getInt( "drink" );
+                eventString = getDrinkNameByID( drinkID ) + event.getGuiRepresentation();
+                break;
+              default :
+                eventString = event.getGuiRepresentation();
+                break;
+            }
+            final String[] log = { eventString, consumer,
                 NumberFormat.getCurrencyInstance( new Locale( "de", "DE" ) ).format( rs.getFloat( "transaction_price" ) ).toString()
                     .replace( " ", "" ),
                 balance, String.valueOf( rs.getLong( "timestamp" ) ), String.valueOf( rs.getBoolean( "undo" ) ),
@@ -932,7 +1131,7 @@ class Database
   public String[][] getLast5HistoryEntries()
   {
     final ArrayList<String[]> history = new ArrayList<>();
-    final String sql = "SELECT action,consumer,timestamp,undo FROM historie_log ORDER BY timestamp DESC LIMIT 5";
+    final String sql = "SELECT event, drink, consumer,timestamp,undo FROM historie_log ORDER BY timestamp DESC LIMIT 5";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
@@ -941,7 +1140,8 @@ class Database
         if ( !rs.getBoolean( "undo" ) )
         {
           final String[] log =
-              { rs.getString( "action" ), getDisplayName( rs.getString( "consumer" ) ), String.valueOf( rs.getLong( "timestamp" ) ) };
+              { rs.getString( "event" ), getDisplayName( rs.getString( "consumer" ) ), String.valueOf( rs.getLong( "timestamp" ) ),
+                  getDrinkNameByID( rs.getInt( "drink" ) ) };
           history.add( log );
         }
       }
@@ -966,13 +1166,13 @@ class Database
       scoreMap.put( displayName, 0 );
     }
 
-    final String sql = "SELECT action,consumer,undo,timestamp FROM historie_log";
+    final String sql = "SELECT event,consumer,undo,timestamp FROM historie_log";
     try ( Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery( sql ) )
     {
       while ( rs.next() )
       {
-        if ( rs.getString( "action" ).contains( "getrunken" ) )
+        if ( rs.getString( "event" ).equals( HistoryEvents.CONSUMED_DRINK.toString() ) )
         {
           if ( !rs.getBoolean( "undo" ) )
           {
@@ -1013,23 +1213,36 @@ class Database
   /**
    * Erstellt einen neuen History-Log Eintrag.
    *
-   * @param action Guthaben aufgeladen / Getränk gekauft
+   * @param event Guthaben aufgeladen / Getränk gekauft
    * @param username Nutzername
    * @param transaction Transaktionsmenge
    * @param newBalance neuer Kontostand
    * @param timestamp Datum
    */
-  void addLog( final String action, final String username, final Float transaction, final Float newBalance, final long timestamp )
+  void addLog( final HistoryEvents event, final String username, final Float transaction,
+               final Float newBalance, final long timestamp, final Integer drinkID )
   {
     lock.lock();
-    final String sql = "INSERT INTO historie_log(action,consumer,transaction_price,balance,timestamp) VALUES(?,?,?,?,?)";
+    final String sql;
+    if ( drinkID == null )
+    {
+      sql = "INSERT INTO historie_log(event,consumer,transaction_price,balance,timestamp) VALUES(?,?,?,?,?)";
+    }
+    else
+    {
+      sql = "INSERT INTO historie_log(event,consumer,transaction_price,balance,timestamp,drink) VALUES(?,?,?,?,?,?)";
+    }
     try ( PreparedStatement pstmt = conn.prepareStatement( sql ) )
     {
-      pstmt.setString( 1, action );
+      pstmt.setString( 1, event.toString() );
       pstmt.setString( 2, username );
       pstmt.setFloat( 3, transaction );
       pstmt.setFloat( 4, newBalance );
       pstmt.setLong( 5, timestamp );
+      if ( drinkID != null )
+      {
+        pstmt.setInt( 6, drinkID );
+      }
       pstmt.executeUpdate();
     }
     catch ( final SQLException e )
