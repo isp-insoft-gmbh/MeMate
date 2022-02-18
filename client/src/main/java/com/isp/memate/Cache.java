@@ -24,7 +24,6 @@ public class Cache
   private String                        serverVersion               = null;
   private String                        clientVersion               = null;
   private String[]                      userArray                   = null;
-  private String[]                      displayNamesArray           = null;
   private User[]                        fullUserArray               = null;
   private String[][]                    history;
   private String[][]                    shortHistory                = null;
@@ -167,16 +166,6 @@ public class Cache
     this.userArray = userArray;
   }
 
-  public String[] getDisplayNamesArray()
-  {
-    return displayNamesArray;
-  }
-
-  public void setDisplayNamesArray( String[] displayNamesArray )
-  {
-    this.displayNamesArray = displayNamesArray;
-  }
-
   public User[] getFullUserArray()
   {
     return fullUserArray;
@@ -307,8 +296,9 @@ public class Cache
       ClientLog.newLog( "Debug-Mode activated" );
     }
   }
-  
-  public boolean isDebugMode() {
+
+  public boolean isDebugMode()
+  {
     return isDebug;
   }
 }

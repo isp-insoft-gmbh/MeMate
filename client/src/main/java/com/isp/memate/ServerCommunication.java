@@ -165,9 +165,6 @@ public class ServerCommunication
             case USER_DISPLAYNAME:
               cache.setDisplayname( (String) shared.getValue() );
               break;
-            case GET_USERS_DISPLAYNAMES:
-              cache.setDisplayNamesArray( (String[]) shared.getValue() );
-              break;
             case GET_FULLUSERS_RESULT:
               cache.setFullUserArray( (User[]) shared.getValue() );
               break;

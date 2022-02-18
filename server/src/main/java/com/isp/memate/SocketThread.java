@@ -109,10 +109,6 @@ class SocketThread extends Thread
               sendHistoryData();
               break;
 
-            case GET_USERS:
-              sendUsers();
-              break;
-
             case REGISTER_DRINK:
               registerDrink( (Drink) shared.getValue() );
               SocketPool.notifyAllSocketsToSendDrinks();
@@ -359,14 +355,6 @@ class SocketThread extends Thread
     try
     {
       objectOutputStream.writeObject( new Shared( Operation.GET_USERS_RESULT, database.getUser() ) );
-    }
-    catch ( final IOException exception )
-    {
-      ServerLog.newLog( logType.ERROR, "Die User konnten nicht geladen werden. " + exception );
-    }
-    try
-    {
-      objectOutputStream.writeObject( new Shared( Operation.GET_USERS_DISPLAYNAMES, database.getDisplayNames() ) );
     }
     catch ( final IOException exception )
     {
@@ -692,6 +680,10 @@ class SocketThread extends Thread
     catch ( final IOException | InterruptedException e )
     {
       // TODO(nwe|04.10.2021): Fehlerbehandlung muss noch implementiert werden!
+    }
+    if ( isUserAdmin() )
+    {
+      sendUsers();
     }
     sendDrinks();
     sendBalance();

@@ -50,7 +50,6 @@ public class Shared implements Serializable
     SCOREBOARD,
     WEEKLY_SCOREBOARD,
     GET_DRINKS,
-    GET_USERS,
     GET_USERS_RESULT,
     GET_FULLUSERS_RESULT,
     GET_VERSION,

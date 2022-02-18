@@ -33,7 +33,7 @@ import com.isp.memate.util.PropertyHelper;
  */
 public class DataExport
 {
-  private final String path           = System.getenv( PropertyHelper.MAIN_FOLDER + File.separator );
+  private final String path           = PropertyHelper.MAIN_FOLDER + File.separator;
   private final String userXMLPath    = path + "users.xml";
   private final String drinksXMLPath  = path + "drinks.xml";
   private final String historyXMLPath = path + "history.xml";
@@ -54,46 +54,46 @@ public class DataExport
    */
   private void historyExport()
   {
-    String[][] history = Cache.getInstance().getHistory( dateType.LONG );
+    final String[][] history = Cache.getInstance().getHistory( dateType.LONG );
     try
     {
-      DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-      Document document = documentBuilder.newDocument();
-      Element root = document.createElement( "Historie" );
+      final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+      final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+      final Document document = documentBuilder.newDocument();
+      final Element root = document.createElement( "Historie" );
       document.appendChild( root );
       for ( int i = 0; i < history.length; i++ )
       {
-        Element logElement = document.createElement( "Log" );
+        final Element logElement = document.createElement( "Log" );
         root.appendChild( logElement );
-        Element user = document.createElement( "Benutzer" );
+        final Element user = document.createElement( "Benutzer" );
         user.appendChild( document.createTextNode( history[ i ][ 1 ] ) );
         logElement.appendChild( user );
-        Element action = document.createElement( "Aktion" );
+        final Element action = document.createElement( "Aktion" );
         action.appendChild( document.createTextNode( history[ i ][ 0 ] ) );
         logElement.appendChild( action );
-        Element transaction = document.createElement( "Transaktion" );
+        final Element transaction = document.createElement( "Transaktion" );
         transaction.appendChild( document.createTextNode( history[ i ][ 2 ] ) );
         logElement.appendChild( transaction );
-        Element balance = document.createElement( "Kontostand" );
+        final Element balance = document.createElement( "Kontostand" );
         balance.appendChild( document.createTextNode( history[ i ][ 3 ] ) );
         logElement.appendChild( balance );
-        Element date = document.createElement( "Datum" );
+        final Element date = document.createElement( "Datum" );
         date.appendChild( document.createTextNode( history[ i ][ 4 ] ) );
         logElement.appendChild( date );
       }
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = transformerFactory.newTransformer();
-      DOMSource domSource = new DOMSource( document );
-      StreamResult streamResult = new StreamResult( new File( historyXMLPath ) );
+      final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      final Transformer transformer = transformerFactory.newTransformer();
+      final DOMSource domSource = new DOMSource( document );
+      final StreamResult streamResult = new StreamResult( new File( historyXMLPath ) );
       transformer.transform( domSource, streamResult );
       ClientLog.newLog( "Done creating History-XML File" );
     }
-    catch ( ParserConfigurationException pce )
+    catch ( final ParserConfigurationException pce )
     {
       pce.printStackTrace();
     }
-    catch ( TransformerException tfe )
+    catch ( final TransformerException tfe )
     {
       tfe.printStackTrace();
     }
@@ -104,76 +104,76 @@ public class DataExport
    */
   private void drinksExport()
   {
-    HashMap<Integer, Drink> drinks = Cache.getInstance().getDrinks();
+    final HashMap<Integer, Drink> drinks = Cache.getInstance().getDrinks();
     try
     {
-      DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-      Document document = documentBuilder.newDocument();
-      Element root = document.createElement( "Getränke" );
+      final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+      final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+      final Document document = documentBuilder.newDocument();
+      final Element root = document.createElement( "Getränke" );
       document.appendChild( root );
-      for ( Drink drink : drinks.values() )
+      for ( final Drink drink : drinks.values() )
       {
-        Element drinkElement = document.createElement( "Getränk" );
+        final Element drinkElement = document.createElement( "Getränk" );
         root.appendChild( drinkElement );
-        Element id = document.createElement( "ID" );
+        final Element id = document.createElement( "ID" );
         id.appendChild( document.createTextNode( String.valueOf( drink.getId() ) ) );
         drinkElement.appendChild( id );
-        Element name = document.createElement( "Name" );
+        final Element name = document.createElement( "Name" );
         name.appendChild( document.createTextNode( drink.getName() ) );
         drinkElement.appendChild( name );
-        Element price = document.createElement( "Preis" );
+        final Element price = document.createElement( "Preis" );
         price.appendChild( document.createTextNode( String.valueOf( drink.getPrice() ) ) );
         drinkElement.appendChild( price );
-        Element amount = document.createElement( "Anzahl" );
+        final Element amount = document.createElement( "Anzahl" );
         amount.appendChild( document.createTextNode( String.valueOf( drink.getAmount() ) ) );
         drinkElement.appendChild( amount );
         if ( drink.isIngredients() )
         {
-          Element hasIngredients = document.createElement( "Zutatenangabe" );
+          final Element hasIngredients = document.createElement( "Zutatenangabe" );
           drinkElement.appendChild( hasIngredients );
-          Element ingredients = document.createElement( "Zutaten" );
+          final Element ingredients = document.createElement( "Zutaten" );
           ingredients.appendChild( document.createTextNode( drink.getDrinkIngredients().getIngredients() ) );
           hasIngredients.appendChild( ingredients );
-          Element kJ = document.createElement( "kJ" );
+          final Element kJ = document.createElement( "kJ" );
           kJ.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getEnergy_kJ() ) ) );
           hasIngredients.appendChild( kJ );
-          Element kcal = document.createElement( "kcal" );
+          final Element kcal = document.createElement( "kcal" );
           kcal.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getEnergy_kcal() ) ) );
           hasIngredients.appendChild( kcal );
-          Element fat = document.createElement( "Fett" );
+          final Element fat = document.createElement( "Fett" );
           fat.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getFat() ) ) );
           hasIngredients.appendChild( fat );
-          Element fatty_acids = document.createElement( "gesättigteFettsäuren" );
+          final Element fatty_acids = document.createElement( "gesättigteFettsäuren" );
           fatty_acids.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getFatty_acids() ) ) );
           hasIngredients.appendChild( fatty_acids );
-          Element carbs = document.createElement( "Kohlenhydrate" );
+          final Element carbs = document.createElement( "Kohlenhydrate" );
           carbs.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getCarbs() ) ) );
           hasIngredients.appendChild( carbs );
-          Element sugar = document.createElement( "Zucker" );
+          final Element sugar = document.createElement( "Zucker" );
           sugar.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getProtein() ) ) );
           hasIngredients.appendChild( sugar );
-          Element protein = document.createElement( "Eiweiß" );
+          final Element protein = document.createElement( "Eiweiß" );
           protein.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getProtein() ) ) );
           hasIngredients.appendChild( protein );
-          Element salt = document.createElement( "Salz" );
+          final Element salt = document.createElement( "Salz" );
           salt.appendChild( document.createTextNode( String.valueOf( drink.getDrinkIngredients().getSalt() ) ) );
           hasIngredients.appendChild( salt );
         }
       }
 
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = transformerFactory.newTransformer();
-      DOMSource domSource = new DOMSource( document );
-      StreamResult streamResult = new StreamResult( new File( drinksXMLPath ) );
+      final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      final Transformer transformer = transformerFactory.newTransformer();
+      final DOMSource domSource = new DOMSource( document );
+      final StreamResult streamResult = new StreamResult( new File( drinksXMLPath ) );
       transformer.transform( domSource, streamResult );
       ClientLog.newLog( "Done creating Drink-XML File" );
     }
-    catch ( ParserConfigurationException pce )
+    catch ( final ParserConfigurationException pce )
     {
       pce.printStackTrace();
     }
-    catch ( TransformerException tfe )
+    catch ( final TransformerException tfe )
     {
       tfe.printStackTrace();
     }
@@ -187,41 +187,41 @@ public class DataExport
     userArray = Cache.getInstance().getFullUserArray();
     try
     {
-      DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-      Document document = documentBuilder.newDocument();
-      Element root = document.createElement( "Benutzer" );
+      final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+      final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+      final Document document = documentBuilder.newDocument();
+      final Element root = document.createElement( "Benutzer" );
       document.appendChild( root );
-      for ( User user : userArray )
+      for ( final User user : userArray )
       {
-        Element userElement = document.createElement( "Benutzer" );
+        final Element userElement = document.createElement( "Benutzer" );
         root.appendChild( userElement );
-        Element id = document.createElement( "ID" );
+        final Element id = document.createElement( "ID" );
         id.appendChild( document.createTextNode( String.valueOf( user.id ) ) );
         userElement.appendChild( id );
-        Element username = document.createElement( "Benutzername" );
+        final Element username = document.createElement( "Benutzername" );
         username.appendChild( document.createTextNode( user.name ) );
         userElement.appendChild( username );
-        Element balance = document.createElement( "Guthaben" );
+        final Element balance = document.createElement( "Guthaben" );
         balance.appendChild( document.createTextNode( String.valueOf( user.balance ) ) );
         userElement.appendChild( balance );
-        Element password = document.createElement( "Passwort" );
+        final Element password = document.createElement( "Passwort" );
         password.appendChild( document.createTextNode( user.password ) );
         userElement.appendChild( password );
       }
 
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = transformerFactory.newTransformer();
-      DOMSource domSource = new DOMSource( document );
-      StreamResult streamResult = new StreamResult( new File( userXMLPath ) );
+      final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      final Transformer transformer = transformerFactory.newTransformer();
+      final DOMSource domSource = new DOMSource( document );
+      final StreamResult streamResult = new StreamResult( new File( userXMLPath ) );
       transformer.transform( domSource, streamResult );
       ClientLog.newLog( "Done creating user-XML File" );
     }
-    catch ( ParserConfigurationException pce )
+    catch ( final ParserConfigurationException pce )
     {
       pce.printStackTrace();
     }
-    catch ( TransformerException tfe )
+    catch ( final TransformerException tfe )
     {
       tfe.printStackTrace();
     }

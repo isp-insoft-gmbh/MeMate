@@ -8,14 +8,12 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -30,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 import com.isp.memate.Cache;
 import com.isp.memate.DataExport;
 import com.isp.memate.ServerCommunication;
+import com.isp.memate.components.MeMateDialog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.Util;
@@ -51,7 +50,7 @@ public class Adminview extends JPanel
       MeMateUIManager.createIconButton( new ImageIcon( getClass().getClassLoader().getResource( "password_white.png" ) ),
           new ImageIcon( getClass().getClassLoader().getResource( "password_black.png" ) ) );
   private final JButton    setAdminBalanceButton = new JButton();
-  private final JDialog    passwordFrame         = new JDialog( GUIObjects.mainframe );
+  private MeMateDialog     passwordFrame;
   private final JLabel     piggyBankLabel        = new JLabel();
   private final JPanel     upperPanel            = new JPanel();
   private final JPanel     upperUpperPanel       = new JPanel();
@@ -159,8 +158,6 @@ public class Adminview extends JPanel
     }
     resetPasswordButton.addActionListener( e ->
     {
-      passwordFrame.setTitle( "Passwort zurücksetzen" );
-      passwordFrame.setIconImage( GUIObjects.mainframe.getIconImage() );
       final String[] user = Cache.getInstance().getUserArray();
       final JPanel passwordPanel = new JPanel( new GridBagLayout() );
       final JButton saveButton = new JButton( "Speichern" );
@@ -201,6 +198,16 @@ public class Adminview extends JPanel
       abortButtonConstraints.gridy = 2;
       passwordPanel.add( abortButton, abortButtonConstraints );
 
+      passwordFrame = new MeMateDialog( GUIObjects.mainframe )
+      {
+        @Override
+        public void layoutComponents()
+        {
+          layoutContainer.add( passwordPanel, BorderLayout.CENTER );
+        }
+      };
+      passwordFrame.setTitle( "Passwort zurücksetzen" );
+      passwordFrame.setIconImage( GUIObjects.mainframe.getIconImage() );
 
       abortButton.addActionListener( e1 -> passwordFrame.dispose() );
       saveButton.addActionListener( e1 ->
