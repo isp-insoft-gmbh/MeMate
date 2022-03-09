@@ -1,6 +1,5 @@
 package com.isp.memate;
 
-import java.awt.Cursor;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,12 +9,14 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.isp.memate.ServerCommunication.dateType;
-import com.isp.memate.panels.Adminview;
+import com.isp.memate.panels.AdminView;
 import com.isp.memate.panels.Dashboard;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.ObservableValue;
 import com.isp.memate.util.ValueListener;
+
+import javafx.scene.Cursor;
 
 public class Cache
 {
@@ -56,9 +57,9 @@ public class Cache
       @Override
       public void valueChanged( final Float __, final Float newValue )
       {
-        if ( GUIObjects.currentPanel != null && GUIObjects.currentPanel instanceof Adminview )
+        if ( GUIObjects.currentPanel != null && GUIObjects.currentPanel instanceof AdminView )
         {
-          ((Adminview) GUIObjects.currentPanel).setPiggybankBalance( newValue );
+          ((AdminView) GUIObjects.currentPanel).setPiggybankBalance( newValue );
         }
       }
     } );
@@ -279,7 +280,7 @@ public class Cache
     {
       //TODO(nwe | 08.04.2021): Das muss besser werden. Es soll nicht alles geupdatet werden, nur die geänderte Information
       ((Dashboard) GUIObjects.currentPanel).updateButtonpanel();
-      GUIObjects.mainframe.setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
+      GUIObjects.mainframe.getScene().setCursor( Cursor.DEFAULT );
     }
   }
 

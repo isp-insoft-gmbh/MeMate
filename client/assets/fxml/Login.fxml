@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="210.0" prefWidth="550.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="600.0" text="Willkommen bei MeMate" textAlignment="CENTER">
+         <font>
+            <Font size="29.0" />
+         </font>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </Label>
+      <HBox prefHeight="30.0" prefWidth="600.0">
+         <children>
+            <Label prefWidth="110.0" text="Benutzername">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="usernameTextField" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox prefHeight="30.0" prefWidth="600.0">
+         <children>
+            <Label prefWidth="110.0" text="Passwort">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <PasswordField fx:id="passwordField" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </PasswordField>
+         </children>
+      </HBox>
+      <HBox prefHeight="30.0" prefWidth="200.0">
+         <children>
+            <Label prefWidth="110.0" text="Eingeloggt bleiben">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <CheckBox fx:id="stayLoggedInCheckBox" mnemonicParsing="false" />
+            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+            <Hyperlink fx:id="forgotPasswordHyperlink" onAction="#forgotPasswordHyperlinkClicked" text="Passwort vergessen?">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Hyperlink>
+         </children>
+      </HBox>
+      <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#loginButtonClicked" prefWidth="600.0" text="Anmelden">
+         <VBox.margin>
+            <Insets left="10.0" right="10.0" />
+         </VBox.margin>
+      </Button>
+      <Separator prefWidth="200.0">
+         <VBox.margin>
+            <Insets left="10.0" right="10.0" top="5.0" />
+         </VBox.margin>
+      </Separator>
+      <Hyperlink fx:id="createUserHyperlink" alignment="CENTER" contentDisplay="CENTER" onAction="#createUserHyperlinkClicked" prefWidth="600.0" text="Konto erstellen" textAlignment="CENTER">
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
+      </Hyperlink>
+   </children>
+</VBox>

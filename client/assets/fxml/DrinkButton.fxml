@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#buttonClicked" prefHeight="270.0" prefWidth="270.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox prefHeight="16.0" prefWidth="270.0">
+         <children>
+            <Region maxWidth="16.0" minWidth="16.0" prefHeight="0.0" prefWidth="16.0" HBox.hgrow="NEVER">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </Region>
+            <Label fx:id="nameLabel" alignment="CENTER" prefHeight="0.0" prefWidth="228.0" text="Drinkname" HBox.hgrow="ALWAYS" />
+            <ImageView fx:id="infoIconImageView" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </ImageView>
+         </children>
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </HBox>
+      <BorderPane prefHeight="208.0" prefWidth="200.0">
+         <VBox.margin>
+            <Insets bottom="10.0" top="10.0" />
+         </VBox.margin>
+         <center>
+            <ImageView fx:id="pictureImageView" fitHeight="208.0" fitWidth="270.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+      <HBox prefHeight="16.0" prefWidth="200.0">
+         <children>
+            <Label fx:id="priceLabel" prefHeight="16.0" prefWidth="32.0" text="1,00€" HBox.hgrow="NEVER">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="amountLabel" alignment="CENTER_RIGHT" prefWidth="228.0" text="Noch 5 Stück" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </HBox>
+   </children>
+</VBox>

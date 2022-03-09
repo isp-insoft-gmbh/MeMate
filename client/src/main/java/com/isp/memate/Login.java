@@ -1,339 +1,90 @@
-/**
- * © 2019 isp-insoft GmbH
- */
 package com.isp.memate;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.UUID;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
-import javax.swing.border.EmptyBorder;
-
 import com.isp.memate.Shared.LoginResult;
-import com.isp.memate.dialogs.ChangePasswordDialog;
-import com.isp.memate.dialogs.RegistrationDialog;
 import com.isp.memate.util.GUIObjects;
-import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.PropertyHelper;
-import com.isp.memate.util.SwingUtil;
-import com.isp.memate.util.Util;
 
-/**
- * Im LoginFrame kann der Benutzer sich registrieren oder wenn er bereits ein
- * Konto besitzt, sich einloggen. Außerdem besteht die Möglichkeit angemeldet zu
- * bleiben.
- *
- * @author nwe
- * @since 15.10.2019
- */
-public class Login extends JFrame
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class Login extends Stage
 {
-  private static final String LABEL_FOREGROUND   = "Label.foreground";
-  private static final String PASSWORT_VERGESSEN = "Passwort vergessen?";
-  private static final String KONTO_ERSTELLEN    = "Konto erstellen";
-  Cache                       cache              = Cache.getInstance();
-  private JButton             loginButton;
-  private JLabel              usernameLabel, passwordLabel, stayLoggedInLabel, headerLabel;
-  private JTextPane           registerHyperLink, forgotPasswordHyperLink;
-  private JCheckBox           stayLoggedInCheckBox;
-  private JPanel              loginPanel;
-  private JPasswordField      passwordField;
-  private JTextField          usernameTextField;
-  private static String       currentUsername;
+  final LoginController controllerRef;
 
   public Login()
   {
     GUIObjects.loginFrame = this;
-    initComponents();
-    layoutComponents();
-    addActionListener();
-    applyFrameSettings();
-  }
+    final FXMLLoader loader = new FXMLLoader();
 
-  private void initComponents()
-  {
-    stayLoggedInCheckBox = new JCheckBox();
-    registerHyperLink = new JTextPane();
-    forgotPasswordHyperLink = new JTextPane();
-    loginButton = new JButton();
-    loginPanel = new JPanel();
-    usernameLabel = new JLabel();
-    passwordLabel = new JLabel();
-    stayLoggedInLabel = new JLabel();
-    passwordField = new JPasswordField();
-    usernameTextField = new JTextField();
-    ImageIcon icon;
+    final LoginController controller = new LoginController( this );
+    loader.setController( controller );
 
-    if ( MeMateUIManager.getDarkModeState() )
+    final File fxmlFile = new File( "assets/fxml/Login.fxml" );
+    URL fxmlUrl;
+    VBox vbox = null;
+    try
     {
-      icon = (ImageIcon) UIManager.getIcon( "login.icon.welcome.white" );
+      fxmlUrl = fxmlFile.toURI().toURL();
+      loader.setLocation( fxmlUrl );
+      vbox = loader.<VBox>load();
     }
-    else
+    catch ( final IOException e )
     {
-      icon = (ImageIcon) UIManager.getIcon( "login.icon.welcome.black" );
+      // TODO(nwe|07.03.2022): Fehlerbehandlung muss noch implementiert werden!
     }
 
-    headerLabel = new JLabel( icon );
-    loginPanel.setBorder( new EmptyBorder( 10, 10, 10, 10 ) );
-    headerLabel.setBorder( new EmptyBorder( 0, 0, 15, 0 ) );
-    SwingUtil.setPreferredWidth( 420, usernameTextField );
-    SwingUtil.setPreferredWidth( 420, passwordField );
 
-    loginButton.setText( "Anmelden" );
-    passwordLabel.setText( "Passwort" );
-    usernameLabel.setText( "Benutzername" );
-    stayLoggedInLabel.setText( "Eingeloggt bleiben" );
+    controllerRef = loader.getController();
 
-    registerHyperLink.setEditable( false );
-    registerHyperLink.setContentType( "text/html" );
-    registerHyperLink.setHighlighter( null );
-    registerHyperLink.setText( generateHTMLText( UIManager.getColor( LABEL_FOREGROUND ), KONTO_ERSTELLEN ) );
-    forgotPasswordHyperLink.setEditable( false );
-    forgotPasswordHyperLink.setContentType( "text/html" );
-    forgotPasswordHyperLink.setHighlighter( null );
-    forgotPasswordHyperLink.setText( generateHTMLText( UIManager.getColor( LABEL_FOREGROUND ), PASSWORT_VERGESSEN ) );
-
-    addHyperlinkFocusListener( registerHyperLink, KONTO_ERSTELLEN );
-    addHyperlinkFocusListener( forgotPasswordHyperLink, PASSWORT_VERGESSEN );
-  }
-
-  private String generateHTMLText( Color color, String string )
-  {
-    final String fontName = UIManager.getFont( "Label.font" ).getFontName();
-    if ( color != null )
+    controllerRef.getLoginButton().setDisable( true );
+    controllerRef.getUserNameTextField().textProperty().addListener( ( observable, oldValue, newValue ) ->
     {
-      final String htmlColor = "rgb(" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ")";
-      return "<html><font color='" + htmlColor + "'><font face='" + fontName + "'><a href>" + string + "</a></font></font></html>";
-    }
-    return "<html><font face='" + fontName + "'><a href>" + string + "</a></font></html>";
-  }
-
-  private void addHyperlinkFocusListener( JTextPane hyperlink, String text )
-  {
-    hyperlink.addFocusListener( new FocusListener()
-    {
-      @Override
-      public void focusLost( final FocusEvent e )
-      {
-        hyperlink.setText(
-            generateHTMLText( UIManager.getColor( LABEL_FOREGROUND ), text ) );
-      }
-
-      @Override
-      public void focusGained( final FocusEvent e )
-      {
-        hyperlink.setText(
-            generateHTMLText( UIManager.getColor( "Component.linkColor" ), text ) );
-      }
+      controllerRef.updateLoginButtonEnabledState();
     } );
-  }
-
-  private void addActionListener()
-  {
-    loginButton.addActionListener( __ ->
+    controllerRef.getPasswordTextField().textProperty().addListener( ( observable, oldValue, newValue ) ->
     {
-      if ( usernameTextField.getText().isEmpty() )
-      {
-        showMessageDialog( "Benutzername" );
-        return;
-      }
-      else if ( passwordField.getPassword().length == 0 )
-      {
-        showMessageDialog( "Passwort" );
-        return;
-      }
-      else
-      {
-        currentUsername = usernameTextField.getText();
-        final LoginInformation login = new LoginInformation( usernameTextField.getText(),
-            Util.getHash( String.valueOf( passwordField.getPassword() ) ) );
-        ServerCommunication.getInstance().checkLogin( login );
-      }
+      controllerRef.updateLoginButtonEnabledState();
     } );
 
-    forgotPasswordHyperLink.addMouseListener( new MouseAdapter()
-    {
-      @Override
-      public void mouseReleased( MouseEvent e )
-      {
-        if ( e.getX() >= 0
-            && e.getX() <= forgotPasswordHyperLink.getWidth()
-            && e.getY() >= 0
-            && e.getY() <= forgotPasswordHyperLink.getHeight() )
-        {
-          JOptionPane.showMessageDialog( Login.this, "Bitte kontaktieren Sie ihren Admin.", "Passwort vergessen",
-              JOptionPane.WARNING_MESSAGE, null );
-        }
-      }
-    } );
-
-    registerHyperLink.addMouseListener( new MouseAdapter()
-    {
-      @Override
-      public void mouseReleased( MouseEvent e )
-      {
-        if ( e.getX() >= 0
-            && e.getX() <= registerHyperLink.getWidth()
-            && e.getY() >= 0
-            && e.getY() <= registerHyperLink.getHeight() )
-        {
-          new RegistrationDialog( Login.this );
-        }
-      }
-    } );
-  }
-
-  private void showMessageDialog( String string )
-  {
-    JOptionPane.showMessageDialog( loginPanel, string + " darf nicht leer sein.", "Login fehlgeschlagen",
-        JOptionPane.WARNING_MESSAGE, null );
-  }
-
-  private void layoutComponents()
-  {
-    loginPanel.setLayout( new GridBagLayout() );
-    final GridBagConstraints titleConstraints = new GridBagConstraints();
-    titleConstraints.gridx = 0;
-    titleConstraints.gridy = 0;
-    titleConstraints.gridwidth = 6;
-    loginPanel.add( headerLabel, titleConstraints );
-
-    final GridBagConstraints usernameConstraints = new GridBagConstraints();
-    usernameConstraints.gridx = 0;
-    usernameConstraints.gridy = 1;
-    usernameConstraints.anchor = GridBagConstraints.LINE_START;
-    loginPanel.add( usernameLabel, usernameConstraints );
-    final GridBagConstraints usernameConstraints2 = new GridBagConstraints();
-    usernameConstraints2.gridx = 2;
-    usernameConstraints2.gridy = 1;
-    usernameConstraints2.gridwidth = 4;
-    usernameConstraints2.insets = new Insets( 0, 10, 5, 0 );
-    loginPanel.add( usernameTextField, usernameConstraints2 );
-
-    final GridBagConstraints passwordConstraints = new GridBagConstraints();
-    passwordConstraints.gridx = 0;
-    passwordConstraints.gridy = 2;
-    passwordConstraints.anchor = GridBagConstraints.LINE_START;
-    loginPanel.add( passwordLabel, passwordConstraints );
-    final GridBagConstraints passwordConstraints2 = new GridBagConstraints();
-    passwordConstraints2.gridx = 2;
-    passwordConstraints2.gridy = 2;
-    passwordConstraints2.gridwidth = 4;
-    passwordConstraints2.insets = new Insets( 0, 10, 5, 0 );
-    loginPanel.add( passwordField, passwordConstraints2 );
-
-    final GridBagConstraints stayLoggedInConstraints = new GridBagConstraints();
-    stayLoggedInConstraints.gridx = 0;
-    stayLoggedInConstraints.gridy = 3;
-    stayLoggedInConstraints.anchor = GridBagConstraints.LINE_START;
-    loginPanel.add( stayLoggedInLabel, stayLoggedInConstraints );
-
-    final GridBagConstraints checkboxConstraints = new GridBagConstraints();
-    checkboxConstraints.gridx = 2;
-    checkboxConstraints.gridy = 3;
-    checkboxConstraints.insets = new Insets( 0, 8, 0, 0 );
-    loginPanel.add( stayLoggedInCheckBox, checkboxConstraints );
-
-    final GridBagConstraints loginButtonConstraints = new GridBagConstraints();
-    loginButtonConstraints.gridx = 0;
-    loginButtonConstraints.gridy = 4;
-    loginButtonConstraints.gridwidth = 6;
-    loginButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
-    loginButtonConstraints.insets = new Insets( 5, 0, 10, 0 );
-    loginPanel.add( loginButton, loginButtonConstraints );
-
-    final GridBagConstraints registrierenHyperlinkConstraints = new GridBagConstraints();
-    registrierenHyperlinkConstraints.gridx = 0;
-    registrierenHyperlinkConstraints.gridy = 6;
-    registrierenHyperlinkConstraints.gridwidth = 6;
-    registrierenHyperlinkConstraints.fill = GridBagConstraints.NONE;
-    registrierenHyperlinkConstraints.insets = new Insets( 0, 0, 0, 0 );
-    loginPanel.add( registerHyperLink, registrierenHyperlinkConstraints );
-
-    final GridBagConstraints forgotPasswordHyperlinkConstraints = new GridBagConstraints();
-    forgotPasswordHyperlinkConstraints.gridx = 5;
-    forgotPasswordHyperlinkConstraints.gridy = 3;
-    forgotPasswordHyperlinkConstraints.anchor = GridBagConstraints.LINE_END;
-    loginPanel.add( forgotPasswordHyperLink, forgotPasswordHyperlinkConstraints );
-
-    final GridBagConstraints seperatorConstraints = new GridBagConstraints();
-    seperatorConstraints.gridx = 0;
-    seperatorConstraints.gridy = 5;
-    seperatorConstraints.gridwidth = 6;
-    seperatorConstraints.fill = GridBagConstraints.HORIZONTAL;
-    loginPanel.add( new JSeparator( SwingConstants.HORIZONTAL ), seperatorConstraints );
-
-    add( loginPanel );
-  }
-
-  private void applyFrameSettings()
-  {
-    setIconImages( (List<Image>) UIManager.get( "frame.icons" ) );
-    setTitle( "MeMate" );
-    setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
-    pack();
+    final Scene scene = new Scene( vbox );
+    setScene( scene );
+    show();
     setResizable( false );
-    setLocationRelativeTo( null );
-    getRootPane().setDefaultButton( loginButton );
+    setTitle( "MeMate" );
   }
 
-  /**
-   * Der Antwort des Servers auf die Loginabfrage wird validiert.
-   *
-   * @param loginResult Antwort des Servers
-   */
-  public void validateLoginResult( final LoginResult loginResult )
+  public void validateLoginResult( LoginResult loginResult )
   {
-    if ( loginResult == LoginResult.LOGIN_SUCCESSFULL )
+    if ( LoginResult.LOGIN_SUCCESSFULL == loginResult )
     {
-      generateSessionID( currentUsername );
-      GUIObjects.loginFrame = null;
-      dispose();
-      final Thread thread = new Thread( () ->
-      {
-        new Mainframe();
-      } );
-      thread.start();
+      generateSessionID( controllerRef.getUsername() );
+      close();
+      final MainFrame mainFrame = new MainFrame();
+      mainFrame.show();
     }
-    else if ( loginResult == LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD )
+    else if ( LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD == loginResult )
     {
-      new ChangePasswordDialog( GUIObjects.loginFrame );
+      //TODO(nwe | 07.03.2022): 
     }
     else
     {
-      String message;
-      if ( loginResult == LoginResult.USER_NOT_FOUND )
-      {
-        message = "Benutzer konnte nicht gefunden werden.";
-      }
-      else
-      {
-        message = "Falsches Passwort eingegeben.";
-      }
-      JOptionPane.showMessageDialog( loginButton, message, "Login fehlgeschlagen", JOptionPane.ERROR_MESSAGE,
-          null );
+      final String message =
+          LoginResult.USER_NOT_FOUND == loginResult ? "Benutzer konnte nicht gefunden werden." : "Falsches Passwort eingegeben.";
+      final Alert alert = new Alert( AlertType.WARNING );
+      alert.setTitle( "Login fehlgeschlagen" );
+      alert.setHeaderText( null );
+      alert.setContentText( message );
+      alert.initOwner( this );
+      alert.showAndWait();
     }
   }
 
@@ -349,21 +100,9 @@ public class Login extends JFrame
   {
     final UUID uuid = UUID.randomUUID();
     ServerCommunication.getInstance().connectSessionIDToUser( uuid.toString() );
-    if ( stayLoggedInCheckBox.isSelected() )
+    if ( controllerRef.getStayLoggedInState() )
     {
       PropertyHelper.setProperty( "SessionID", uuid.toString() );
     }
-  }
-
-  public void newPasswordHasBeenSet()
-  {
-    generateSessionID( currentUsername );
-    GUIObjects.loginFrame = null;
-    dispose();
-    final Thread thread = new Thread( () ->
-    {
-      new Mainframe();
-    } );
-    thread.start();
   }
 }

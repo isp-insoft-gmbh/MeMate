@@ -49,7 +49,7 @@ class FindServer
     {
       broadcastList = listAllBroadcastAddresses();
       ClientLog.newLog( "Es wurden " + broadcastList.size() + " mögliche Netzwerkschnittstellen gefunden." );
-      for ( InetAddress inetAddress : broadcastList )
+      for ( final InetAddress inetAddress : broadcastList )
       {
         if ( serverAddress == null )
         {
@@ -58,7 +58,7 @@ class FindServer
         }
       }
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ClientLog.newLog( "Es konnte kein Server gefunden werden." );
       ClientLog.newLog( exception.getMessage() );
@@ -79,26 +79,26 @@ class FindServer
     //Sendet das Packet an den Server
     socket = new DatagramSocket();
     socket.setBroadcast( true );
-    byte[] buffer = broadcastMessage.getBytes();
-    DatagramPacket clientPacket = new DatagramPacket( buffer, buffer.length, address, 3141 );
+    final byte[] buffer = broadcastMessage.getBytes();
+    final DatagramPacket clientPacket = new DatagramPacket( buffer, buffer.length, address, 3141 );
     socket.send( clientPacket );
     socket.setSoTimeout( 1500 );
 
 
     //Empfangen des Serverpackets
-    byte[] buf = new byte[256];
-    DatagramPacket serverPacket = new DatagramPacket( buf, buf.length );
+    final byte[] buf = new byte[256];
+    final DatagramPacket serverPacket = new DatagramPacket( buf, buf.length );
     try
     {
       socket.receive( serverPacket );
       serverAddress = serverPacket.getAddress();
       serverPort = serverPacket.getPort();
-      String serverMessage = new String( serverPacket.getData(), 0, serverPacket.getLength() );
+      final String serverMessage = new String( serverPacket.getData(), 0, serverPacket.getLength() );
 
       ClientLog.newLog( "Es wurde ein Server gefunden." );
       ClientLog.newLog( "Adresse: " + serverAddress + "\nPort: " + serverPort + "\nNachricht: " + serverMessage );
     }
-    catch ( IOException exception )
+    catch ( final IOException exception )
     {
       ClientLog.newLog( "Das Serverpacket konnte nicht richtig empfangen werden." );
       ClientLog.newLog( exception.getMessage() );
@@ -119,11 +119,11 @@ class FindServer
    */
   private static List<InetAddress> listAllBroadcastAddresses() throws SocketException
   {
-    List<InetAddress> broadcastList = new ArrayList<>();
-    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+    final List<InetAddress> broadcastList = new ArrayList<>();
+    final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
     while ( interfaces.hasMoreElements() )
     {
-      NetworkInterface networkInterface = interfaces.nextElement();
+      final NetworkInterface networkInterface = interfaces.nextElement();
 
       if ( networkInterface.isLoopback() || !networkInterface.isUp() )
       {

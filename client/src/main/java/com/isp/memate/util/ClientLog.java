@@ -5,7 +5,6 @@ package com.isp.memate.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.FileHandler;
@@ -31,20 +30,20 @@ public class ClientLog
    */
   public static void newLog( String message )
   {
-    LocalDateTime now = LocalDateTime.now();
-    String date = now.format( formatter );
+    final LocalDateTime now = LocalDateTime.now();
+    final String date = now.format( formatter );
 
     System.out.println( "[" + date + "] " + message );
 
 
-    File logFile = new File( PropertyHelper.MAIN_FOLDER + File.separator + "ClientLog.log" );
-    Logger logger = Logger.getLogger( "ClientLog" );
+    final File logFile = new File( PropertyHelper.MAIN_FOLDER + File.separator + "ClientLog.log" );
+    final Logger logger = Logger.getLogger( "ClientLog" );
     try
     {
       logger.setUseParentHandlers( false );
-      FileHandler logFileHandler = new FileHandler( logFile.toString(), true );
+      final FileHandler logFileHandler = new FileHandler( logFile.toString(), true );
       logger.addHandler( logFileHandler );
-      SimpleFormatter formatter = new SimpleFormatter();
+      final SimpleFormatter formatter = new SimpleFormatter();
       logFileHandler.setFormatter( formatter );
       logger.info( message );
       logFileHandler.close();
@@ -55,4 +54,3 @@ public class ClientLog
     }
   }
 }
-

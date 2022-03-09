@@ -1,254 +1,115 @@
-/**
- * © 2019 isp-insoft GmbH
- */
 package com.isp.memate.panels;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
 
 import com.isp.memate.Cache;
 import com.isp.memate.Drink;
 import com.isp.memate.ServerCommunication;
-import com.isp.memate.components.DrinkConsumptionButton;
-import com.isp.memate.util.ClientLog;
+import com.isp.memate.components.DrinkButton;
 import com.isp.memate.util.GUIObjects;
-import com.isp.memate.util.MeMateUIManager;
-import com.isp.memate.util.SwingUtil;
-import com.isp.memate.util.WrapLayout;
 
-import net.miginfocom.layout.CC;
-import net.miginfocom.layout.LC;
-import net.miginfocom.swing.MigLayout;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
-/**
- * Auf dem Dashboard soll der Nutzer die Auswahl an Getränken sehen
- * und sich nach Bedarf, welche kaufen können.
- * Tut er dies, so wird der Preis des Getränks von seinem Guthaben abgezogen.
- * Außerdem hat der Benutzer auf dem Dashboard die Möglichkeit sein Kontostand aufzuladen
- * und Getränkeinformationen zu erhalten.
- *
- * @author nwe
- * @since 15.10.2019
- */
-public class Dashboard extends JPanel
+public class Dashboard extends VBox
 {
-  private JScrollPane                                scrollpane;
-  private final Map<Integer, DrinkConsumptionButton> buttonMap = new HashMap<>();
-  Cache                                              cache     = Cache.getInstance();
+  final ScrollPane scrollPane = new ScrollPane();
+  final FlowPane   flowPane   = new FlowPane();
 
-  /**
-   * Passt Layout, Hintergrund und Borders an.
-   *
-   */
   public Dashboard()
   {
+    setPadding( new Insets( 5 ) );
     GUIObjects.currentPanel = this;
-    initScrollPane();
-
-    setLayout( new BorderLayout() );
-    add( scrollpane, BorderLayout.CENTER );
-    add( createLowerPanel(), BorderLayout.SOUTH );
-  }
-
-  private void initScrollPane()
-  {
-    scrollpane = new JScrollPane( createDrinkButtonPanel() );
-    scrollpane.getVerticalScrollBar().setUnitIncrement( 16 );
-    scrollpane.setBorder( new EmptyBorder( 0, 0, 0, 0 ) );
-    scrollpane.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER );
-  }
-
-
-  /**
-   * Erstellt das lowerPanel und setzt das Layout.
-   * Das lowerPanel beinhaltet die Komponenten um das Konto aufzuladen.
-   * Außerdem zeigt es noch eine kleine Info zur Einzahlung an.
-   */
-  private JPanel createLowerPanel()
-  {
-    final JPanel panel = new JPanel();
-    final SpinnerNumberModel spinnerModel = new SpinnerNumberModel( 1, -50, 1000, 1 );
-    final JSpinner valueSpinner = new JSpinner( spinnerModel );
-
-    final JButton aufladenButton = new JButton( "button" );
-    aufladenButton.setText( "Einzahlen" );
-    aufladenButton.addActionListener( e ->
+    flowPane.setHgap( 5 );
+    flowPane.setVgap( 5 );
+    for ( final Drink drink : Cache.getInstance().getDrinks().values() )
     {
-      final Object value = valueSpinner.getValue();
-      String description = "<html>Wollen Sie wirklich <b>" + value + "€</b> einzahlen?";
-      String title = "Guthaben hinzufügen";
-      if ( (int) value < 0 )
+      if ( drink.getAmount() > 0 )
       {
-        description = "<html>Wollen Sie wirklich <b>" + (int) value * -1 + "€</b> aus der Kasse nehmen?";
-        title = "Geld leihen";
+        flowPane.getChildren().add( new DrinkButton( drink ) );
       }
-      if ( (int) value != 0 )
-      {
+    }
+    scrollPane.setFitToWidth( true );
+    scrollPane.setFitToHeight( true );
+    scrollPane.setContent( flowPane );
+    scrollPane.setStyle( "-fx-background-color:transparent;" );
 
-        final int result =
-            JOptionPane.showConfirmDialog( Dashboard.this, description,
-                title, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE );
-        if ( result == JOptionPane.YES_OPTION )
-        {
-          final ServerCommunication sc = ServerCommunication.getInstance();
-          sc.addBalance( (int) value );
-          GUIObjects.mainframe.setUndoButtonEnabled( true );
-        }
+    final BorderPane footer = new BorderPane();
+    final VBox leftVBox = new VBox();
+    final HBox hBox = new HBox();
+    final Spinner<Integer> spinner = new Spinner<>();
+    spinner.setValueFactory( new IntegerSpinnerValueFactory( -1000, 1000, 1, 1 ) );
+    hBox.getChildren().add( spinner );
+    final Button payButton = new Button( "Einzahlen" );
+    payButton.setOnAction( new EventHandler<ActionEvent>()
+    {
+      @Override
+      public void handle( ActionEvent e )
+      {
+        ServerCommunication.getInstance().addBalance( spinner.getValue() );
       }
     } );
-
-    final JLabel aufladenlabel = new JLabel();
-    final String infoText1 =
-        "Einzahlung sind nur in Höhe von gültigen Kombination von 1€ und 2€ Münzen, 5€ Scheinen, 10€ Scheinen und 20€ Scheinen möglich.";
-    final String infoText2 =
-        "Einmal eingezahltes Guthaben kann nicht wieder ausgezahlt werden und muss durch den Konsum von Getränken aufgebraucht werden.";
-    final JLabel infoTextLabel1 = new JLabel();
-    final JLabel infoTextLabel2 = new JLabel();
-    aufladenlabel.setText( "Kontostand aufladen" );
-    infoTextLabel1.setText( infoText1 );
-    infoTextLabel2.setText( infoText2 );
-
-    JLabel infoIconLabel = new JLabel();
-    infoIconLabel
-        .setIcon( MeMateUIManager.getDarkModeState() ? UIManager.getIcon( "info.icon.white" ) : UIManager.getIcon( "info.icon.black" ) );
-    infoIconLabel.setBorder( new MatteBorder( 0, 20, 0, 0, UIManager.getColor( "separator.background" ) ) );
-
-    final String infoTextToolTip = "<html>" + infoText1 + "<br>" + infoText2 + "</html>";
-    infoTextLabel1.setToolTipText( infoTextToolTip );
-    infoTextLabel2.setToolTipText( infoTextToolTip );
-
-    infoTextLabel1.setFont( infoTextLabel1.getFont().deriveFont( 13f ) );
-    infoTextLabel2.setFont( infoTextLabel2.getFont().deriveFont( 13f ) );
-    aufladenlabel.setFont( aufladenlabel.getFont().deriveFont( 15f ) );
-
-    panel.setLayout( new MigLayout( new LC().flowX().fill().insets( "10px", "0", "0", "0" ) ) );
-    panel.add( aufladenlabel, new CC().spanX( 2 ) );
-    panel.add( infoIconLabel, new CC().spanY() );
-    panel.add( infoTextLabel1, new CC().minWidth( "0" ).pushX().wrap() );
-    panel.add( valueSpinner, new CC() );
-    panel.add( aufladenButton, new CC() );
-    panel.add( infoTextLabel2, new CC().skip( 1 ).minWidth( "0" ).pushX() );
-
-    SwingUtil.setPreferredWidth( 50, valueSpinner );
-
-    panel.setBorder( new EmptyBorder( 0, 20, 10, 0 ) );
-    return panel;
-  }
+    hBox.getChildren().add( payButton );
+    final Label addBalanceLabel = new Label( "Kontostand aufladen" );
+    addBalanceLabel.setFont( new Font( 14 ) );
+    leftVBox.getChildren().add( addBalanceLabel );
+    leftVBox.getChildren().add( hBox );
+    leftVBox.setPadding( new Insets( 0, 5, 0, 0 ) );
 
 
-  /**
-   * Es wird eine Liste von der Klasse {@link ServerCommunication}
-   * genommen, welche die Namen aller Getränke enthält.
-   * Auf Grundlage dieser Liste, wird für jedes Getränk (wenn Anzahl>0)
-   * ein Button, mit zugehörigen Preis und Bild
-   * erstellt und dem Panel hinzugefügt.
-   *
-   * @return Das Panel in welchem man die angebotenen Getränke anklicken kann.
-   */
-  private JPanel createDrinkButtonPanel()
-  {
-    buttonMap.clear();
-    final JPanel panel = new JPanel();
-    panel.setLayout( new WrapLayout( FlowLayout.LEFT ) );
+    final VBox rightVBox = new VBox();
+    final Label infoLabel1 =
+        new Label( "Einzahlungen sind nur in Höhe von gültigen Kombination von 1€ und 2€ Münzen, 5€ Scheinen, 10€ Scheinen und "
+            + "20€ Scheinen möglich." );
+    final Label infoLabel2 = new Label(
+        "Einmal eingezahltes Guthaben kann nicht wieder ausgezahlt werden und "
+            + "muss durch den Kauf von Getränken aufgebraucht werden." );
+    infoLabel1.setFont( new Font( 13 ) );
+    infoLabel2.setFont( new Font( 13 ) );
+    rightVBox.getChildren().add( infoLabel1 );
+    rightVBox.getChildren().add( infoLabel2 );
+    final BorderPane borderPane = new BorderPane();
+    borderPane.setCenter( rightVBox );
+    borderPane.prefHeightProperty().bind( leftVBox.heightProperty() );
 
-    for ( final Drink drink : cache.getDrinks().values() )
-    {
-      if ( drink.getAmount() == 0 )
-      {
-        continue;
-      }
-      final DrinkConsumptionButton button = new DrinkConsumptionButton( drink );
-      buttonMap.put( drink.getId(), button );
-      panel.add( button );
-    }
-    return panel;
+    getChildren().add( scrollPane );
+    footer.setLeft( leftVBox );
+    footer.setRight( borderPane );
+    getChildren().add( footer );
+    footer.setPadding( new Insets( 5, 10, 10, 15 ) );
   }
 
   public void updateButtonpanel()
   {
-    final ReentrantLock lock = ServerCommunication.getInstance().lock;
-    lock.lock();
-    try
+    flowPane.getChildren().clear();
+    for ( final Drink drink : Cache.getInstance().getDrinks().values() )
     {
-      scrollpane.setViewportView( createDrinkButtonPanel() );
-    }
-    catch ( final Exception exception )
-    {
-      ClientLog.newLog( exception.getMessage() );
-    }
-    finally
-    {
-      lock.unlock();
-    }
-  }
-
-  /**
-   * Shows a dialog, if the drinkprice of the client differs from the one on the sever.
-   *
-   * @param drink the matching drinkObject
-   */
-  public void showPriceChangedDialog( final Drink drink )
-  {
-
-    final int result = JOptionPane.showConfirmDialog( Dashboard.this,
-        String.format(
-            "<html>Der Preis von <b>" + drink.getName()
-                + "</b> hat sich auf <b>%.2f€</b> geändert.\nWollen Sie das Getränk trotzdem kaufen?",
-            drink.getPrice() ),
-        "Getränkepreis hat sich geändert", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
-    if ( result == JOptionPane.YES_OPTION )
-    {
-      ServerCommunication.getInstance().consumeDrink( drink );
-    }
-  }
-
-  /**
-   * Wenn die Anzahl des Getränks 0 beträgt, so wird ein Dialog angezeigt, dass
-   * das gewünschte Getränk leer ist.
-   *
-   * @param name Getränkenaame
-   */
-  public void showNoMoreDrinksDialog( final String name )
-  {
-    JOptionPane.showMessageDialog( Dashboard.this, "<html><b>" + name + " </b>ist leider nicht mehr verfügbar</html>",
-        "Getränk nicht verfügbar",
-        JOptionPane.ERROR_MESSAGE, null );
-  }
-
-
-  /**
-   * All DrinkConsumptionButtons are being set to default State, in order to only show the buy state in one
-   * button at the time.
-   * 
-   * @param source the {@link DrinkConsumptionButton} that should not get reseted.
-   */
-  public void resetAllDrinkButtons( DrinkConsumptionButton source )
-  {
-    for ( final DrinkConsumptionButton drinkConsumptionButton : buttonMap.values() )
-    {
-      if ( DrinkConsumptionButton.STATE.BUY.equals( drinkConsumptionButton.getCURRENT_STATE() ) )
+      if ( drink.getAmount() > 0 )
       {
-        if ( !drinkConsumptionButton.equals( source ) )
-        {
-          drinkConsumptionButton.switchState( DrinkConsumptionButton.STATE.DEFAULT );
-          drinkConsumptionButton.setBackground( UIManager.getColor( "Button.background" ) );
-        }
+        flowPane.getChildren().add( new DrinkButton( drink ) );
       }
     }
+  }
+
+  public void showPriceChangedDialog( Drink drink )
+  {
+    // TODO(nwe|07.03.2022): Methode muss noch implementiert werden!
+
+  }
+
+  public void showNoMoreDrinksDialog( String value )
+  {
+    // TODO(nwe|07.03.2022): Methode muss noch implementiert werden!
+
   }
 }

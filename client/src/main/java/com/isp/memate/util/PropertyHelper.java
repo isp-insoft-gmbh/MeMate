@@ -1,6 +1,5 @@
 package com.isp.memate.util;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,6 +11,8 @@ import java.util.Properties;
 import com.isp.memate.Cache;
 import com.isp.memate.Config;
 import com.isp.memate.ServerCommunication;
+
+import javafx.scene.paint.Color;
 
 public class PropertyHelper
 {
@@ -99,8 +100,10 @@ public class PropertyHelper
     {
       return Color.CYAN;
     }
-    final int rgb = Integer.valueOf( appColor );
-    return new Color( rgb );
+    //TODO(nwe | 08.03.2022): 
+    //    final int rgb = Integer.valueOf( appColor );
+    //    return Color.valueOf( appColor );
+    return Color.ORANGE;
   }
 
   public static boolean getDarkModeProperty()

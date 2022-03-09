@@ -1,7 +1,5 @@
 package com.isp.memate;
 
-import com.isp.memate.util.Compare;
-import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.PropertyHelper;
 
 /**
@@ -18,32 +16,9 @@ class Main
     Cache.getInstance().setDebugMode( args.length == 2 && "-debug".equals( args[ 0 ] ) && "true".equals( args[ 1 ] ) );
     ServerCommunication.getInstance();
     PropertyHelper.createPropFile();
-    MeMateUIManager.init();
+    //    MeMateUIManager.init();
 
-    if ( PropertyHelper.isSessionIDValid() )
-    {
-      showMainframe();
-    }
-    else
-    {
-      showLogin();
-    }
-  }
+    Application.main( args );
 
-  private static void showMainframe()
-  {
-    final Thread thread = new Thread( () ->
-    {
-      new Mainframe();
-      Compare.checkVersion();
-    } );
-    thread.start();
-  }
-
-  private static void showLogin()
-  {
-    final Login login = new Login();
-    login.setVisible( true );
-    Compare.checkVersion();
   }
 }

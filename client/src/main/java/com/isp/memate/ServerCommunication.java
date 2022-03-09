@@ -22,14 +22,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.JOptionPane;
-
 import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.Shared.Operation;
 import com.isp.memate.panels.Dashboard;
 import com.isp.memate.util.ClientLog;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.PropertyHelper;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 /**
  * Die Klasse ServerCommunication kommuniziert mit dem Server und schickt
@@ -83,9 +85,12 @@ public class ServerCommunication
     catch ( final Exception __ )
     {
       ClientLog.newLog( "Der Server konnte nicht gefunden werden " + __.getMessage() );
-      JOptionPane.showMessageDialog( GUIObjects.loginFrame,
-          "Es konnte kein Server gefunden werden. Bitte stelle sicher, dass der Server an ist",
-          "Server nicht gefunden", JOptionPane.ERROR_MESSAGE, null );
+      final Alert alert = new Alert( AlertType.ERROR );
+      alert.setTitle( "Server nicht gefunden" );
+      alert.setHeaderText( null );
+      alert.setContentText( "Es konnte kein Server gefunden werden. Bitte stelle sicher, dass der Server an ist" );
+      alert.initOwner( GUIObjects.loginFrame );
+      alert.showAndWait();
       System.exit( 1 );
     }
     initTrayIcon();
@@ -112,16 +117,25 @@ public class ServerCommunication
           switch ( operation )
           {
             case LOGIN_RESULT:
-              GUIObjects.loginFrame.validateLoginResult( (LoginResult) shared.getValue() );
+              Platform.runLater( () ->
+              {
+                GUIObjects.loginFrame.validateLoginResult( (LoginResult) shared.getValue() );
+              } );
               break;
             case LOGIN_WITH_SESSION_ID_RESULT:
               cache.setSessionIDValid( (boolean) shared.getValue() );
               break;
             case GET_DRINKS:
-              cache.setDrinks( (HashMap<Integer, Drink>) shared.getValue() );
+              Platform.runLater( () ->
+              {
+                cache.setDrinks( (HashMap<Integer, Drink>) shared.getValue() );
+              } );
               break;
             case USER_BALANCE:
-              cache.setBalance( (float) shared.getValue() );
+              Platform.runLater( () ->
+              {
+                cache.setBalance( (float) shared.getValue() );
+              } );
               break;
             case REGISTRATION_RESULT:
               GUIObjects.registrationFrame.validateRegistartionResult( (String) shared.getValue() );
@@ -163,7 +177,10 @@ public class ServerCommunication
               cache.setUserArray( (String[]) shared.getValue() );
               break;
             case USER_DISPLAYNAME:
-              cache.setDisplayname( (String) shared.getValue() );
+              Platform.runLater( () ->
+              {
+                cache.setDisplayname( (String) shared.getValue() );
+              } );
               break;
             case GET_FULLUSERS_RESULT:
               cache.setFullUserArray( (User[]) shared.getValue() );
@@ -302,7 +319,12 @@ public class ServerCommunication
   private void showErrorDialog( final String message, final String title )
   {
     ClientLog.newLog( message );
-    JOptionPane.showMessageDialog( GUIObjects.mainframe, message, title, JOptionPane.ERROR_MESSAGE, null );
+    final Alert alert = new Alert( AlertType.ERROR );
+    alert.setTitle( title );
+    alert.setHeaderText( null );
+    alert.setContentText( message );
+    alert.initOwner( GUIObjects.mainframe );
+    alert.showAndWait();
   }
 
   /**
@@ -351,6 +373,7 @@ public class ServerCommunication
     LONG,
     MIDDLE;
   };
+
 
   /**
    * Es wird ein Shared-Objekt mit dem Befehl REGISTER_USER und einem User-Objekt

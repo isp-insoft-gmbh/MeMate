@@ -18,8 +18,8 @@ import java.util.Objects;
  */
 public class ObservableValue<T>
 {
-  private List<ValueListener<T>> listeners;
-  private T                      value;
+  private final List<ValueListener<T>> listeners;
+  private T                            value;
 
   /**
    * @param value initialer Wert
