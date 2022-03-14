@@ -57,6 +57,7 @@ public class Dashboard extends VBox
       public void handle( ActionEvent e )
       {
         ServerCommunication.getInstance().addBalance( spinner.getValue() );
+        GUIObjects.mainframe.setUndoButtonEnabled( true );
       }
     } );
     hBox.getChildren().add( payButton );
@@ -81,7 +82,6 @@ public class Dashboard extends VBox
     final BorderPane borderPane = new BorderPane();
     borderPane.setCenter( rightVBox );
     borderPane.prefHeightProperty().bind( leftVBox.heightProperty() );
-
     getChildren().add( scrollPane );
     footer.setLeft( leftVBox );
     footer.setRight( borderPane );

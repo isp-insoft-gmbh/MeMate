@@ -138,7 +138,7 @@ public class ServerCommunication
               } );
               break;
             case REGISTRATION_RESULT:
-              GUIObjects.registrationFrame.validateRegistartionResult( (String) shared.getValue() );
+              //  GUIObjects.registrationFrame.validateRegistartionResult( (String) shared.getValue() );
               break;
             case HISTORY_DATA:
               cache.setHistory( (String[][]) shared.getValue() );

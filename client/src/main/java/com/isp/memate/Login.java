@@ -1,6 +1,7 @@
 package com.isp.memate;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.UUID;
@@ -9,12 +10,15 @@ import com.isp.memate.Shared.LoginResult;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.PropertyHelper;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class Login extends Stage
 {
@@ -36,6 +40,8 @@ public class Login extends Stage
       fxmlUrl = fxmlFile.toURI().toURL();
       loader.setLocation( fxmlUrl );
       vbox = loader.<VBox>load();
+      final Image frameIcon = new Image( new FileInputStream( new File( "assets/icons/frameicon128.png" ) ) );
+      getIcons().add( frameIcon );
     }
     catch ( final IOException e )
     {
@@ -59,7 +65,16 @@ public class Login extends Stage
     setScene( scene );
     show();
     setResizable( false );
-    setTitle( "MeMate" );
+    setTitle( "MeMateFX" );
+
+    setOnCloseRequest( new EventHandler<WindowEvent>()
+    {
+      @Override
+      public void handle( WindowEvent e )
+      {
+        System.exit( 0 );
+      }
+    } );
   }
 
   public void validateLoginResult( LoginResult loginResult )
@@ -70,6 +85,7 @@ public class Login extends Stage
       close();
       final MainFrame mainFrame = new MainFrame();
       mainFrame.show();
+      GUIObjects.loginFrame = null;
     }
     else if ( LoginResult.LOGIN_SUCCESSFULL_REQUEST_NEW_PASSWORD == loginResult )
     {

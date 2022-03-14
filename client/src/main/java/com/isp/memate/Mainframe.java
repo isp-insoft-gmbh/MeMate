@@ -7,11 +7,15 @@ import java.io.FileNotFoundException;
 import com.isp.memate.actionbar.ActionBar;
 import com.isp.memate.actionbar.ActionBarButton;
 import com.isp.memate.panels.ConsumptionRateView;
+import com.isp.memate.panels.CreditHistory;
 import com.isp.memate.panels.Dashboard;
 import com.isp.memate.panels.History;
+import com.isp.memate.panels.Scoreboard;
+import com.isp.memate.panels.SettingsView;
 import com.isp.memate.util.GUIObjects;
 import com.isp.memate.util.PropertyHelper;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -27,19 +31,22 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class MainFrame extends Stage
 {
-  private Node             rightNode     = null;
-  private final HBox       content       = new HBox();
-  private final BorderPane header        = new BorderPane();
-  private final Label      usernameLabel = new Label( "" );
-  private final Label      balanceLabel  = new Label( "" );
+  private Node                  rightNode     = null;
+  private final HBox            content       = new HBox();
+  private final BorderPane      header        = new BorderPane();
+  private final Label           usernameLabel = new Label( "" );
+  private final Label           balanceLabel  = new Label( "" );
+  private final ActionBarButton undoButton;
+  private BorderPane            applicationHeader;
 
   public MainFrame()
   {
     GUIObjects.mainframe = this;
-    setTitle( "MeMate" );
+    setTitle( "MeMateFX" );
     //    rightComponent.prefHeightProperty().bind( this.heightProperty() );
     //    rightComponent.setMaxWidth( Double.MAX_VALUE );
     //    rightComponent.setMinWidth( 50 );
@@ -60,6 +67,7 @@ public class MainFrame extends Stage
     Image settingsPressedIcon = null;
     Image logoutIcon = null;
     Image logoutPressedIcon = null;
+    Image frameIcon = null;
     try
     {
       dashboardIcon = new Image( new FileInputStream( new File( "assets/icons/dashboard_black.png" ) ) );
@@ -78,6 +86,7 @@ public class MainFrame extends Stage
       settingsPressedIcon = new Image( new FileInputStream( new File( "assets/icons/settings_white.png" ) ) );
       logoutIcon = new Image( new FileInputStream( new File( "assets/icons/logout_black.png" ) ) );
       logoutPressedIcon = new Image( new FileInputStream( new File( "assets/icons/logout_white.png" ) ) );
+      frameIcon = new Image( new FileInputStream( new File( "assets/icons/frameicon128.png" ) ) );
     }
     catch ( final FileNotFoundException e )
     {
@@ -116,7 +125,7 @@ public class MainFrame extends Stage
           @Override
           public void run()
           {
-            //        setRightNode( new Dashboard() );
+            setRightNode( new CreditHistory() );
           }
         } );
     bar.addButton( scoreboardIcon, scoreboardPressedIcon, "Scoreboard", "Öffnet das Scoreboard",
@@ -125,17 +134,17 @@ public class MainFrame extends Stage
           @Override
           public void run()
           {
-            //        setRightNode( new Dashboard() );
+            setRightNode( new Scoreboard() );
           }
         } );
     bar.addSpace();
-    final ActionBarButton undoButton =
+    undoButton =
         bar.addButton( undoIcon, undoPressedIcon, "Rückgängig", "Letzte Aktion rückgänig machen", new Runnable()
         {
           @Override
           public void run()
           {
-            //        setRightNode( new Dashboard() );
+            ServerCommunication.getInstance().undoLastAction();
           }
         } );
     undoButton.setDisable( true );
@@ -144,7 +153,7 @@ public class MainFrame extends Stage
       @Override
       public void run()
       {
-        //        setRightNode( new Dashboard() );
+        setRightNode( new SettingsView() );
       }
     } );
     bar.addButton( logoutIcon, logoutPressedIcon, "Logout", "Ausloggen", new Runnable()
@@ -152,7 +161,18 @@ public class MainFrame extends Stage
       @Override
       public void run()
       {
-        //        setRightNode( new Dashboard() );
+        final Cache cache = Cache.getInstance();
+        cache.setSessionIDValid( false );
+        cache.setAdminUser( false );
+        cache.setDisplayname( null );
+        cache.setBalance( 0 );
+        ServerCommunication.getInstance().logout();
+        setUndoButtonEnabled( false );
+        GUIObjects.mainframe = null;
+        //Resetting the sessionID
+        PropertyHelper.setProperty( "SessionID", "null" );
+        close();
+        new Login();
       }
     } );
     bar.showLabels( false );
@@ -167,9 +187,22 @@ public class MainFrame extends Stage
     vBox.getChildren().add( content );
     setRightNode( new Dashboard() );
 
+    getIcons().add( frameIcon );
     setScene( new Scene( vBox ) );
     setHeight( 800 );
     setWidth( 1200 );
+    setMinHeight( 700 );
+    setMinWidth( 900 );
+    show();
+
+    setOnCloseRequest( new EventHandler<WindowEvent>()
+    {
+      @Override
+      public void handle( WindowEvent e )
+      {
+        System.exit( 0 );
+      }
+    } );
   }
 
   private void initHeader( ActionBarButton burgerButton )
@@ -181,14 +214,13 @@ public class MainFrame extends Stage
     usernameLabel.prefHeightProperty().bind( header.heightProperty() );
     balanceLabel.prefHeightProperty().bind( header.heightProperty() );
 
-    final BorderPane rightHeader = new BorderPane();
-    rightHeader.setPadding( new Insets( 0, 5, 0, 5 ) );
-    rightHeader.setLeft( usernameLabel );
-    rightHeader.setRight( balanceLabel );
+    applicationHeader = new BorderPane();
+    applicationHeader.setPadding( new Insets( 0, 5, 0, 5 ) );
+    applicationHeader.setLeft( usernameLabel );
+    applicationHeader.setRight( balanceLabel );
     header.setLeft( burgerButton );
-    header.setCenter( rightHeader );
-    rightHeader
-        .setBackground( new Background( new BackgroundFill( PropertyHelper.getAppColorProperty(), CornerRadii.EMPTY, Insets.EMPTY ) ) );
+    header.setCenter( applicationHeader );
+    updateHeaderColor();
   }
 
   private void setRightNode( Node node )
@@ -199,10 +231,14 @@ public class MainFrame extends Stage
     HBox.setHgrow( rightNode, Priority.ALWAYS );
   }
 
+  public void updateHeaderColor()
+  {
+    applicationHeader
+        .setBackground( new Background( new BackgroundFill( PropertyHelper.getAppColorProperty(), CornerRadii.EMPTY, Insets.EMPTY ) ) );
+  }
+
   public void updateBalanceLabel( Float newValue )
   {
-    System.out.println( "UPDATE BALANCE" );
-    System.out.println( newValue );
     balanceLabel.setText( String.format( "Kontostand: %.2f€", newValue ) );
   }
 
@@ -214,7 +250,7 @@ public class MainFrame extends Stage
 
   public void setUndoButtonEnabled( boolean enabled )
   {
-    // TODO(nwe|07.03.2022): Methode muss noch implementiert werden!
-
+    undoButton.setDisable( !enabled );
   }
+
 }

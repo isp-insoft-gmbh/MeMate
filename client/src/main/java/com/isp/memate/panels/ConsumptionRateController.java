@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -54,7 +55,7 @@ public class ConsumptionRateController
 
   private void addSeriesFor( String drink )
   {
-    final Map<String, Integer> amountMap = new HashMap<>();
+    final Map<String, Integer> amountMap = new LinkedHashMap<>();
     final DateFormat simpleDateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
     final Series<String, Number> series = new Series<String, Number>();
     series.setName( drink );
@@ -62,7 +63,7 @@ public class ConsumptionRateController
     final LocalDateTime now = LocalDateTime.now();
     final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
 
-    for ( int i = 0; i < 31; i++ )
+    for ( int i = 30; i >= 0; i-- )
     {
       amountMap.put( formatter.format( now.minusDays( i ) ).toString(), 0 );
     }

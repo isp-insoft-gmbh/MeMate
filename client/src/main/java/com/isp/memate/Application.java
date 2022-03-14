@@ -1,5 +1,6 @@
 package com.isp.memate;
 
+import com.isp.memate.util.Compare;
 import com.isp.memate.util.PropertyHelper;
 
 import javafx.stage.Stage;
@@ -27,16 +28,14 @@ public class Application extends javafx.application.Application
 
   private static void showMainframe()
   {
-    final MainFrame mainFrame = new MainFrame();
-    mainFrame.show();
-    //      Compare.checkVersion();
+    new MainFrame();
+    Compare.checkVersion();
   }
 
   private static void showLogin()
   {
-    final Login login = new Login();
-    login.show();
-    //      Compare.checkVersion();
+    new Login();
+    Compare.checkVersion();
   }
 }
 

@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 
 import com.isp.memate.Drink;
 import com.isp.memate.ServerCommunication;
+import com.isp.memate.util.GUIObjects;
 
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -36,6 +37,7 @@ public class DrinkButtonController implements Initializable
   public void buttonClicked( Event e )
   {
     ServerCommunication.getInstance().consumeDrink( drink );
+    GUIObjects.mainframe.setUndoButtonEnabled( true );
   }
 
 
@@ -55,5 +57,13 @@ public class DrinkButtonController implements Initializable
     {
       // TODO(nwe|08.03.2022): Fehlerbehandlung muss noch implementiert werden!
     }
+    initializePopUpForInfoIcon();
+  }
+
+
+  private void initializePopUpForInfoIcon()
+  {
+    // TODO(nwe|11.03.2022): Methode muss noch implementiert werden!
+
   }
 }

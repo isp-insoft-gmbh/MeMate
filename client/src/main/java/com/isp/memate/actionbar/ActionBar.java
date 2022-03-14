@@ -142,5 +142,6 @@ public class ActionBar extends VBox
     {
       buttonWithLabel.showLabel( showLabels );
     }
+    minWidth( getPrefWidth() );
   }
 }

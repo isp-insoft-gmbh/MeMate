@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefWidth="250.0">
+         <children>
+            <Label alignment="CENTER" prefWidth="250.0" text="weekly">
+               <font>
+                  <Font name="System" size="20.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" prefWidth="250.0" text="- Scoreboard -">
+               <font>
+                  <Font name="System" size="26.0" />
+               </font>
+            </Label>
+            <Label fx:id="weeklyFirstLabel" alignment="CENTER" prefWidth="250.0" textFill="GOLD" visible="false">
+               <padding>
+                  <Insets top="5.0" />
+               </padding>
+               <font>
+                  <Font name="System" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="weeklySecondLabel" alignment="CENTER" prefWidth="250.0" textFill="SILVER" visible="false">
+               <font>
+                  <Font name="System" size="22.0" />
+               </font>
+            </Label>
+            <Label fx:id="weeklyThirdLabel" alignment="CENTER" prefWidth="250.0" textFill="#cc8e34" visible="false">
+               <font>
+                  <Font name="System" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="weeklyFourthLabel" alignment="CENTER" prefWidth="250.0" textFill="#7f7679" visible="false">
+               <font>
+                  <Font name="System" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="weeklyFifthLabel" alignment="CENTER" prefWidth="250.0" textFill="#7f7679" visible="false">
+               <font>
+                  <Font name="System" size="16.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <VBox prefWidth="200.0" spacing="5.0">
+         <children>
+            <GridPane fx:id="acitvity1Pane" prefWidth="167.0" style="-fx-background-color: LIGHTGRAY;" visible="false">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="156.0" minWidth="10.0" prefWidth="123.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="79.0" minWidth="10.0" prefWidth="34.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label fx:id="acitvity1NameLabel">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="acitvity1DateLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="acitvity1DrinkLabel" prefHeight="27.0" prefWidth="125.0" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </GridPane>
+            <GridPane fx:id="acitvity2Pane" prefWidth="167.0" style="-fx-background-color: LIGHTGRAY;" visible="false">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="156.0" minWidth="10.0" prefWidth="123.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="79.0" minWidth="10.0" prefWidth="34.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label fx:id="acitvity2NameLabel">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="acitvity2DateLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="acitvity2DrinkLabel" prefHeight="27.0" prefWidth="125.0" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </GridPane>
+            <GridPane fx:id="acitvity3Pane" prefWidth="167.0" style="-fx-background-color: LIGHTGRAY;" visible="false">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="156.0" minWidth="10.0" prefWidth="123.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="79.0" minWidth="10.0" prefWidth="34.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label fx:id="acitvity3NameLabel">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="acitvity3DateLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="acitvity3DrinkLabel" prefHeight="27.0" prefWidth="125.0" visible="false" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </GridPane>
+            <GridPane fx:id="acitvity4Pane" prefWidth="167.0" style="-fx-background-color: LIGHTGRAY;" visible="false">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="156.0" minWidth="10.0" prefWidth="123.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="79.0" minWidth="10.0" prefWidth="34.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label fx:id="acitvity4NameLabel">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="acitvity4DateLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="acitvity4DrinkLabel" prefHeight="27.0" prefWidth="125.0" visible="false" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </GridPane>
+            <GridPane fx:id="acitvity5Pane" prefWidth="167.0" style="-fx-background-color: LIGHTGRAY;" visible="false">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="156.0" minWidth="10.0" prefWidth="123.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="79.0" minWidth="10.0" prefWidth="34.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label fx:id="acitvity5NameLabel">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="acitvity5DateLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="acitvity5DrinkLabel" prefHeight="27.0" prefWidth="125.0" visible="false" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </GridPane>
+         </children>
+      </VBox>
+      <VBox prefWidth="250.0">
+         <children>
+            <Label alignment="CENTER" prefWidth="250.0" text="overall">
+               <font>
+                  <Font name="System" size="20.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" prefWidth="250.0" text="- Scoreboard -">
+               <font>
+                  <Font name="System" size="26.0" />
+               </font>
+            </Label>
+            <Label fx:id="overallFirstLabel" alignment="CENTER" prefWidth="250.0" textFill="GOLD" visible="false">
+               <padding>
+                  <Insets top="5.0" />
+               </padding>
+               <font>
+                  <Font name="System" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="overallSecondLabel" alignment="CENTER" prefWidth="250.0" textFill="SILVER" visible="false">
+               <font>
+                  <Font name="System" size="22.0" />
+               </font>
+            </Label>
+            <Label fx:id="overallThirdLabel" alignment="CENTER" prefWidth="250.0" textFill="#cc8e34" visible="false">
+               <font>
+                  <Font name="System" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="overallFourthLabel" alignment="CENTER" prefWidth="250.0" textFill="#7f7679" visible="false">
+               <font>
+                  <Font name="System" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="overallFifthLabel" alignment="CENTER" prefWidth="250.0" textFill="#7f7679" visible="false">
+               <font>
+                  <Font name="System" size="16.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+   </children>
+</HBox>

@@ -94,16 +94,13 @@ public class PropertyHelper
 
   public static Color getAppColorProperty()
   {
-    final String appColor = PropertyHelper.getProperty( "AppColor" );
+    final String appColor = PropertyHelper.getProperty( "FXAppColor" );
     //Default-Value falls die Property nicht gefunden wurde
     if ( appColor == null )
     {
       return Color.CYAN;
     }
-    //TODO(nwe | 08.03.2022): 
-    //    final int rgb = Integer.valueOf( appColor );
-    //    return Color.valueOf( appColor );
-    return Color.ORANGE;
+    return Color.valueOf( appColor );
   }
 
   public static boolean getDarkModeProperty()
