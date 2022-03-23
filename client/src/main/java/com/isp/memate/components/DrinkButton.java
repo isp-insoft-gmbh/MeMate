@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import com.isp.memate.Drink;
+import com.isp.memate.util.PropertyHelper;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -36,9 +37,11 @@ public class DrinkButton extends VBox
       loader.setLocation( fxmlUrl );
       currentState = loader.<VBox>load();
       getChildren().add( currentState );
-      setBorder( new Border( new BorderStroke( Color.LIGHTGRAY,
+      setBorder( new Border( new BorderStroke( PropertyHelper.getDarkModeProperty() ? Color.DARKGRAY : Color.LIGHTGRAY,
           BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT ) ) );
-      setBackground( new Background( new BackgroundFill( Color.WHITE, CornerRadii.EMPTY, new Insets( 0 ) ) ) );
+
+      setBackground( new Background(
+          new BackgroundFill( PropertyHelper.getDarkModeProperty() ? Color.GRAY : Color.WHITE, CornerRadii.EMPTY, new Insets( 0 ) ) ) );
     }
     catch ( final IOException e )
     {

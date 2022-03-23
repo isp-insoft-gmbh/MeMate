@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+import com.isp.memate.util.GUIObjects;
+import com.isp.memate.util.MeMateUIManager;
+
 import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Priority;
@@ -41,6 +44,7 @@ public class ActionBar extends VBox
 
   public ActionBar( Stage primaryStage )
   {
+    GUIObjects.actionBar = this;
     burgerButton = createBurgerButton();
     prefHeightProperty().bind( primaryStage.heightProperty() );
   }
@@ -143,5 +147,23 @@ public class ActionBar extends VBox
       buttonWithLabel.showLabel( showLabels );
     }
     minWidth( getPrefWidth() );
+  }
+
+  public void reverseIcons()
+  {
+    for ( final ActionBarButton actionBarButton : buttonList )
+    {
+      actionBarButton.reverseIcons();
+    }
+    burgerButton.reverseIcons();
+  }
+
+  public void updateBackground()
+  {
+    for ( final ActionBarButton actionBarButton : buttonList )
+    {
+      actionBarButton.setBackground( MeMateUIManager.getDefaultBackground() );
+    }
+    burgerButton.setBackground( MeMateUIManager.getDefaultBackground() );
   }
 }

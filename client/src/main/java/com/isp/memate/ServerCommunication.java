@@ -35,9 +35,9 @@ import javafx.scene.control.Alert.AlertType;
 
 /**
  * Die Klasse ServerCommunication kommuniziert mit dem Server und schickt
- * verschiedenen Shared-Objekte an der Server. Beispielsweise bei checkLogin
+ * verschiedenen Shared-Objekte an den Server. Beispielsweise bei checkLogin
  * schickt die Klasse ein Objekt, welches den Befehl CHECK_LOGIN und ein
- * Userobjekt, welches Nutzername und gehashtes Passwort enthält an der Server.
+ * Userobjekt, welches Nutzername und gehashtes Passwort enthält an den Server.
  *
  * @author nwe
  * @since 24.10.2019
@@ -53,13 +53,6 @@ public class ServerCommunication
   private ObjectOutputStream               outStream;
   private TrayIcon                         trayIcon                  = null;
 
-  /**
-   * @return the static instance of {@link ServerCommunication}
-   */
-  public static ServerCommunication getInstance()
-  {
-    return instance;
-  }
 
   /**
    * Erzeugt eine Socketverbindung zum Server. Außerdem wird ein Output- und
@@ -97,6 +90,14 @@ public class ServerCommunication
 
     startReceiverThread();
     startMeetingNotificationThread();
+  }
+
+  /**
+   * @return the static instance of {@link ServerCommunication}
+   */
+  public static ServerCommunication getInstance()
+  {
+    return instance;
   }
 
   /**

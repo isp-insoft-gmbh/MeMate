@@ -14,7 +14,7 @@ public class History extends TableView<HistoryObject>
 {
   public History()
   {
-    setEditable( true );
+    setEditable( false );
 
     final TableColumn<HistoryObject, String> actionCol = new TableColumn<>( "Aktion" );
     final TableColumn<HistoryObject, String> consumerCol = new TableColumn<>( "Benutzer" );

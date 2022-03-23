@@ -1,5 +1,8 @@
 package com.isp.memate.actionbar;
 
+import com.isp.memate.util.MeMateUIManager;
+import com.isp.memate.util.PropertyHelper;
+
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -11,7 +14,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 
 /**
  * Diese Klasse repräsentiert einen Button für die {@link ActionBar ActionBar}.
@@ -24,23 +26,17 @@ import javafx.scene.paint.Color;
  */
 public class ActionBarButton extends HBox
 {
-
   private boolean         marked      = false;
   private final Label     label       = new Label();
   private final Label     markerLabel = new Label();
   private final ImageView imageView   = new ImageView();
-  private final Image     icon, pressedIcon;
+  private Image           icon;
+  private Image           pressedIcon;
   private final ActionBar actionBar;
   private final Runnable  runnable;
 
-  private final Background defaultBackground = new Background(
-      new BackgroundFill( Color.WHITESMOKE, CornerRadii.EMPTY, Insets.EMPTY ) );
-  private final Background hoverBackground   = new Background(
-      new BackgroundFill( Color.rgb( 169, 169, 169 ), CornerRadii.EMPTY, Insets.EMPTY ) );
-  private final Background pressedBackground = new Background(
-      new BackgroundFill( Color.rgb( 118, 118, 118 ), CornerRadii.EMPTY, Insets.EMPTY ) );
-  private final Background markerBackground  = new Background(
-      new BackgroundFill( Color.ROYALBLUE, CornerRadii.EMPTY, Insets.EMPTY ) );
+  private final Background markerBackground = new Background(
+      new BackgroundFill( PropertyHelper.getAppColorProperty(), CornerRadii.EMPTY, Insets.EMPTY ) );
 
   /**
    * Erstellt einen neuen ActionBarButton
@@ -89,6 +85,7 @@ public class ActionBarButton extends HBox
     setSpacing( 5 );
     setPadding( new Insets( 9, 9, 9, 0 ) );
     applyEventHandler( isBurgerButton );
+    setBackground( MeMateUIManager.getDefaultBackground() );
   }
 
   /**
@@ -105,7 +102,7 @@ public class ActionBarButton extends HBox
       @Override
       public void handle( MouseEvent event )
       {
-        setBackground( hoverBackground );
+        setBackground( MeMateUIManager.getHoverBackground() );
         if ( !isBurgerButton )
         {
           actionBar.resetMarker();
@@ -122,10 +119,10 @@ public class ActionBarButton extends HBox
       @Override
       public void handle( MouseEvent event )
       {
-        setBackground( hoverBackground );
+        setBackground( MeMateUIManager.getHoverBackground() );
         if ( !marked )
         {
-          markerLabel.setBackground( hoverBackground );
+          markerLabel.setBackground( MeMateUIManager.getHoverBackground() );
         }
         event.consume();
       }
@@ -137,11 +134,11 @@ public class ActionBarButton extends HBox
       @Override
       public void handle( MouseEvent event )
       {
-        setBackground( defaultBackground );
+        setBackground( MeMateUIManager.getDefaultBackground() );
         imageView.setImage( icon );
         if ( !marked )
         {
-          markerLabel.setBackground( defaultBackground );
+          markerLabel.setBackground( MeMateUIManager.getDefaultBackground() );
         }
         event.consume();
       }
@@ -153,11 +150,11 @@ public class ActionBarButton extends HBox
       @Override
       public void handle( MouseEvent event )
       {
-        setBackground( pressedBackground );
+        setBackground( MeMateUIManager.getPressedBackground() );
         imageView.setImage( pressedIcon );
         if ( !marked )
         {
-          markerLabel.setBackground( pressedBackground );
+          markerLabel.setBackground( MeMateUIManager.getPressedBackground() );
         }
         event.consume();
       }
@@ -168,11 +165,11 @@ public class ActionBarButton extends HBox
       @Override
       public void handle( MouseEvent event )
       {
-        setBackground( hoverBackground );
+        setBackground( MeMateUIManager.getHoverBackground() );
         imageView.setImage( icon );
         if ( !marked )
         {
-          markerLabel.setBackground( hoverBackground );
+          markerLabel.setBackground( MeMateUIManager.getHoverBackground() );
         }
         event.consume();
       }
@@ -201,5 +198,12 @@ public class ActionBarButton extends HBox
     {
       markerLabel.setBackground( getBackground() );
     }
+  }
+
+  public void reverseIcons()
+  {
+    final Image icon = this.icon;
+    this.icon = this.pressedIcon;
+    this.pressedIcon = icon;
   }
 }

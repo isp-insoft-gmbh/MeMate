@@ -13,6 +13,7 @@ import com.isp.memate.panels.History;
 import com.isp.memate.panels.Scoreboard;
 import com.isp.memate.panels.SettingsView;
 import com.isp.memate.util.GUIObjects;
+import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.PropertyHelper;
 
 import javafx.event.EventHandler;
@@ -40,6 +41,7 @@ public class MainFrame extends Stage
   private final BorderPane      header        = new BorderPane();
   private final Label           usernameLabel = new Label( "" );
   private final Label           balanceLabel  = new Label( "" );
+  private final Scene           scene;
   private final ActionBarButton undoButton;
   private BorderPane            applicationHeader;
 
@@ -137,6 +139,15 @@ public class MainFrame extends Stage
             setRightNode( new Scoreboard() );
           }
         } );
+    //    bar.addButton( scoreboardIcon, scoreboardPressedIcon, "Admin", "Test",
+    //        new Runnable()
+    //        {
+    //          @Override
+    //          public void run()
+    //          {
+    //            setRightNode( new AdminView() );
+    //          }
+    //        } );
     bar.addSpace();
     undoButton =
         bar.addButton( undoIcon, undoPressedIcon, "Rückgängig", "Letzte Aktion rückgänig machen", new Runnable()
@@ -188,12 +199,19 @@ public class MainFrame extends Stage
     setRightNode( new Dashboard() );
 
     getIcons().add( frameIcon );
-    setScene( new Scene( vBox ) );
+    scene = new Scene( vBox );
+    MeMateUIManager.applyTheme( scene );
+    setScene( scene );
     setHeight( 800 );
     setWidth( 1200 );
     setMinHeight( 700 );
     setMinWidth( 900 );
     show();
+
+    if ( PropertyHelper.getDarkModeProperty() )
+    {
+      bar.reverseIcons();
+    }
 
     setOnCloseRequest( new EventHandler<WindowEvent>()
     {

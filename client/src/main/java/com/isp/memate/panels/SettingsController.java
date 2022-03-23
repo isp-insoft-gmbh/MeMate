@@ -8,6 +8,7 @@ import org.controlsfx.control.ToggleSwitch;
 
 import com.isp.memate.ServerCommunication;
 import com.isp.memate.util.GUIObjects;
+import com.isp.memate.util.MeMateUIManager;
 import com.isp.memate.util.PropertyHelper;
 import com.isp.memate.util.Util;
 
@@ -111,6 +112,9 @@ public class SettingsController implements Initializable
                            Toggle old_toggle, Toggle new_toggle )
       {
         PropertyHelper.setProperty( "Darkmode", String.valueOf( darkModeRadioButton.isSelected() ) );
+        MeMateUIManager.applyTheme( GUIObjects.mainframe.getScene() );
+        GUIObjects.actionBar.updateBackground();
+        GUIObjects.actionBar.reverseIcons();
       }
     } );
   }
